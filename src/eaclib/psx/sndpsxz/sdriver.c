@@ -20,52 +20,53 @@
  */
 
 /* --- packet-voice table fields (0x2c stride) --- */
-extern "C" int           &DAT_801479f8;     /* +0x08 hw pitch/rate (int view: [chan*0xb]) */
-extern "C" char          &DAT_801479f0;     /* +0x00 voice-table base (byte, for hook arg)  */
-extern "C" unsigned char &DAT_80147a08;     /* +0x18 volume angle/pan (u16) */
-extern "C" unsigned char &DAT_80147a0a;     /* +0x1a base pitch (u16)       */
-extern "C" unsigned char &DAT_80147a0c;     /* +0x1c playstate              */
-extern "C" unsigned char &DAT_80147a0d;     /* +0x1d substate               */
-extern "C" unsigned char &DAT_80147a0e;     /* +0x1e volume routing mode    */
-extern "C" unsigned char &DAT_80147a0f;     /* +0x1f channel count          */
-extern "C" unsigned char &DAT_80147a10;     /* +0x20 linked voice index     */
-extern "C" unsigned char &DAT_80147a12;     /* +0x22 cached level           */
-extern "C" unsigned char &DAT_80147a13;     /* +0x23 cached fx level        */
-extern "C" unsigned char &DAT_80147a14;     /* +0x24 L out cache            */
-extern "C" unsigned char &DAT_80147a15;     /* +0x25 R out cache            */
-extern "C" unsigned char &DAT_80147a17;     /* +0x27 voice-done flag (bit7) */
-extern "C" unsigned char &DAT_80147a18;     /* +0x28 pitch-dirty flag       */
+extern "C" int &DAT_801479f8;           /* +0x08 hw pitch/rate (int view: [chan*0xb]) */
+extern "C" char &DAT_801479f0;          /* +0x00 voice-table base (byte, for hook arg)  */
+extern "C" unsigned char &DAT_80147a08; /* +0x18 volume angle/pan (u16) */
+extern "C" unsigned char &DAT_80147a0a; /* +0x1a base pitch (u16)       */
+extern "C" unsigned char &DAT_80147a0c; /* +0x1c playstate              */
+extern "C" unsigned char &DAT_80147a0d; /* +0x1d substate               */
+extern "C" unsigned char &DAT_80147a0e; /* +0x1e volume routing mode    */
+extern "C" unsigned char &DAT_80147a0f; /* +0x1f channel count          */
+extern "C" unsigned char &DAT_80147a10; /* +0x20 linked voice index     */
+extern "C" unsigned char &DAT_80147a12; /* +0x22 cached level           */
+extern "C" unsigned char &DAT_80147a13; /* +0x23 cached fx level        */
+extern "C" unsigned char &DAT_80147a14; /* +0x24 L out cache            */
+extern "C" unsigned char &DAT_80147a15; /* +0x25 R out cache            */
+extern "C" unsigned char &DAT_80147a17; /* +0x27 voice-done flag (bit7) */
+extern "C" unsigned char &DAT_80147a18; /* +0x28 pitch-dirty flag       */
 
 /* "voice has finished" notifier installed by the host (@0x8014803C) */
 extern "C" void (*snd_voice_done_hook)(void *voice);
 
 /* dependencies in sibling objs */
-extern "C" intptr_t     iSNDfreechan(int chan);                       /* salloc  */
-extern "C" int          iSNDpsxkeyoff(int mask);                      /* spatkey */
-extern "C" unsigned int iSNDpsxeffecton(int mask);                    /* spatkey */
-extern "C" unsigned int iSNDpsxeffectoff(int mask);                   /* spatkey */
-extern "C" unsigned int iSNDsetvol(int chan, int left, int right);    /* spatkey */
-extern "C" void iSNDatolrv(unsigned int pan, int level, int *outL, int *outR);                 /* saetolrv */
-extern "C" void iSNDatodlrv(unsigned int pan, int level, int *outL, int *outR, int pL, int pR);/* saetodv  */
+extern "C" intptr iSNDfreechan(int chan);                                                       /* salloc  */
+extern "C" int iSNDpsxkeyoff(int mask);                                                         /* spatkey */
+extern "C" unsigned int iSNDpsxeffecton(int mask);                                              /* spatkey */
+extern "C" unsigned int iSNDpsxeffectoff(int mask);                                             /* spatkey */
+extern "C" unsigned int iSNDsetvol(int chan, int left, int right);                              /* spatkey */
+extern "C" void iSNDatolrv(unsigned int pan, int level, int *outL, int *outR);                  /* saetolrv */
+extern "C" void iSNDatodlrv(unsigned int pan, int level, int *outL, int *outR, int pL, int pR); /* saetodv  */
 
-extern "C" int iSNDstop(unsigned int chan);                           /* @0x800FFE90 */
-extern "C" int iSNDvol(int chan, int level);                          /* @0x801000F8 */
+extern "C" int iSNDstop(unsigned int chan);  /* @0x800FFE90 */
+extern "C" int iSNDvol(int chan, int level); /* @0x801000F8 */
 
 /* iSNDstop @0x800FFE90 : silence a hardware voice (and its linked partner).  Fires the voice-done hook
  *   unless already flagged, releases the channel(s) back to the pool, marks them idle and strobes the SPU
  *   key-off for the combined voice mask. */
 extern "C" int iSNDstop(unsigned int chan)
 {
-    int          vt = (int)chan * 0x2c;
+    int vt = (int)chan * 0x2c;
     unsigned int mask, link;
 
-    if (-1 < (int)((unsigned)(&DAT_80147a17)[vt] << 0x18))     /* voice-done bit clear -> notify */
+    if (-1 < (int)((unsigned)(&DAT_80147a17)[vt] << 0x18)) /* voice-done bit clear -> notify */
         (*snd_voice_done_hook)(&DAT_801479f0 + vt);
     iSNDfreechan((int)chan);
     (&DAT_80147a0d)[vt] = 3;
     (&DAT_80147a0c)[vt] = 0;
     mask = 1u << (chan & 0x1f);
-    if (1 < (&DAT_80147a0f)[vt]) {                             /* linked pair -> stop the partner too */
+    if (1 < (&DAT_80147a0f)[vt])
+    { /* linked pair -> stop the partner too */
         link = (unsigned)(char)(&DAT_80147a10)[vt];
         iSNDfreechan((int)link);
         mask |= 1u << (link & 0x1f);
@@ -82,10 +83,10 @@ extern "C" int iSNDplatformpitch(int chan, int pitch)
 {
     int vt = chan * 0x2c;
 
-    (&DAT_801479f8)[chan * 0xb] =
-        ((int)((unsigned)*(unsigned short *)(&DAT_80147a0a + vt) * pitch) >> 0xc) * 0x1b9;
+    (&DAT_801479f8)[chan * 0xb] = ((int)((unsigned)*(unsigned short *)(&DAT_80147a0a + vt) * pitch) >> 0xc) * 0x1b9;
     (&DAT_80147a18)[vt] = 1;
-    if ((&DAT_80147a0f)[vt] == 2) {                            /* linked pair shares the pitch */
+    if ((&DAT_80147a0f)[vt] == 2)
+    { /* linked pair shares the pitch */
         int link = (char)(&DAT_80147a10)[vt];
         (&DAT_801479f8)[link * 0xb] = (&DAT_801479f8)[chan * 0xb];
         (&DAT_80147a18)[link * 0x2c] = 1;
@@ -99,15 +100,16 @@ extern "C" int iSNDplatformpitch(int chan, int pitch)
  *   overwrites $a1 with the playstate), `fxon` is $a2 -- matches SNDfxlevel's iSNDplatformfxlevel(voice,bus,fxArg). */
 extern "C" int iSNDplatformfxlevel(unsigned int chan, int bus, int fxon)
 {
-    int          vt = (int)chan * 0x2c;
+    int vt = (int)chan * 0x2c;
     unsigned int mask;
-    (void)bus;        /* 3-arg per IDA/disasm (a1=bus is overwritten by the playstate read); fxon is a2 */
+    (void)bus; /* 3-arg per IDA/disasm (a1=bus is overwritten by the playstate read); fxon is a2 */
 
-    if ((&DAT_80147a0c)[vt] != 2) {                           /* not playing -> cache for next key-on */
+    if ((&DAT_80147a0c)[vt] != 2)
+    { /* not playing -> cache for next key-on */
         (&DAT_80147a13)[vt] = (char)fxon;
         return 0;
     }
-    mask = 1u << (chan & 0x1f);                               /* (computed even when the branch below skips) */
+    mask = 1u << (chan & 0x1f); /* (computed even when the branch below skips) */
     if ((&DAT_80147a0f)[vt] == 2)
         mask |= 1u << ((unsigned char)(&DAT_80147a10)[vt] & 0x1f);
     if (fxon == 0)
@@ -126,15 +128,15 @@ extern "C" int iSNDvol(int chan, int level)
     int vt = chan * 0x2c;
     int outL = 0, outR = 0;
 
-    if ((&DAT_80147a0c)[vt] != 2) {                           /* not playing -> cache the level */
+    if ((&DAT_80147a0c)[vt] != 2)
+    { /* not playing -> cache the level */
         (&DAT_80147a12)[vt] = (char)level;
         return 0;
     }
-    if ((&DAT_80147a0e)[vt] == 0)                             /* absolute L/R from level */
+    if ((&DAT_80147a0e)[vt] == 0) /* absolute L/R from level */
         iSNDatolrv((unsigned)*(unsigned short *)(&DAT_80147a08 + vt), level, &outL, &outR);
-    else if ((&DAT_80147a0e)[vt] == 1)                        /* delta from current L/R cache */
-        iSNDatodlrv((unsigned)*(unsigned short *)(&DAT_80147a08 + vt), level, &outL, &outR,
-                    (int)(signed char)(&DAT_80147a14)[vt], (int)(signed char)(&DAT_80147a15)[vt]);
+    else if ((&DAT_80147a0e)[vt] == 1) /* delta from current L/R cache */
+        iSNDatodlrv((unsigned)*(unsigned short *)(&DAT_80147a08 + vt), level, &outL, &outR, (int)(signed char)(&DAT_80147a14)[vt], (int)(signed char)(&DAT_80147a15)[vt]);
     (&DAT_80147a14)[vt] = (unsigned char)outL;
     (&DAT_80147a15)[vt] = (unsigned char)outR;
     iSNDsetvol(chan, outL, outR);

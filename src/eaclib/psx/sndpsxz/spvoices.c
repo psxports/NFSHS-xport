@@ -7,31 +7,30 @@
 #include "../../../lib/snd.h"
 
 /* ---- sst.obj internals (the layer below) + stream/pktplay/ssysserv backends ---- */
-extern "C" int  iSNDstreamcreate(int *priority, int numReq, int pktArg, intptr_t objbuf,
-                                 int memsize, int extHandle, int extFlag);   /* @0x800E9730 */
-extern "C" SndStreamState *iSNDstreamgetstreamptr(int idx);                 /* @0x800E8C48 */
-extern "C" int  iSNDstreamnumcreated(void);                                 /* @0x800E96F8 */
-extern "C" int  iSNDstreamqueue(unsigned int s, int name, char *filename, int off, int mode); /* @0x800E9970 */
-extern "C" void iSNDstreamservice(void);                                    /* @0x800E9590 (serve hook) */
-extern "C" void SNDPKTPLAY_destroy(int pktplay);                            /* spktplay */
+extern "C" int iSNDstreamcreate(int *priority, int numReq, int pktArg, intptr objbuf, int memsize, int extHandle, int extFlag); /* @0x800E9730 */
+extern "C" SndStreamState *iSNDstreamgetstreamptr(int idx);                                                                     /* @0x800E8C48 */
+extern "C" int iSNDstreamnumcreated(void);                                                                                      /* @0x800E96F8 */
+extern "C" int iSNDstreamqueue(unsigned int s, int name, char *filename, int off, int mode);                                    /* @0x800E9970 */
+extern "C" void iSNDstreamservice(void);                                                                                        /* @0x800E9590 (serve hook) */
+extern "C" void SNDPKTPLAY_destroy(int pktplay);                                                                                /* spktplay */
 extern "C" void SNDPKTPLAY_stop(int pktplay);
-extern "C" void STREAM_destroy(intptr_t strm);                              /* stream.obj */
-extern "C" void STREAM_kill(intptr_t strm);
-extern "C" void iSNDserverremoveclient(void *cb);                           /* ssysserv */
+extern "C" void STREAM_destroy(intptr strm); /* stream.obj */
+extern "C" void STREAM_kill(intptr strm);
+extern "C" void iSNDserverremoveclient(void *cb); /* ssysserv */
 #ifndef _MSC_VER
 extern "C" void *memset(void *d, int c, int n);
 #endif
 
-extern "C" intptr_t (&sndss)[1];
-extern "C" int sndgs[];                      /* (char)sndgs[0xf] = init flag, sndgs[0x22] = destroyall hook */
+extern "C" intptr (&sndss)[1];
+extern "C" int sndgs[]; /* (char)sndgs[0xf] = init flag, sndgs[0x22] = destroyall hook */
 
-extern "C" void SNDSTRM_purge(int s);        /* @0x800E9C58 (fwd: destroy calls it) */
+extern "C" void SNDSTRM_purge(int s); /* @0x800E9C58 (fwd: destroy calls it) */
 
 /* SNDSTRM_create @0x800E9B44 : create a streaming voice with its OWN ring (extHandle/extFlag forced 0).
  *   Returns the stream slot or a negative error. */
 extern "C" int SNDSTRM_create(int *priority, int numReq, int pktArg, void *objbuf, int memsize)
 {
-    return iSNDstreamcreate(priority, numReq, pktArg, (intptr_t)objbuf, memsize, 0, 0);
+    return iSNDstreamcreate(priority, numReq, pktArg, (intptr)objbuf, memsize, 0, 0);
 }
 
 /* SNDSTRM_destroy @0x800E9B70 : purge and tear down a streaming voice; when the last one goes, unhook the
@@ -46,7 +45,8 @@ extern "C" int SNDSTRM_destroy(int s)
         return -8;
 
     SNDSTRM_purge(s);
-    if (iSNDstreamnumcreated() == 1) {                  /* this is the last live stream */
+    if (iSNDstreamnumcreated() == 1)
+    { /* this is the last live stream */
         iSNDserverremoveclient((void *)iSNDstreamservice);
         sndgs[0x22] = 0;
     }
@@ -68,7 +68,8 @@ extern "C" int SNDSTRM_queuefile(int s, int name, char *filename, long off)
 extern "C" void SNDSTRM_purge(int s)
 {
     SndStreamState *S;
-    if ((char)sndgs[0xf] != 0 && (S = iSNDstreamgetstreamptr(s)) != 0) {
+    if ((char)sndgs[0xf] != 0 && (S = iSNDstreamgetstreamptr(s)) != 0)
+    {
         if (-1 < S->playResult)
             SNDPKTPLAY_stop(S->packetPlayer);
         S->playResult = -1;

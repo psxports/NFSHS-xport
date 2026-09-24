@@ -43,26 +43,30 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <ReconRoot>$(ProjectDir)..\..\</ReconRoot>
-    <OutDir>$(ProjectDir)..\..\..\bin\</OutDir>
+    <XportRoot>$(ProjectDir)..\..\..\..\xport\</XportRoot>
+    <NativeOutDir>$(ProjectDir)..\..\..\bin\</NativeOutDir>
+    <OutDir>$(ProjectDir)..\..\..\_build\msvc\$(Configuration)\out\</OutDir>
     <IntDir>$(ProjectDir)..\..\..\_build\msvc\$(Configuration)\</IntDir>
     <TargetExt>.exe</TargetExt>
-    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(NativeOutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>NFSHS-debug</TargetName>
-    <LocalDebuggerCommand>$(OutDir)NFSHS-debug.exe</LocalDebuggerCommand>
+    <TargetName>NFSHS</TargetName>
+    <LocalDebuggerCommand>$(NativeOutDir)NFSHS.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>NFSHS</TargetName>
-    <LocalDebuggerCommand>$(OutDir)NFSHS.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(NativeOutDir)NFSHS.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>AP_WIN=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>$(ProjectDir)diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>AP_WIN=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=1;WND_TITLE=&quot;Need For Speed: High Stakes (xport)&quot;;WND_WIDTH=640;WND_HEIGHT=480;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ReconRoot);$(XportRoot)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ReconRoot)host\diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -74,6 +78,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateFullProgramDatabaseFile>true</GenerateFullProgramDatabaseFile>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -88,12 +93,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>AP_WIN=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=0;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>$(ProjectDir)diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>AP_WIN=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=0;NDEBUG;WND_TITLE=&quot;Need For Speed: High Stakes (xport)&quot;;WND_WIDTH=640;WND_HEIGHT=480;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ReconRoot);$(XportRoot)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ReconRoot)host\diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -104,6 +111,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateFullProgramDatabaseFile>true</GenerateFullProgramDatabaseFile>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -130,9 +138,28 @@
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="$(ReconRoot)address.cpp;$(ReconRoot)bigbuf.cpp;$(ReconRoot)materialized_data.cpp;$(ReconRoot)link_data.cpp;$(ReconRoot)link_dat.cpp;$(ReconRoot)link_defs.cpp;$(ReconRoot)link_ida.cpp;$(ReconRoot)link_init.cpp;$(ReconRoot)link_ptr.cpp" />
-    <ClCompile Include="link_hwreg.cpp;link_runtime.cpp;link_stubs.cpp;link_trampolines.cpp;psx_host.cpp;psx_crt_compat.cpp;windows_runtime.cpp;windows_sim_telemetry.cpp;psx_memory.cpp" />
-    <ClCompile Include="psx.c;spu_core.c;audio_waveout.c">
+    <ClCompile Include="$(XportRoot)src\platform\win\main.c">
+      <ObjectFileName>$(IntDir)xport_main.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="$(ReconRoot)host\link_hwreg.cpp;$(ReconRoot)host\link_runtime.cpp;$(ReconRoot)host\link_stubs.cpp;$(ReconRoot)host\link_trampolines.cpp;$(ReconRoot)host\psx_host.cpp;$(ReconRoot)host\psx_crt_compat.cpp;$(ReconRoot)host\host_runtime.cpp;$(ReconRoot)host\host_sim_telemetry.cpp;$(ReconRoot)host\psx_memory.cpp" />
+    <ClCompile Include="$(XportRoot)src\psx_spu.c">
       <CompileAs>CompileAsC</CompileAs>
+      <ObjectFileName>$(IntDir)xport_psx_spu.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="$(XportRoot)src\psx_gpu.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <ObjectFileName>$(IntDir)xport_psx_gpu.obj</ObjectFileName>
+      <Optimization Condition="'$(Configuration)'=='Debug'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)'=='Debug'">Default</BasicRuntimeChecks>
+    </ClCompile>
+    <ClCompile Include="$(XportRoot)src\psx_pad.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <ObjectFileName>$(IntDir)xport_psx_pad.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="$(XportRoot)src\psx.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <ObjectFileName>$(IntDir)xport_psx_memory.obj</ObjectFileName>
+      <PreprocessorDefinitions>XPORT_PSX_MEMORY_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Update="$(ReconRoot)game\common\spchevnt.c">
       <ObjectFileName>$(IntDir)game_spchevnt.obj</ObjectFileName>
@@ -143,7 +170,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(ReconRoot)**\*.h;$(ReconRoot)**\*.hpp" />
+    <ClInclude Include="$(XportRoot)src\xport.h" />
+    <ClInclude Include="$(XportRoot)src\psx_spu.h" />
+    <ClInclude Include="$(XportRoot)src\psx.h" />
   </ItemGroup>
+  <Target Name="PublishNativeExecutable" AfterTargets="Build">
+    <MakeDir Directories="$(NativeOutDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(NativeOutDir)NFSHS.exe" SkipUnchangedFiles="false" />
+  </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

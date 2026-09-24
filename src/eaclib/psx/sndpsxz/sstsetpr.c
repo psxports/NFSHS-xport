@@ -8,10 +8,10 @@
  */
 #include "../../../lib/snd.h"
 
-extern "C" SndStreamState *iSNDstreamgetstreamptr(int streamid); /* @0x800E8C48 */
-extern "C" void STREAM_setpriority(intptr_t handle, int prio, int a3); /* @0x800FD1F8 */
+extern "C" SndStreamState *iSNDstreamgetstreamptr(int streamid);     /* @0x800E8C48 */
+extern "C" void STREAM_setpriority(intptr handle, int prio, int a3); /* @0x800FD1F8 */
 
-extern "C" int SNDSTRM_setpriority(int streamid, int prio, int a3)   /* @0x800E6CF0 */
+extern "C" int SNDSTRM_setpriority(int streamid, int prio, int a3) /* @0x800E6CF0 */
 {
     if (SND->enabled == 0)
         return -10;

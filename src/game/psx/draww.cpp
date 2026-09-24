@@ -22,7 +22,7 @@ ChunkObjectInfo gChunkObjInfo;   /* @0x8011f748  (bss(zero)) */
 CCOORD16     gVertex3d[160];   /* @0x8011f760  (bss(zero)) */
 extern "C" { int          stackSpeedUpEnbabledFlag; } /* @0x8013d81c  (bss(zero)) */
 char         goffsets[8] = { 125, 125, 50, 15, -1, 125, 0, 0 };   /* @0x8013d820 */
-intptr_t     gWSavePtr;   /* @0x8013d830  (bss(zero); native SetSp address) */
+intptr     gWSavePtr;   /* @0x8013d830  (bss(zero); native SetSp address) */
 int          gSD_gt4counter;   /* @0x8013d834  (bss(zero)) */
 int          gSD_gt3counter;   /* @0x8013d838  (bss(zero)) */
 DRender_tView *gVi;   /* @0x8013d83c  (bss(zero)) */
@@ -469,7 +469,7 @@ gte_stflg(&flag);
       if (v4->a == '\0') {
         otEntry = (u_long *)(Render_gPalettePtr + subOtz_local * 4);
 #ifdef AP_WIN
-        NFSHS_HostAddPrim(otEntry,Render_gPacketPtr);
+        AddPrim(otEntry,Render_gPacketPtr);
 #else
         *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *otEntry & 0xffffff;
         tu1 = (u_int)Render_gPacketPtr & 0xffffff;
@@ -487,7 +487,7 @@ DrawWSubdiv_testV2:
     if (v6->a == '\0') {
         tp2 = (u_int *)(Render_gPalettePtr + subOtz_local * 4);
 #ifdef AP_WIN
-        NFSHS_HostAddPrim(tp2,Render_gPacketPtr);
+        AddPrim(tp2,Render_gPacketPtr);
 #else
         *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *tp2 & 0xffffff;
         tu1 = (u_int)Render_gPacketPtr & 0xffffff;
@@ -507,7 +507,7 @@ DrawWSubdiv_testV1:
       if (v5->a == '\0') {
         otEntry = (u_long *)(Render_gPalettePtr + subOtz_local * 4);
 #ifdef AP_WIN
-        NFSHS_HostAddPrim(otEntry,Render_gPacketPtr);
+        AddPrim(otEntry,Render_gPacketPtr);
 #else
         *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *otEntry & 0xffffff;
         tu1 = (u_int)Render_gPacketPtr & 0xffffff;
@@ -523,7 +523,7 @@ DrawWSubdiv_testV3:
   if (((v3->a == '\0') && (v0->a == '\0')) && (v7->a == '\0')) {
       tp2 = (u_int *)(Render_gPalettePtr + subOtz_local * 4);
 #ifdef AP_WIN
-      NFSHS_HostAddPrim(tp2,Render_gPacketPtr);
+      AddPrim(tp2,Render_gPacketPtr);
 #else
       *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *tp2 & 0xffffff;
       tu1 = (u_int)Render_gPacketPtr & 0xffffff;
@@ -1011,7 +1011,7 @@ void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
   short tu29;
   short tu30;
   int bfctResult;
-  intptr_t tu24;
+  intptr tu24;
   int dV;
   int tu4;
   int ti5;
@@ -1054,7 +1054,7 @@ void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
   CCOORD16 vt1;
   CCOORD16 vt2;
   CCOORD16 vt3;
-  RECT r;
+  PSX_RECT r;
   long dvxy0;
   long dvxy1;
   long dvxy3;
@@ -1208,7 +1208,7 @@ gte_swc2(0x8,&depthcue);
         r.x = 0;
         r.y = 0;
 #ifdef AP_WIN
-        NFSHS_HostAddPrim(Render_gPalettePtr+sd->otz*4,Render_gPacketPtr);
+        AddPrim(Render_gPalettePtr+sd->otz*4,Render_gPacketPtr);
 #else
         *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xffffff;
         tu4 = (u_int)Render_gPacketPtr & 0xffffff;
@@ -1221,7 +1221,7 @@ gte_swc2(0x8,&depthcue);
         prim = (POLY_GT4 *)(sd->head).cprim.PrimPtr;
         otEntry = (sd->head).cprim.LastPrim + sd->otz;
         (sd->head).cprim.PrimPtr = (char *)(prim + 1);
-        prim->tag = (u_long)(uintptr_t)(u_long *)0x0c000000;
+        prim->tag = (u_long)(intptr)(u_long *)0x0c000000;
         AddPrim(otEntry,prim);
       }
       else {
@@ -1320,11 +1320,11 @@ gte_SetTransMatrix(((char *)sd + 0x74));
           DrawW_SetUpSubdividFacet(facetIdx,sd);
         }
         else {
-          tu24 = (intptr_t)SetSp((void *)gWSavePtr);
+          tu24 = (intptr)SetSp((void *)gWSavePtr);
           stackSpeedUpEnbabledFlag = 0;
           gWSavePtr = tu24;
           DrawW_SetUpSubdividFacet(facetIdx,sd);
-          gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+          gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
           stackSpeedUpEnbabledFlag = 1;
         }
 gte_SetRotMatrix(((char *)sd + 0x14));
@@ -1348,7 +1348,7 @@ gte_SetTransMatrix(((char *)sd + 0x14));
         r.x = 0;
         r.y = 0;
 #ifdef AP_WIN
-        NFSHS_HostAddPrim(Render_gPalettePtr+sd->otz*4,Render_gPacketPtr);
+        AddPrim(Render_gPalettePtr+sd->otz*4,Render_gPacketPtr);
 #else
         *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xffffff;
         uVar3_00 = (u_int)Render_gPacketPtr & 0xffffff;
@@ -2363,10 +2363,10 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
         gChunkObjInfo.objInstanceBuf = Track_chunkList[sVar1].objInstanceBuf;
         gChunkObjInfo.doFrustumClip = (int)(geomRez == 4);
         gChunkObjInfo.simObjs = (Trk_SimObject *)(pGVar4 + 1);
-        gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+        gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
         stackSpeedUpEnbabledFlag = 1;
         DrawW_BuildChunkObjectFacets(gVi,&gChunkObjInfo);
-        gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+        gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
         stackSpeedUpEnbabledFlag = 0;
       }
       if (((GameSetup_gData.Time == 0) && (GameSetup_gData.Weather == 0)) &&
@@ -2397,10 +2397,10 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
       gChunkObjInfo.doFrustumClip = 1;
       gChunkObjInfo.zClipSq = gCurrContext->polyFarZClipSq;
       gChunkObjInfo.visList = (short *)0x0;
-      gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+      gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
       stackSpeedUpEnbabledFlag = 1;
       DrawW_BuildObjectFacets(gVi,&gChunkObjInfo);
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
     }
   }
@@ -2413,10 +2413,10 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
     /* 0x800C8F88: sll v1,s5,6; 0x800C8F90 adds the byte offset.
        The visibility row stride is 64 bytes = 32 shorts. */
     gChunkObjInfo.visList = Track_gInViewList + iVar6 * 32;
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     DrawW_BuildObjectFacets(gVi,&gChunkObjInfo);
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
   }
   if ((Object_customObjInst != (Group *)0x0) && (0 < Object_customObjInst->m_num_elements)) {
@@ -2808,7 +2808,7 @@ void DrawW_OnyxLinePrim(CCOORD16 *geomVertices,Trk_Line *lineQuad,int count,Draw
   u_int tu2;
   u_int tu4;
   int lineLimit;
-  intptr_t previousStack;
+  intptr previousStack;
   int positiveSideVisible;
   int negativeSideVisible;
   
@@ -3007,11 +3007,11 @@ gte_SetTransMatrix(((char *)sd + 0x74));
                 DrawW_SetUpSubdividFacet_Line(sd);
               }
               else {
-                previousStack = (intptr_t)SetSp((void *)gWSavePtr);
+                previousStack = (intptr)SetSp((void *)gWSavePtr);
                 stackSpeedUpEnbabledFlag = 0;
                 gWSavePtr = previousStack;
                 DrawW_SetUpSubdividFacet_Line(sd);
-                gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+                gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
                 stackSpeedUpEnbabledFlag = 1;
               }
 gte_SetRotMatrix(((char *)sd + 0x14));

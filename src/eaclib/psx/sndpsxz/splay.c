@@ -9,30 +9,33 @@
 #include "../../../nfs4_types.h"
 
 extern "C" int sndgs[];
-extern "C" int iSNDvalidbank(int bankid);                /* sbvalid */
+extern "C" int iSNDvalidbank(int bankid);                            /* sbvalid */
 extern "C" int iSNDplaytaggedpatch(unsigned char *patch, int *info); /* stagpat */
 
-extern "C" int  cSNDplay(int *info);            /* @0x800E7A68 */
-extern "C" void SNDplay(int *info);             /* @0x800E7A30 */
+extern "C" int cSNDplay(int *info); /* @0x800E7A68 */
+extern "C" int SNDplay(int *info);  /* @0x800E7A30 */
 
 /* SNDplay @0x800E7A30 : play `info` if the audio system is up. */
-extern "C" void SNDplay(int *info)
+extern "C" int SNDplay(int *info)
 {
     if ((char)sndgs[0xf] != 0)
-        cSNDplay(info);
+        return cSNDplay(info);
+    return -10;
 }
 
 /* cSNDplay @0x800E7A68 : resolve the play-info's (bank, patch) to a tagged patch and play it. */
 extern "C" int cSNDplay(int *info)
 {
     int patch, bank;
-    intptr_t pp;
-    if (-1 < iSNDvalidbank((int)(char)info[1])) {
+    intptr pp;
+    if (-1 < iSNDvalidbank((int)(char)info[1]))
+    {
         patch = info[0];
         bank = *(int *)((char)info[1] * 0xc + sndgs[0x26]);
         if (patch < 0)
             return -8;
-        if (patch < (int)(unsigned)*(unsigned short *)(bank + 6)) {
+        if (patch < (int)(unsigned)*(unsigned short *)(bank + 6))
+        {
             if (*(char *)(bank + 4) == 4)
                 pp = *(int *)(bank + patch * 4 + 0x14);
             else

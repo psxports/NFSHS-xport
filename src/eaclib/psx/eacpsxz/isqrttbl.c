@@ -5,8 +5,8 @@
  */
 extern "C" unsigned short DAT_8013bd50[0x60]; /* @0x8013BD50 : ASCII(0x20..0x7f)->SJIS [0x60] */
 
-extern "C" unsigned int remapshiftjiscode(unsigned int c);      /* @0x801069C4 */
-extern "C" int          decodeshiftjis(unsigned char **cursor); /* @0x801069EC */
+extern "C" unsigned int remapshiftjiscode(unsigned int c); /* @0x801069C4 */
+extern "C" int decodeshiftjis(unsigned char **cursor);     /* @0x801069EC */
 
 /* remapshiftjiscode : map a 1-byte ASCII code (0x20..0x7f) to its full-width SJIS code. */
 extern "C" unsigned int remapshiftjiscode(unsigned int c)
@@ -20,12 +20,15 @@ extern "C" unsigned int remapshiftjiscode(unsigned int c)
 extern "C" int decodeshiftjis(unsigned char **cursor)
 {
     unsigned char *p = *cursor;
-    unsigned char  b1 = *p;
+    unsigned char b1 = *p;
     unsigned char *next = p + 1;
-    unsigned int   code;
-    if ((b1 & 0x80) == 0) {
+    unsigned int code;
+    if ((b1 & 0x80) == 0)
+    {
         code = remapshiftjiscode((unsigned int)b1);
-    } else {
+    }
+    else
+    {
         unsigned char b2 = *next;
         next = p + 2;
         code = ((unsigned int)b1 << 8) | b2;

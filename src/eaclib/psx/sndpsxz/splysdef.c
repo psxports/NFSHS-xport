@@ -10,20 +10,20 @@
  *     +0x0C/0E   s16 pitch = 0x1000 (== 1.0)  +0x10/12 s16 = 0
  */
 
-extern "C" void SNDplaysetdef(void *def)   /* @0x800E6834 */
+extern "C" void SNDplaysetdef(void *def) /* @0x800E6834 */
 {
     char *d = (char *)def;
-    *(int *)(d + 0x00)   = -1;
-    *(char *)(d + 0x04)  = (char)-1;
-    *(char *)(d + 0x05)  = 0x3C;
+    *(int *)(d + 0x00) = -1;
+    *(char *)(d + 0x04) = (char)-1;
+    *(char *)(d + 0x05) = 0x3C;
     *(short *)(d + 0x0C) = 0x1000;
     *(short *)(d + 0x0E) = 0x1000;
-    *(char *)(d + 0x06)  = 0x7F;
-    *(char *)(d + 0x08)  = 0x7F;
-    *(char *)(d + 0x0A)  = 0x7F;
-    *(char *)(d + 0x07)  = 0x40;
-    *(char *)(d + 0x09)  = 0x40;
-    *(char *)(d + 0x0B)  = 0;
+    *(char *)(d + 0x06) = 0x7F;
+    *(char *)(d + 0x08) = 0x7F;
+    *(char *)(d + 0x0A) = 0x7F;
+    *(char *)(d + 0x07) = 0x40;
+    *(char *)(d + 0x09) = 0x40;
+    *(char *)(d + 0x0B) = 0;
     *(short *)(d + 0x10) = 0;
     *(short *)(d + 0x12) = 0;
 }

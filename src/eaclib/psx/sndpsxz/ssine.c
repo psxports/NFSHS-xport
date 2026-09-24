@@ -5,22 +5,24 @@
  *   quarter-wave table snd_sine_table[0..0x100].
  */
 
-extern "C" unsigned short snd_sine_table[];   /* quarter-wave sine, 0x101 entries (data-mat #75) */
+extern "C" unsigned short snd_sine_table[]; /* quarter-wave sine, 0x101 entries (data-mat #75) */
 
-extern "C" int iSNDsin(int a);                /* @0x8010CC40 */
+extern "C" int iSNDsin(int a); /* @0x8010CC40 */
 
 /* iSNDsin @0x8010CC40 : full-circle sine from a 0x100-step quarter-wave table -- quadrant 0 reads forward,
  *   1 mirrors, 2 negates forward, 3 negates the mirror. */
 extern "C" int iSNDsin(int a)
 {
     unsigned int quad = (unsigned int)(a >> 8) & 3;
-    if (quad != 0) {
-        if (quad != 1) {
+    if (quad != 0)
+    {
+        if (quad != 1)
+        {
             if (quad == 2)
-                return -(int)(unsigned int)snd_sine_table[a];           /* quad 2: raw a (@0x8010cc94 a<<1) */
-            return -(int)(unsigned int)snd_sine_table[0x100 - a];       /* quad 3: raw a (@0x8010cca4) */
+                return -(int)(unsigned int)snd_sine_table[a];     /* quad 2: raw a (@0x8010cc94 a<<1) */
+            return -(int)(unsigned int)snd_sine_table[0x100 - a]; /* quad 3: raw a (@0x8010cca4) */
         }
-        return (int)(unsigned int)snd_sine_table[0x100 - a];            /* quad 1: raw a (@0x8010cc80) */
+        return (int)(unsigned int)snd_sine_table[0x100 - a]; /* quad 1: raw a (@0x8010cc80) */
     }
-    return (int)(unsigned int)snd_sine_table[(unsigned int)a & 0xff];   /* quad 0: phase masked (@0x8010cc4c) */
+    return (int)(unsigned int)snd_sine_table[(unsigned int)a & 0xff]; /* quad 0: phase masked (@0x8010cc4c) */
 }

@@ -60,8 +60,8 @@ static inline int nfs4_mips_negu_s32(int value)
    C++. */
 static inline int nfs4_mips_div_s32(int dividend, int divisor)
 {
-    if (divisor == 0 ||
-        (dividend == nfs4_mips_bits_to_s32(0x80000000U) && divisor == -1)) {
+    if (divisor == 0 || (dividend == nfs4_mips_bits_to_s32(0x80000000U) && divisor == -1))
+    {
 #if defined(_MSC_VER)
         __debugbreak();
 #else
@@ -75,10 +75,10 @@ static inline int nfs4_mips_div_s32(int dividend, int divisor)
 /* DIVU leaves the remainder in HI and traps through the compiler-emitted
    BREAK 7 guard when the divisor is zero.  Keep the same defined boundary so
    host optimization cannot assume a decompiled empty zero check is dead. */
-static inline unsigned int nfs4_mips_modu_u32(unsigned int dividend,
-                                               unsigned int divisor)
+static inline unsigned int nfs4_mips_modu_u32(unsigned int dividend, unsigned int divisor)
 {
-    if (divisor == 0) {
+    if (divisor == 0)
+    {
 #if defined(_MSC_VER)
         __debugbreak();
 #else
@@ -96,8 +96,7 @@ static inline int nfs4_mips_sign_extend(unsigned int value, unsigned int bits)
     return (int)((value & mask) ^ sign) - (int)sign;
 }
 
-static inline void nfs4_mips_copy_bytes(void *destination, const void *source,
-                                        unsigned int count)
+static inline void nfs4_mips_copy_bytes(void *destination, const void *source, unsigned int count)
 {
     unsigned char *out = (unsigned char *)destination;
     const unsigned char *in = (const unsigned char *)source;

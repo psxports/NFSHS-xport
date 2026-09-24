@@ -35,6 +35,7 @@ extern "C" void Sim_StartUp(void)
   simVar.currentClockTicks = 0;
   simVar.keyRelease = 0;
   simGlobal.gameStarted = 0;
+  countdown = '\0';
   simGlobal.gameTicks = 0;
   simGlobal.schedule32Hz = Sched_CreateNewSchedule("Sc32-1",0x46);
   simGlobal.schedule32Hz2 = Sched_CreateNewSchedule("Sc32-2",0xb);
@@ -173,33 +174,33 @@ void Sim_ProcessSimSchedules(void)
   }
   if ((simGlobal.gameTicks & 1U) == 0) {
     systemtask(0);
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     Stats_ClearPosition();
     Collide_ClearCollisionRegistry();
     Sched_Execute(simGlobal.schedule32Hz);
     Cars_ManageBureaucracy();
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     Cars_CheckForAccidentScenes();
   }
-  gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   Sched_Execute(simGlobal.schedule64Hz);
-  gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
   stackSpeedUpEnbabledFlag = 0;
   if ((simGlobal.gameTicks & 1U) != 0) {
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     AIHigh_Execute();
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     Sched_Execute(simGlobal.schedule32Hz2);
     Stats_TrackEndGame();
     Stats_DoPlayerGlue();
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     AudioClc_SoundCars();
   }

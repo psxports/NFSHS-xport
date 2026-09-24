@@ -325,7 +325,7 @@ int DrawC_PrimStart(Draw_tVertex *center,Car_tObj *carObj,int lightAvg,Draw_CarC
   int envSpeed;
   int shadowAbsOffs;
   int halfTransp;
-  RECT tw;
+  PSX_RECT tw;
   u_int shadowTex;
   Draw_tPixMap *reflMap_iter;
   u_int envMapTex;
@@ -696,9 +696,9 @@ DrawCPrimStart_camRotMatrix:
   else {
     shapeData_p = Draw_GetDRAWENV(gCView.id,gFlip);
     SetDrawMode(&sd->drawModeOn,(u_int)shapeData_p->dfe,1,
-               (u_int)shapeData_p->tpage,(RECT *)0x0);
+               (u_int)shapeData_p->tpage,(PSX_RECT *)0x0);
     SetDrawMode(&sd->drawModeOff,(u_int)shapeData_p->dfe,0,
-               (u_int)shapeData_p->tpage,(RECT *)0x0);
+               (u_int)shapeData_p->tpage,(PSX_RECT *)0x0);
     nfs4_mips_copy_bytes(&sd->ePmx0,gMenuPixmap[0],16);
   }
   ChangeTPage(&(sd->ePmx0).tpage,1);
@@ -755,7 +755,7 @@ void DrawC_PrimStop(Car_tObj *carObj,Draw_CarCache *sd)
                     sd->head.cprim.LastPrim[iVar3] & 0xffffff;
     puVar4 = (u_int *)sd->head.cprim.LastPrim + iVar3;
     *puVar4 = *puVar4 & 0xff000000 |
-              (u_int)(uintptr_t)(sd->sub_ot + (iVar2 + -1)) & 0xffffffU;
+              (u_int)(intptr)(sd->sub_ot + (iVar2 + -1)) & 0xffffffU;
   }
   return;
 }
@@ -1099,10 +1099,10 @@ DrawC_Prim_envmap1MainLoop:
         iVar8 = sd->otz;
         puVar20 = sd->sub_ot;
         (sd->head).cprim.PrimPtr = (char *)(primOut_drm + 3);
-        puVar19 = (u_long *)(intptr_t)(sd->drawModeOn).tag;
+        puVar19 = (u_long *)(intptr)(sd->drawModeOn).tag;
         uVar21 = (sd->drawModeOn).code[0];
         drmode_w1 = (sd->drawModeOn).code[1];
-        primOut_drm[0] = (u_int)(uintptr_t)puVar19;
+        primOut_drm[0] = (u_int)(intptr)puVar19;
         primOut_drm[1] = uVar21;
         primOut_drm[2] = drmode_w1;
         AddPrim(puVar20 + iVar8,primOut_drm);
@@ -1586,7 +1586,7 @@ DrawC_Prim_ePmx1UVEmit:
     iVar8 = sd->otz;
     sub_ot_p = sd->sub_ot;
     (sd->head).cprim.PrimPtr = (char *)(primOut_drmOff + 3);
-    drmodeOff_w0 = (u_int)(uintptr_t)(sd->drawModeOff).tag;
+    drmodeOff_w0 = (u_int)(intptr)(sd->drawModeOff).tag;
     drmodeOff_w1 = (sd->drawModeOff).code[0];
     drmodeOff_w2 = (sd->drawModeOff).code[1];
     primOut_drmOff[0] = drmodeOff_w0;
@@ -1603,7 +1603,7 @@ DrawC_Prim_ePmx1UVEmit:
     iVar8 = sd->otz;
     puVar20 = sd->sub_ot;
     (sd->head).cprim.PrimPtr = (char *)(primOut_drm2 + 3);
-    drmodeOn_tag = (u_int)(uintptr_t)(sd->drawModeOn).tag;
+    drmodeOn_tag = (u_int)(intptr)(sd->drawModeOn).tag;
     drmode_w0 = (sd->drawModeOn).code[0];
     drmodeOn_w1 = (sd->drawModeOn).code[1];
     primOut_drm2[0] = drmodeOn_tag;
@@ -2191,10 +2191,10 @@ DrawC_PrimClip_envmap9Eq1Loop:
         iVar12 = sd->otz;
         sub_ot_p = sd->sub_ot;
         (sd->head).cprim.PrimPtr = (char *)(primOut_drm + 3);
-        puVar28 = (u_long *)(intptr_t)(sd->drawModeOff).tag;
+        puVar28 = (u_long *)(intptr)(sd->drawModeOff).tag;
         uVar9 = (sd->drawModeOff).code[0];
         uVar26 = (sd->drawModeOff).code[1];
-        *primOut_drm = (u_int)(uintptr_t)puVar28;
+        *primOut_drm = (u_int)(intptr)puVar28;
         primOut_drm[1] = uVar9;
         primOut_drm[2] = uVar26;
         AddPrim(sub_ot_p + iVar12,primOut_drm);
@@ -2208,10 +2208,10 @@ DrawC_PrimClip_envmap9Eq1Loop:
         iVar12 = sd->otz;
         sub_ot_p = sd->sub_ot;
         (sd->head).cprim.PrimPtr = (char *)(primOut_drmOn + 3);
-        puVar28 = (u_long *)(intptr_t)(sd->drawModeOn).tag;
+        puVar28 = (u_long *)(intptr)(sd->drawModeOn).tag;
         drmodeOn_w0 = (sd->drawModeOn).code[0];
         drmodeOn_w1 = (sd->drawModeOn).code[1];
-        primOut_drmOn[0] = (u_int)(uintptr_t)puVar28;
+        primOut_drmOn[0] = (u_int)(intptr)puVar28;
         primOut_drmOn[1] = drmodeOn_w0;
         primOut_drmOn[2] = drmodeOn_w1;
         AddPrim(sub_ot_p + iVar12,primOut_drmOn);
@@ -2768,7 +2768,7 @@ DrawC_PrimClip_ePmx1UVEmit:
     sd->vt2 = Nvertex_p[puVar23->vertexId2];
     primOut_drmOff = (u_int *)(sd->head).cprim.PrimPtr;
     (sd->head).cprim.PrimPtr = (char *)(primOut_drmOff + 3);
-    tu45 = (u_int)(uintptr_t)(sd->drawModeOff).tag;
+    tu45 = (u_int)(intptr)(sd->drawModeOff).tag;
     tu47 = (sd->drawModeOff).code[0];
     tu49 = (sd->drawModeOff).code[1];
     primOut_drmOff[0] = tu45;
@@ -2785,7 +2785,7 @@ DrawC_PrimClip_ePmx1UVEmit:
     iVar12 = sd->otz;
     sub_ot_p = sd->sub_ot;
     (sd->head).cprim.PrimPtr = (char *)(tp43 + 3);
-    tu43 = (u_int)(uintptr_t)(sd->drawModeOn).tag;
+    tu43 = (u_int)(intptr)(sd->drawModeOn).tag;
     drmodeOn_w0 = (sd->drawModeOn).code[0];
     drmodeOn_w1 = (sd->drawModeOn).code[1];
     tp43[0] = tu43;
@@ -3146,10 +3146,10 @@ DrawCPrimMenu_facetLoopTop:
       iVar16 = sd->otz;
       puVar31 = sd->sub_ot;
       (sd->head).cprim.PrimPtr = (char *)(puVar27 + 3);
-      puVar29 = (u_long *)(intptr_t)(sd->drawModeOff).tag;
+      puVar29 = (u_long *)(intptr)(sd->drawModeOff).tag;
       uVar20 = (sd->drawModeOff).code[0];
       uVar32 = (sd->drawModeOff).code[1];
-    *puVar27 = (u_int)(uintptr_t)puVar29;
+    *puVar27 = (u_int)(intptr)puVar29;
       puVar27[1] = uVar20;
       puVar27[2] = uVar32;
       AddPrim(puVar31 + iVar16,puVar27);
@@ -3163,10 +3163,10 @@ DrawCPrimMenu_facetLoopTop:
       iVar16 = sd->otz;
       puVar31 = sd->sub_ot;
       (sd->head).cprim.PrimPtr = (char *)(puVar28 + 3);
-      puVar29 = (u_long *)(intptr_t)(sd->drawModeOn).tag;
+      puVar29 = (u_long *)(intptr)(sd->drawModeOn).tag;
       uVar20 = (sd->drawModeOn).code[0];
       uVar32 = (sd->drawModeOn).code[1];
-    *puVar28 = (u_int)(uintptr_t)puVar29;
+    *puVar28 = (u_int)(intptr)puVar29;
       puVar28[1] = uVar20;
       puVar28[2] = uVar32;
       AddPrim(puVar31 + iVar16,puVar28);
@@ -3803,9 +3803,9 @@ gte_SetTransMatrix(((char *)sd + 0x14));
   sd->otz = 0;
   (sd->head).cprim.PrimPtr = (char *)(pDVar7 + 1);
   puVar8 = (u_int *)(puVar10 + sd->otz);
-  pDVar7->tag = (u_long)(uintptr_t)(u_long *)((u_int)pDVar7->tag & 0xff000000 | *puVar8 & 0xffffff);
+  pDVar7->tag = (u_long)(intptr)(u_long *)((u_int)pDVar7->tag & 0xff000000 | *puVar8 & 0xffffff);
   *puVar8 = *puVar8 & 0xff000000 | (u_int)pDVar7 & 0xffffff;
-  SetDrawMode(pDVar7,0,0,0x120,(RECT *)0x0);
+  SetDrawMode(pDVar7,0,0,0x120,(PSX_RECT *)0x0);
   sVar1 = Fe3D_spotVertex[0x20].z;
   sVar2 = Fe3D_spotVertex[0x20].y;
   uVar11 = 0xffffff;
@@ -3861,9 +3861,9 @@ gte_lwc2(0,*(int *)(((char *)sd + 0xac)));
   puVar10 = (sd->head).cprim.LastPrim;
   (sd->head).cprim.PrimPtr = (char *)(pDVar7 + 1);
   puVar8 = (u_int *)(puVar10 + sd->otz);
-  pDVar7->tag = (u_long)(uintptr_t)(u_long *)((u_int)pDVar7->tag & 0xff000000 | *puVar8 & 0xffffff);
+  pDVar7->tag = (u_long)(intptr)(u_long *)((u_int)pDVar7->tag & 0xff000000 | *puVar8 & 0xffffff);
   *puVar8 = *puVar8 & 0xff000000 | (u_int)pDVar7 & 0xffffff;
-  SetDrawMode(pDVar7,0,1,0x120,(RECT *)0x0);
+  SetDrawMode(pDVar7,0,1,0x120,(PSX_RECT *)0x0);
   return;
 }
 

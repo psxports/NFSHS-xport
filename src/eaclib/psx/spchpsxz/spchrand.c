@@ -14,20 +14,20 @@
 #include "../../../nfs4_types.h"
 
 /* ---- 6-word PRNG state @0x801235F4 (.data; runtime-seeded by iSPCH_EACseedrandom).  data-mat #75. ---- */
-extern "C" unsigned int seedX;          /* @0x801235F4 accumulator (word0) */
-extern "C" unsigned int DAT_801235f8;   /* @0x801235F8 word1 */
-extern "C" unsigned int DAT_801235fc;   /* @0x801235FC word2 */
-extern "C" unsigned int DAT_80123600;   /* @0x80123600 word3 */
-extern "C" unsigned int DAT_80123604;   /* @0x80123604 word4 */
-extern "C" unsigned int DAT_80123608;   /* @0x80123608 word5 */
+extern "C" unsigned int seedX;        /* @0x801235F4 accumulator (word0) */
+extern "C" unsigned int DAT_801235f8; /* @0x801235F8 word1 */
+extern "C" unsigned int DAT_801235fc; /* @0x801235FC word2 */
+extern "C" unsigned int DAT_80123600; /* @0x80123600 word3 */
+extern "C" unsigned int DAT_80123604; /* @0x80123604 word4 */
+extern "C" unsigned int DAT_80123608; /* @0x80123608 word5 */
 
-extern "C" intptr_t gEventDats[4];      /* @0x80148048 : four PSX pointer words; native pointers on host */
+extern "C" intptr gEventDats[4]; /* @0x80148048 : four PSX pointer words; native pointers on host */
 extern "C" void trap(unsigned int code);
 
-extern "C" int   iSPCH_EACrandom(void);                 /* @0x800EB9C4 */
-extern "C" int  *iSPCH_EACseedrandom(unsigned int seed);/* @0x800EBAC4 */
-extern "C" int   iSPCH_Rand(int n);                     /* @0x800EBB30 */
-extern "C" int   iSPCH_BindData(unsigned short *dat);   /* @0x800EBB84 */
+extern "C" int iSPCH_EACrandom(void);                   /* @0x800EB9C4 */
+extern "C" int *iSPCH_EACseedrandom(unsigned int seed); /* @0x800EBAC4 */
+extern "C" int iSPCH_Rand(int n);                       /* @0x800EBB30 */
+extern "C" int iSPCH_BindData(unsigned short *dat);     /* @0x800EBB84 */
 
 /* iSPCH_EACrandom @0x800EB9C4 : step the additive generator (carry-propagated) and return the new seed. */
 extern "C" int iSPCH_EACrandom(void)
@@ -46,10 +46,7 @@ extern "C" int iSPCH_EACrandom(void)
     DAT_801235fc = u3;
     DAT_80123600 = u2;
     DAT_80123604 = u1;
-    if (DAT_80123608 == 0 && (DAT_80123604 = u1 + 1, DAT_80123604 == 0) &&
-        (DAT_80123600 = u2 + 1, DAT_80123600 == 0) &&
-        (DAT_801235fc = u3 + 1, DAT_801235fc == 0) &&
-        (DAT_801235f8 = u4 + 1, DAT_801235f8 == 0))
+    if (DAT_80123608 == 0 && (DAT_80123604 = u1 + 1, DAT_80123604 == 0) && (DAT_80123600 = u2 + 1, DAT_80123600 == 0) && (DAT_801235fc = u3 + 1, DAT_801235fc == 0) && (DAT_801235f8 = u4 + 1, DAT_801235f8 == 0))
         seedX = seedX + 1;
     return (int)seedX;
 }
@@ -58,7 +55,7 @@ extern "C" int iSPCH_EACrandom(void)
  *   constants are eacpsxz srandom's default seeds, so seed==0 reproduces that default state).  Returns base. */
 extern "C" int *iSPCH_EACseedrandom(unsigned int seed)
 {
-    seedX        = seed + 0xf22d0e56u;
+    seedX = seed + 0xf22d0e56u;
     DAT_801235f8 = seed + 0x883126e9u;
     DAT_801235fc = seed + 0xc624dd2fu;
     DAT_80123600 = seed + 0x0702c49cu;
@@ -83,15 +80,18 @@ extern "C" int iSPCH_Rand(int n)
  *   gEventDats[0..3] slot.  Returns 1 on success, 0 if rejected or the table is full. */
 extern "C" int iSPCH_BindData(unsigned short *dat)
 {
-    intptr_t *p;
-    int  i;
-    if (0x11d < *dat) {
+    intptr *p;
+    int i;
+    if (0x11d < *dat)
+    {
         i = 0;
         p = gEventDats;
-        do {
+        do
+        {
             i++;
-            if (*p == 0) {
-                *p = (intptr_t)dat;
+            if (*p == 0)
+            {
+                *p = (intptr)dat;
                 return 1;
             }
             p++;

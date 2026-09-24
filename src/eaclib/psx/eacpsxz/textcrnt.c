@@ -8,9 +8,10 @@ extern "C" void puti(unsigned char *buf, unsigned int val, int n); /* @0x800F30D
 /* putm @0x800F30AC : write `val` as `n` bytes big-endian into dst[0..n). */
 extern "C" void putm(int dst, unsigned int val, int n)
 {
-    int            i = n - 1;
+    int i = n - 1;
     unsigned char *p = (unsigned char *)(dst + i);
-    for (; -1 < i; i = i - 1) {
+    for (; -1 < i; i = i - 1)
+    {
         *p = (unsigned char)val;
         val = val >> 8;
         p = p - 1;
@@ -20,7 +21,8 @@ extern "C" void putm(int dst, unsigned int val, int n)
 /* puti @0x800F30D4 : write `val` as `n` bytes little-endian into buf[0..n). */
 extern "C" void puti(unsigned char *buf, unsigned int val, int n)
 {
-    while (n = n - 1, -1 < n) {
+    while (n = n - 1, -1 < n)
+    {
         *buf = (unsigned char)val;
         val = val >> 8;
         buf = buf + 1;

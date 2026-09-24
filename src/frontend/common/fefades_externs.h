@@ -3,7 +3,7 @@
 #define _FRONTEND_COMMON_FEFADES_EXTERNS_H_
 #include "../../nfs4_types.h"
 
-extern int  kRGBVals[28];            /* RGB palette (fronttext) */
-extern "C" char textDefinitions[14][6];  /* per-tMenuTextType colour indices */
+extern int kRGBVals[28];                /* RGB palette (fronttext) */
+extern "C" char textDefinitions[14][6]; /* per-tMenuTextType colour indices */
 
 #endif

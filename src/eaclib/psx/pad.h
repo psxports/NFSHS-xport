@@ -11,20 +11,21 @@
  * Return types are SYM-faithful: padinit/PAD_restore = void (SYM FCN VOID; the earlier
  * 'int' came from a decompiler $v0-liveness artifact, not a real source local). */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void padinit(void);                         /* :66  EXT FCN VOID */
-void PAD_restore(void);                     /* :83  EXT FCN VOID */
-u_short PAD_state(int padID);               /* :172 EXT FCN USHORT */
-void PAD_update(void);                      /* :320 EXT FCN VOID */
+    void padinit(void);           /* :66  EXT FCN VOID */
+    void PAD_restore(void);       /* :83  EXT FCN VOID */
+    u_short PAD_state(int padID); /* :172 EXT FCN USHORT */
+    void PAD_update(void);        /* :320 EXT FCN VOID */
 
 #ifdef __cplusplus
 }
 #endif
 
 /* ---- pad.obj data globals (eaclib/psx, from canonical Globals) ---- */
-extern "C" PAD_COMMON      Padglobal[2];    /* 0x8013e8f0  per-port pad buffers   */
-extern "C" tPadModuleState gPadinfo;        /* 0x8013e89c  module state (84 B)    */
+extern "C" PAD_COMMON Padglobal[2];  /* 0x8013e8f0  per-port pad buffers   */
+extern "C" tPadModuleState gPadinfo; /* 0x8013e89c  module state (84 B)    */
 
 #endif /* _EACLIB_PSX_PAD_H_ */

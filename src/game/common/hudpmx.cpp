@@ -33,8 +33,8 @@ void HudPmx_LoadShape(char *n,HudPmx_tShape *s)
    * PSX KUSEG address zero mirrors physical RAM, while Win32 leaves its null
    * page unmapped. Preserve the two actual low-RAM reads through the common
    * address-space adapter; ordinary non-null shapes still use their fields. */
-  s->width = PsyQ_readRam16((intptr_t)shp + 4);
-  s->height = PsyQ_readRam16((intptr_t)shp + 6);
+  s->width = PsyQ_readRam16((intptr)shp + 4);
+  s->height = PsyQ_readRam16((intptr)shp + 6);
   Texture_LoadPmx(gShpfile,n,0x41,loadShapeXOff + 0x80,0x80,-1,-1,&s->pixmap);
   return;
 }
@@ -95,28 +95,28 @@ void HudPmx_InitTextures(void)
     puVar6 = ppuVar1[1];
     puVar8 = ppuVar1[2];
     puVar10 = ppuVar1[3];
-    *puVar3 = (u_int)(uintptr_t)*ppuVar1;
-    puVar3[1] = (u_int)(uintptr_t)puVar6;
-    puVar3[2] = (u_int)(uintptr_t)puVar8;
-    puVar3[3] = (u_int)(uintptr_t)puVar10;
+    *puVar3 = (u_int)(intptr)*ppuVar1;
+    puVar3[1] = (u_int)(intptr)puVar6;
+    puVar3[2] = (u_int)(intptr)puVar8;
+    puVar3[3] = (u_int)(intptr)puVar10;
     ppuVar1 = ppuVar1 + 4;
     puVar3 = puVar3 + 4;
   } while (ppuVar1 != (u_char **)&Track_gShapeNamePtrs_end);
-  *puVar3 = (u_int)(uintptr_t)(u_char *)Track_gShapeNamePtrs_end;
+  *puVar3 = (u_int)(intptr)(u_char *)Track_gShapeNamePtrs_end;
   puVar3 = local_4d0;
   ppuVar1 = (u_char **)&Track_gTachNamePtrs;
   do {
     puVar6 = ppuVar1[1];
     puVar8 = ppuVar1[2];
     puVar10 = ppuVar1[3];
-    *puVar3 = (u_int)(uintptr_t)*ppuVar1;
-    puVar3[1] = (u_int)(uintptr_t)puVar6;
-    puVar3[2] = (u_int)(uintptr_t)puVar8;
-    puVar3[3] = (u_int)(uintptr_t)puVar10;
+    *puVar3 = (u_int)(intptr)*ppuVar1;
+    puVar3[1] = (u_int)(intptr)puVar6;
+    puVar3[2] = (u_int)(intptr)puVar8;
+    puVar3[3] = (u_int)(intptr)puVar10;
     ppuVar1 = ppuVar1 + 4;
     puVar3 = puVar3 + 4;
   } while (ppuVar1 != (u_char **)(gShapeNamePtrs_subList + 3));
-  *puVar3 = (u_int)(uintptr_t)gShapeNamePtrs_subList[3];
+  *puVar3 = (u_int)(intptr)gShapeNamePtrs_subList[3];
   sprintf(acStack_458,"mp%02d",GameSetup_gData.track);
   puVar3 = local_450;
   ppcVar4 = local_240;

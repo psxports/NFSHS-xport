@@ -137,7 +137,7 @@ void Speaker_Promote(Speaker *pThis);
 void Speech_Server(void);
 void Speech_SetDelayedStatus(Speech *pThis,Speaker *sub,int delay);
 void DispatchSpeaker_Activate(DispatchSpeaker *pThis,u_int seedupdatecount);
-intptr_t Speech_Dispatch(void);
+intptr Speech_Dispatch(void);
 void DispatchSpeaker_Roger(DispatchSpeaker *pThis);
 void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis);
 void DispatchSpeaker_Status(DispatchSpeaker *pThis);
@@ -155,7 +155,7 @@ void Speech_GetVoice(Car_tObj *carObj);
 void MobileSpeaker_Activate(MobileSpeaker *pThis,Car_tObj *carObj);
 void MobileSpeaker_ReActivate(MobileSpeaker *pThis);
 Speaker * Speech_FindMobile(Speech *pThis,Car_tObj *carObj);
-intptr_t Speech_Mobile(Car_tObj *carObj);
+intptr Speech_Mobile(Car_tObj *carObj);
 int Speaker_CalcMph(Speaker *pThis,Car_tObj *perp);
 void MobileSpeaker_SetSpeed(MobileSpeaker *pThis,Car_tObj *perp);
 int MobileSpeaker_DistToPerp(MobileSpeaker *pThis);
@@ -749,11 +749,11 @@ void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoff
   u_char *entry = (u_char *)header + 0x10;
 
   locatebigentry(header,"j:eventdat\\event.dat",0,&eventOffset,&eventSize);
-  FILE_readsync(pThis->fFileHandle,eventOffset,(intptr_t)eventData,eventSize,100);
-  SPCH_ResolveData((int)(intptr_t)eventData);
+  FILE_readsync(pThis->fFileHandle,eventOffset,(intptr)eventData,eventSize,100);
+  SPCH_ResolveData((int)(intptr)eventData);
   u_char *bankData = eventData + eventSize;
   u_char *headerData = (u_char *)reservememadr("spch temp",hsize,0x10);
-  FILE_readsync(pThis->fFileHandle,hoffset,(intptr_t)headerData,hsize,100);
+  FILE_readsync(pThis->fFileHandle,hoffset,(intptr)headerData,hsize,100);
   char **bankNames = (char **)reservememadr("spch temp",pThis->fBankCount * sizeof(char *),0x10);
   for (int i = 0; i < pThis->fBankCount; i = i + 1) {
     bankNames[i] = 0;
@@ -774,7 +774,7 @@ void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoff
       if (isHeader && Speech_CheckMultiBank(pThis,name,headerBank,bn) != 0) {
         headerBank = headerBank + 1;
         memcpy(bankData,headerData + offset - hoffset,size);
-        int bankId = SPCH_AddBank((intptr_t)bankData);
+        int bankId = SPCH_AddBank((intptr)bankData);
         bankData = bankData + size;
         bankNames[bankId] = name;
       }
@@ -912,9 +912,9 @@ Speech * Speech_ct(Speech *pThis)
   }
   if (pThis->fBankOffset != 0) {
     uVar11 = SPCH_GetSampleDataRate(0x2b11,0x10,2);
-    SPCH_Init((intptr_t)Speech_HandleRequest,0x12345678,uVar11);
-    SPCH_InitBankMem((intptr_t)Speech_AllocateRAM,
-               (intptr_t)Speech_PurgeRAM,pThis->fBankCount);
+    SPCH_Init((intptr)Speech_HandleRequest,0x12345678,uVar11);
+    SPCH_InitBankMem((intptr)Speech_AllocateRAM,
+               (intptr)Speech_PurgeRAM,pThis->fBankCount);
     iVar8 = FILE_opensync(acStack_88,1,100,&pThis->fFileHandle);
     pThis->fFileOpen = (u_int)(iVar8 != 0);
     Speech_LoadBankHeaders(pThis,(char *)header,bankNames,local_20,local_1c);
@@ -1204,15 +1204,15 @@ void DispatchSpeaker_Activate(DispatchSpeaker *pThis,u_int seedupdatecount)
 }
 
 /* ---- Dispatch__6Speech  [SPEECH.CPP:1578-1586] SLD-VERIFIED ---- */
-intptr_t Speech_Dispatch(void)
+intptr Speech_Dispatch(void)
 
 {
   Speaker *result;
   
   if ((Speech_fgSpeech != 0) && (Speech_fgSpeech->fBankOffset != 0)) {
-    return (intptr_t)Speech_fgSpeech->fDispatch;
+    return (intptr)Speech_fgSpeech->fDispatch;
   }
-  return (intptr_t)*(Speaker **)Speech_fgUndefined;
+  return (intptr)*(Speaker **)Speech_fgUndefined;
 }
 
 /* ---- Roger__Q26Speech15DispatchSpeaker  [SPEECH.CPP:1592-1629] SLD-VERIFIED ---- */
@@ -1576,14 +1576,14 @@ void MobileSpeaker_Status(MobileSpeaker *pThis)
                             base->fLocation,&base->fDistance,&base->fPerpName);
       SPCH_PlaySpeech();
 
-      dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+      dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
       savedDispatchSub = dispatch->_base_Speaker.fSub;
-      dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+      dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
       dispatch->_base_Speaker.fSub = base;
-      dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+      dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
       entry = &(*dispatch->_base_Speaker._vf)[14];
       NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta);
-      dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+      dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
       dispatch->_base_Speaker.fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
       return;
     }
@@ -1607,11 +1607,11 @@ void MobileSpeaker_Status(MobileSpeaker *pThis)
       SPCHNFS_S_C_SUPER_COP_CRITICISM(&pThis->fVoice);
     }
     else {
-      dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+      dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
       sub = dispatch->_base_Speaker.fSub;
       if ((sub != 0) && (sub->fSub == base)) {
         SPCHNFS_C_C_NEW_OFFICER_ENGAGING(&pThis->fVoice,base->fFrom);
-        dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+        dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
         sub = dispatch->_base_Speaker.fSub;
         entry = &(*sub->_vf)[14];
         NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
@@ -1827,7 +1827,7 @@ void DispatchSpeaker_Grant(DispatchSpeaker *pThis)
 
   /* The second guard is literal MIPS: addiu v0,sub,0x14; beqz v0.
    * It protects the address-of-member expression for the undefined sentinel. */
-  if ((sub != 0) && (sub != (Speaker *)(uintptr_t)(intptr_t)-0x14)) {
+  if ((sub != 0) && (sub != (Speaker *)(intptr)(intptr)-0x14)) {
     Speech_fgSpeech->fSpeakerCar = 0;
     if (Speech_fgSpeech->fMultiplePerps == 0) {
       SPCHNFS_D_C_RDBLK_SPBLT_GRANT_REPLY(&sub->fBlockade,&base->fConfirm);
@@ -1989,7 +1989,7 @@ Speaker * Speech_FindMobile(Speech *pThis,Car_tObj *carObj)
 }
 
 /* ---- Mobile__6SpeechP8Car_tObj  [SPEECH.CPP:2244-2250] SLD-VERIFIED ---- */
-intptr_t Speech_Mobile(Car_tObj *carObj)
+intptr Speech_Mobile(Car_tObj *carObj)
 
 {
   Speaker *pSVar1;
@@ -1998,7 +1998,7 @@ intptr_t Speech_Mobile(Car_tObj *carObj)
   if ((Speech_fgSpeech != 0) && (Speech_fgSpeech->fBankOffset != 0)) {
     pSVar1 = Speech_FindMobile(Speech_fgSpeech,carObj);
   }
-  return (intptr_t)pSVar1;
+  return (intptr)pSVar1;
 }
 
 /* ---- CalcMph__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:2256-2257] SLD-VERIFIED ---- */
@@ -2146,7 +2146,7 @@ void MobileSpeaker_Report(MobileSpeaker *pThis,Car_tObj *perp)
   SPCHNFS_C_D_PERP_SIGHTED(&pThis->fVoice,&base->fColour,base->fCar,&base->fDistance,
                            &base->fPosition,base->fLocation,&base->fPerpName);
   SPCH_PlaySpeech();
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   dispatch->_base_Speaker.fSub = base;
 }
 
@@ -2175,7 +2175,7 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
     if (Speech_fgSpeech->fMultiplePerps != 0) {
       return;
     }
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     entry = &(*dispatch->_base_Speaker._vf)[21];
     if (NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta) >= 0x160) {
       return;
@@ -2201,7 +2201,7 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   entry = &(*base->_vf)[25];
   car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
   if ((car->carFlags & 0x200) == 0) {
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     previous = &dispatch->_base_Speaker;
     cursor = previous->fSub;
     while ((cursor != 0) && (cursor != base)) {
@@ -2214,7 +2214,7 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
     }
   }
 
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   if (dispatch->_base_Speaker.fSub == base) {
     entry = &(*base->_vf)[25];
     car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
@@ -2240,7 +2240,7 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   if (NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta) != 0) {
     entry = &(*base->_vf)[27];
     activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     dispatchSub = dispatch->_base_Speaker.fSub;
     if (((activePerp->carFlags & 4) != 0) && (dispatchSub != 0)) {
       entry = &(*dispatchSub->_vf)[25];
@@ -2250,9 +2250,9 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   }
 
   if (insertAtHead) {
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     base->fSub = dispatch->_base_Speaker.fSub;
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     dispatch->_base_Speaker.fSub = base;
     if (base->fBlockade.flags != 0) {
       return;
@@ -2266,7 +2266,7 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
     goto MobileEngage_playAndReturn;
   }
 
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   previous = &dispatch->_base_Speaker;
   dispatchSub = previous->fSub;
   if (dispatchSub != 0) {
@@ -2296,10 +2296,10 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
     return;
   }
 
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   entry = &(*dispatch->_base_Speaker._vf)[18];
   if (NFS4_VCALL_PTR_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,perp) != 0) {
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     entry = &(*dispatch->_base_Speaker._vf)[21];
     if (NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta) < 0x180) {
       return;
@@ -2318,7 +2318,7 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
   MobileSpeaker_SetSpeed(pThis,activePerp);
 
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   entry = &(*dispatch->_base_Speaker._vf)[18];
   if (NFS4_VCALL_PTR_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,activePerp) == 0) {
     SPCHNFS_C_D_ENGAGE_PURS_REP_SPDR(&pThis->fVoice,&base->fColour,base->fCar,
@@ -2332,16 +2332,16 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   }
   SPCH_PlaySpeech();
 
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   savedDispatchSub = dispatch->_base_Speaker.fSub;
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   dispatch->_base_Speaker.fSub = base;
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   entry = &(*base->_vf)[27];
   activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
   entry = &(*dispatch->_base_Speaker._vf)[1];
   NFS4_VCALL_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,activePerp);
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   dispatch->_base_Speaker.fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
   return;
 
@@ -2370,7 +2370,7 @@ void MobileSpeaker_Lose(MobileSpeaker *pThis)
   }
 
   Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   leader = dispatch->_base_Speaker.fSub;
   if (!((leader != 0) && (leader->fSub == base) &&
         (base->fBlockade.flags == 0) && (base->fArrest.flags == 0))) {
@@ -2390,7 +2390,7 @@ void MobileSpeaker_Lose(MobileSpeaker *pThis)
 
   if (base->fArrest.flags == 0) {
     if ((base->fBlockade.flags == 0) && (leader == 0)) {
-      dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+      dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
       entry = &(*dispatch->_base_Speaker._vf)[21];
       if (NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta) > 0x160) {
         return;
@@ -2442,7 +2442,7 @@ void MobileSpeaker_Lose(MobileSpeaker *pThis)
   base->fUpdate.flags = 0;
 
   if (leader == 0) {
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     savedDispatchSub = dispatch->_base_Speaker.fSub;
     dispatch->_base_Speaker.fSub = base;
     entry = &(*dispatch->_base_Speaker._vf)[14];
@@ -2536,7 +2536,7 @@ MobileCatch_requestEms:
   SPCH_PlaySpeech();
 
 MobileCatch_dispatchCallback:
-  dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   entry = &(*dispatch->_base_Speaker._vf)[19];
   NFS4_VCALL_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,pThis->fPerp);
 }
@@ -2546,7 +2546,7 @@ void MobileSpeaker_RoadBlock(MobileSpeaker *pThis)
 
 {
   Speaker *base = &pThis->_base_Speaker;
-  DispatchSpeaker *dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   Speaker *sub = dispatch->_base_Speaker.fSub;
   __vtbl_ptr_type *entry;
   CallSignBank *callSign;
@@ -2576,7 +2576,7 @@ void MobileSpeaker_SpikeBelt(MobileSpeaker *pThis)
 
 {
   Speaker *base = &pThis->_base_Speaker;
-  DispatchSpeaker *dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+  DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
   Speaker *sub = dispatch->_base_Speaker.fSub;
   __vtbl_ptr_type *entry;
   CallSignBank *callSign;
@@ -2643,7 +2643,7 @@ void MobileSpeaker_Roger(MobileSpeaker *pThis)
 
   Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
   if (sub != 0) {
-    dispatch = (DispatchSpeaker *)(uintptr_t)Speech_Dispatch();
+    dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
     entry = &(*dispatch->_base_Speaker._vf)[22];
     statusSub = (Speaker *)NFS4_VCALL_PTR0(entry->pfn,
                                            (u_char *)&dispatch->_base_Speaker + entry->delta);
@@ -2684,7 +2684,7 @@ void MobileSpeaker_Bullhorn(MobileSpeaker *pThis)
   VOICE = &pThis->fVoice;
   *(Car_tObj **)(((int)Speech_fgSpeech) + 0x38c) = pThis->fCarObj;
   SPCHNFS_C_P_BULLHORN_SPEECH(VOICE);
-  SPCH_PlaySpeech((int)(intptr_t)VOICE,reg_a1,reg_a2,reg_a3);
+  SPCH_PlaySpeech((int)(intptr)VOICE,reg_a1,reg_a2,reg_a3);
   return;
 }
 
@@ -2732,10 +2732,10 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
       SNDstop(CopSpeak_gSpchHandle);
     }
     else {
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
       SNDstop(CopSpeak_gSpchHandle);
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 1;
     }
   }
@@ -2748,11 +2748,11 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
   }
   if (bVar1) {
     if (stackSpeedUpEnbabledFlag != 0) {
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
       AudioMus_StopSong(500);
       AudioMus_PlaySong((char *)0x0);
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 1;
       (pThis->_base_Speaker).fBlockade.flags = 0;
       goto Purge_resetSpeakerFields;

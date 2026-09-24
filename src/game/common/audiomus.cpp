@@ -6,7 +6,6 @@
 #include "../../nfs4_types.h"
 #include "audiomus_externs.h"
 
-
 /* ---- audiomus.obj-owned globals (SYM-typed; .data=real EXE bytes, .bss=zero) ---- */
 AudioMus_tMusicGlobals *AudioMus_g;   /* @0x8013c720  (bss(zero)) */
 
@@ -203,9 +202,8 @@ void AudioMus_QueueRequestedSong(void)
     AudioMus_g->requesthandle =
         SNDSTRM_queuefile(AudioMus_g->streamhandle,0x3e8,AudioMus_g->bigfilename,offset);
   }
-  iVar4 = 2;
   AudioMus_g->switchsong = 2;
-  gettick();
+  iVar4 = gettick();
   pAVar2 = AudioMus_g;
   AudioMus_g->failby = iVar4 + 0x280;
   (pAVar2->current).remaining = 0;
@@ -405,13 +403,13 @@ int AudioMus_Server(int mode,int ticks)
             return 0;
           }
           if (AudioMus_g->errorcode == -5) {
-            pThis = (void *)(intptr_t)AudioMus_g->streamhandle;
+            pThis = (void *)(intptr)AudioMus_g->streamhandle;
             iVar3 = AudioMus_g->volume;
             AudioMus_g->errorcode = 0;
           }
           else {
             AudioMus_SetCurrentSongInfo();
-            pThis = (void *)(intptr_t)AudioMus_g->streamhandle;
+            pThis = (void *)(intptr)AudioMus_g->streamhandle;
             iVar3 = AudioMus_g->volume;
           }
           SNDSTRM_autovol(pThis,2000,iVar3);
@@ -419,8 +417,7 @@ int AudioMus_Server(int mode,int ticks)
           return 0;
         }
         iVar3 = (AudioMus_g->streamstatus).outstandingrequests;
-        if ((iVar3 != 0) &&
-           (SNDSTRM_getvol(AudioMus_g->streamhandle), iVar3 != 0)) {
+        if ((iVar3 != 0) && (SNDSTRM_getvol(AudioMus_g->streamhandle) != 0)) {
           return 0;
         }
         if (-1 < AudioMus_g->streamhandle) {
@@ -438,8 +435,8 @@ int AudioMus_Server(int mode,int ticks)
         pAVar4 = AudioMus_g;
         AudioMus_g->switchsong = 2;
       }
-      gettick();
-      AudioMus_g->failby = (int)&pAVar4[1].current.info.date;
+      iVar3 = gettick();
+      AudioMus_g->failby = iVar3 + 0x280;
     }
     else if (AudioMus_g->errorcode == 0) {
       iVar3 = AudioMus_g->requestsong;
@@ -569,10 +566,6 @@ void AudioMus_DriverStartUp(int buffersize,int spusize)
   SNDPLAYOPTS opts;
   int *piVar1;
   AudioMus_tMusicGlobals *pAVar2;
-  int aiStack_40 [4];
-  int local_30;
-  int aiStack_28 [2];
-  u_char local_20;
   
   if (AudioMus_g != (AudioMus_tMusicGlobals *)0x0) {
     if (AudioMus_g->driveractive == 0) {
@@ -580,20 +573,21 @@ void AudioMus_DriverStartUp(int buffersize,int spusize)
     }
     pAVar2 = AudioMus_g;
     piVar1 = &AudioMus_g->streamhandle;
-    AudioMus_g->threshold = buffersize + spusize >> 5;
+    /* Reserve one STREAM block and one asynchronous refill block */
+    AudioMus_g->threshold = buffersize + spusize > 0x2000 ? (buffersize + spusize - 0x2000) >> 5 : 0;
     if ((*piVar1 < 0) && (pAVar2->streambuffer != (char *)0x0)) {
       chunks = buffersize;
       if (buffersize < 0) {
         chunks = buffersize + 0x3ff;
       }
       chunks = chunks >> 10;
-      SNDSTRM_overhead(0x1,chunks);
-      size = buffersize + SNDgetlimits(aiStack_40);   /* oracle 0x6ab5c: size = buffersize + SNDgetlimits ret */
-      local_30 = spusize;
-      SNDsetlimits(aiStack_40);
-      SNDplaysetdef(aiStack_28);
-      local_20 = 0;
-      streamHandle = SNDSTRM_create(aiStack_28,1,chunks,AudioMus_g->streambuffer,size);
+      size = buffersize + SNDSTRM_overhead(1,chunks);
+      SNDgetlimits((int *)&sndlimits);
+      sndlimits.packetbufsize = spusize;
+      SNDsetlimits((int *)&sndlimits);
+      SNDplaysetdef(&opts);
+      opts.vol = 0;
+      streamHandle = SNDSTRM_create((int *)&opts,1,chunks,AudioMus_g->streambuffer,size);
       AudioMus_g->streamhandle = streamHandle;
       if (-1 < streamHandle) {
         SNDSTRM_setgreedylevel(streamHandle,0);
@@ -602,7 +596,7 @@ void AudioMus_DriverStartUp(int buffersize,int spusize)
     }
     gMusicHandle = AudioMus_g->streamhandle;
     if (AudioMus_g->serveractive == 0) {
-      addsystemtask((intptr_t)AudioMus_Server,0x19,0);
+      addsystemtask((intptr)AudioMus_Server,0x19,0);
       AudioMus_g->serveractive = 1;
     }
   }
@@ -614,11 +608,15 @@ extern "C" void AudioMus_SysStartUp(int buffersize,int spusize,char *songs)
 {
   char *pcVar1;
   int iVar2;
+  SNDLIMITS sndlimits;
   
   if (AudioMus_g == (AudioMus_tMusicGlobals *)0x0) {
     AudioMus_g = (AudioMus_tMusicGlobals *)reservememadr("Music Globals",0x158,0);
     if (AudioMus_g != (AudioMus_tMusicGlobals *)0x0) {
       AudioMus_InitGlobals();
+      SNDgetlimits((int *)&sndlimits);
+      sndlimits.packetbufsize = spusize;
+      SNDsetlimits((int *)&sndlimits);
       iVar2 = buffersize;
       if (buffersize < 0) {
         iVar2 = buffersize + 0x3ff;
@@ -645,7 +643,7 @@ void AudioMus_DriverCleanUp(void)
 {
   if (AudioMus_g != (AudioMus_tMusicGlobals *)0x0) {
     if (AudioMus_g->serveractive != 0) {
-      delsystemtask((intptr_t)AudioMus_Server /* @0x8007a3d0 system-task callback */);
+      delsystemtask((intptr)AudioMus_Server /* @0x8007a3d0 system-task callback */);
       AudioMus_g->serveractive = 0;
     }
     if (-1 < AudioMus_g->streamhandle) {
@@ -889,16 +887,11 @@ extern "C" void AudioMus_Volume(int volume)
     }
     else {
       iVar1 = AudioMus_g->fadetime;
-      if ((((iVar1 != 0) && (-1 < AudioMus_g->streamhandle)) &&
-          (SNDSTRM_getvol(AudioMus_g->streamhandle), 0 < iVar1)) &&
-         (iVar2 = AudioMus_g->volume, 0 < iVar2)) {
-        iVar1 = AudioMus_g->fadetime * iVar1;
-        s = iVar1 / iVar2;
-        if (iVar2 == 0) {
-          trap(0x1c00);
-        }
-        if ((iVar2 == -1) && (iVar1 == -0x80000000)) {
-          trap(0x1800);
+      if ((iVar1 != 0) && (-1 < AudioMus_g->streamhandle)) {
+        curvol = SNDSTRM_getvol(AudioMus_g->streamhandle);
+        iVar2 = AudioMus_g->volume;
+        if ((0 < curvol) && (0 < iVar2)) {
+          s = AudioMus_g->fadetime * curvol / iVar2;
         }
       }
       if (s == 0) {

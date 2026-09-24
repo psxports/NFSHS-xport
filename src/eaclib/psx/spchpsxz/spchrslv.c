@@ -8,7 +8,7 @@
  *   iSPCH_BindData's v0 is passed straight back, so the return is int.
  */
 
-extern "C" int iSPCH_BindData(unsigned short *dat);   /* spchrand */
+extern "C" int iSPCH_BindData(unsigned short *dat); /* spchrand */
 
 extern "C" int SPCH_ResolveData(unsigned short *dat); /* @0x800EBBD4 */
 

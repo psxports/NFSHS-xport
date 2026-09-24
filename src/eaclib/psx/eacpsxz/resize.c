@@ -22,76 +22,67 @@
 struct MemBlock;
 struct MemClass;
 
-extern "C" MemClass *gMemClassTable[16];                       /* @0x8013E900 */
-extern "C" void  FREE_add   (MemClass *cls, MemBlock *node);   /* @0x800E4E70 */
-extern "C" void  FREE_remove(MemClass *cls, MemBlock *node);   /* @0x800E4F04 */
-extern "C" int   initmemblock(MemBlock *blk, char *name, int size, int tailextra,
-                              int flags, MemBlock *physprev, MemBlock *physnext);  /* @0x800E4F2C */
-extern "C" int   MEM_tailsize(char *name, int id);             /* @0x800E5030 */
-extern "C" char *getblockname(void *p);                        /* @0x800E52E0 */
-extern "C" void  blockmove(void *src, void *dst, int n);       /* @0x800E62DC */
-#ifdef AP_WIN
-extern "C" void *NFSHS_HostAlloc(unsigned int size);
-extern "C" unsigned int NFSHS_HostAllocationSize(void *p);
-#endif
+extern "C" MemClass *gMemClassTable[16];                                                                                            /* @0x8013E900 */
+extern "C" void FREE_add(MemClass *cls, MemBlock *node);                                                                            /* @0x800E4E70 */
+extern "C" void FREE_remove(MemClass *cls, MemBlock *node);                                                                         /* @0x800E4F04 */
+extern "C" int initmemblock(MemBlock *blk, char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext); /* @0x800E4F2C */
+extern "C" int MEM_tailsize(char *name, int id);                                                                                    /* @0x800E5030 */
+extern "C" char *getblockname(void *p);                                                                                             /* @0x800E52E0 */
+extern "C" void blockmove(void *src, void *dst, int n);                                                                             /* @0x800E62DC */
 
-extern "C" void *resizememadr(void *userptr, int newsize)      /* @0x800F1950 */
+extern "C" void *resizememadr(void *userptr, int newsize) /* @0x800F1950 */
 {
-#ifdef AP_WIN
-    if (!userptr || newsize < 0) return userptr;
-    unsigned int oldsize = NFSHS_HostAllocationSize(userptr);
-    if ((unsigned int)newsize <= oldsize) return userptr;
-    void *replacement = NFSHS_HostAlloc((unsigned int)newsize);
-    if (!replacement) return userptr;
-    blockmove(userptr, replacement, (int)oldsize);
-    return replacement;
-#else
-    char *hdr = (char *)userptr - 0x10;                         /* s3 = block header */
-    unsigned short flags = *(unsigned short *)(hdr + 2);        /* s1 */
-    char *next = *(char **)(hdr + 8);                           /* s2 = hdr->physnext */
-    MemClass *cls = gMemClassTable[flags & 0xF];                /* s5 */
+    char *hdr = (char *)userptr - 0x10;                  /* s3 = block header */
+    unsigned short flags = *(unsigned short *)(hdr + 2); /* s1 */
+    char *next = *(char **)(hdr + 8);                    /* s2 = hdr->physnext */
+    MemClass *cls = gMemClassTable[flags & 0xF];         /* s5 */
 
     /* 1. coalesce forward if the next physical block is free */
-    if (*(unsigned short *)(next + 2) & 0x4000) {
+    if (*(unsigned short *)(next + 2) & 0x4000)
+    {
         FREE_remove(cls, (MemBlock *)next);
-        next = *(char **)(next + 8);                            /* next = next->physnext */
-        *(char **)(hdr + 8) = next;                             /* hdr->physnext = next */
+        next = *(char **)(next + 8); /* next = next->physnext */
+        *(char **)(hdr + 8) = next;  /* hdr->physnext = next */
     }
 
     /* 2. clamp requested size (s4 keeps the raw value used as the new tail offset) */
-    int usable = newsize;                                       /* s4 */
-    int sz     = newsize;                                       /* s0 */
-    if (sz < 8) {
-        if (sz == -1)      sz = 0x40000000;                     /* grow to max */
-        else if (sz >= 0)  sz = 8;                              /* 0..7 -> 8 (negatives kept) */
+    int usable = newsize; /* s4 */
+    int sz = newsize;     /* s0 */
+    if (sz < 8)
+    {
+        if (sz == -1)
+            sz = 0x40000000; /* grow to max */
+        else if (sz >= 0)
+            sz = 8; /* 0..7 -> 8 (negatives kept) */
     }
 
     /* 3. aligned physical payload needed, clamped to available span */
-    char *name  = getblockname(userptr);
-    int   tail  = MEM_tailsize(name, flags);
-    int   align = *(int *)((char *)cls + 0x28);                 /* class->alignment */
-    int   needed = (int)(((unsigned)(sz + tail + align + 15)) & (unsigned)(-align)) - 0x10;
-    int   avail  = (int)(next - hdr) - 0x10;
-    if (avail < needed) {
-        needed = avail;                                        /* can't grow past the span */
-        usable = avail - tail;                                 /* s4 = avail - tailsize */
+    char *name = getblockname(userptr);
+    int tail = MEM_tailsize(name, flags);
+    int align = *(int *)((char *)cls + 0x28); /* class->alignment */
+    int needed = (int)(((unsigned)(sz + tail + align + 15)) & (unsigned)(-align)) - 0x10;
+    int avail = (int)(next - hdr) - 0x10;
+    if (avail < needed)
+    {
+        needed = avail;        /* can't grow past the span */
+        usable = avail - tail; /* s4 = avail - tailsize */
     }
 
     /* 4. relocate the tail (info/name) to sit right after the new usable region */
-    blockmove((char *)userptr + *(int *)(hdr + 4),    /* src = p + old tail offset (hdr[+4]) */
-              (char *)userptr + usable,               /* dst = p + new usable size           */
+    blockmove((char *)userptr + *(int *)(hdr + 4), /* src = p + old tail offset (hdr[+4]) */
+              (char *)userptr + usable,            /* dst = p + new usable size           */
               tail);
 
     /* 5. split off the leftover as a new free block if it's worth it (>= 65 bytes) */
-    if ((avail - needed) >= 0x41) {
+    if ((avail - needed) >= 0x41)
+    {
         MemBlock *split;
-        *(int *)(hdr + 4) = usable;                            /* hdr usable size = new tail offset */
+        *(int *)(hdr + 4) = usable; /* hdr usable size = new tail offset */
         split = (MemBlock *)((char *)userptr + needed + 0x10);
         initmemblock(split, 0, 0, 0, 0, (MemBlock *)hdr, (MemBlock *)next);
         FREE_add(cls, split);
-        *(char **)(next + 0xC) = (char *)split;               /* next->physprev = split */
-        *(char **)(hdr  + 8)   = (char *)split;               /* hdr->physnext  = split */
+        *(char **)(next + 0xC) = (char *)split; /* next->physprev = split */
+        *(char **)(hdr + 8) = (char *)split;    /* hdr->physnext  = split */
     }
     return userptr;
-#endif
 }

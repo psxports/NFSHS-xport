@@ -3,7 +3,7 @@
 #define _FE_SCREENS_FETRACKS_EXTERNS_H_
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
-extern "C" extern char        *Paths_Paths[];
-extern "C" extern tfrontEnd    frontEnd;
+extern "C" extern char *Paths_Paths[];
+extern "C" extern tfrontEnd frontEnd;
 extern __vtbl_ptr_type tListIteratorTrack_vtable[];
 #endif

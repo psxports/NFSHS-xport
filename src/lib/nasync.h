@@ -10,47 +10,55 @@
 #define LIB_NASYNC_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* ---- one async-load request : 0x2C (44) bytes, array at `request` ---- */
-typedef struct AsyncReq {
-    int id;                /* +0x00 (slotIndex in low byte) | (requestidcounter in upper bits)         */
-    struct AsyncReq *next; /* +0x04 free/call-queue link                                                */
-    int bytesread;         /* +0x08 bytes transferred so far (0 == not started; getasyncreadstatus)     */
-    int status;            /* +0x0C 0 == active; nonzero makes getasyncreadstatus return -2             */
-    int buffer;            /* +0x10 result buffer addr (1 == "allocate by size" sentinel until alloc'd) */
-    int callback;          /* +0x14 optional user completion callback fn ptr (0 == poll-only)           */
-    int fileop;            /* +0x18 in-flight FILE op id; nonzero makes getasyncreadstatus return 0       */
-    int handle;            /* +0x1C FILE handle from FILE_open                                          */
-    int offset;            /* +0x20 file read offset cursor                                             */
-    int arg24;             /* +0x24 reservememadr mem-class (file load) / remaining size (segment load) */
-    int dest;              /* +0x28 memory destination cursor                                           */
-} AsyncReq;                /* 0x2C */
+    /* ---- one async-load request : 0x2C (44) bytes, array at `request` ---- */
+    typedef struct AsyncReq
+    {
+        int id;                /* +0x00 (slotIndex in low byte) | (requestidcounter in upper bits)         */
+        struct AsyncReq *next; /* +0x04 free/call-queue link                                                */
+        int bytesread;         /* +0x08 bytes transferred so far (0 == not started; getasyncreadstatus)     */
+        int status;            /* +0x0C 0 == active; nonzero makes getasyncreadstatus return -2             */
+        int buffer;            /* +0x10 result buffer addr (1 == "allocate by size" sentinel until alloc'd) */
+        int callback;          /* +0x14 optional user completion callback fn ptr (0 == poll-only)           */
+        int fileop;            /* +0x18 in-flight FILE op id; nonzero makes getasyncreadstatus return 0       */
+        int handle;            /* +0x1C FILE handle from FILE_open                                          */
+        int offset;            /* +0x20 file read offset cursor                                             */
+        int arg24;             /* +0x24 reservememadr mem-class (file load) / remaining size (segment load) */
+        int dest;              /* +0x28 memory destination cursor                                           */
+    } AsyncReq;                /* 0x2C */
 
-/* ---- a FIFO queue of requests : {head, tail} (8 bytes) ---- */
-typedef struct AsyncQueue {
-    AsyncReq *head;        /* +0x00 */
-    AsyncReq *tail;        /* +0x04 */
-} AsyncQueue;
+    /* ---- a FIFO queue of requests : {head, tail} (8 bytes) ---- */
+    typedef struct AsyncQueue
+    {
+        AsyncReq *head; /* +0x00 */
+        AsyncReq *tail; /* +0x04 */
+    } AsyncQueue;
 
-/* ---- nasync globals (data-materialization pass owns the addresses) ---- */
-extern AsyncReq  *request;          /* the request slot pool (reservememadr'd in initasync)            */
-extern int        numrequests;      /* pool size                                                       */
-extern int        readblocksize;    /* per-chunk read size                                             */
-extern AsyncQueue freequeue;        /* @0x8013DEA0 : free slots                                        */
-extern AsyncQueue callqueue;        /* @0x8013DEA8 : finished slots awaiting their user callback        */
-extern int        asyncfilehandle;  /* @0x8013DEB0 : the FILE handle set by setasyncfile (segment loads)*/
-extern int        asyncfileoffset;  /* running file offset for segment loads                           */
-extern void      *mutex;            /* allocmutex() handle                                             */
+    /* ---- nasync globals (data-materialization pass owns the addresses) ---- */
+    extern AsyncReq *request;    /* the request slot pool (reservememadr'd in initasync)            */
+    extern int numrequests;      /* pool size                                                       */
+    extern int readblocksize;    /* per-chunk read size                                             */
+    extern AsyncQueue freequeue; /* @0x8013DEA0 : free slots                                        */
+    extern AsyncQueue callqueue; /* @0x8013DEA8 : finished slots awaiting their user callback        */
+    extern int asyncfilehandle;  /* @0x8013DEB0 : the FILE handle set by setasyncfile (segment loads)*/
+    extern int asyncfileoffset;  /* running file offset for segment loads                           */
+    extern void *mutex;          /* allocmutex() handle                                             */
 
 /* ---- cop0 IRQ-disabled critical section (host no-op; faithful intent on the MIPS target) ---- */
 #if defined(__mips__)
-void ASYNC_enterCS(void);
-void ASYNC_leaveCS(void);
+    void ASYNC_enterCS(void);
+    void ASYNC_leaveCS(void);
 #else
-static inline void ASYNC_enterCS(void) {}
-static inline void ASYNC_leaveCS(void) {}
+static inline void ASYNC_enterCS(void)
+{
+}
+
+static inline void ASYNC_leaveCS(void)
+{
+}
 #endif
 
 #ifdef __cplusplus

@@ -4,49 +4,44 @@
  *   Ghidra nfs4-f.exe.c (inittmr) + disasm-v3 + IDA sigs.  Bare VAs symbolicated: addexit arg 0x800F4304 =
  *   &restoretimer; blockclear target 0x8012360C = &tmrsub; creatememclass template 0x8013DD48 = &DAT_8013dd48.
  */
-extern "C" int   timerflag;     /* RCnt event installed flag */
-extern "C" int   timerevent;    /* RCnt event handle */
-extern "C" int   reentryflag;   /* tmrint re-entry guard */
-extern "C" int   timerhz;       /* tick rate */
+extern "C" int timerflag;            /* RCnt event installed flag */
+extern "C" int timerevent;           /* RCnt event handle */
+extern "C" int reentryflag;          /* tmrint re-entry guard */
+extern "C" int timerhz;              /* tick rate */
 extern "C" void *gMemClassTable[16]; /* @0x8013E900 */
-extern "C" int   DAT_8013dd48;  /* creatememclass template */
-extern "C" int   tmrsub;        /* int[8] : per-tick handler list */
-extern "C" int   ticks;         /* raw tick counter */
-extern "C" int   libticks;      /* library tick counter */
-extern "C" int   g_currentthread;
+extern "C" int DAT_8013dd48;         /* creatememclass template */
+extern "C" int tmrsub;               /* int[8] : per-tick handler list */
+extern "C" int ticks;                /* raw tick counter */
+extern "C" int libticks;             /* library tick counter */
+extern "C" int g_currentthread;
 
-extern "C" int creatememclass(int id, char *name, char *membuf, int bufsize,
-                               int granularity, int alignment, int infosize,
-                               int lowguard, int reserved9, int highguard,
-                               int usemutex, int field3c);
+extern "C" int creatememclass(int id, char *name, char *membuf, int bufsize, int granularity, int alignment, int infosize, int lowguard, int reserved9, int highguard, int usemutex, int field3c);
 extern "C" unsigned int MEM_defaultevent(void); /* @0x800F4178 */
-extern "C" void blockclear(int dst, int len);           /* blkfill */
-extern "C" int  addexit(int fn);                        /* exit */
-extern "C" void initgp(void);                           /* savegp */
-extern "C" void savegp(void *buf);                      /* savegp */
-extern "C" void restoregp(int gp);                      /* savegp */
-extern "C" void resettick(void);                        /* timer */
+extern "C" void blockclear(int dst, int len);   /* blkfill */
+extern "C" int addexit(int fn);                 /* exit */
+extern "C" void initgp(void);                   /* savegp */
+extern "C" void savegp(void *buf);              /* savegp */
+extern "C" void restoregp(int gp);              /* savegp */
+extern "C" void resettick(void);                /* timer */
 extern "C" void trap(unsigned int code);
 /* --- syslib (PsyQ libapi/libetc) --- */
 extern "C" void EnterCriticalSection(void);
 extern "C" void ExitCriticalSection(void);
-extern "C" int  OpenEvent(unsigned int cls, int spec, int mode, int *fn);
+extern "C" int OpenEvent(unsigned int cls, int spec, int mode, int *fn);
 extern "C" void EnableEvent(int ev);
 extern "C" void DisableEvent(int ev);
 extern "C" void SetRCnt(int spec, unsigned short target, int mode);
 extern "C" void StartRCnt(int spec);
 
-extern "C" int  initmemadr(int base, int size);   /* @0x800F4180 */
-extern "C" int  inittimer(int hz);                /* @0x800F41F0 */
-extern "C" void restoretimer(void);               /* @0x800F4304 */
-extern "C" unsigned int tmrint(void);             /* @0x800F4328 */
+extern "C" int initmemadr(int base, int size); /* @0x800F4180 */
+extern "C" int inittimer(int hz);              /* @0x800F41F0 */
+extern "C" void restoretimer(void);            /* @0x800F4304 */
+extern "C" unsigned int tmrint(void);          /* @0x800F4328 */
 
 /* initmemadr @0x800F4180 : create the timer's memory class from the static template. */
 extern "C" int initmemadr(int base, int size)
 {
-    int r = creatememclass(0, (char *)&DAT_8013dd48, (char *)base, size,
-                           8, 0x20, 0, 0, 0, 0, 0,
-                           (int)MEM_defaultevent);
+    int r = creatememclass(0, (char *)&DAT_8013dd48, (char *)base, size, 8, 0x20, 0, 0, 0, 0, 0, (int)MEM_defaultevent);
     gMemClassTable[1] = gMemClassTable[0];
     return r;
 }
@@ -57,7 +52,8 @@ extern "C" int inittimer(int hz)
     if (hz == 0)
         hz = 100;
     EnterCriticalSection();
-    if (timerflag == 0) {
+    if (timerflag == 0)
+    {
         blockclear((int)&tmrsub, 0x20);
         timerevent = OpenEvent(0xf2000002, 2, 0x1000, (int *)tmrint);
         EnableEvent(timerevent);
@@ -87,13 +83,14 @@ extern "C" void restoretimer(void)
 extern "C" unsigned int tmrint(void)
 {
     unsigned int gpbuf[2];
-    int          i = 0;
-    int         *p = &tmrsub;
+    int i = 0;
+    int *p = &tmrsub;
     savegp(gpbuf);
     ticks = ticks + 1;
     g_currentthread = 1;
     libticks = libticks + 1;
-    do {
+    do
+    {
         if (*p != 0)
             ((void (*)(void))*p)();
         i = i + 1;

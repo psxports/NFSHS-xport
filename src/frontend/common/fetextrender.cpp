@@ -177,7 +177,7 @@ extern "C" void FETextRender_MenuTextPositionedJustifyFade(int fade,short index,
 
 /* ---- FETextRender_WordWrapTextRGBJustify  [FETEXTRENDER.CPP:216-355] SLD-VERIFIED ---- */
 
-extern "C" int FETextRender_WordWrapTextRGBJustify(char *str,RECT &r,int col,int justify,int size,bool JustGrabHeight)
+extern "C" int FETextRender_WordWrapTextRGBJustify(char *str,PSX_RECT &r,int col,int justify,int size,bool JustGrabHeight)
 
 {
   char cVar1;
@@ -307,7 +307,7 @@ FETextRender_skipLeadSpace:
 
 /* ---- FETextRender_WordWrapTextRGB  [FETEXTRENDER.CPP:359-360] SLD-VERIFIED ---- */
 
-extern "C" void FETextRender_WordWrapTextRGB(char *str,RECT &r,int Col)
+extern "C" void FETextRender_WordWrapTextRGB(char *str,PSX_RECT &r,int Col)
 
 {
   
@@ -318,7 +318,7 @@ extern "C" void FETextRender_WordWrapTextRGB(char *str,RECT &r,int Col)
 
 
 /* ---- FETextRender_WordWrapTextFade  [FETEXTRENDER.CPP:364-371] SLD-VERIFIED ---- */
-extern "C" void FETextRender_WordWrapTextFade(int fade,char *str,RECT &r,tMenuTextState textState,tMenuTextType textType)
+extern "C" void FETextRender_WordWrapTextFade(int fade,char *str,PSX_RECT &r,tMenuTextState textState,tMenuTextType textType)
 
 {
   
@@ -331,7 +331,7 @@ extern "C" void FETextRender_WordWrapTextFade(int fade,char *str,RECT &r,tMenuTe
 
 
 /* ---- FETextRender_WordWrapText  [FETEXTRENDER.CPP:375-376] SLD-VERIFIED ---- */
-extern "C" void FETextRender_WordWrapText(char *str,RECT &r,tMenuTextState textState,tMenuTextType textType)
+extern "C" void FETextRender_WordWrapText(char *str,PSX_RECT &r,tMenuTextState textState,tMenuTextType textType)
 
 {
   
@@ -342,7 +342,7 @@ extern "C" void FETextRender_WordWrapText(char *str,RECT &r,tMenuTextState textS
 
 
 /* ---- FETextRender_WordWrapFade  [FETEXTRENDER.CPP:380-383] SLD-VERIFIED ---- */
-extern "C" void FETextRender_WordWrapFade(int fade,short index,RECT &r,tMenuTextState state,tMenuTextType type)
+extern "C" void FETextRender_WordWrapFade(int fade,short index,PSX_RECT &r,tMenuTextState state,tMenuTextType type)
 
 {
   char *str;
@@ -355,7 +355,7 @@ extern "C" void FETextRender_WordWrapFade(int fade,short index,RECT &r,tMenuText
 
 
 /* ---- FETextRender_WordWrap  [FETEXTRENDER.CPP:388-389] SLD-VERIFIED ---- */
-void FETextRender_WordWrap(short index,RECT &r,tMenuTextState textState,tMenuTextType textType)
+void FETextRender_WordWrap(short index,PSX_RECT &r,tMenuTextState textState,tMenuTextType textType)
 
 {
   
@@ -371,7 +371,7 @@ extern "C" int FETextRender_WordWrapHeight(short width,char *str)
 
 {
   int h;
-  RECT r;
+  PSX_RECT r;
   
   r.h = 500;
   r.x = 0;

@@ -9,17 +9,18 @@
 #include "../../../lib/snd.h"
 #include "../../../mips_semantics.h"
 
-extern "C" int iSNDunsafevol(int handle, int vol)   /* @0x800E69D0 */
+extern "C" int iSNDunsafevol(int handle, int vol) /* @0x800E69D0 */
 {
     int chan = iSNDgetchan(handle);
     if (chan < 0)
         return chan;
     int iter = -1;
-    int level = nfs4_mips_sll_s32(vol,16);
-    while (iSNDpatchkey(chan, &iter)) {
+    int level = nfs4_mips_sll_s32(vol, 16);
+    while (iSNDpatchkey(chan, &iter))
+    {
         SndVoice *v = &SND->voices[iter];
         if (v->f1C == level)
-            break;                          /* already this level -> done */
+            break; /* already this level -> done */
         v->f1C = level;
         iSNDcalcvol(iter);
         v->f14 = 0;
@@ -28,7 +29,7 @@ extern "C" int iSNDunsafevol(int handle, int vol)   /* @0x800E69D0 */
     return chan;
 }
 
-extern "C" int SNDvol(int handle, int vol)   /* @0x800E6A94 */
+extern "C" int SNDvol(int handle, int vol) /* @0x800E6A94 */
 {
     if (SND->enabled == 0)
         return -10;

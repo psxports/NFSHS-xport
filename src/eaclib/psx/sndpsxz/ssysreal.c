@@ -5,12 +5,12 @@
  */
 #include "../../../nfs4_types.h"
 
-extern "C" void SNDSYS_service(void);                               /* ssysserv */
-extern "C" int addsystemtask(intptr_t fn, int period, int delay);   /* eacpsxz systask.obj */
-extern "C" int  DAT_80134a6c;   /* @0x80134A6C : "real-time task installed" flag */
+extern "C" void SNDSYS_service(void);                           /* ssysserv */
+extern "C" int addsystemtask(intptr fn, int period, int delay); /* eacpsxz systask.obj */
+extern "C" int DAT_80134a6c;                                    /* @0x80134A6C : "real-time task installed" flag */
 
-extern "C" void iSNDsystemtaskreal(void);   /* @0x800F2130 */
-extern "C" void SNDSYS_vectortoreal(void);  /* @0x800F2150 */
+extern "C" void iSNDsystemtaskreal(void);  /* @0x800F2130 */
+extern "C" void SNDSYS_vectortoreal(void); /* @0x800F2150 */
 
 /* iSNDsystemtaskreal @0x800F2130 : the per-frame system-task entry -- run the sound service. */
 extern "C" void iSNDsystemtaskreal(void)
@@ -21,8 +21,9 @@ extern "C" void iSNDsystemtaskreal(void)
 /* SNDSYS_vectortoreal @0x800F2150 : install iSNDsystemtaskreal as a real-time system task (once). */
 extern "C" void SNDSYS_vectortoreal(void)
 {
-    if (DAT_80134a6c == 0) {
-        addsystemtask((intptr_t)iSNDsystemtaskreal, 0, 1);
+    if (DAT_80134a6c == 0)
+    {
+        addsystemtask((intptr)iSNDsystemtaskreal, 0, 1);
         DAT_80134a6c = 1;
     }
 }

@@ -491,7 +491,7 @@ void InitFrontEndStructure(void)
     frontEnd.rampGas[iVar7] = '\x01';
     frontEnd.rampBrake[iVar7] = '\x01';
     do {
-      ptVar4 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (short)iVar3);
+      ptVar4 = (tCarInfo *)(intptr)GetCarFromID(&carManager, (short)iVar3);
       frontEnd.carColors[iVar7][iVar3] = ptVar4 ? ptVar4->fDefaultColor : 0;
       iVar3 = iVar3 + 1;
     } while (iVar3 < 0x30);
@@ -941,7 +941,7 @@ FrontInitPlayers_playerLoop:
   for (sVar2 = 0; iVar5 = (int)sVar2, iVar5 < streamData->numPlayers; sVar2 = sVar2 + 1) {
     carModel = (tCarModels)streamData->playerCars[iVar5].fCarID;
     carColor = streamData->playerCars[iVar5].fColor;
-    pvVar4 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &carModel,&carColor);
+    pvVar4 = (void *)(intptr)IsCarAnAddedModel(&carManager, &carModel,&carColor);
     if ((pvVar4 != (void *)0x1) && (streamData->totalModels < 0xd)) {
       streamData->totalModels = streamData->totalModels + 6;
     }
@@ -990,7 +990,7 @@ void Front_InitTourneyTraffic(tFEStream *streamData)
       if (5 < iVar5 * 0x10000 >> 0x10) {
         iVar5 = 0;
       }
-      pvVar4 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &carModel,&carColor);
+      pvVar4 = (void *)(intptr)IsCarAnAddedModel(&carManager, &carModel,&carColor);
       if (pvVar4 != (void *)0x1) {
         streamData->totalModels = streamData->totalModels + 1;
         AddCarToIngameList(&carManager, &carModel,&carColor);
@@ -1079,9 +1079,9 @@ void Front_InitOpponentCars(tFEStream *streamData)
         sVar3 = (short)iVar10;
         bVar1 = ptVar2->fTournaments[iVar7].fOpponentCar[sVar3];
         carModel = (tCarModels)bVar1;
-        ptVar4 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (ushort)bVar1);
+        ptVar4 = (tCarInfo *)(intptr)GetCarFromID(&carManager, (ushort)bVar1);
         carColor = ptVar4->fDefaultColor;
-        pvVar5 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &carModel,&carColor);
+        pvVar5 = (void *)(intptr)IsCarAnAddedModel(&carManager, &carModel,&carColor);
         if ((pvVar5 != (void *)0x1) && (streamData->totalModels < 0x10)) {
           streamData->totalModels = streamData->totalModels + 3;
         }
@@ -1098,7 +1098,7 @@ void Front_InitOpponentCars(tFEStream *streamData)
           streamData->carLineup[sVar3 + 1].carUpgrades = streamData->playerCars[0].fUpgrades;
         }
         if ((frontEnd.raceType == '\x02') && (frontEnd.tier == '\0')) {
-          pvVar5 = (void *)(intptr_t)FECheat_IsCheatEnabled(cheat_FinishedTournament);
+          pvVar5 = (void *)(intptr)FECheat_IsCheatEnabled(cheat_FinishedTournament);
           if ((pvVar5 == (void *)0x0) || (frontEnd.opponentUpgrades == '\0')) {
             streamData->carLineup[sVar3 + 1].carUpgrades = '\0';
           }
@@ -1143,7 +1143,7 @@ void Front_InitOpponentCars(tFEStream *streamData)
     GetStockCar(&carManager, (ushort)(byte)frontEnd.oppCar,&tStack_120);
     tStack_38 = (tCarModels)(int)tStack_120.fCarID;
     loc_34[0] = tStack_120.fColorOrder[tStack_120.fDefaultColor];
-    pvVar5 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &tStack_38,loc_34);
+    pvVar5 = (void *)(intptr)IsCarAnAddedModel(&carManager, &tStack_38,loc_34);
     if (pvVar5 != (void *)0x1) {
       if (streamData->totalModels < 0x10) {
         streamData->totalModels = streamData->totalModels + 3;
@@ -1316,7 +1316,7 @@ void Front_InitCopCars(tFEStream *streamData)
             ptVar2 = regularCopModels[uVar9] + (byte)(streamData->trackInfo).fCountry;
           }
           copModel = *ptVar2;
-          pvVar3 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &copModel,&copColor);
+          pvVar3 = (void *)(intptr)IsCarAnAddedModel(&carManager, &copModel,&copColor);
           if (pvVar3 != (void *)0x1) {
             streamData->totalModels = streamData->totalModels + 3;
             AddCarToIngameList(&carManager, &copModel,&copColor);
@@ -1383,7 +1383,7 @@ void Front_InitPerps(tFEStream *streamData)
       bVar1 = streamData->pStages[iVar6].fCarModel;
       carModel = (tCarModels)bVar1;
       carColor = streamData->pStages[iVar6].fColor;
-      ptVar2 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (ushort)bVar1);
+      ptVar2 = (tCarInfo *)(intptr)GetCarFromID(&carManager, (ushort)bVar1);
       iVar3 = 0;
       iVar6 = 0;
       do {
@@ -1393,7 +1393,7 @@ void Front_InitPerps(tFEStream *streamData)
         iVar6 = iVar4;
       } while (iVar4 * 0x10000 >> 0x10 < 0x10);
       carColor = (char)iVar6;
-      pvVar5 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &carModel,&carColor);
+      pvVar5 = (void *)(intptr)IsCarAnAddedModel(&carManager, &carModel,&carColor);
       if (pvVar5 != (void *)0x1) {
         if (streamData->totalModels < 0x10) {
           streamData->totalModels = streamData->totalModels + 6;
@@ -1428,7 +1428,7 @@ void Front_InitTrack(tFEStream *streamData)
   
   if (frontEnd.raceType == '\x02') {
     GetTrackToRace(&tournamentManager,&streamData->track);
-    src = (tTrackInformation *)(intptr_t)GetTrackByID(&trackManager,(short)(streamData->track).fTrackNumber);
+    src = (tTrackInformation *)(intptr)GetTrackByID(&trackManager,(short)(streamData->track).fTrackNumber);
     blockmove(src,&streamData->trackInfo,0x30);
   }
   else {
@@ -1535,7 +1535,7 @@ void Front_InitTraffic(tFEStream *streamData)
       if (5 < iVar5 * 0x10000 >> 0x10) {
         iVar3 = 0;
       }
-      pvVar4 = (void *)(intptr_t)IsCarAnAddedModel(&carManager, &carModel,&carColor);
+      pvVar4 = (void *)(intptr)IsCarAnAddedModel(&carManager, &carModel,&carColor);
       if (pvVar4 != (void *)0x1) {
         AddCarToIngameList(&carManager, &carModel,&carColor);
       }
@@ -1700,7 +1700,7 @@ int * Front_AppendOpponentData(int *stream,tFEStream *streamData)
   if (0 < streamData->numOpponents) {
     do {
       iVar2 = (int)(short)iVar4 + (int)streamData->numPlayers;
-      ptVar3 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (short)streamData->carLineup[iVar2].carModel);
+      ptVar3 = (tCarInfo *)(intptr)GetCarFromID(&carManager, (short)streamData->carLineup[iVar2].carModel);
       *stream = 0x119;
       stream[1] = (int)streamData->currentCar;
       stream[2] = (int)streamData->carLineup[iVar2].position;
@@ -1784,7 +1784,7 @@ int * Front_AppendCopData(int *stream,tFEStream *streamData)
   }
   for (sVar4 = 0; iVar3 = (int)sVar4,
       iVar3 < (int)streamData->numCops + (int)streamData->numSuperCops; sVar4 = sVar4 + 1) {
-    ptVar1 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (short)streamData->copCars[iVar3]);
+    ptVar1 = (tCarInfo *)(intptr)GetCarFromID(&carManager, (short)streamData->copCars[iVar3]);
     *stream = 0x104;
     iVar2 = 8;
     stream[1] = (int)streamData->currentCar;
@@ -1861,7 +1861,7 @@ int * Front_AppendPerpData(int *stream,tFEStream *streamData)
   iVar4 = 0;
   if (0 < streamData->numPerpObjects) {
     do {
-      ptVar1 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (short)streamData->perps[iVar4].carModel);
+      ptVar1 = (tCarInfo *)(intptr)GetCarFromID(&carManager, (short)streamData->perps[iVar4].carModel);
       *piVar3 = 0x104;
       piVar3[1] = (int)streamData->currentCar;
       piVar3[2] = (uint)ptVar1->fSimNumber;
@@ -1924,7 +1924,7 @@ int * Front_AppendTrafficData(int *stream,tFEStream *streamData)
   iVar2 = 0;
   if (0 < streamData->numTraffic) {
     do {
-      ptVar1 = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, streamData->trafficCars[iVar2]);
+      ptVar1 = (tCarInfo *)(intptr)GetCarFromID(&carManager, streamData->trafficCars[iVar2]);
       *stream = 0x104;
       iVar2 = iVar2 + 1;
       stream[1] = (int)streamData->currentCar;
@@ -2626,7 +2626,7 @@ extern "C" void SetLicensePlate(void)
   p = 0;
   do {
     player = p >> 0x10;
-    fmt = (char *)(intptr_t)PlayerName(player);
+    fmt = (char *)(intptr)PlayerName(player);
     s = frontEnd.licensePlate + player;
     sprintf(*s,fmt);
     StatTool_UpperCaseItKeepingInMindThoseBloodySpecialCharacters(*s);
@@ -2666,7 +2666,7 @@ extern "C" void SetPlayList(int ivealreadygotone)
   
   AudioMus_SysCleanUp();
   AudioMus_SysStartUp(0xc000,0x18000,"ymus");
-  addr = (AudioMus_tSongList *)(intptr_t)AudioMus_GetSongList("game*",0);
+  addr = (AudioMus_tSongList *)(intptr)AudioMus_GetSongList("game*",0);
   if (ivealreadygotone == 0) {
     memset(frontEnd.FEPlayList,0,sizeof(frontEnd.FEPlayList));
     iVar1 = 0;

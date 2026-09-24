@@ -5,51 +5,58 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" { char *Platform_GetDCTBuffer(...); void Platform_ResetDCTBuffer(); }
-extern "C" CVECTOR * Chunk_lightTable;
-extern Car_tObj           *Cars_gTrafficCarList[];
-extern "C" Chunk              *Track_chunkList;
-extern "C" extern GameSetup_tData   GameSetup_gData;
-extern "C" CTrackSpec        TrackSpec_gSpec;
-extern Group              *Object_customSFXInst;     /* 0x8013d2d0 */
-extern "C" Group              *gPersistObjDef;           /* track.obj */
-extern "C" MATRIX     &Render_gWorldMat, &Render_gNightMat;
-extern Trk_NewSlice  *BWorldSm_slices;
-extern camera_info       Camera_gInfo[2];            /* camera.obj */
-extern char * Track_MakeTrackDataPathName(char *ext);
-extern char * Track_MakeTrackPathName(char *ext);
+extern "C"
+{
+    char *Platform_GetDCTBuffer(...);
+    void Platform_ResetDCTBuffer();
+}
+extern "C" CVECTOR *Chunk_lightTable;
+extern Car_tObj *Cars_gTrafficCarList[];
+extern "C" Chunk *Track_chunkList;
+extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" CTrackSpec TrackSpec_gSpec;
+extern Group *Object_customSFXInst; /* 0x8013d2d0 */
+extern "C" Group *gPersistObjDef;   /* track.obj */
+extern "C" MATRIX &Render_gWorldMat, &Render_gNightMat;
+extern Trk_NewSlice *BWorldSm_slices;
+extern camera_info Camera_gInfo[2]; /* camera.obj */
+extern char *Track_MakeTrackDataPathName(char *ext);
+extern char *Track_MakeTrackPathName(char *ext);
 extern char Night_gDrawLightning;
-extern coorddef * Chunk_chunkCenters;
-extern int                 Cars_gNumCopCars;
-extern int                 Object_customSliceNum;    /* 0x8013d2d4 */
-extern "C" extern int                 generic128HzClock, stackSpeedUpEnbabledFlag;
-extern "C" int               Replay_ReplayMode;          /* replay.obj */
-extern "C" int               screenheight, ticks, gFlip, gLargestUnused, Draw_gPlayer1View, Draw_gDoVSync, currentVideo;
-extern "C" int            Chunk_numLight;            /* 0x8013d4ec */
-extern "C" int            Draw_gPlayer1View, Draw_gPlayer2View;
-extern int            gNumSlices;
-extern "C" int    &Skid_gCtrlScratch_94, &Skid_gCtrlScratch_98, Skid_gScratchPos1, Skid_gScratchPos2, &gScratchLastWord;
-extern int   BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez);
+extern coorddef *Chunk_chunkCenters;
+extern int Cars_gNumCopCars;
+extern int Object_customSliceNum; /* 0x8013d2d4 */
+extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern "C" int Replay_ReplayMode; /* replay.obj */
+extern "C" int screenheight, ticks, gFlip, gLargestUnused, Draw_gPlayer1View, Draw_gDoVSync, currentVideo;
+extern "C" int Chunk_numLight; /* 0x8013d4ec */
+extern "C" int Draw_gPlayer1View, Draw_gPlayer2View;
+extern int gNumSlices;
+extern "C" int &Skid_gCtrlScratch_94, &Skid_gCtrlScratch_98, Skid_gScratchPos1, Skid_gScratchPos2, &gScratchLastWord;
+extern int BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez);
 extern "C" u_char *Track_gInViewCount;
-extern "C" { extern int Loading_UpdateLoadingScreen(int); }
+extern "C"
+{
+    extern int Loading_UpdateLoadingScreen(int);
+}
 extern int Night_gLightningType;
 extern int Night_gXDistShift;
 extern int Night_gZDistShift;
 extern int Night_gZNear;
 extern "C" extern int gNight_renderNight;
 extern "C" short *Track_gInViewList;
-extern "C" u_char           *&Render_gPacketPtr, *&Render_gPalettePtr;
-extern intptr_t            gWSavePtr;
-extern void  Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);
+extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
+extern intptr gWSavePtr;
+extern void Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);
 extern void BWorldSm_Restart(void);
 extern void Chunk_UpdateSys(DRender_tView *Vi);
-extern void DrawW_BuildSpikeBelt(DRender_tView *Vi,int scale,Draw_DCache *sd);
-extern void DrawW_DoLines(DRender_tView *Vi,tBuildEntry *buildList,Draw_DCache *sd);
-extern void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList);
-extern void DrawW_DoTrough(DRender_tView *Vi,tBuildEntry *buildList);
+extern void DrawW_BuildSpikeBelt(DRender_tView *Vi, int scale, Draw_DCache *sd);
+extern void DrawW_DoLines(DRender_tView *Vi, tBuildEntry *buildList, Draw_DCache *sd);
+extern void DrawW_DoObjects(DRender_tView *Vi, tBuildEntry *buildList);
+extern void DrawW_DoTrough(DRender_tView *Vi, tBuildEntry *buildList);
 extern void DrawW_WorldSetUpMatrix(matrixtdef *, MATRIX *);
-extern void FindAbsClosestSliceCrude(coorddef *pt,BWorldSm_Pos *slicePos);
-extern void Flare_Halo(DRender_tView *Vi,int scale,int type,coorddef *fpt,Draw_FlareCache *sd);
+extern void FindAbsClosestSliceCrude(coorddef *pt, BWorldSm_Pos *slicePos);
+extern void Flare_Halo(DRender_tView *Vi, int scale, int type, coorddef *fpt, Draw_FlareCache *sd);
 extern void Flare_Halo2(DRender_tView *, int, int, coorddef *, coorddef *, Draw_FlareCache *);
 extern void Night_SetCopColor(GameSetup_tCarData *carinfo);
 extern void Object_ClearCustomObjects(void);
@@ -61,11 +68,11 @@ extern void Scene_Init(int numObjDefs);
 extern void Scene_LoadSceneFile(int sceneFileIndex);
 extern void Track_Init(char *tempName);
 extern void Track_SetTrackNumber(int tracknum);
-extern void TrgSfx_AddEnviroEffect(int obj,int type,coorddef *emitterpt,coorddef *vec);
+extern void TrgSfx_AddEnviroEffect(int obj, int type, coorddef *emitterpt, coorddef *vec);
 extern void TrsProj_SetPsxTrans(coorddef *t);
 extern void TrsProj_SetPsxTransZero(void);
 extern void TrsProj_TransPt(coorddef *, coorddef *);
-extern void TrsProj_TransPtN16(RelCoord16 *s,coorddef *d,int n);
+extern void TrsProj_TransPtN16(RelCoord16 *s, coorddef *d, int n);
 int Anim_InitSystem(char *trackName);
 void Anim_Restart(void);
 void AudList_LoadAudioFile(int AudioFileIndex);

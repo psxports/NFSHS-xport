@@ -17,13 +17,17 @@
  */
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
-extern "C" { unsigned int g_bootGP; unsigned int g_handlerGP; }
+extern "C"
+{
+    unsigned int g_bootGP;
+    unsigned int g_handlerGP;
+}
 
-extern "C" unsigned int g_bootGP;        /* @0x801234E8 (data-mat pass owns) */
-extern "C" unsigned int g_handlerGP;     /* @0x8013FA34 lib small-data base  */
-unsigned int g_gpContext = 0;            /* models the live $gp register      */
+extern "C" unsigned int g_bootGP;    /* @0x801234E8 (data-mat pass owns) */
+extern "C" unsigned int g_handlerGP; /* @0x8013FA34 lib small-data base  */
+unsigned int g_gpContext = 0;        /* models the live $gp register      */
 
-extern "C" void initgp(void)             /* @0x800EB080 */
+extern "C" void initgp(void) /* @0x800EB080 */
 {
     g_bootGP = g_gpContext;
 }

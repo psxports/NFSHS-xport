@@ -9,14 +9,14 @@
  *   (the asm sets a2=0 then drops straight into blockfill), i.e. blockclear = memset(dst, 0, n).
  */
 
-extern "C" void blockfill(void *dst, int n, unsigned char val)  /* @0x800F17A4 */
+extern "C" void blockfill(void *dst, int n, unsigned char val) /* @0x800F17A4 */
 {
     unsigned char *d = (unsigned char *)dst;
     while (n-- > 0)
         *d++ = val;
 }
 
-extern "C" void blockclear(void *dst, int n)                    /* @0x800F17A0 (falls into blockfill, val=0) */
+extern "C" void blockclear(void *dst, int n) /* @0x800F17A0 (falls into blockfill, val=0) */
 {
     blockfill(dst, n, 0);
 }

@@ -9,6 +9,7 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "aih_cop_externs.h"
+#include "new.h"
 
 extern int AI_elapsedTime;   /* H22: ai.cpp @0x8013C554 (not in this TU's externs) */
 
@@ -214,7 +215,7 @@ void AIHigh_Cop::HighExecute()
 
     if ((((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_)->carFlags & 0x400U) == 0) {
 
-      pAVar11 = (AIState_Purgatory *)operator new(8);
+      pAVar11 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar14 = (AIState_Base *) (new(pAVar11) AIState_Purgatory((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -232,7 +233,7 @@ void AIHigh_Cop::HighExecute()
 
     else {
 
-      pAVar14 = (AIState_Base *)operator new(0x10);
+      pAVar14 = (AIState_Base *)__builtin_new(0x10);
 
       (new(pAVar14) AIState_Base((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -282,7 +283,7 @@ void AIHigh_Cop::HighExecute()
 
       this->AssignToPlayer((this->_base_AIHigh_BasicCop).blockade_.target);
 
-      pAVar14 = (AIState_Base *)operator new(0x10);
+      pAVar14 = (AIState_Base *)__builtin_new(0x10);
 
       (new(pAVar14) AIState_Base((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -379,7 +380,7 @@ void AIHigh_Cop::HighExecute()
 
             this->AssignToPlayer((AIHigh_Player *)0x0);
 
-            pAVar14 = (AIState_Base *)operator new(0x10);
+            pAVar14 = (AIState_Base *)__builtin_new(0x10);
 
             (new(pAVar14) AIState_Base((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -403,7 +404,7 @@ void AIHigh_Cop::HighExecute()
 
             this->AssignToPlayer((AIHigh_Player *)0x0);
 
-            pAVar13 = (AIState_Normal *)operator new(8);
+            pAVar13 = (AIState_Normal *)__builtin_new(8);
 
             pAVar14 = &(new(pAVar13) AIState_Normal((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_))->_base_AIState_Base
 
@@ -445,7 +446,7 @@ void AIHigh_Cop::HighExecute()
 
             this->AssignToPlayer((AIHigh_Player *)0x0);
 
-            pAVar7 = (AIState_Offroad *)operator new(0x68);
+            pAVar7 = (AIState_Offroad *)__builtin_new(0x68);
 
             pAVar7 = (new(pAVar7) AIState_Offroad((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_,newTrigger.offroad.slice,
 
@@ -501,7 +502,7 @@ void AIHigh_Cop::HighExecute()
 
         this->GetCheckChasePosition(&local_60);
 
-        pAVar26 = (AIState_Chase *)operator new(0x94);
+        pAVar26 = (AIState_Chase *)__builtin_new(0x94);
 
         pAVar26 = (new(pAVar26) AIState_Chase((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_,
 
@@ -560,7 +561,7 @@ void AIHigh_Cop::HighExecute()
 
     this->AssignToPlayer((AIHigh_Player *)0x0);
 
-    pAVar11 = (AIState_Purgatory *)operator new(8);
+    pAVar11 = (AIState_Purgatory *)__builtin_new(8);
 
     pAVar14 = (AIState_Base *) (new(pAVar11) AIState_Purgatory((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -596,7 +597,7 @@ void AIHigh_Cop::HighExecute()
 
       this->AssignToPlayer((AIHigh_Player *)0x0);
 
-      pAVar13 = (AIState_Normal *)operator new(8);
+      pAVar13 = (AIState_Normal *)__builtin_new(8);
 
       pAVar14 = &(new(pAVar13) AIState_Normal((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -632,7 +633,7 @@ void AIHigh_Cop::HighExecute()
 
             this->GetCheckChasePosition(&local_60);
 
-            pAVar26 = (AIState_Chase *)operator new(0x94);
+            pAVar26 = (AIState_Chase *)__builtin_new(0x94);
 
             pAVar26 = (new(pAVar26) AIState_Chase((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_,
 
@@ -678,7 +679,7 @@ void AIHigh_Cop::HighExecute()
 
           this->AssignToPlayer((AIHigh_Player *)0x0);
 
-          pAVar11 = (AIState_Purgatory *)operator new(8);
+          pAVar11 = (AIState_Purgatory *)__builtin_new(8);
 
           pAVar14 = (AIState_Base *) (new(pAVar11) AIState_Purgatory((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -770,12 +771,12 @@ void AIHigh_Cop::HighExecute()
 
           else {
 
-            gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+            gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 0;
 
             this->_base_AIHigh_BasicCop.SetupBlockadeElements(&(this->_base_AIHigh_BasicCop).blockade_);
 
-            gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+            gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 1;
 
           }
@@ -896,7 +897,7 @@ LAB_80064df8:
 
         (this->_base_AIHigh_BasicCop).blockade_.mode = 0;
 
-        pAVar26 = (AIState_Chase *)operator new(0x94);
+        pAVar26 = (AIState_Chase *)__builtin_new(0x94);
 
         pAVar26 = (new(pAVar26) AIState_Chase((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_,
 
@@ -950,7 +951,7 @@ LAB_80064a0c:
 
       this->AssignToPlayer((AIHigh_Player *)0x0);
 
-      pAVar13 = (AIState_Normal *)operator new(8);
+      pAVar13 = (AIState_Normal *)__builtin_new(8);
 
       pAVar14 = &(new(pAVar13) AIState_Normal((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -993,7 +994,7 @@ LAB_80064a0c:
 
     this->AssignToPlayer((AIHigh_Player *)0x0);
 
-    pAVar11 = (AIState_Purgatory *)operator new(8);
+    pAVar11 = (AIState_Purgatory *)__builtin_new(8);
 
     pAVar14 = (AIState_Base *) (new(pAVar11) AIState_Purgatory((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -1021,7 +1022,7 @@ LAB_80064a0c:
 
       iVar12 = (pAVar26)->FindBarrierEndSlice();
 
-      pAVar25 = (AIState_GotoSlice *)operator new(0x10);
+      pAVar25 = (AIState_GotoSlice *)__builtin_new(0x10);
 
       pAVar25 = (new(pAVar25) AIState_GotoSlice((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_,iVar12,0));
 
@@ -1190,7 +1191,7 @@ LAB_80064778:
 
       this->AssignToPlayer((AIHigh_Player *)0x0);
 
-      pAVar13 = (AIState_Normal *)operator new(8);
+      pAVar13 = (AIState_Normal *)__builtin_new(8);
 
       pAVar14 = &(new(pAVar13) AIState_Normal((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -1252,7 +1253,7 @@ LAB_80064778:
 
     this->AssignToPlayer((AIHigh_Player *)0x0);
 
-    pAVar11 = (AIState_Purgatory *)operator new(8);
+    pAVar11 = (AIState_Purgatory *)__builtin_new(8);
 
     pAVar14 = (AIState_Base *) (new(pAVar11) AIState_Purgatory((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -1323,7 +1324,7 @@ LAB_80064778:
 
       this->AssignToPlayer((AIHigh_Player *)0x0);
 
-      pAVar13 = (AIState_Normal *)operator new(8);
+      pAVar13 = (AIState_Normal *)__builtin_new(8);
 
       pAVar14 = &(new(pAVar13) AIState_Normal((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -1353,7 +1354,7 @@ LAB_80064778:
 
     this->AssignToPlayer((AIHigh_Player *)0x0);
 
-    pAVar11 = (AIState_Purgatory *)operator new(8);
+    pAVar11 = (AIState_Purgatory *)__builtin_new(8);
 
     pAVar14 = (AIState_Base *) (new(pAVar11) AIState_Purgatory((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_));
 
@@ -1383,7 +1384,7 @@ LAB_80064778:
 
     if (iVar12 == 0) goto switchD_80063d30_caseD_6;
 
-    pAVar13 = (AIState_Normal *)operator new(8);
+    pAVar13 = (AIState_Normal *)__builtin_new(8);
 
     pAVar14 = &(new(pAVar13) AIState_Normal((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 

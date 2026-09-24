@@ -3,6 +3,6 @@
 #define _GAME_COMMON_GENERICPMX_H_
 #include "../../nfs4_types.h"
 
-void GenericPMX_LoadTexture__Fv(void);   /* :54 */
+void GenericPMX_LoadTexture__Fv(void); /* :54 */
 
 #endif /* _GAME_COMMON_GENERICPMX_H_ */

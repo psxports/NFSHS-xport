@@ -31,10 +31,6 @@ extern "C" void Audio_InitDriver(int buffersize,int spusize)
     i = i + 1;
     pSVar1 = pSVar1 + 1;
   } while (i < 7);
-#ifdef AP_WIN
-  Audio_direct3davail = 0;
-  return;
-#endif
   if ((AudioCmn_kAudioOn != 0) || (AudioCmn_kAudioStreamingOn != 0)) {
     SNDSYS_getopts(&opts);
     opts.set.maxbanks = 0x30;
@@ -56,9 +52,6 @@ extern "C" void Audio_InitDriver(int buffersize,int spusize)
 extern "C" void Audio_DeInitDriver(void)
 
 {
-#ifdef AP_WIN
-  return;
-#endif
   AudioMus_SysCleanUp();
   if ((AudioCmn_kAudioOn != 0) || (AudioCmn_kAudioStreamingOn != 0)) {
     SNDSYS_restore();
@@ -126,7 +119,7 @@ int AudioCmn_AddBank(char *filename,int size,char *pdata,int BankNum)
       cVar1 = *filename;
     } while (cVar1 != '\0');
   }
-  iVar2 = SNDbankadd(&bhandle,(intptr_t)pdata);
+  iVar2 = SNDbankadd(&bhandle,(intptr)pdata);
   if (iVar2 == 7) {
     iVar2 = SNDbankheadersize(bhandle);
     destBuf = (char *)reservememadr(pool_name,iVar2,0);

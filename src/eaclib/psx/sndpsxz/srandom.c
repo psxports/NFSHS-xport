@@ -7,7 +7,7 @@
 extern "C" unsigned int sndseed;
 extern "C" unsigned int DAT_8013c2f4, DAT_8013c2f8, DAT_8013c2fc, DAT_8013c300, DAT_8013c304;
 
-extern "C" int iSNDrandom(void);   /* @0x8010BE80 */
+extern "C" int iSNDrandom(void); /* @0x8010BE80 */
 
 /* iSNDrandom @0x8010BE80 : step the additive generator (with carry propagation) and return the new seed. */
 extern "C" int iSNDrandom(void)
@@ -26,10 +26,7 @@ extern "C" int iSNDrandom(void)
     DAT_8013c2f8 = u3;
     DAT_8013c2fc = u2;
     DAT_8013c300 = u1;
-    if (DAT_8013c304 == 0 && (DAT_8013c300 = u1 + 1, DAT_8013c300 == 0) &&
-        (DAT_8013c2fc = u2 + 1, DAT_8013c2fc == 0) &&
-        (DAT_8013c2f8 = u3 + 1, DAT_8013c2f8 == 0) &&
-        (DAT_8013c2f4 = u4 + 1, DAT_8013c2f4 == 0))
+    if (DAT_8013c304 == 0 && (DAT_8013c300 = u1 + 1, DAT_8013c300 == 0) && (DAT_8013c2fc = u2 + 1, DAT_8013c2fc == 0) && (DAT_8013c2f8 = u3 + 1, DAT_8013c2f8 == 0) && (DAT_8013c2f4 = u4 + 1, DAT_8013c2f4 == 0))
         sndseed = sndseed + 1;
     return (int)sndseed;
 }

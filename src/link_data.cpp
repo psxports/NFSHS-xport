@@ -111,7 +111,7 @@ int gBrakeRatio;                                               /* @8013d2f0 4B *
 int gCISouffle;                                                /* @8013d44c 4B */
 Car_tObj * gCarObj[2];                                         /* @80052a68 8B */
 short gClutDepth[256][16];                                     /* @8012107c 8192B */
-intptr_t gCurrentMemory;                                    /* @8013dab8 4B on PSX */
+intptr gCurrentMemory;                                    /* @8013dab8 4B on PSX */
 int gCurrentNumSplats;                                         /* @8013dba0 4B */
 dflip gEnviro[2];                                              /* @8011f424 48B */
 int gFlip;                                                     /* @8013d7b4 4B */
@@ -120,14 +120,14 @@ u_char gFontSpaceWidth;                                        /* @8013d866 1B *
 CSceneList * gGameSceneList;                                   /* @8013d408 4B */
 int gGasRatio;                                                 /* @8013d2f4 4B */
 tTexture_ShapeInfo * gHelpShapes;                              /* @80052a64 4B */
-intptr_t gHighMemory;                                       /* @8013dab4 4B on PSX */
+intptr gHighMemory;                                       /* @8013dab4 4B on PSX */
 Souffle_tISouffle * gISouffle;                                 /* @8013d448 4B */
 Track_tArtresource gInitialArt;                                /* @8011e158 24B */
 int gLoop;                                                     /* @8013d7b8 4B */
-intptr_t gLowMemory;                                        /* @8013dab0 4B on PSX */
+intptr gLowMemory;                                        /* @8013dab0 4B on PSX */
 tMdecHandle gMDECinfo;                                         /* @80052b28 8B */
-intptr_t gMemAlloc;                                            /* @801370a8 4B on PSX; callback pointer carrier */
-intptr_t gMemFree;                                             /* @801370ac 4B on PSX; callback pointer carrier */
+intptr gMemAlloc;                                            /* @801370a8 4B on PSX; callback pointer carrier */
+intptr gMemFree;                                             /* @801370ac 4B on PSX; callback pointer carrier */
 int gMenuRotate[2];                                            /* @80051264 8B */
 int gNumBanks;                                                 /* @801370b8 4B */
 Group                  * gObjDefOffsetsGroup;                  /* @8013d4e0 4B */
@@ -138,11 +138,11 @@ Group              * gPersistObjInst;                          /* @8013d4c0 4B *
 tSkid gPrevSkidSm[8][4];                                       /* @8011e2f0 896B */
 Camera_tCamSlot gReplayCameraSlots[32];                        /* @8011dbdc 1024B */
 int gSPCH_Initialized;                                         /* @801370b0 4B */
-intptr_t gSampleRequest;                                       /* @80137094 4B on PSX; callback pointer */
+intptr gSampleRequest;                                       /* @80137094 4B on PSX; callback pointer */
 int gSaveChunk[8][4];                                          /* @8011e770 128B */
 Skidmark_Segment * gSaveSeg[8][4];                             /* @8011e6f0 128B */
-intptr_t gSentenceRuleSet;                                     /* @8013709c 4B on PSX; callback pointer */
-intptr_t gSentenceRuleTest;                                    /* @80137098 4B on PSX; callback pointer */
+intptr gSentenceRuleSet;                                     /* @8013709c 4B on PSX; callback pointer */
+intptr gSentenceRuleTest;                                    /* @80137098 4B on PSX; callback pointer */
 int gShowroomLights;                                           /* @800514b4 4B */
 int gStatusSm[8][4];                                           /* @8011e670 128B */
 int gSteerRatio;                                               /* @8013d2f8 4B */
@@ -155,7 +155,7 @@ int gTEnviroEffect[8];                                         /* @8011e1b0 32B 
 int gTMoveSouffle;                                             /* @8013d450 4B */
 int gTotalMem;                                                 /* @8013d7c4 4B */
 u_int gTotalMemory;                                            /* @8013dabc 4B */
-intptr_t *gVoxBanks;                                           /* @801370b4 4B on PSX; bank-pointer array */
+intptr *gVoxBanks;                                           /* @801370b4 4B on PSX; bank-pointer array */
 int gWindDir;                                                  /* @8013d454 4B */
 int gZDepth;                                                   /* @8013db74 4B */
 int g_currentthread;                                           /* @8013dd5c 4B */

@@ -13,10 +13,14 @@
 #define _NFS4_NEW_H_
 
 #if defined(__GNUC__) && __GNUC__ < 3
-#  include <sys/types.h>                       /* size_t */
-inline void *operator new(size_t, void *p) { return p; }
+    #include <sys/types.h> /* size_t */
+
+inline void *operator new(size_t, void *p)
+{
+    return p;
+}
 #else
-#  include <new>
+    #include <new>
 #endif
 
 #endif /* _NFS4_NEW_H_ */

@@ -19,7 +19,7 @@ int          Render_gBlurEffectDepth2;   /* @0x8013d3c4  (bss(zero)) */
 int          Render_gBlurEffectMode;   /* @0x8013d3c8  (bss(zero)) */
 extern "C" { int          Draw_gPlayer1View; } /* @0x8013d3cc  (bss(zero)) */
 extern "C" { int          Draw_gPlayer2View; } /* @0x8013d3d0  (bss(zero)) */
-RECT         gPauseMenuRect;   /* @0x8013d3d4  (bss(zero)) */
+PSX_RECT         gPauseMenuRect;   /* @0x8013d3d4  (bss(zero)) */
 int          gPauseRender;   /* @0x8013d3dc  (bss(zero)) */
 extern "C" { int          Draw_gRearView; } /* @0x8013d3e0  (bss(zero)) */
 int          Render_gDebugView;   /* @0x8013d3e4  (bss(zero)) */
@@ -288,7 +288,7 @@ void FlareThing(void)
   int players;
   int n_players;
   FLARE_DEF *flare_walk;
-  RECT rec;
+  PSX_RECT rec;
   
   n_players = 1;
   if (GameSetup_gData.commMode == 1) {
@@ -488,7 +488,7 @@ void Render_InsertDepthOfField(void)
   int i;
   int pkt_addr24_c;
   int players;
-  RECT rec;
+  PSX_RECT rec;
   void *prev_pkt_drm2;
   void *prev_pkt_drm;
   u_char *cur_pkt_poly;
@@ -536,7 +536,7 @@ void Render_InsertDepthOfField(void)
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     *puVar1 = *puVar1 & 0xff000000 | pkt_addr24_c;
     tpage = GetTPage(2,1,0,0x100);
-    SetDrawMode((DR_MODE *)cur_pkt_drm,0,0,(u_int)(u_short)tpage,(RECT *)0x0);
+    SetDrawMode((DR_MODE *)cur_pkt_drm,0,0,(u_int)(u_short)tpage,(PSX_RECT *)0x0);
   }
   return;
 }

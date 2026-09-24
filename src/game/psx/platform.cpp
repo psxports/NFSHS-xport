@@ -8,15 +8,10 @@
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
 #ifdef AP_WIN /* PORTABILITY-REVIEWED: host-owned PSX memory regions */
-char gDctBuffer[32 * 1024 * 1024];
+char *gDctBuffer = (char *)DRAM + 0x124038;
 char *gDctXtraMem;
-char gEAMemPoolBase[64];
-char gPlatformInitMem[64];
-/* The PSX used the fixed 0x80010080..0x801fc000 RAM window.  On Windows that
- * address arithmetic produces an enormous wrapped size and corrupts memory.
- * Keep the original allocators, but give them a real, stable host arena. */
-static char gWindowsMainMemory[32 * 1024 * 1024];
-static char gWindowsEacMemory[32 * 1024 * 1024];
+char *gEAMemPoolBase = (char *)DRAM + 0x148b0c;
+char *gPlatformInitMem = (char *)DRAM + 0x054d10;
 #else
 char gDctBuffer[64]; char *gDctXtraMem; char gEAMemPoolBase[64]; char gPlatformInitMem[64];  /* PSX linker-owned regions */
 #endif
@@ -26,19 +21,19 @@ char gDctBuffer[64]; char *gDctXtraMem; char gEAMemPoolBase[64]; char gPlatformI
 extern "C" void Platform_InitMemory(void)
 
 {
-  intptr_t tempLow;
+  intptr tempLow;
 
 #ifdef AP_WIN /* PORTABILITY-REVIEWED: host bump-arena address boundary */
-  tempLow = (intptr_t)gWindowsMainMemory;
-  gTotalMemory = sizeof(gWindowsMainMemory);
+  tempLow = (intptr)DRAM + 0x10080;
+  gTotalMemory = 0x54d10 - 0x10080;
   gLowMemory = tempLow;
-  gHighMemory = tempLow + sizeof(gWindowsMainMemory);
+  gHighMemory = (intptr)DRAM + 0x54d10;
   gCurrentMemory = tempLow;
 #else
   tempLow = 0x80010080;   /* PSX prog base 0x80010000 + 0x80 EXE-header = low-mem bound; memory-map constant (no data symbol), not a VA to migrate */
-  gTotalMemory = (u_int)((intptr_t)gPlatformInitMem - tempLow);
+  gTotalMemory = (u_int)((intptr)gPlatformInitMem - tempLow);
   gLowMemory = tempLow;
-  gHighMemory = (intptr_t)gPlatformInitMem;
+  gHighMemory = (intptr)gPlatformInitMem;
   gCurrentMemory = tempLow;
 #endif
   return;
@@ -49,7 +44,7 @@ extern "C" char *Platform_ReserveMemory(int size,char *string)
 
 {
   int alignedSize;
-  intptr_t newmem;
+  intptr newmem;
   char *mem;
 
   alignedSize = size + 3;
@@ -58,7 +53,7 @@ extern "C" char *Platform_ReserveMemory(int size,char *string)
   }
   newmem = gCurrentMemory + (alignedSize >> 2) * 4;
   mem = (char *)gCurrentMemory;
-  if (newmem - gLowMemory <= (intptr_t)gTotalMemory) {
+  if (newmem - gLowMemory <= (intptr)gTotalMemory) {
     gCurrentMemory = newmem;
     return mem;
   }
@@ -70,7 +65,7 @@ extern "C" char *Platform_TempReserveMemory(int size,char *string)
 
 {
   int alignedSize;
-  intptr_t newmem;
+  intptr newmem;
   char *mem;
 
   alignedSize = size + 3;
@@ -79,7 +74,7 @@ extern "C" char *Platform_TempReserveMemory(int size,char *string)
   }
   mem = (char *)0x0;
   newmem = gCurrentMemory + (alignedSize >> 2) * 4;
-  if (newmem - gLowMemory <= (intptr_t)gTotalMemory) {
+  if (newmem - gLowMemory <= (intptr)gTotalMemory) {
     mem = (char *)gCurrentMemory;
   }
   return mem;
@@ -93,14 +88,12 @@ extern "C" void Platform_SysStartUp(void)
 
   disablecd = 0;
 #ifdef AP_WIN /* PORTABILITY-REVIEWED: separate host EAC heap region */
-  /* EA's managed heap and the game's overlay/bump arena occupy independent
-     PSX regions.  Keeping them separate is essential because
-     Platform_InitMemory rewinds the bump arena at every module transition. */
-  endofcode = gWindowsEacMemory;
-  nfs_sysInfo.userRam = sizeof(gWindowsEacMemory);
+  endofcode = (char *)DRAM + 0x148b0c;
+  /* Native call stacks do not consume the PSX top-of-RAM stack reserve */
+  nfs_sysInfo.userRam = PSX_DRAM_SIZE - 0x148b0c;
 #else
   endofcode = (char *)gEAMemPoolBase;
-  nfs_sysInfo.userRam = (int)((intptr_t)0x801fc000 - (intptr_t)endofcode);   /* PSX RAM top (2MB) - 16KB stack reserve */
+  nfs_sysInfo.userRam = (int)((intptr)0x801fc000 - (intptr)endofcode);   /* PSX RAM top (2MB) - 16KB stack reserve */
 #endif
   initmemadr(endofcode,nfs_sysInfo.userRam);
   nfs2eacinit();

@@ -537,7 +537,7 @@ short LoadGame(short player,bool PinkSlips,bool WithDialogs)
   MCRDFILE_def memCardFile;
   tDialogNoInputMessage *warningDialog;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogNoInputMessage)];
   } warningDialogStorage;
   

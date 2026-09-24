@@ -9,41 +9,42 @@
 
 #include "../../../lib/snd.h"
 
-extern "C" int  sndgs[];
-extern "C" int  DAT_80134a68;                  /* output-caps init-once flag */
+extern "C" int sndgs[];
+extern "C" int DAT_80134a68; /* output-caps init-once flag */
 
-extern "C" void iSNDplatformoutputcaps(void);  /* slib    */
-extern "C" void iSNDplatformoutputset(void);   /* slib    */
-extern "C" void iSNDinit(void);                /* slib    */
-extern "C" void iSNDrestore(void);             /* slib    */
-extern "C" void iSNDmeminit(int membase, int memsize);   /* smemman */
-extern "C" int  iSNDmalloc(unsigned int size);           /* smemman */
-extern "C" void iSNDmemrestore(void);                    /* smemman */
-extern "C" void iSND100hzserver(void);         /* sserver */
-extern "C" void SNDI_mutexalloc(void);         /* sdfx    */
-extern "C" void SNDI_mutexfree(void);          /* sdfx    */
-extern "C" void SNDstopall(void);              /* sstopall */
+extern "C" void iSNDplatformoutputcaps(void);          /* slib    */
+extern "C" void iSNDplatformoutputset(void);           /* slib    */
+extern "C" void iSNDinit(void);                        /* slib    */
+extern "C" void iSNDrestore(void);                     /* slib    */
+extern "C" void iSNDmeminit(int membase, int memsize); /* smemman */
+extern "C" int iSNDmalloc(unsigned int size);          /* smemman */
+extern "C" void iSNDmemrestore(void);                  /* smemman */
+extern "C" void iSND100hzserver(void);                 /* sserver */
+extern "C" void SNDI_mutexalloc(void);                 /* sdfx    */
+extern "C" void SNDI_mutexfree(void);                  /* sdfx    */
+extern "C" void SNDstopall(void);                      /* sstopall */
 #ifndef _MSC_VER
-extern "C" void *memset(void *dst, int c, int n);        /* C43 (BIOS thunk) */
+extern "C" void *memset(void *dst, int c, int n); /* C43 (BIOS thunk) */
 #endif
 
-extern "C" void SNDSYS_getopts(int *opts);     /* @0x800F1D58 */
-extern "C" int  SNDSYS_setopts(int opts);      /* @0x800F1E14 */
-extern "C" void SNDSYS_init(int membase, int memsize);   /* @0x800F1F10 */
-extern "C" void SNDSYS_restore(void);          /* @0x800F204C */
+extern "C" void SNDSYS_getopts(int *opts);             /* @0x800F1D58 */
+extern "C" int SNDSYS_setopts(int opts);               /* @0x800F1E14 */
+extern "C" void SNDSYS_init(int membase, int memsize); /* @0x800F1F10 */
+extern "C" void SNDSYS_restore(void);                  /* @0x800F204C */
 
 /* SNDSYS_getopts @0x800F1D58 : copy the live option block sndgs[0..0xe] into the caller's struct (lazily
  *   publishing the platform output caps first, defaulting the reverb-channel count to 0x10). */
 extern "C" void SNDSYS_getopts(int *opts)
 {
     int i;
-    if (DAT_80134a68 == 0) {
+    if (DAT_80134a68 == 0)
+    {
         iSNDplatformoutputcaps();
         DAT_80134a68 = 1;
     }
-    if (((short *)sndgs)[6] == 0)               /* sndgs[3]._0_2_ : reverb channels */
+    if (((short *)sndgs)[6] == 0) /* sndgs[3]._0_2_ : reverb channels */
         ((short *)sndgs)[6] = 0x10;
-    for (i = 0; i < 0xf; i++)                    /* sndgs[0..0xe] -> opts[0..0xe] */
+    for (i = 0; i < 0xf; i++) /* sndgs[0..0xe] -> opts[0..0xe] */
         opts[i] = sndgs[i];
 }
 
@@ -52,7 +53,7 @@ extern "C" void SNDSYS_getopts(int *opts)
 extern "C" int SNDSYS_setopts(int opts)
 {
     int i;
-    for (i = 3; i <= 0xe; i++)                   /* opts[3..0xe] -> sndgs[3..0xe] (unaligned-safe source) */
+    for (i = 3; i <= 0xe; i++) /* opts[3..0xe] -> sndgs[3..0xe] (unaligned-safe source) */
         sndgs[i] = *(int *)(opts + i * 4);
     iSNDplatformoutputset();
     return 0;
@@ -64,18 +65,20 @@ extern "C" int SNDSYS_setopts(int opts)
 extern "C" void SNDSYS_init(int membase, int memsize)
 {
     unsigned int nchan;
-    int          rv;
-    if ((char)sndgs[0xf] == 0) {
+    int rv;
+    if ((char)sndgs[0xf] == 0)
+    {
         iSNDmeminit(membase, memsize);
-        nchan = (unsigned int)((unsigned char *)sndgs)[0x11];     /* sndgs[4]._1_1_ */
-        if (nchan == 0) {                                          /* no caps yet -> defaults */
+        nchan = (unsigned int)((unsigned char *)sndgs)[0x11]; /* sndgs[4]._1_1_ */
+        if (nchan == 0)
+        { /* no caps yet -> defaults */
             SNDSYS_getopts(sndgs);
             SNDSYS_setopts((int)sndgs);
             nchan = (unsigned int)((unsigned char *)sndgs)[0x11];
         }
-        sndgs[0x25] = iSNDmalloc(nchan * 100);                     /* channel pool */
+        sndgs[0x25] = iSNDmalloc(nchan * 100); /* channel pool */
         memset((unsigned char *)sndgs[0x25], 0, (int)((unsigned)((unsigned char *)sndgs)[0x11] * 100));
-        sndgs[0x26] = iSNDmalloc((unsigned int)((unsigned short *)sndgs)[6] * 0xc);  /* reverb table */
+        sndgs[0x26] = iSNDmalloc((unsigned int)((unsigned short *)sndgs)[6] * 0xc); /* reverb table */
         memset((unsigned char *)sndgs[0x26], 0, (int)((unsigned)((unsigned short *)sndgs)[6] * 0xc));
         if (SND->server100Hz == 0)
             SND->server100Hz = iSND100hzserver;
@@ -83,12 +86,12 @@ extern "C" void SNDSYS_init(int membase, int memsize)
         rv = 0x7f;
         sndgs[0x11] = 0;
         sndgs[0x2b] = 0;
-        ((char *)sndgs)[0x3d] = 0x7f;                              /* sndgs[0xf]._1_1_ : master vol */
+        ((char *)sndgs)[0x3d] = 0x7f; /* sndgs[0xf]._1_1_ : master vol */
         iSNDinit();
         if (rv < 0)
             iSNDrestore();
         else
-            ((char *)sndgs)[0x3c] = 1;                             /* sndgs[0xf]._0_1_ : audio up */
+            ((char *)sndgs)[0x3c] = 1; /* sndgs[0xf]._0_1_ : audio up */
     }
 }
 
@@ -96,16 +99,23 @@ extern "C" void SNDSYS_init(int membase, int memsize)
  *   voices, restore the SPU, free the mutex + memory.  No-op if not up. */
 extern "C" void SNDSYS_restore(void)
 {
-    if ((char)sndgs[0xf] != 0) {
-        if (sndgs[0x23] != 0) (*(void (*)(void))sndgs[0x23])();
-        if (sndgs[0x24] != 0) (*(void (*)(void))sndgs[0x24])();
-        if (sndgs[0x21] != 0) (*(void (*)(void))sndgs[0x21])();
-        if (sndgs[0x22] != 0) (*(void (*)(void))sndgs[0x22])();
-        if (sndgs[0x20] != 0) (*(void (*)(void))sndgs[0x20])();
+    if ((char)sndgs[0xf] != 0)
+    {
+        if (sndgs[0x23] != 0)
+            (*(void (*)(void))sndgs[0x23])();
+        if (sndgs[0x24] != 0)
+            (*(void (*)(void))sndgs[0x24])();
+        if (sndgs[0x21] != 0)
+            (*(void (*)(void))sndgs[0x21])();
+        if (sndgs[0x22] != 0)
+            (*(void (*)(void))sndgs[0x22])();
+        if (sndgs[0x20] != 0)
+            (*(void (*)(void))sndgs[0x20])();
         SNDstopall();
-        if (sndgs[0x1f] != 0) (*(void (*)(unsigned int))sndgs[0x1f])(0xffffffff);
+        if (sndgs[0x1f] != 0)
+            (*(void (*)(unsigned int))sndgs[0x1f])(0xffffffff);
         iSNDrestore();
-        ((char *)sndgs)[0x3c] = 0;                                 /* audio down */
+        ((char *)sndgs)[0x3c] = 0; /* audio down */
         SNDI_mutexfree();
         iSNDmemrestore();
     }

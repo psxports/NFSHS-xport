@@ -8,24 +8,30 @@
 /* ---- vtable: AIHigh_BasicCop (this obj) ---- */
 extern __vtbl_ptr_type AIHigh_BasicCop_vtable[];
 
-intptr_t Speech_Mobile(Car_tObj *carObj);   /* pointer-width address; MIPS returns Speaker* in v0 */
+intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; MIPS returns Speaker* in v0 */
 extern AICop_spikeBelt_t AICop_spikeBelt;
-extern Car_tObj         *Cars_gHumanRaceCarList[9];  /* cars.obj */
-extern Car_tObj * AILife_IsSliceInAnyVisibleArea(int slice);
-extern Group              *Object_customSFXInst;     /* 0x8013d2d0 */
-extern "C" Sim_tSimGlobalVar  simGlobal;          /* Sim.obj   (.gameTicks) */
-extern Trk_NewSlice  *BWorldSm_slices;
-extern int                 Object_customSliceNum;    /* 0x8013d2d4 */
-extern int   BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez);
-extern int   Cars_topSpeedCap[22];              /* [carType] */
+extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
+extern Car_tObj *AILife_IsSliceInAnyVisibleArea(int slice);
+extern Group *Object_customSFXInst;     /* 0x8013d2d0 */
+extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
+extern Trk_NewSlice *BWorldSm_slices;
+extern int Object_customSliceNum; /* 0x8013d2d4 */
+extern int BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez);
+extern int Cars_topSpeedCap[22]; /* [carType] */
 extern int AICop_gRoadBlockState;
-extern int GetPlaneY(const coorddef *norm,const coorddef *pointOnPlane,const coorddef *testPoint);
+extern int GetPlaneY(const coorddef *norm, const coorddef *pointOnPlane, const coorddef *testPoint);
 extern int Object_FindDefWithThisID(int ID);
 extern int Object_GetObjDefID(int index);
-extern u_int               fastRandom, randSeed, randtemp;   /* fastrand.obj PRNG state */
-extern void  BWorldSm_SetSlice(int slice, BWorldSm_Pos *pos);
-extern "C" { extern void *BWorldSm_UForward(BWorldSm_Pos *pos); }
-extern "C" { extern void *BWorldSm_UNormal(BWorldSm_Pos *pos); }
+extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
+extern void BWorldSm_SetSlice(int slice, BWorldSm_Pos *pos);
+extern "C"
+{
+    extern void *BWorldSm_UForward(BWorldSm_Pos *pos);
+}
+extern "C"
+{
+    extern void *BWorldSm_UNormal(BWorldSm_Pos *pos);
+}
 extern void BWorld_InitSpikeBelt(void);
 extern void Object_AddCustomObject(SceneElem *elem, int setupSimDataFlag);
 extern void Object_ClearCustomObjects(void);

@@ -163,8 +163,8 @@ void tScreenCarSelect::DrawOverlay(tOverlay *overlay)
   short i;
   short j;
   short fade;
-  RECT pos;
-  RECT temp;
+  PSX_RECT pos;
+  PSX_RECT temp;
   tCarInfo carInfo;
   tDrawShapeExtended drawFlags;
   short upgradeTranslate [3] = {2, 3, 1};
@@ -1512,16 +1512,16 @@ void tScreenCarSelectDuel::DrawBackground()
   tListIteratorCar *carIter;
   short sVar2;
   byte validCar;
-  RECT r;
+  PSX_RECT r;
   tCarInfo carInfo;
-  RECT temp;
+  PSX_RECT temp;
   byte bVar1;
   u_char *prev_pkt;
   u_char *cur_pkt_2;
   u_char *daprim;
   byte bVar2;
   
-  drenv = Draw_GetDRAWENV((int)(intptr_t)Draw_gPlayer1View,gFlip);
+  drenv = Draw_GetDRAWENV((int)(intptr)Draw_gPlayer1View,gFlip);
   daprim = Render_gPacketPtr;
   (this->_base_tScreenCarSelect).fState = 7;
   prev_pkt = Render_gPalettePtr;
@@ -1880,16 +1880,16 @@ void tScreenCarSelectTwoPlayer::DrawBackground()
   short ts3;
   short carY;
   short ts10;
-  RECT r;
+  PSX_RECT r;
   tCarInfo carInfo;
-  RECT temp;
+  PSX_RECT temp;
   u_char *cur_pkt;
   u_char *daprim;
   u_char *cur_pkt_2;
   byte bVar1;
   
   ts10 = 0x4f;
-  drenv = Draw_GetDRAWENV((int)(intptr_t)Draw_gPlayer1View,gFlip);
+  drenv = Draw_GetDRAWENV((int)(intptr)Draw_gPlayer1View,gFlip);
   daprim = Render_gPacketPtr;
   cur_pkt = Render_gPalettePtr;
   temp.x = 0;
@@ -2192,7 +2192,7 @@ int tScreenPinkSlipsCarSelect::GetCar(tCarInfo &carInfo)
   else {
     pv = (void *)0x0;
   }
-  return (int)(intptr_t)pv;
+  return (int)(intptr)pv;
 }
 
 
@@ -2570,9 +2570,9 @@ tScreenCarSelectDuel::~tScreenCarSelectDuel()
   DRAWENV *drenv;
   int garageNumber;
   int currentplayer;
-  RECT pos;
-  RECT temp;
-  RECT r;
+  PSX_RECT pos;
+  PSX_RECT temp;
+  PSX_RECT r;
   int T [4];
   char buffer [32];
   

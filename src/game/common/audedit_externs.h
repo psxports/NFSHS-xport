@@ -5,6 +5,6 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern char * Track_MakeTrackPathName(char *ext);
+extern char *Track_MakeTrackPathName(char *ext);
 
 #endif /* _GAME_COMMON_AUDEDIT_EXTERNS_H_ */

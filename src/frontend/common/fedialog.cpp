@@ -568,7 +568,7 @@ void tDialogMessageString::Draw()
 {
   __vtbl_ptr_type (*pa_Var1) [10];
   int col;
-  RECT r;
+  PSX_RECT r;
   
   pa_Var1 = (this->_base_tDialogBase)._base_tScreen._vf;
   NFS4_VCALL_AUTO(pa_Var1[1][0].pfn, (this->_base_tDialogBase)._base_tScreen.fPermShapes.fFilename + pa_Var1[1][0].delta + -0x14);
@@ -1018,7 +1018,7 @@ tDialogBase::~tDialogBase()
   int numLetters;
   u_int debounce;
   char buffer [80];
-  RECT r;
+  PSX_RECT r;
   
   return;
 }

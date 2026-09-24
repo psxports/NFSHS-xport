@@ -14,46 +14,46 @@
 #include "../../../nfs4_types.h"
 
 /* the scratch record passed by-pointer through FILE_atomic to each *atomic worker */
-typedef struct LoadArgs {
-    char *name;      /* +0x00  source filename                                   */
-    void *dest;      /* +0x04  fixed destination pointer word on PSX             */
-    int   memclass;  /* +0x08  allocator class id (loadfile* / bigfile family)   */
-    int   abortval;  /* +0x0C  abort flag snapshot (0 for the "z" variants)      */
+typedef struct LoadArgs
+{
+    char *name;   /* +0x00  source filename                                   */
+    void *dest;   /* +0x04  fixed destination pointer word on PSX             */
+    int memclass; /* +0x08  allocator class id (loadfile* / bigfile family)   */
+    int abortval; /* +0x0C  abort flag snapshot (0 for the "z" variants)      */
 } LoadArgs;
 
 /* ---- FILE_*sync primitives + retry harness (libfile / sibling objs) ---- */
-extern "C" int  FILE_opensync (char *name, int mode, int retry, int *handle);  /* @0x800EA8A8 */
-extern "C" int  FILE_sizesync (int handle, int retry);                         /* @0x800EA9A4 */
-extern "C" int  FILE_readsync (intptr_t handle, unsigned int offset, intptr_t dest,
-                                int size, int retry); /* @0x800EA920 */
-extern "C" int  FILE_closesync(int handle, int retry);                         /* @0x800EA950 */
-extern "C" intptr_t FILE_atomic(intptr_t fn, int idle, int retries, void *args); /* @0x800ECB40 */
-extern "C" int  asyncidle     (void);                                          /* @0x800F6114 */
+extern "C" int FILE_opensync(char *name, int mode, int retry, int *handle);                         /* @0x800EA8A8 */
+extern "C" int FILE_sizesync(int handle, int retry);                                                /* @0x800EA9A4 */
+extern "C" int FILE_readsync(intptr handle, unsigned int offset, intptr dest, int size, int retry); /* @0x800EA920 */
+extern "C" int FILE_closesync(int handle, int retry);                                               /* @0x800EA950 */
+extern "C" intptr FILE_atomic(intptr fn, int idle, int retries, void *args);                        /* @0x800ECB40 */
+extern "C" int asyncidle(void);                                                                     /* @0x800F6114 */
 
 /* ---- memstd allocator (eaclib/psx/eacpsxz/memstd.cpp) ---- */
-extern "C" void *reservememadr(char *name, int size, int classid);            /* @0x800E533C */
-extern "C" int   purgememadr  (void *p);                                       /* @0x800E5540 */
+extern "C" void *reservememadr(char *name, int size, int classid); /* @0x800E533C */
+extern "C" int purgememadr(void *p);                               /* @0x800E5540 */
 
 /* ---- big-file header helpers (next obj) ---- */
-extern "C" int   typeofbigfile      (void *buf);     /* @0x800E5F1C */
-extern "C" int   sizeofbigfileheader(void *buf);     /* @0x800E5F84 */
-extern "C" void  blockmove          (void *src, void *dst, int n);  /* @0x800E62DC */
+extern "C" int typeofbigfile(void *buf);                /* @0x800E5F1C */
+extern "C" int sizeofbigfileheader(void *buf);          /* @0x800E5F84 */
+extern "C" void blockmove(void *src, void *dst, int n); /* @0x800E62DC */
 
 /* ---- data globals (defined in the data-materialization pass) ---- */
-extern "C" int abortflag;                                  /* @0x8013DCD4 */
+extern "C" int abortflag;                                                   /* @0x8013DCD4 */
 extern "C" void *(*loadfilecallback)(void *dest, char *name, int memclass); /* @0x8013DD60 */
 
 /* forward decls of the intra-obj *atomic XDEFs (C-linkage) */
-extern "C" intptr_t filesizeatomic         (int retry, void *args);
-extern "C" intptr_t loadfileadratomic      (int retry, void *args);
-extern "C" intptr_t loadfileatadratomic    (int retry, void *args);
-extern "C" intptr_t loadbigfileheaderatomic(int retry, void *args);
+extern "C" intptr filesizeatomic(int retry, void *args);
+extern "C" intptr loadfileadratomic(int retry, void *args);
+extern "C" intptr loadfileatadratomic(int retry, void *args);
+extern "C" intptr loadbigfileheaderatomic(int retry, void *args);
 
 /* ===================================================================== *
  *  filesizeatomic @0x800E5608 : open `a->name`, query its size, close.   *
  *  Returns the byte size, or 0 if the open failed.                       *
  * ===================================================================== */
-extern "C" intptr_t filesizeatomic(int retry, void *args)   /* @0x800E5608 */
+extern "C" intptr filesizeatomic(int retry, void *args) /* @0x800E5608 */
 {
     LoadArgs *a = (LoadArgs *)args;
     int handle;
@@ -67,13 +67,13 @@ extern "C" intptr_t filesizeatomic(int retry, void *args)   /* @0x800E5608 */
 /* ===================================================================== *
  *  filesize @0x800E566C : public wrapper -> retry-driven filesizeatomic. *
  * ===================================================================== */
-extern "C" int filesize(char *name)   /* @0x800E566C */
+extern "C" int filesize(char *name) /* @0x800E566C */
 {
     LoadArgs a;
     a.name = name;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (int)FILE_atomic((intptr_t)filesizeatomic, idle, 0x64, &a);
+    return (int)FILE_atomic((intptr)filesizeatomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -81,56 +81,58 @@ extern "C" int filesize(char *name)   /* @0x800E566C */
  *  `a->memclass`, read the whole file in, close, then run the optional   *
  *  loadfilecallback hook.  Returns the buffer (NULL on any failure).     *
  * ===================================================================== */
-extern "C" intptr_t loadfileadratomic(int retry, void *args)   /* @0x800E56B0 */
+extern "C" intptr loadfileadratomic(int retry, void *args) /* @0x800E56B0 */
 {
     LoadArgs *a = (LoadArgs *)args;
     int handle;
     if (FILE_opensync(a->name, 1, retry, &handle) == 0)
-        return 0;                                       /* open failed */
+        return 0; /* open failed */
 
     int size = FILE_sizesync(handle, retry - 1);
     void *buf = reservememadr(a->name, size, a->memclass);
-    if (buf == 0) {
+    if (buf == 0)
+    {
         FILE_closesync(handle, retry - 1);
-        return 0;                                       /* out of memory */
+        return 0; /* out of memory */
     }
 
-    FILE_readsync(handle, 0, (intptr_t)buf, size, retry - 1);
+    FILE_readsync(handle, 0, (intptr)buf, size, retry - 1);
     FILE_closesync(handle, retry - 1);
 
-    if (loadfilecallback != 0) {                        /* post-load hook */
+    if (loadfilecallback != 0)
+    { /* post-load hook */
         void *r = loadfilecallback(buf, a->name, a->memclass);
         if (r == 0)
-            purgememadr(buf);                           /* hook failed -> free */
+            purgememadr(buf); /* hook failed -> free */
         buf = r;
     }
-    return (intptr_t)buf;
+    return (intptr)buf;
 }
 
 /* ===================================================================== *
  *  loadfileadrz  @0x800E57A8 : wrapper, abort disabled (abortval = 0).   *
  * ===================================================================== */
-extern "C" void *loadfileadrz(char *name, int memclass)   /* @0x800E57A8 */
+extern "C" void *loadfileadrz(char *name, int memclass) /* @0x800E57A8 */
 {
     LoadArgs a;
     a.name = name;
     a.memclass = memclass;
     a.abortval = 0;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr_t)loadfileadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic((intptr)loadfileadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
  *  loadfileadr   @0x800E57E8 : wrapper, abort via global abortflag.      *
  * ===================================================================== */
-extern "C" void *loadfileadr(char *name, int memclass)   /* @0x800E57E8 */
+extern "C" void *loadfileadr(char *name, int memclass) /* @0x800E57E8 */
 {
     LoadArgs a;
     a.name = name;
     a.memclass = memclass;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr_t)loadfileadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic((intptr)loadfileadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -138,41 +140,41 @@ extern "C" void *loadfileadr(char *name, int memclass)   /* @0x800E57E8 */
  *  caller-supplied fixed address `a->dest`, close.  Returns dest (0 on   *
  *  open failure).                                                        *
  * ===================================================================== */
-extern "C" intptr_t loadfileatadratomic(int retry, void *args)   /* @0x800E5830 */
+extern "C" intptr loadfileatadratomic(int retry, void *args) /* @0x800E5830 */
 {
     LoadArgs *a = (LoadArgs *)args;
     int handle;
     if (FILE_opensync(a->name, 1, retry, &handle) == 0)
         return 0;
-    FILE_readsync(handle, 0, (intptr_t)a->dest, 0x7FFFFFFF, retry - 1);
+    FILE_readsync(handle, 0, (intptr)a->dest, 0x7FFFFFFF, retry - 1);
     FILE_closesync(handle, retry - 1);
-    return (intptr_t)a->dest;
+    return (intptr)a->dest;
 }
 
 /* ===================================================================== *
  *  loadfileatadrz @0x800E58B0 : wrapper, abort disabled.                 *
  * ===================================================================== */
-extern "C" void *loadfileatadrz(char *name, void *dest)   /* @0x800E58B0 */
+extern "C" void *loadfileatadrz(char *name, void *dest) /* @0x800E58B0 */
 {
     LoadArgs a;
     a.name = name;
     a.dest = dest;
     a.abortval = 0;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr_t)loadfileatadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic((intptr)loadfileatadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
  *  loadfileatadr @0x800E58F0 : wrapper, abort via global abortflag.      *
  * ===================================================================== */
-extern "C" void *loadfileatadr(char *name, void *dest)   /* @0x800E58F0 */
+extern "C" void *loadfileatadr(char *name, void *dest) /* @0x800E58F0 */
 {
     LoadArgs a;
     a.name = name;
     a.dest = dest;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr_t)loadfileatadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic((intptr)loadfileatadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -181,7 +183,7 @@ extern "C" void *loadfileatadr(char *name, void *dest)   /* @0x800E58F0 */
  *  true header (sizeofbigfileheader) is larger, reallocates and reads    *
  *  the remainder.  Returns the header buffer (NULL on failure).          *
  * ===================================================================== */
-extern "C" intptr_t loadbigfileheaderatomic(int retry, void *args)   /* @0x800E5938 */
+extern "C" intptr loadbigfileheaderatomic(int retry, void *args) /* @0x800E5938 */
 {
     LoadArgs *a = (LoadArgs *)args;
     int handle;
@@ -189,47 +191,50 @@ extern "C" intptr_t loadbigfileheaderatomic(int retry, void *args)   /* @0x800E5
         return 0;
 
     void *buf = reservememadr(a->name, 0xA90, a->memclass);
-    if (buf == 0) {
+    if (buf == 0)
+    {
         FILE_closesync(handle, retry - 1);
         return 0;
     }
 
-    FILE_readsync(handle, 0, (intptr_t)buf, 0xA90, retry - 1);
+    FILE_readsync(handle, 0, (intptr)buf, 0xA90, retry - 1);
 
-    if (typeofbigfile(buf) == 0) {                      /* not a big file */
+    if (typeofbigfile(buf) == 0)
+    { /* not a big file */
         purgememadr(buf);
         FILE_closesync(handle, retry - 1);
         return 0;
     }
 
     int fullsize = sizeofbigfileheader(buf);
-    if (fullsize >= 0xA91) {                            /* header exceeds first read */
+    if (fullsize >= 0xA91)
+    { /* header exceeds first read */
         void *full = reservememadr(a->name, fullsize, a->memclass);
-        if (full == 0) {
+        if (full == 0)
+        {
             purgememadr(buf);
             FILE_closesync(handle, retry - 1);
             return 0;
         }
-        blockmove(buf, full, 0xA90);                    /* keep the bytes already read */
+        blockmove(buf, full, 0xA90); /* keep the bytes already read */
         purgememadr(buf);
         buf = full;
-        FILE_readsync(handle, 0xA90, (intptr_t)((char *)buf + 0xA90),
-                      fullsize - 0xA90, retry - 1);
+        FILE_readsync(handle, 0xA90, (intptr)((char *)buf + 0xA90), fullsize - 0xA90, retry - 1);
     }
 
     FILE_closesync(handle, retry - 1);
-    return (intptr_t)buf;
+    return (intptr)buf;
 }
 
 /* ===================================================================== *
  *  loadbigfileheader @0x800E5A7C : wrapper, abort via global abortflag.  *
  * ===================================================================== */
-extern "C" void *loadbigfileheader(char *name, int memclass)   /* @0x800E5A7C */
+extern "C" void *loadbigfileheader(char *name, int memclass) /* @0x800E5A7C */
 {
     LoadArgs a;
     a.name = name;
     a.memclass = memclass;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr_t)loadbigfileheaderatomic, idle, 0x64, &a);
+    return (void *)FILE_atomic((intptr)loadbigfileheaderatomic, idle, 0x64, &a);
 }

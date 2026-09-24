@@ -5,7 +5,6 @@
 #include "../../lib/libfns.h"
 
 extern "C" extern tfrontEnd frontEnd;
-extern "C" extern char     *Paths_Paths[];
-
+extern "C" extern char *Paths_Paths[];
 
 #endif

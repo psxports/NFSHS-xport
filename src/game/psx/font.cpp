@@ -261,7 +261,7 @@ void Font_SwitchFont(char *f1)
 {
   charactertbl *pcVar1;
   
-  setfont((intptr_t)f1);
+  setfont((intptr)f1);
   currentfont.textDraw = (FontTextDraw)0;
   currentfont.reserved98[0] = 0;
   currentfont.reserved98[1] = 0;
@@ -309,7 +309,7 @@ extern "C" int Font_LoadFont(char *f1,int x,int y,char in_game)
   shapetbl *shp;
   u_char *pixels;
   
-  setfont((intptr_t)f1);
+  setfont((intptr)f1);
   shp_00 = currentfont.shape;
   shp = (shapetbl *)shp_00;
   pixels = (u_char *)&shp->data;
@@ -330,7 +330,7 @@ extern "C" int Font_LoadFont(char *f1,int x,int y,char in_game)
   Texture_Vramf((shapetbl *)shp_00,x,y,font_clutx,font_cluty);
   waitdraw();
   *(u_int *)shp_00 = (u_int)*(u_char *)shp_00 |
-                     (u_int)((intptr_t)&shpfontclut - (intptr_t)shp_00) * 0x100;
+                     (u_int)((intptr)&shpfontclut - (intptr)shp_00) * 0x100;
   iVar1 = 0;
   if (0 < iVar3) {
     do {
@@ -399,7 +399,7 @@ void Font_TextXY(char *string,int x,int y)
   tpage_packed = (u_int)Render_gPacketPtr & 0xffffff;
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *(u_int *)tp1 = *(u_int *)tp1 & 0xff000000 | tpage_packed;
-  SetDrawMode((DR_MODE *)p,0,0,tpage,(RECT *)0x0);
+  SetDrawMode((DR_MODE *)p,0,0,tpage,(PSX_RECT *)0x0);
   return;
 }
 

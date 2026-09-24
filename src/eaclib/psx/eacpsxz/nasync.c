@@ -27,30 +27,29 @@
 static int nasync_requestidcounter;
 
 /* ---- nfile FILE_* API (eacpsxz) + memory/system helpers this loader drives ---- */
-extern "C" unsigned int FILE_open(char *name, unsigned int a1, unsigned int a2, unsigned int a3); /* @0x800EC36C */
-extern "C" unsigned int FILE_close(void *handle, unsigned int a1, unsigned int a2);               /* @0x800EC42C */
-extern "C" unsigned int FILE_read(intptr_t handle, unsigned int offset, intptr_t dest,
-                                  int len, unsigned int a5, intptr_t a6);                          /* @0x800EC4EC */
-extern "C" unsigned int FILE_size(void *handle, unsigned int a1, unsigned int a2);                /* @0x800EC5D0 */
-extern "C" int  FILE_completeop(unsigned int id);                                                 /* @0x800EC2B0 */
-extern "C" void FILE_callbackop(unsigned int id, void (*cb)(int, int));                           /* @0x800EBE4C */
-extern "C" void FILE_cancelop(unsigned int id);                                                   /* @0x800EC008 */
-extern "C" int  FILE_opensync(char *name, int mode, int prio, int *outHandle);                    /* @0x800EA8A8 */
-extern "C" int  FILE_closesync(int handle, int prio);                                             /* @0x800EA950 */
-extern "C" void *reservememadr(char *name, int size, int classid);                                /* @0x800E533C */
-extern "C" void  purgememadr(void *p);                                                            /* @0x800E5540 */
-extern "C" int   addsystemtask(intptr_t fn, int period, int delay);                               /* @0x800E6AF4 */
-extern "C" void *allocmutex(void);                                                                /* @0x800FE424 */
+extern "C" unsigned int FILE_open(char *name, unsigned int a1, unsigned int a2, unsigned int a3);                        /* @0x800EC36C */
+extern "C" unsigned int FILE_close(void *handle, unsigned int a1, unsigned int a2);                                      /* @0x800EC42C */
+extern "C" unsigned int FILE_read(intptr handle, unsigned int offset, intptr dest, int len, unsigned int a5, intptr a6); /* @0x800EC4EC */
+extern "C" unsigned int FILE_size(void *handle, unsigned int a1, unsigned int a2);                                       /* @0x800EC5D0 */
+extern "C" int FILE_completeop(unsigned int id);                                                                         /* @0x800EC2B0 */
+extern "C" void FILE_callbackop(unsigned int id, void (*cb)(int, int));                                                  /* @0x800EBE4C */
+extern "C" void FILE_cancelop(unsigned int id);                                                                          /* @0x800EC008 */
+extern "C" int FILE_opensync(char *name, int mode, int prio, int *outHandle);                                            /* @0x800EA8A8 */
+extern "C" int FILE_closesync(int handle, int prio);                                                                     /* @0x800EA950 */
+extern "C" void *reservememadr(char *name, int size, int classid);                                                       /* @0x800E533C */
+extern "C" void purgememadr(void *p);                                                                                    /* @0x800E5540 */
+extern "C" int addsystemtask(intptr fn, int period, int delay);                                                          /* @0x800E6AF4 */
+extern "C" void *allocmutex(void);                                                                                       /* @0x800FE424 */
 
 /* forward decls for the FILE completion callbacks (referenced by FILE_callbackop and each other) */
 extern "C" int loadfileclosecallback(int id, int status, AsyncReq *req);
-extern "C" int loadfilereadcallback (int id, int status, AsyncReq *req);
-extern "C" int loadfilesizecallback (int id, int status, AsyncReq *req);
-extern "C" int loadfileopencallback (int id, int status, AsyncReq *req);
-extern "C" int loadsegreadcallback  (int id, int status, AsyncReq *req);
+extern "C" int loadfilereadcallback(int id, int status, AsyncReq *req);
+extern "C" int loadfilesizecallback(int id, int status, AsyncReq *req);
+extern "C" int loadfileopencallback(int id, int status, AsyncReq *req);
+extern "C" int loadsegreadcallback(int id, int status, AsyncReq *req);
 extern "C" int asyncsystemtask(void);
 
-#define RQ(r)  ((unsigned int)(size_t)(AsyncReq *)(r))   /* req ptr as a FILE callback param (uint) */
+#define RQ(r) ((unsigned int)(size_t)(AsyncReq *)(r)) /* req ptr as a FILE callback param (uint) */
 
 /* ---- request queue + slot primitives ---- */
 
@@ -58,8 +57,10 @@ extern "C" int asyncsystemtask(void);
 extern "C" void queueadd(AsyncQueue *q, AsyncReq *n)
 {
     ASYNC_enterCS();
-    if (q->head == 0) q->head = n;          /* empty -> head = n */
-    else              q->tail->next = n;    /* else link onto the tail */
+    if (q->head == 0)
+        q->head = n; /* empty -> head = n */
+    else
+        q->tail->next = n; /* else link onto the tail */
     q->tail = n;
     n->next = 0;
     ASYNC_leaveCS();
@@ -70,8 +71,9 @@ extern "C" AsyncReq *queuefetch(AsyncQueue *q)
 {
     AsyncReq *r;
     ASYNC_enterCS();
-    r = q->head;                            /* 0 if empty */
-    if (r != 0) q->head = r->next;
+    r = q->head; /* 0 if empty */
+    if (r != 0)
+        q->head = r->next;
     ASYNC_leaveCS();
     return r;
 }
@@ -80,7 +82,7 @@ extern "C" AsyncReq *queuefetch(AsyncQueue *q)
 extern "C" int newrequestid(AsyncReq *r)
 {
     nasync_requestidcounter += 0x100;
-    if (nasync_requestidcounter == 0)              /* never 0 */
+    if (nasync_requestidcounter == 0) /* never 0 */
         nasync_requestidcounter = 0x100;
     r->id = (int)((unsigned char)r->id) | nasync_requestidcounter;
     return r->id;
@@ -98,7 +100,7 @@ static AsyncReq *locaterequest(int id)
     if ((unsigned int)slot >= (unsigned int)numrequests)
         return 0;
     r = (AsyncReq *)((char *)request + slot * 0x2C);
-    if (r->id != id)                        /* slot recycled -> stale */
+    if (r->id != id) /* slot recycled -> stale */
         return 0;
     return r;
 }
@@ -109,15 +111,16 @@ extern "C" void cancelrequest(AsyncReq *r)
     int wasPending;
     ASYNC_enterCS();
     wasPending = (r->status == 1);
-    if (wasPending) r->status = 2;
+    if (wasPending)
+        r->status = 2;
     ASYNC_leaveCS();
     if (!wasPending)
         return;
-    if (r->buffer >= 2)                     /* real buffer (0/1 are "none"/sentinel) -> free it */
+    if (r->buffer >= 2) /* real buffer (0/1 are "none"/sentinel) -> free it */
         purgememadr((void *)(size_t)(unsigned int)r->buffer);
     r->fileop = 0;
     queueadd(&freequeue, r);
-    r->id = (unsigned char)r->id;           /* clear the counter bits -> slot is free */
+    r->id = (unsigned char)r->id; /* clear the counter bits -> slot is free */
 }
 
 /* finishrequest @0x800F0CE8 : mark the FILE operation complete for every request, then queue `r`
@@ -126,7 +129,7 @@ extern "C" void cancelrequest(AsyncReq *r)
 extern "C" void finishrequest(AsyncReq *r)
 {
     r->fileop = 0;
-    if (r->callback == 0)                   /* poll-only request -> nothing to do */
+    if (r->callback == 0) /* poll-only request -> nothing to do */
         return;
     queueadd(&callqueue, r);
 }
@@ -136,32 +139,35 @@ extern "C" void finishrequest(AsyncReq *r)
 /* loadfileclosecallback @0x800F0D24 : harvest the close op, then finish or cancel the request. */
 extern "C" int loadfileclosecallback(int id, int status, AsyncReq *req)
 {
-    (void)id; (void)status;
     FILE_completeop(req->fileop);
-    if (req->status != 0) cancelrequest(req);   /* cancelled mid-flight -> cleanup */
-    else                  finishrequest(req);   /* done -> hand back to the user */
+    if (req->status != 0)
+        cancelrequest(req); /* cancelled mid-flight -> cleanup */
+    else
+        finishrequest(req); /* done -> hand back to the user */
     return 0;
 }
 
 /* loadfilereadcallback @0x800F0D80 : one chunk read; loop until EOF/cancel, then close. */
 extern "C" int loadfilereadcallback(int id, int status, AsyncReq *req)
 {
-    int n = FILE_completeop(req->fileop);       /* bytes read this chunk */
+    int n = FILE_completeop(req->fileop); /* bytes read this chunk */
     unsigned int nextop;
-    (void)id; (void)status;
     req->bytesread += n;
-    if (n < readblocksize || req->status != 0) {            /* short read (EOF) or cancel -> close */
+    if (n < readblocksize || req->status != 0)
+    { /* short read (EOF) or cancel -> close */
         nextop = FILE_close((void *)(size_t)(unsigned int)req->handle, 0x63, RQ(req));
-        if (nextop == 0) return 0;
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfileclosecallback);
-    } else {                                                 /* full chunk -> read the next one */
+    }
+    else
+    { /* full chunk -> read the next one */
         req->offset += n;
-        req->dest   += n;
-        nextop = FILE_read((intptr_t)(unsigned int)req->handle,
-                           (unsigned int)req->offset, (intptr_t)(unsigned int)req->dest,
-                           readblocksize, 0x63, (intptr_t)RQ(req));
-        if (nextop == 0) return 0;
+        req->dest += n;
+        nextop = FILE_read((intptr)(unsigned int)req->handle, (unsigned int)req->offset, (intptr)(unsigned int)req->dest, readblocksize, 0x63, (intptr)RQ(req));
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfilereadcallback);
     }
@@ -173,20 +179,22 @@ extern "C" int loadfilesizecallback(int id, int status, AsyncReq *req)
 {
     int filesize = FILE_completeop(req->fileop);
     unsigned int nextop;
-    (void)id; (void)status;
-    if (req->status != 0) {                                  /* cancelled -> close */
+    if (req->status != 0)
+    { /* cancelled -> close */
         nextop = FILE_close((void *)(size_t)(unsigned int)req->handle, 0x63, RQ(req));
-        if (nextop == 0) return 0;
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfileclosecallback);
-    } else {                                                 /* allocate "ASYNCBUF" of the file size */
+    }
+    else
+    { /* allocate "ASYNCBUF" of the file size */
         void *buf = reservememadr((char *)"ASYNCBUF", filesize, req->arg24);
         req->buffer = (int)(size_t)buf;
-        req->dest   = (int)(size_t)buf;
-        nextop = FILE_read((intptr_t)(unsigned int)req->handle,
-                           (unsigned int)req->offset, (intptr_t)(unsigned int)req->dest,
-                           readblocksize, 0x63, (intptr_t)RQ(req));
-        if (nextop == 0) return 0;
+        req->dest = (int)(size_t)buf;
+        nextop = FILE_read((intptr)(unsigned int)req->handle, (unsigned int)req->offset, (intptr)(unsigned int)req->dest, readblocksize, 0x63, (intptr)RQ(req));
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfilereadcallback);
     }
@@ -198,28 +206,36 @@ extern "C" int loadfileopencallback(int id, int status, AsyncReq *req)
 {
     int handle = FILE_completeop(req->fileop);
     unsigned int nextop;
-    (void)id;
-    req->handle = handle;                          /* asm: stored on both paths (delay slot) */
-    if (handle == 0) {                             /* open failed */
-        if (req->status != 0) cancelrequest(req);
-        else                  finishrequest(req);
+    req->handle = handle; /* asm: stored on both paths (delay slot) */
+    if (handle == 0)
+    { /* open failed */
+        if (req->status != 0)
+            cancelrequest(req);
+        else
+            finishrequest(req);
         return 0;
     }
-    if (req->status != 0) {                        /* cancelled during open -> close */
+    if (req->status != 0)
+    { /* cancelled during open -> close */
         nextop = FILE_close((void *)(size_t)(unsigned int)handle, 0x63, RQ(req));
-        if (nextop == 0) return 0;
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfileclosecallback);
-    } else if (req->buffer != 0) {                 /* alloc mode -> get the size first */
+    }
+    else if (req->buffer != 0)
+    { /* alloc mode -> get the size first */
         nextop = FILE_size((void *)(size_t)(unsigned int)handle, (unsigned int)status, RQ(req));
-        if (nextop == 0) return 0;
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfilesizecallback);
-    } else {                                        /* direct read into the preset dest */
-        nextop = FILE_read((intptr_t)(unsigned int)handle,
-                           (unsigned int)req->offset, (intptr_t)(unsigned int)req->dest,
-                           readblocksize, 0x63, (intptr_t)RQ(req));
-        if (nextop == 0) return 0;
+    }
+    else
+    { /* direct read into the preset dest */
+        nextop = FILE_read((intptr)(unsigned int)handle, (unsigned int)req->offset, (intptr)(unsigned int)req->dest, readblocksize, 0x63, (intptr)RQ(req));
+        if (nextop == 0)
+            return 0;
         req->fileop = (int)nextop;
         FILE_callbackop(nextop, (void (*)(int, int))loadfilereadcallback);
     }
@@ -232,20 +248,26 @@ extern "C" int loadsegreadcallback(int id, int status, AsyncReq *req)
     int n = FILE_completeop(req->fileop);
     int remaining, len;
     unsigned int nextop;
-    (void)id; (void)status;
     req->bytesread += n;
-    req->offset    += n;
+    req->offset += n;
     asyncfileoffset = req->offset;
-    if (req->status != 0) { cancelrequest(req); return 0; }     /* cancelled */
-    if (n < readblocksize) { finishrequest(req); return 0; }    /* short read -> done */
-    req->arg24 -= n;                                            /* remaining bytes */
-    req->dest  += n;
+    if (req->status != 0)
+    {
+        cancelrequest(req);
+        return 0;
+    } /* cancelled */
+    if (n < readblocksize)
+    {
+        finishrequest(req);
+        return 0;
+    } /* short read -> done */
+    req->arg24 -= n; /* remaining bytes */
+    req->dest += n;
     remaining = req->arg24;
-    len = (readblocksize < remaining) ? readblocksize : remaining;   /* clamp to a block */
-    nextop = FILE_read((intptr_t)(unsigned int)asyncfilehandle,
-                       (unsigned int)req->offset, (intptr_t)(unsigned int)req->dest,
-                       len, 0x63, (intptr_t)RQ(req));
-    if (nextop == 0) return 0;
+    len = (readblocksize < remaining) ? readblocksize : remaining; /* clamp to a block */
+    nextop = FILE_read((intptr)(unsigned int)asyncfilehandle, (unsigned int)req->offset, (intptr)(unsigned int)req->dest, len, 0x63, (intptr)RQ(req));
+    if (nextop == 0)
+        return 0;
     req->fileop = (int)nextop;
     FILE_callbackop(nextop, (void (*)(int, int))loadsegreadcallback);
     return 0;
@@ -256,14 +278,18 @@ extern "C" int loadsegreadcallback(int id, int status, AsyncReq *req)
 extern "C" int asyncsystemtask(void)
 {
     AsyncReq *req = queuefetch(&callqueue);
-    while (req != 0) {
-        if (req->status != 0) {                    /* cancelled -> full cleanup */
+    while (req != 0)
+    {
+        if (req->status != 0)
+        { /* cancelled -> full cleanup */
             cancelrequest(req);
-        } else {                                   /* normal completion -> fire the callback */
+        }
+        else
+        { /* normal completion -> fire the callback */
             void (*cb)(int) = (void (*)(int))(size_t)(unsigned int)req->callback;
             cb(req->id);
             queueadd(&freequeue, req);
-            req->id = (unsigned char)req->id;      /* free the slot */
+            req->id = (unsigned char)req->id; /* free the slot */
         }
         req = queuefetch(&callqueue);
     }
@@ -274,25 +300,27 @@ extern "C" int asyncsystemtask(void)
  *   mutex, and register asyncsystemtask.  No-op if already initialised or numreq out of range. */
 extern "C" int initasync(int numreq, int blocksize, int memclass)
 {
-    if (request == 0 && numreq < 0x101) {
+    if (request == 0 && numreq < 0x101)
+    {
         int i;
         readblocksize = blocksize;
-        numrequests   = numreq;
+        numrequests = numreq;
         request = (AsyncReq *)reservememadr((char *)"ASYNCREQ", numreq * 0x2C, memclass);
         freequeue.head = request;
-        freequeue.tail = (AsyncReq *)((char *)request + (numreq * 0x2C - 0x2C));  /* &request[numreq-1] */
+        freequeue.tail = (AsyncReq *)((char *)request + (numreq * 0x2C - 0x2C)); /* &request[numreq-1] */
         callqueue.head = 0;
         callqueue.tail = 0;
         asyncfilehandle = 0;
         mutex = allocmutex();
-        for (i = 0; i < numreq; i++) {                     /* link every slot onto the free list */
+        for (i = 0; i < numreq; i++)
+        { /* link every slot onto the free list */
             AsyncReq *r = (AsyncReq *)((char *)request + i * 0x2C);
-            r->id     = i;                                 /* id low byte == slot index */
-            r->next   = (AsyncReq *)((char *)r + 0x2C);
+            r->id = i; /* id low byte == slot index */
+            r->next = (AsyncReq *)((char *)r + 0x2C);
             r->fileop = 0;
         }
-        request[numreq - 1].next = 0;                      /* terminate the free list */
-        addsystemtask((intptr_t)asyncsystemtask, 1, 1);
+        request[numreq - 1].next = 0; /* terminate the free list */
+        addsystemtask((intptr)asyncsystemtask, 1, 1);
     }
     return 0;
 }
@@ -309,12 +337,12 @@ extern "C" int asyncloadfilecallback(int name, int memclass, int cb)
         return 0;
     newrequestid(req);
     req->bytesread = 0;
-    req->status    = 0;
-    req->buffer    = 1;                 /* "allocate by size" sentinel */
-    req->callback  = cb;
-    req->offset    = 0;
+    req->status = 0;
+    req->buffer = 1; /* "allocate by size" sentinel */
+    req->callback = cb;
+    req->offset = 0;
     op = FILE_open((char *)(size_t)(unsigned int)name, 1, 0x64, RQ(req));
-    req->arg24 = memclass;             /* asm: delay slot */
+    req->arg24 = memclass; /* asm: delay slot */
     if (op == 0)
         return 0;
     req->fileop = (int)op;
@@ -337,12 +365,12 @@ extern "C" int asyncloadfileatcallback(int name, int dest, int cb)
         return 0;
     newrequestid(req);
     req->bytesread = 0;
-    req->status    = 0;
-    req->buffer    = 0;                 /* direct read (no alloc) */
-    req->callback  = cb;
-    req->offset    = 0;
+    req->status = 0;
+    req->buffer = 0; /* direct read (no alloc) */
+    req->callback = cb;
+    req->offset = 0;
     op = FILE_open((char *)(size_t)(unsigned int)name, 1, 0x64, RQ(req));
-    req->dest = dest;                  /* asm: delay slot */
+    req->dest = dest; /* asm: delay slot */
     if (op == 0)
         return 0;
     req->fileop = (int)op;
@@ -361,7 +389,8 @@ extern "C" void setasyncfile(int name)
 {
     if (asyncfilehandle != 0)
         FILE_closesync(asyncfilehandle, 0x64);
-    if (name == 0) {
+    if (name == 0)
+    {
         asyncfilehandle = 0;
         return;
     }
@@ -380,21 +409,20 @@ extern "C" int asyncloadsegmentcallback(int offset, int dest, int size, int cb)
         return 0;
     newrequestid(req);
     req->bytesread = 0;
-    req->status    = 0;
-    req->buffer    = 0;
-    req->callback  = cb;
-    req->offset    = offset;
-    req->arg24     = size;             /* remaining bytes */
-    req->dest      = dest;             /* asm: delay slot */
-    if (asyncfilehandle == 0) {        /* no file open -> finish now */
+    req->status = 0;
+    req->buffer = 0;
+    req->callback = cb;
+    req->offset = offset;
+    req->arg24 = size; /* remaining bytes */
+    req->dest = dest;  /* asm: delay slot */
+    if (asyncfilehandle == 0)
+    { /* no file open -> finish now */
         finishrequest(req);
         return req->id;
     }
-    len = (readblocksize < size) ? readblocksize : size;   /* clamp the first chunk */
-    op = FILE_read((intptr_t)(unsigned int)asyncfilehandle,
-                   (unsigned int)req->offset, (intptr_t)(unsigned int)req->dest,
-                   len, 0x64, (intptr_t)RQ(req));
-    req->fileop = (int)op;            /* asm: set on both branches */
+    len = (readblocksize < size) ? readblocksize : size; /* clamp the first chunk */
+    op = FILE_read((intptr)(unsigned int)asyncfilehandle, (unsigned int)req->offset, (intptr)(unsigned int)req->dest, len, 0x64, (intptr)RQ(req));
+    req->fileop = (int)op; /* asm: set on both branches */
     if (op == 0)
         return 0;
     FILE_callbackop(op, (void (*)(int, int))loadsegreadcallback);
@@ -414,13 +442,13 @@ extern "C" int cancelasyncload(int id)
     AsyncReq *req = locaterequest(id);
     if (req == 0)
         return 0;
-    if (req->status != 0)              /* already cancelling/cancelled */
+    if (req->status != 0) /* already cancelling/cancelled */
         return 0;
     FILE_cancelop(req->fileop);
-    req->status = 1;                   /* request cancel (asm: delay slot) */
-    if (req->fileop != 0)              /* still in flight -> let the callback finish it */
+    req->status = 1;      /* request cancel (asm: delay slot) */
+    if (req->fileop != 0) /* still in flight -> let the callback finish it */
         return 0;
-    if (req->callback != 0)            /* has a callback -> it will run */
+    if (req->callback != 0) /* has a callback -> it will run */
         return 0;
     cancelrequest(req);
     return 0;
@@ -432,15 +460,20 @@ extern "C" int getasyncreadadr(int id)
 {
     AsyncReq *req = locaterequest(id);
     int adr;
-    if (req == 0)        return 0;
-    if (req->status != 0) return 0;    /* cancelled */
-    if (req->fileop != 0) return 0;    /* still loading */
+    if (req == 0)
+        return 0;
+    if (req->status != 0)
+        return 0; /* cancelled */
+    if (req->fileop != 0)
+        return 0; /* still loading */
     adr = req->buffer;
-    if (adr == 1) adr = 0;             /* alloc sentinel, not a real address */
-    if (req->buffer == 0) return 0;    /* nothing allocated */
-    if (req->callback != 0)            /* a callback owns the lifecycle */
+    if (adr == 1)
+        adr = 0; /* alloc sentinel, not a real address */
+    if (req->buffer == 0)
+        return 0;           /* nothing allocated */
+    if (req->callback != 0) /* a callback owns the lifecycle */
         return adr;
-    queueadd(&freequeue, req);         /* poll-only -> recycle the slot now */
+    queueadd(&freequeue, req); /* poll-only -> recycle the slot now */
     req->id = (unsigned char)req->id;
     return adr;
 }
@@ -452,16 +485,31 @@ extern "C" int getasyncreadstatus(int id)
 {
     AsyncReq *req = locaterequest(id);
     int st;
-    if (req == 0)        return -2;
-    if (req->status != 0) return -2;
-    if (req->fileop != 0) return 0;                    /* still loading */
+    if (req == 0)
+        return -2;
+    if (req->status != 0)
+        return -2;
+    if (req->fileop != 0)
+        return 0; /* still loading */
     st = (req->bytesread != 0) ? req->bytesread : -1;
-    if (req->buffer != 0)   return st;
-    if (req->callback != 0) return st;
-    queueadd(&freequeue, req);                         /* harvested -> recycle the slot */
+    if (req->buffer != 0)
+        return st;
+    if (req->callback != 0)
+        return st;
+    queueadd(&freequeue, req); /* harvested -> recycle the slot */
     req->id = (unsigned char)req->id;
     return st;
 }
 
-extern "C" { AsyncQueue callqueue; AsyncQueue freequeue; int asyncfileoffset; int numrequests; int readblocksize; }  /* owning-TU defs (BSS) */
-extern "C" { void *mutex; }   /* nasync.obj async-pool mutex handle (= allocmutex() result); BSS */
+extern "C"
+{
+    AsyncQueue callqueue;
+    AsyncQueue freequeue;
+    int asyncfileoffset;
+    int numrequests;
+    int readblocksize;
+} /* owning-TU defs (BSS) */
+extern "C"
+{
+    void *mutex;
+} /* nasync.obj async-pool mutex handle (= allocmutex() result); BSS */

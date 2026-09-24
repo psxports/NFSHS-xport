@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "project": "C:\\Projects\\xports\\NFSHS-xport",
+  "current_revision": "2026-09-24T11:20:01Z",
+  "target_revision": "2026-09-24T13:10:20Z",
+  "changelog_sha256": "1a2e8e9c60d2bde394876bb1c38574217213033ba8db0967b249e1b687e0832c",
+  "automation_completed": [
+    "2026-09-24T11:52:26Z",
+    "2026-09-24T11:58:01Z",
+    "2026-09-24T12:04:03Z",
+    "2026-09-24T12:10:37Z",
+    "2026-09-24T12:20:46Z",
+    "2026-09-24T12:47:04Z",
+    "2026-09-24T12:54:25Z",
+    "2026-09-24T13:10:20Z"
+  ],
+  "automation_results": [],
+  "status": "complete",
+  "verification": [
+    {
+      "command": [
+        "X",
+        "code_refresh"
+      ],
+      "exit_code": 0,
+      "output": "{\"result\": \"PASS\", \"seconds\": 3.3, \"report\": \"C:\\\\Projects\\\\xports\\\\NFSHS-xport\\\\status\\\\code-refresh-latest.json\", \"log\": \"C:\\\\Projects\\\\xports\\\\NFSHS-xport\\\\status\\\\code-refresh-latest.log\", \"error\": null}\n"
+    },
+    {
+      "command": [
+        "X",
+        "convert_music"
+      ],
+      "exit_code": 0,
+      "output": "{\n  \"status\": \"not_applicable\",\n  \"reason\": \"Supplied NFSHS CUE contains one MODE2/2352 data track and no Red Book AUDIO tracks; music uses XA-ADPCM inside the data track\",\n  \"input\": \"C:\\\\Projects\\\\xports\\\\NFSHS-xport\\\\iso\\\\Need for Speed - High Stakes (USA).cue\",\n  \"tracks\": []\n}\n"
+    },
+    {
+      "command": [
+        "X",
+        "doctor"
+      ],
+      "exit_code": 0,
+      "output": "{\n  \"project\": \"C:\\\\Projects\\\\xports\\\\NFSHS-xport\",\n  \"name\": \"Need for Speed: High Stakes\",\n  \"short_name\": \"NFSHS\",\n  \"toolset\": \"C:\\\\Projects\\\\xports\\\\xport\\\\tools\",\n  \"paths\": {\n    \"status\": \"status\",\n    \"project_tools\": \"tools\",\n    \"analysis_database\": \"status/analysis.sqlite\",\n    \"native_executable\": \"bin/NFSHS.exe\",\n    \"native_working_directory\": \"bin\",\n    \"native_solution\": \"src/platform/win/NFSHS.sln\",\n    \"native_build\": \"_build\",\n    \"callgraph\": \"status/callgraph.json\",\n    \"similarity_directory\": \"status/similarity\",\n    \"ida_exports\": \"orig/images\",\n    \"ida_configs\": \"tools/ida\",\n    \"sdk_classification\": \"status/ghidra/classification.json\"\n  }\n}\n"
+    }
+  ]
+}

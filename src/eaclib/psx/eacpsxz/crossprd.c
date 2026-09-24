@@ -3,9 +3,9 @@
  *   FULL reconstruction (disasm-v3 MIPS); NOT a stub.  Standard 3D cross product in 16.16 fixed
  *   point (each component product via fixedmult).  out = a x b.  C-linkage.
  */
-extern "C" int fixedmult(int a, int b);              /* eacpsxz @0x800E4328 (16.16 multiply) */
+extern "C" int fixedmult(int a, int b); /* eacpsxz @0x800E4328 (16.16 multiply) */
 
-extern "C" void crossproduct(int *a, int *b, int *out)   /* @0x800EAAE4 */
+extern "C" void crossproduct(int *a, int *b, int *out) /* @0x800EAAE4 */
 {
     out[0] = fixedmult(a[1], b[2]) - fixedmult(a[2], b[1]);
     out[1] = fixedmult(a[2], b[0]) - fixedmult(a[0], b[2]);

@@ -7,7 +7,7 @@
 
 extern "C" int sndgs[];
 
-extern "C" int iSNDvalidbank(int bank_id);   /* @0x800FE6BC */
+extern "C" int iSNDvalidbank(int bank_id); /* @0x800FE6BC */
 
 /* iSNDvalidbank @0x800FE6BC : 0 if the bank is loaded and ready, -8 if out of range / empty, -0x12 if it
  *   is still loading. */

@@ -17,7 +17,7 @@
  *     COORD16, CRVECTOR3, CRVECTOR4, CVECTOR, DIRENTRY, DISPENV, DRAWENV, DR_ENV, DR_MODE,
  *     DRender_tCalcView, DVECTOR, Draw_CarVertex, Draw_PrimStruct, Draw_SVertex, Draw_tCacheHeader,
  *     Draw_tPixMap, EXEC, MATRIX, PAD_ANALOG, PAD_COMMON, PAD_MOUSE, PAD_NEGCON, PAD_PSX, PCOORD16,
- *     RECT, RVECTOR, SHAPETABLEENTRY, SVECTOR, TCB, VECTOR, cdstreamstruct, kernpair, linedef,
+ *     PSX_RECT, RVECTOR, SHAPETABLEENTRY, SVECTOR, TCB, VECTOR, cdstreamstruct, kernpair, linedef,
  *     matrixtdef, shapetbl (+ union ._N).
  *
  *   All 35 struct types are ALREADY reconstructed in ../../nfs4_types.h (verified present). There is

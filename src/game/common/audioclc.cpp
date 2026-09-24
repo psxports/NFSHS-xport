@@ -741,17 +741,9 @@ void AudioClc_SoundPlayersCar(int playerIndex)
     car->wrongway = uVar5;
     if (((0x3f < (int)uVar5) && ((uVar5 & 0x1f) == 0)) &&
        (((int)uVar5 < 0x94 || (Hud_BeTheCop != 0)))) {
-#ifndef AP_WIN
       AudioCmn_PlayWrongWaySFX();
-#endif
     }
   }
-#ifdef AP_WIN
-  /* 0x80075568..0x80075748 also updates car->wrongway (+0x3f0),
-     consumed by camera.cpp and DashHUD_CheckWrongWay. Keep that gameplay
-     side effect when muting audio; Doppler/engine/horn work starts below. */
-  return;
-#endif
   objectPos = &(car->N).position;
   iVar7 = AudioClc_CalcDopplerShiftRatio(objectPos,&(car->N).linearVel);
   if (GameSetup_gData.commMode == 1) {
@@ -917,7 +909,7 @@ void AudioClc_GetClosestCars(int playerIndex,int closestIndex,int numclosest)
   AudioClc_tCLCache *cache = (AudioClc_tCLCache *)
       NFS4_AUDIOCLC_ALLOCA((unsigned int)numclosest * sizeof(AudioClc_tCLCache));
   AudioClc_tSource *closest = AudioClc_gClosest + closestIndex;
-  Car_tObj *emptyMarker = (Car_tObj *)(intptr_t)-1;
+  Car_tObj *emptyMarker = (Car_tObj *)(intptr)-1;
   int i, j;
 
   for (i = 0; i < numclosest; ++i) {
@@ -1005,14 +997,10 @@ void AudioClc_GetClosestCars(int playerIndex,int closestIndex,int numclosest)
 /* ---- AudioClc_SoundSpeech__Fv  [@0x80076130] ---- */
 void AudioClc_SoundSpeech(void)
 {
-#ifdef AP_WIN
-  /* The native port intentionally has no SPU/music/speech backend.  Keeping
-     the original speech scheduler alive is both wasted work and unsafe: its
-     reconstructed object graph assumes PsyQ audio objects were initialized. */
-  return;
-#endif
   AudioCmn_SetLevels();
-  Speech_Server();
+  if (Speech_Dispatch() != 0) {
+    Speech_Server();
+  }
   CopSpeak_Server();
   return;
 }
@@ -1031,14 +1019,6 @@ void AudioCmn_UpdateThunder(void);
  *  Pursuit "busted" block re-primes perp engine SFX. */
 void AudioClc_SoundCars(void)
 {
-#ifdef AP_WIN
-  /* Preserve the gameplay prefix of SoundPlayersCar at the original
-     32-Hz call site. SoundCars MIPS 0x80076278..0x8007639C calls player 0
-     in both modes and player 1 only when commMode == 1. */
-  AudioClc_SoundPlayersCar(0);
-  if (GameSetup_gData.commMode == 1) AudioClc_SoundPlayersCar(1);
-  return;
-#endif
   int i, patch;
 
   AudioClc_SoundSpeech();

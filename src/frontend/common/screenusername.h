@@ -5,9 +5,9 @@
 #include "screenusername_externs.h"
 
 /* tScreenUserName member fns are declared in nfs4_types.h (the class). */
-extern "C" short            menu_kUserNameRows;   /* row count */
-extern short            MENUUSERNAME_STARTY;  /* vertical-centre offset */
-extern tScreenUserName *screenUserName;       /* the screen instance */
-extern char             UserPermFileName[20]; /* shape file name */
+extern "C" short menu_kUserNameRows;    /* row count */
+extern short MENUUSERNAME_STARTY;       /* vertical-centre offset */
+extern tScreenUserName *screenUserName; /* the screen instance */
+extern char UserPermFileName[20];       /* shape file name */
 
 #endif

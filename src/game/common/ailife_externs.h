@@ -6,34 +6,34 @@
 #include "aiworld.h"
 #include "../../lib/libfns.h"
 
-extern Car_tObj           *Cars_gCopCarList[];
-extern Car_tObj         *Cars_gHumanRaceCarList[9];  /* cars.obj */
-extern Car_tObj      *Cars_gSortedList[];
+extern Car_tObj *Cars_gCopCarList[];
+extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
+extern Car_tObj *Cars_gSortedList[];
 extern Car_tObj *Cars_gLifeBasisCarList[];
-extern "C" extern GameSetup_tData   GameSetup_gData;
-extern Trk_NewSlice  *BWorldSm_slices;
-extern int                 Cars_gNumCopCars;
-extern "C" extern int                 generic128HzClock, stackSpeedUpEnbabledFlag;
-extern int                AIInit_forceHumanHandBrake;
-extern int                AITune_driveSide;
-extern int            Cars_gNumCars;
-extern int            gNumSlices;
-extern "C" extern int       Cars_gNumHumanRaceCars;
+extern "C" extern GameSetup_tData GameSetup_gData;
+extern Trk_NewSlice *BWorldSm_slices;
+extern int Cars_gNumCopCars;
+extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern int AIInit_forceHumanHandBrake;
+extern int AITune_driveSide;
+extern int Cars_gNumCars;
+extern int gNumSlices;
+extern "C" extern int Cars_gNumHumanRaceCars;
 extern int AITune_oneWay;
 extern int Cars_CalculateRoadPosition(Car_tObj *carObj);
 extern int Cars_CalculateRoadSpan(Car_tObj *carObj);
 extern int Cars_gNumLifeBasisCars;
-extern u_int               fastRandom, randSeed, randtemp;   /* fastrand.obj PRNG state */
-extern intptr_t gWSavePtr;
-extern void  Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);
+extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
+extern intptr gWSavePtr;
+extern void Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);
 extern void AIPhysic_ResetCar(Car_tObj *carObj);
 extern void AISpeeds_SetTrafficSpeedRandomFactor(Car_tObj *carObj);
 extern void AIWorld_CalculateLaneInfo(Car_tObj *carObj);
-extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coorddef *offset,int direction);
+extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n, int slice, coorddef *offset, int direction);
 extern void Physics_ResetCar(Car_tObj *carObj);
-extern void R3DCar_ChangeTrafficColor(Car_tObj *carObj,int newColorIndex);
+extern void R3DCar_ChangeTrafficColor(Car_tObj *carObj, int newColorIndex);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
-void  trap(int code);
+void trap(int code);
 void AIInit_ClearAICar(Car_tObj *carObj);
 void AISpeeds_CalcDesiredSpeed(Car_tObj *carObj);
 void AI_ChooseNewLaneSlack(Car_tObj *carObj);

@@ -52,7 +52,7 @@ void Feaudio_StartPatch(SPEECHINFO *info)
   SNDPLAYOPTS playopts;
   
   if (info->sSpeechData != (char *)0x0) {
-    iVar1 = SNDbankadd(&info->nHandle,(intptr_t)info->sSpeechData);
+    iVar1 = SNDbankadd(&info->nHandle,(intptr)info->sSpeechData);
     if (iVar1 == 7) {
       iVar1 = SNDbankheadersize(info->nHandle);
       pcVar2 = (char *)reservememadr((char *)(bigBuf + 0x104),iVar1,0x10);

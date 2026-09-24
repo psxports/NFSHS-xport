@@ -483,13 +483,13 @@ void BWorld_OnyxBuildFacets(DRender_tView *Vi)
   
   Chunk_UpdateSys(Vi);
   gVi2 = Vi;
-  gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   sd = (Draw_DCache *)getScratchAddr(0);
   SetupBuildMatrices(gVi2,sd);
   DrawW_WorldSetUpMatrix(&gWorldMat,&Render_gWorldMat);
   BWorld_gChunkCount = SetupChunkBuildList(gVi2);
-  gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
   stackSpeedUpEnbabledFlag = 0;
   Skid_gScratchPos1 = 0;
   Skid_gScratchPos2 = 0;
@@ -512,17 +512,17 @@ void BWorld_OnyxBuildFacets(DRender_tView *Vi)
     uVar1 = (u_short)Night_gZNear;
   }
   uVar2 = (u_long)uVar1;
-  gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   DrawW_DoTrough(Vi,(tBuildEntry *)BWorld_gChunkBuildList);
-  gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
   stackSpeedUpEnbabledFlag = 0;
   if ((GameSetup_gData.track != 0) ||
      (uVar2 = GameSetup_gData.Weather, GameSetup_gData.Weather != 1)) {
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     DrawW_DoLines(Vi,(tBuildEntry *)BWorld_gChunkBuildList,sd);
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
   }
   stackSpeedUpEnbabledFlag = 0;
   if ((gSpikeBelt != 0) && (iVar4 = 0, 0 < BWorld_gChunkCount)) {

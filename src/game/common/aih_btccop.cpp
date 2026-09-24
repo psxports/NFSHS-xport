@@ -8,6 +8,7 @@
 #include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aih_btccop_externs.h"
+#include "new.h"
 
 extern int AI_elapsedTime;   /* H19: ai.cpp @0x8013C554 (not in this TU's externs) */
 
@@ -1952,7 +1953,7 @@ void AIHigh_BTC_Wingman::HighExecute()
 
     pCVar9->AIFlags = pCVar9->AIFlags & 0xfffffffd;
 
-    pAVar5 = (AIState_Base *)operator new(8);
+    pAVar5 = (AIState_Base *)__builtin_new(8);
 
     pCVar9 = (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_;
 
@@ -2000,7 +2001,7 @@ void AIHigh_BTC_Wingman::HighExecute()
 
         this->_base_AIHigh_BTC_Cop.GetCheckChasePosition(&cStack_40);
 
-        pAVar11 = (AIState_Chase *)operator new(0x94);
+        pAVar11 = (AIState_Chase *)__builtin_new(0x94);
 
         pAVar11 = (new(pAVar11) AIState_Chase((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_,
 
@@ -2038,7 +2039,7 @@ void AIHigh_BTC_Wingman::HighExecute()
 
         this->SetupBlockader(this->newHumanBoss_,(u_int)(this->newRole_ == 3));
 
-        pAVar11 = (AIState_Chase *)operator new(0x10);
+        pAVar11 = (AIState_Chase *)__builtin_new(0x10);
 
         (new(&pAVar11->_base_AIState_Base) AIState_Base((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_));
 
@@ -2074,7 +2075,7 @@ LAB_8005e5d8:
 
     ;
 
-    pAVar5 = (AIState_Base *)operator new(8);
+    pAVar5 = (AIState_Base *)__builtin_new(8);
 
     pCVar9 = (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_;
 
@@ -2106,7 +2107,7 @@ LAB_8005e5d8:
 
       this->currentRole_ = 1;
 
-      pAVar4 = (AIState_Normal *)operator new(8);
+      pAVar4 = (AIState_Normal *)__builtin_new(8);
 
       pAVar5 = &(new(pAVar4) AIState_Normal((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -2180,7 +2181,7 @@ LAB_8005ea9c:
 
       this->currentRole_ = 1;
 
-      pAVar11 = (AIState_Chase *)operator new(0x94);
+      pAVar11 = (AIState_Chase *)__builtin_new(0x94);
 
       pAVar11 = (new(pAVar11) AIState_Chase((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_,
 
@@ -2204,7 +2205,7 @@ LAB_8005ea9c:
 
       this->currentRole_ = 1;
 
-      pAVar4 = (AIState_Normal *)operator new(8);
+      pAVar4 = (AIState_Normal *)__builtin_new(8);
 
       pAVar5 = &(new(pAVar4) AIState_Normal((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -2230,7 +2231,7 @@ LAB_8005ea9c:
 
     ;
 
-    pAVar5 = (AIState_Base *)operator new(8);
+    pAVar5 = (AIState_Base *)__builtin_new(8);
 
     pCVar9 = (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_;
 
@@ -2268,7 +2269,7 @@ LAB_8005ea9c:
 
       iVar3 = (pAVar11)->FindBarrierEndSlice();
 
-      pAVar10 = (AIState_GotoSlice *)operator new(0x10);
+      pAVar10 = (AIState_GotoSlice *)__builtin_new(0x10);
 
       pAVar10 = (new(pAVar10) AIState_GotoSlice((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_,iVar3,
 
@@ -2336,7 +2337,7 @@ LAB_8005ea9c:
 
       this->_base_AIHigh_BTC_Cop.AssignToPlayer((AIHigh_BTC_Perp *)0x0);
 
-      pAVar4 = (AIState_Normal *)operator new(8);
+      pAVar4 = (AIState_Normal *)__builtin_new(8);
 
       pAVar5 = &(new(pAVar4) AIState_Normal((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -2362,7 +2363,7 @@ LAB_8005ea9c:
 
       this->_base_AIHigh_BTC_Cop.AssignToPlayer((AIHigh_BTC_Perp *)0x0);
 
-      pAVar4 = (AIState_Normal *)operator new(8);
+      pAVar4 = (AIState_Normal *)__builtin_new(8);
 
       pAVar5 = &(new(pAVar4) AIState_Normal((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -2396,7 +2397,7 @@ LAB_8005ea9c:
 
     ;
 
-    pAVar5 = (AIState_Base *)operator new(8);
+    pAVar5 = (AIState_Base *)__builtin_new(8);
 
     pCVar9 = (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_;
 
@@ -2438,7 +2439,7 @@ LAB_8005ea9c:
 
     this->SetupBlockader(this->newHumanBoss_,(u_int)(this->newRole_ == 3));
 
-    pAVar5 = (AIState_Base *)operator new(0x10);
+    pAVar5 = (AIState_Base *)__builtin_new(0x10);
 
     (new(pAVar5) AIState_Base((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_));
 
@@ -2472,7 +2473,7 @@ LAB_8005ea9c:
 
 LAB_8005ed58:
 
-    pAVar4 = (AIState_Normal *)operator new(8);
+    pAVar4 = (AIState_Normal *)__builtin_new(8);
 
     pAVar5 = &(new(pAVar4) AIState_Normal((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -2990,12 +2991,12 @@ LAB_8005f268:
 
     else {
 
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 0;
 
       ((AIHigh_BasicCop *)this)->SetupBlockadeElements(&(this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop.blockade_);
 
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 1;
 
     }

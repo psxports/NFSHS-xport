@@ -8,11 +8,11 @@
 
 extern "C" int sndgs[];
 
-extern "C" short *iSNDserveraddclient(int cb);       /* @0x8010479C */
-extern "C" int    iSNDserverremoveclient(int cb);    /* @0x801047CC */
-extern "C" void   SNDSYS_service(void);              /* @0x80104878 */
+extern "C" short *iSNDserveraddclient(int cb); /* @0x8010479C */
+extern "C" int iSNDserverremoveclient(int cb); /* @0x801047CC */
+extern "C" void SNDSYS_service(void);          /* @0x80104878 */
 
-#define NCLIENT (((char *)sndgs)[0x41])   /* sndgs[0x10]._1_1_ : service-client count */
+#define NCLIENT (((char *)sndgs)[0x41]) /* sndgs[0x10]._1_1_ : service-client count */
 
 /* iSNDserveraddclient @0x8010479C : append callback `cb` to the service-client list; returns sndgs. */
 extern "C" short *iSNDserveraddclient(int cb)
@@ -28,17 +28,20 @@ extern "C" int iSNDserverremoveclient(int cb)
 {
     int i = 0, off = 0;
     int more;
-    if (0 < (int)NCLIENT) {
+    if (0 < (int)NCLIENT)
+    {
         off = 0;
-        while (*(int *)((int)sndgs + off + 100) != cb) {     /* find slot (sndgs[0x19] == sndgs+100) */
+        while (*(int *)((int)sndgs + off + 100) != cb)
+        { /* find slot (sndgs[0x19] == sndgs+100) */
             i++;
             off = i * 4;
             if (NCLIENT <= i)
-                return off;                                   /* not found */
+                return off; /* not found */
         }
         NCLIENT = NCLIENT - 1;
         more = (i < (int)NCLIENT);
-        while (off = 0, more) {                               /* compact the tail down one slot */
+        while (off = 0, more)
+        { /* compact the tail down one slot */
             sndgs[i + 0x19] = sndgs[i + 0x1a];
             more = (i + 1 < (int)NCLIENT);
             i++;
@@ -51,9 +54,11 @@ extern "C" int iSNDserverremoveclient(int cb)
 extern "C" void SNDSYS_service(void)
 {
     int *clientp = sndgs;
-    int  i = 0;
-    if (0 < NCLIENT) {
-        do {
+    int i = 0;
+    if (0 < NCLIENT)
+    {
+        do
+        {
             int *cb = clientp + 0x19;
             clientp = clientp + 1;
             (*(void (*)(void))*cb)();

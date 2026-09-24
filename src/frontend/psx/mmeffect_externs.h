@@ -6,10 +6,11 @@
 #include "../../lib/libfns.h"
 
 /* GPU packet build cursors (byte-addressable), shared with PSXFRONT.CPP */
-extern "C" u_char *&Render_gPacketPtr;    /* GPU packet build cursor (byte-arith) */
-extern "C" u_char *&Render_gPalettePtr;   /* GPU packet build cursor (byte-arith) */
+extern "C" u_char *&Render_gPacketPtr;  /* GPU packet build cursor (byte-arith) */
+extern "C" u_char *&Render_gPalettePtr; /* GPU packet build cursor (byte-arith) */
 
-extern "C" {
-/* PsyQ libgpu */
+extern "C"
+{
+    /* PsyQ libgpu */
 }
 #endif

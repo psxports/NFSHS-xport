@@ -3,12 +3,12 @@
 #define _FE_FRONT_EXTERNS_H_
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
-extern "C" int          ticks;
-extern "C" extern tfrontEnd    frontEnd;
+extern "C" int ticks;
+extern "C" extern tfrontEnd frontEnd;
 extern tFEApplication *FEApp;
 extern tGlobalMenuDefs *menuDefs;
-extern "C" extern char        *Paths_Paths[];
-extern tCarManager  carManager;
+extern "C" extern char *Paths_Paths[];
+extern tCarManager carManager;
 extern tTournamentManager tournamentManager;
 extern tTrackManager trackManager;
 extern tAllScreens *gAllScreens;
@@ -16,20 +16,59 @@ extern tAllScreens *gAllScreens;
 /* ===== auto-generated stubs ===== */
 void AddCarToIngameList(tCarManager *, tCarModels *, char *);
 short AdvanceToNextTrack(tTournamentManager *);
-extern "C" { int AudioMus_GetSongList(...); }
-extern "C" { int AudioMus_SysCleanUp(...); }
-extern "C" { int AudioMus_SysStartUp(...); }
-extern "C" { int AudioMus_Volume(...); }
-extern "C" { int Audio_FECleanUp(...); }
-extern "C" { int CarIO_CleanUpLicense(...); }
-extern "C" { int CarIO_CreateLicense(...); }
+extern "C"
+{
+    int AudioMus_GetSongList(...);
+}
+extern "C"
+{
+    int AudioMus_SysCleanUp(...);
+}
+extern "C"
+{
+    int AudioMus_SysStartUp(...);
+}
+extern "C"
+{
+    int AudioMus_Volume(...);
+}
+extern "C"
+{
+    int Audio_FECleanUp(...);
+}
+extern "C"
+{
+    int CarIO_CleanUpLicense(...);
+}
+extern "C"
+{
+    int CarIO_CreateLicense(...);
+}
 long CheapestCarStockPrice(tCarManager *);
-extern "C" { int Controller_SetRamp(...); }
-extern "C" { int DeInit_Memcard(...); }
-extern "C" { int FECheat_IsCheatEnabled(...); }
-extern "C" { int FeAudio_DeInitCommentary(...); }
-extern "C" { int FeAudio_InitCommentary(...); }
-extern "C" { int FeTools_deinit(...); }
+extern "C"
+{
+    int Controller_SetRamp(...);
+}
+extern "C"
+{
+    int DeInit_Memcard(...);
+}
+extern "C"
+{
+    int FECheat_IsCheatEnabled(...);
+}
+extern "C"
+{
+    int FeAudio_DeInitCommentary(...);
+}
+extern "C"
+{
+    int FeAudio_InitCommentary(...);
+}
+extern "C"
+{
+    int FeTools_deinit(...);
+}
 int FindSimilarCar(tCarManager *, tCarModels *, char *, short, tCarModels *);
 tCarInfo *GetCarFromID(tCarManager *, short);
 short GetClassList(tCarManager *, unsigned int, int, tCarModels *);
@@ -38,43 +77,115 @@ short GetLastTrackRaced(tTournamentManager *);
 short GetMissionStages(tMissionManager *, short, short, tStageInfo **);
 void GetMissionToRace(tMissionManager *, tMissionInfo **);
 short GetNumOwnedCars(tCarManager *, short);
-extern "C" { int GetPinkSlipsCar(...); }
+extern "C"
+{
+    int GetPinkSlipsCar(...);
+}
 void GetStockCar(tCarManager *, unsigned short, tCarInfo *);
 void GetTrack(tTrackManager *, unsigned short, tTrackInformation *);
-extern "C" { int GetTrackByID(...); }
-extern "C" { int GetTrackToRace(...); }
-extern "C" { int Init_Memcard(...); }
-extern "C" { int Init_PSX_FrontEnd(...); }
+extern "C"
+{
+    int GetTrackByID(...);
+}
+extern "C"
+{
+    int GetTrackToRace(...);
+}
+extern "C"
+{
+    int Init_Memcard(...);
+}
+extern "C"
+{
+    int Init_PSX_FrontEnd(...);
+}
 void InitializeIngameCarList(tCarManager *);
-extern "C" { int InitializeSpinningCars(...); }
+extern "C"
+{
+    int InitializeSpinningCars(...);
+}
 void *IsCarAnAddedModel(tCarManager *, tCarModels *, char *);
 void LoadDescription(tMissionManager *, bool);
 short LoadGame(short player, bool PinkSlips, bool WithDialogs);
-extern "C" { int MenuExtended_TransitionFromPostGameToMainMenu(...); }
-extern "C" { int PSXExitFrontend(...); }
-extern "C" { int Platform_ResetDCTBuffer(...); }
-extern "C" { char *PlayerName(int); }
+extern "C"
+{
+    int MenuExtended_TransitionFromPostGameToMainMenu(...);
+}
+extern "C"
+{
+    int PSXExitFrontend(...);
+}
+extern "C"
+{
+    int Platform_ResetDCTBuffer(...);
+}
+extern "C"
+{
+    char *PlayerName(int);
+}
 tAppCommand RunFrontEnd(tFEApplication *);
 tAppCommand RunPostGame(tFEApplication *);
 int Setup(...);
-extern "C" { int StatTool_UpperCaseItKeepingInMindThoseBloodySpecialCharacters(...); }
-extern "C" { int Stattool_GetAllDefaultRecords(...); }
-extern "C" { int Stattool_ReturnRecordLapTime(...); }
-extern "C" { int TextSys_UnloadWords(...); }
-extern "C" { int TextSys_Word(...); }
+extern "C"
+{
+    int StatTool_UpperCaseItKeepingInMindThoseBloodySpecialCharacters(...);
+}
+extern "C"
+{
+    int Stattool_GetAllDefaultRecords(...);
+}
+extern "C"
+{
+    int Stattool_ReturnRecordLapTime(...);
+}
+extern "C"
+{
+    int TextSys_UnloadWords(...);
+}
+extern "C"
+{
+    int TextSys_Word(...);
+}
 void UpdateAwardInformation(tTournamentManager *);
 void UpdateCarLineup(tTournamentManager *);
 void *__builtin_new(unsigned int size);
-extern "C" { int s_lower(...); }
-extern "C" { tAllScreens *tAllScreens_ctor(...); }
-extern "C" { tAllScreens *tAllScreens_dtor(...); }
-extern "C" { tFEApplication *tFEApplication_ctor(...); }
-extern "C" { tFEApplication *tFEApplication_dtor(...); }
-extern "C" { tGlobalMenuDefs *tGlobalMenuDefs_ctor(...); }
-extern "C" { tGlobalMenuDefs *tGlobalMenuDefs_dtor(...); }
+extern "C"
+{
+    int s_lower(...);
+}
+extern "C"
+{
+    tAllScreens *tAllScreens_ctor(...);
+}
+extern "C"
+{
+    tAllScreens *tAllScreens_dtor(...);
+}
+extern "C"
+{
+    tFEApplication *tFEApplication_ctor(...);
+}
+extern "C"
+{
+    tFEApplication *tFEApplication_dtor(...);
+}
+extern "C"
+{
+    tGlobalMenuDefs *tGlobalMenuDefs_ctor(...);
+}
+extern "C"
+{
+    tGlobalMenuDefs *tGlobalMenuDefs_dtor(...);
+}
 tScreenAudio *tScreenAudio_ctor(...);
-extern "C" { tScreenCarSelect *tScreenCarSelect_ctor(...); }
-extern "C" { tScreenCarSelect *tScreenCarSelect_dtor(...); }
+extern "C"
+{
+    tScreenCarSelect *tScreenCarSelect_ctor(...);
+}
+extern "C"
+{
+    tScreenCarSelect *tScreenCarSelect_dtor(...);
+}
 tScreenControllerConfig *tScreenControllerConfig_ctor(...);
 tScreenMemcard *tScreenMemcard_ctor(...);
 tScreenTournSelect *tScreenTournSelect_ctor(...);
@@ -82,7 +193,10 @@ tScreenTournSelect *tScreenTournSelect_dtor(...);
 tScreenTournamentStandings *tScreenTournamentStandings_ctor(...);
 tScreenTrophyRoom *tScreenTrophyRoom_ctor(...);
 tScreenTrophyRoom *tScreenTrophyRoom_dtor(...);
-extern "C" { tScreen *tScreen_ctor(...); }
+extern "C"
+{
+    tScreen *tScreen_ctor(...);
+}
 tScreen *tScreen_dtor(...);
 extern "C" Car_tStats *Cars_gNewCarStatsList;
 /* FETracks.obj/SYM: ARY SHORT at 0x80051610.  OutputDisplaySettings MIPS

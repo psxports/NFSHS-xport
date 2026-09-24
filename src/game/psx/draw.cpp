@@ -6,12 +6,12 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "draw_externs.h"
+#include "psx_gpu.h"
 
 #ifdef AP_WIN
 extern "C" void NFSHS_HostBeginPacketArena(void *,void *);
 extern "C" void NFSHS_HostEndPacketArena(void *);
 extern "C" void NFSHS_HostBeginDMAFrame(void);
-extern "C" void NFSHS_HostAddPrim(void *,void *);
 #endif
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
@@ -292,7 +292,7 @@ void Draw_StartRenderingView(int viewid)
     Render_gPacketEnd = (char *)Render_gPacketPtr + Draw_gView[viewid].membudget;
   }
   else {
-    Render_gPacketEnd = (char *)(intptr_t)Draw_gMaxPrim;
+    Render_gPacketEnd = (char *)(intptr)Draw_gMaxPrim;
   }
   Render_gMenuRenderFlag = 0;
   return;
@@ -312,13 +312,13 @@ void Draw_StopRenderingView(int viewid)
   nfs4_mips_copy_bytes(&LEnv,&view->drawenv[gFlip],sizeof(LEnv));
   otLast = view->ot[gFlip] + view->otsize - 1;
 #ifdef AP_WIN
-  NFSHS_HostAddPrim(otLast,cur_pkt);
+  AddPrim(otLast,cur_pkt);
 #else
   *(u_int *)Render_gPacketPtr =
        *(u_int *)Render_gPacketPtr & 0xff000000 |
        *otLast & 0xffffff;
   *otLast = *otLast & 0xff000000 |
-       (u_int)(uintptr_t)Render_gPacketPtr & 0xffffff;
+       (u_int)(intptr)Render_gPacketPtr & 0xffffff;
 #endif
   Render_gPacketPtr = Render_gPacketPtr + 0x40;
   SetDrawEnv((DR_ENV *)cur_pkt,&LEnv);
@@ -361,9 +361,9 @@ void Draw_StartFrameRender(void)
     ClearOTagR(ppuVar3[gFlip],*piVar2);
   }
   Render_gPacketPtr = (u_char *)gEnviro[gFlip].server;
-  Draw_gMaxPrim = (int)(uintptr_t)gEnviro[gFlip].server + gTotalMem;
+  Draw_gMaxPrim = (int)(intptr)gEnviro[gFlip].server + gTotalMem;
 #ifdef AP_WIN
-  NFSHS_HostBeginPacketArena(Render_gPacketPtr,(void *)(intptr_t)Draw_gMaxPrim);
+  NFSHS_HostBeginPacketArena(Render_gPacketPtr,(void *)(intptr)Draw_gMaxPrim);
 #endif
   return;
 }
@@ -404,6 +404,7 @@ void Draw_StopFrameRender(void)
     DrawOTag(pDVar2->ot[gFlip] + pDVar2->otsize + -1);
     pDVar2 = pDVar2 + 1;
   }
+  gpu_present();
   gFlip = 1 - gFlip;
   return;
 }

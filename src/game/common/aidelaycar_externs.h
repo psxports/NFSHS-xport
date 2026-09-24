@@ -7,8 +7,8 @@
 #include "../../lib/libfns.h"
 
 /* ---- (AIDelayCar has no vtable) ---- */
-extern int            gNumSlices;
-extern int AIWorld_LaneIndex(int slice,int position);
+extern int gNumSlices;
+extern int AIWorld_LaneIndex(int slice, int position);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
 
 #endif /* _GAME_COMMON_CAMERA_EXTERNS_H_ */

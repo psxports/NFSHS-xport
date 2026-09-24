@@ -4,65 +4,79 @@
  *   referenced by r3dcar.cpp plus this TU's own R3DCar_* state (extern for syntax-check).
  */
 #ifndef R3DCAR_EXTERNS_H
-#define R3DCAR_EXTERNS_H
+    #define R3DCAR_EXTERNS_H
 
-/* ---- Ghidra-ism helpers (faithful value-level shims) ---- */
-#define INT_1f80008c (*(volatile int *)((u_char *)getScratchAddr(0)+0x8c))
-extern void trap(int code);                          /* gcc MIPS div-by-zero/overflow break helper */
+    /* ---- Ghidra-ism helpers (faithful value-level shims) ---- */
+    #define INT_1f80008c (*(volatile int *)((u_char *)getScratchAddr(0) + 0x8c))
+extern void trap(int code); /* gcc MIPS div-by-zero/overflow break helper */
 
 /* ---- cross-TU globals ---- */
-extern AITune_tTrackInfo  AITune_trackInfo[];
-extern "C" Sim_tSimGlobalVar  simGlobal;
-extern "C" Sim_tSimSystemVar  simVar;
-extern "C" tReplayInterface   Replay_ReplayInterface;
-extern "C" int                Replay_ReplayMode;
-extern camera_info        Camera_gInfo[];
-extern Car_tObj          *Cars_gList[];
-extern int                Cars_gNumCars, Cars_gNumTrafficCars;
-extern "C" DrawC_tEnvMap     *DrawC_gEnvMap, *DrawC_gShadow;
-extern "C" int                DrawC_gEnvMapMax, DrawC_gShadowMax, DrawC_gWetRoad;
-extern "C" MATRIX             DrawC_gScreenMat;
-extern "C" extern "C" GameSetup_tData    GameSetup_gData;
-extern "C" char               GameSetup_gCarNames[51][5];
-extern "C" extern char              *Paths_Paths[];
-extern "C" u_char            *&Render_gPalettePtr;
-extern "C" int                &Render_gMenuRenderFlag;
-extern int                Texture_CarColor, Texture_palNum;
-extern "C" extern DRender_tView      gCView;
-extern "C" int                gFlip, gNight_renderNight, &gScratchLastWord;
-extern "C" extern int                generic128HzClock, stackSpeedUpEnbabledFlag;
-extern intptr_t           gWSavePtr;
+extern AITune_tTrackInfo AITune_trackInfo[];
+extern "C" Sim_tSimGlobalVar simGlobal;
+extern "C" Sim_tSimSystemVar simVar;
+extern "C" tReplayInterface Replay_ReplayInterface;
+extern "C" int Replay_ReplayMode;
+extern camera_info Camera_gInfo[];
+extern Car_tObj *Cars_gList[];
+extern int Cars_gNumCars, Cars_gNumTrafficCars;
+extern "C" DrawC_tEnvMap *DrawC_gEnvMap, *DrawC_gShadow;
+extern "C" int DrawC_gEnvMapMax, DrawC_gShadowMax, DrawC_gWetRoad;
+extern "C" MATRIX DrawC_gScreenMat;
+extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" char GameSetup_gCarNames[51][5];
+extern "C" extern char *Paths_Paths[];
+extern "C" u_char *&Render_gPalettePtr;
+extern "C" int &Render_gMenuRenderFlag;
+extern int Texture_CarColor, Texture_palNum;
+extern "C" extern DRender_tView gCView;
+extern "C" int gFlip, gNight_renderNight, &gScratchLastWord;
+extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern intptr gWSavePtr;
 
 /* ---- cross-TU functions ---- */
-extern int   AudioMus_Buffered(void);
-extern "C" void NFSHS_HostTraceR3DCarEntry(const void *,const void *);
-extern "C" void NFSHS_HostTracePrimStartResult(
-    const void *,int,const void *,const void *,const void *);
-extern "C" { extern int   AudioMus_Threshold(void); }
-extern "C" { extern u_int BWorldSm_QuadLight(BWorldSm_Pos *roadInfo); }
-extern int   Camera_GetMode(int player);
-extern "C" { extern void  CarIO_CleanUpLicense(int player); }
-extern "C" { extern void  CarIO_CreateLicense(char *text, int carType, int player); }
-extern void  CarIO_ReadInCarTextureData(char *shpfile, Car_tObj *carObj, int reload, int player);
-extern void  CarIO_ReleaseCarCluts(Car_tObj *carObj);
-extern void  CarIO_UpdateCarTextureData(char *shpfile, Car_tObj *carObj, int reload);
-extern void  DrawC_NightHeadlight(Car_tObj *carObj);
-extern void  DrawC_Prim(matrixtdef *m, coorddef *t, Transformer_zObj *obj, Transformer_zOverlay *overlay, int envmap, Draw_CarCache *sd);
-extern void  DrawC_PrimClip(matrixtdef *m, coorddef *t, Transformer_zObj *obj, Transformer_zOverlay *overlay, int envmap, Draw_CarCache *sd);
-extern void  DrawC_PrimMenu(matrixtdef *m, coorddef *t, Transformer_zObj *obj, Transformer_zOverlay *overlay, int envmap, Draw_CarCache *sd);
-extern void  DrawC_PrimHalo(matrixtdef *m, coorddef *t, Transformer_zObj *obj, int type, int index, int reflect, Draw_CarCache *sd);
-extern int   DrawC_PrimStart(Draw_tVertex *center, Car_tObj *carObj, int lightAvg, Draw_CarCache *sd);
-extern void  DrawC_PrimStop(Car_tObj *carObj, Draw_CarCache *sd);
-extern void  DrawC_ShadowPrim(Draw_tVertex *shadowVT, Draw_CarCache *sd);
-extern void  DrawC_ShadowPrimClip(Draw_tVertex *shadowVT, Draw_CarCache *sd);
-extern void  DrawC_ShowroomPrims(matrixtdef *m, coorddef *t, Draw_CarCache *sd);
-extern void  DrawC_SpotPrims(matrixtdef *m, coorddef *t, Draw_CarCache *sd);
-extern void  Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);
-extern void  Newton_CalcRealShadowCoordinates(Car_tObj *carObj, int gameTicks);
-extern "C" { extern void *Platform_TempReserveMemory(int size, char *tag); }
-extern int   Risk_ReadNextValue(char **scan);
-extern void  Texture_ProcessPaletteCopy(Texture_pal8bit *pal, int a, int b);
-extern void  TrsProj_TransformProjectVertex(matrixtdef *m, coorddef *t, int n, coorddef *s, Draw_tVertex *v);
+extern int AudioMus_Buffered(void);
+extern "C" void NFSHS_HostTraceR3DCarEntry(const void *, const void *);
+extern "C" void NFSHS_HostTracePrimStartResult(const void *, int, const void *, const void *, const void *);
+extern "C"
+{
+    extern int AudioMus_Threshold(void);
+}
+extern "C"
+{
+    extern u_int BWorldSm_QuadLight(BWorldSm_Pos *roadInfo);
+}
+extern int Camera_GetMode(int player);
+extern "C"
+{
+    extern void CarIO_CleanUpLicense(int player);
+}
+extern "C"
+{
+    extern void CarIO_CreateLicense(char *text, int carType, int player);
+}
+extern void CarIO_ReadInCarTextureData(char *shpfile, Car_tObj *carObj, int reload, int player);
+extern void CarIO_ReleaseCarCluts(Car_tObj *carObj);
+extern void CarIO_UpdateCarTextureData(char *shpfile, Car_tObj *carObj, int reload);
+extern void DrawC_NightHeadlight(Car_tObj *carObj);
+extern void DrawC_Prim(matrixtdef *m, coorddef *t, Transformer_zObj *obj, Transformer_zOverlay *overlay, int envmap, Draw_CarCache *sd);
+extern void DrawC_PrimClip(matrixtdef *m, coorddef *t, Transformer_zObj *obj, Transformer_zOverlay *overlay, int envmap, Draw_CarCache *sd);
+extern void DrawC_PrimMenu(matrixtdef *m, coorddef *t, Transformer_zObj *obj, Transformer_zOverlay *overlay, int envmap, Draw_CarCache *sd);
+extern void DrawC_PrimHalo(matrixtdef *m, coorddef *t, Transformer_zObj *obj, int type, int index, int reflect, Draw_CarCache *sd);
+extern int DrawC_PrimStart(Draw_tVertex *center, Car_tObj *carObj, int lightAvg, Draw_CarCache *sd);
+extern void DrawC_PrimStop(Car_tObj *carObj, Draw_CarCache *sd);
+extern void DrawC_ShadowPrim(Draw_tVertex *shadowVT, Draw_CarCache *sd);
+extern void DrawC_ShadowPrimClip(Draw_tVertex *shadowVT, Draw_CarCache *sd);
+extern void DrawC_ShowroomPrims(matrixtdef *m, coorddef *t, Draw_CarCache *sd);
+extern void DrawC_SpotPrims(matrixtdef *m, coorddef *t, Draw_CarCache *sd);
+extern void Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);
+extern void Newton_CalcRealShadowCoordinates(Car_tObj *carObj, int gameTicks);
+extern "C"
+{
+    extern void *Platform_TempReserveMemory(int size, char *tag);
+}
+extern int Risk_ReadNextValue(char **scan);
+extern void Texture_ProcessPaletteCopy(Texture_pal8bit *pal, int a, int b);
+extern void TrsProj_TransformProjectVertex(matrixtdef *m, coorddef *t, int n, coorddef *s, Draw_tVertex *v);
 
 /* ---- R3DCar_* TU-owned state (sizes from SYM Globals; types inferred from access) ---- */
 // [owned->defined in r3dcar.cpp] extern char               R3DCar_ObjectInfo[58][6];          /* 344B: per-obj [type,flags,...] rows */

@@ -4,11 +4,11 @@
 #include "../../nfs4_types.h"
 
 /* ===== globals (all cross-TU; control.obj owns NO data) ===== */
-extern "C" Sim_tSimGlobalVar  simGlobal;          /* Sim.obj   (.gameTicks) */
-extern int                Cars_gNumAICars;     /* Cars.obj  */
-extern Input_tResults     Input_gSim;          /* Input.obj (sim controller results) */
-extern "C" GameSetup_tData    GameSetup_gData;     /* GameSetup.obj (.mirrorTrack) */
-extern int                HudBustedOverlay;    /* Hud.obj   */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* Sim.obj   (.gameTicks) */
+extern int Cars_gNumAICars;                 /* Cars.obj  */
+extern Input_tResults Input_gSim;           /* Input.obj (sim controller results) */
+extern "C" GameSetup_tData GameSetup_gData; /* GameSetup.obj (.mirrorTrack) */
+extern int HudBustedOverlay;                /* Hud.obj   */
 
 /* ===== free helpers (cfront-mangled in originals; normal C++ linkage) ===== */
 void AI_Main_OverallSetup(void);                          /* AI.obj  @ai.cpp:157 */

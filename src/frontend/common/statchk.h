@@ -5,13 +5,28 @@
 #include "statchk_externs.h"
 
 /* STATCHK.CPP is C++ (cfront-mangled) -> normal C++ linkage. */
-extern "C" { void * StatChk_IsRecordLapTime(Car_tStats *dummyCars,short nNumCars,short *nBestCarIndex); }
-extern "C" { void StatChk_SaveRecordLapTime(Car_tStats *dummyCars,short nNumCars,short nBestCarIndex); }
-extern "C" { short StatChk_IsTopTime(Car_tStats *dummyCars,short nNumCars); }
-extern "C" { void StatChk_SaveTopTime(Car_tStats *dummyCars,short nNumCars); }
-extern "C" { void StatChk_ClearNewRecords(void); }
+extern "C"
+{
+    void *StatChk_IsRecordLapTime(Car_tStats *dummyCars, short nNumCars, short *nBestCarIndex);
+}
+extern "C"
+{
+    void StatChk_SaveRecordLapTime(Car_tStats *dummyCars, short nNumCars, short nBestCarIndex);
+}
+extern "C"
+{
+    short StatChk_IsTopTime(Car_tStats *dummyCars, short nNumCars);
+}
+extern "C"
+{
+    void StatChk_SaveTopTime(Car_tStats *dummyCars, short nNumCars);
+}
+extern "C"
+{
+    void StatChk_ClearNewRecords(void);
+}
 
-extern int NewRecords[8];   /* per-slot new-record flags */
-extern int NewBestLap;      /* new best-lap flag */
+extern int NewRecords[8]; /* per-slot new-record flags */
+extern int NewBestLap;    /* new best-lap flag */
 
 #endif

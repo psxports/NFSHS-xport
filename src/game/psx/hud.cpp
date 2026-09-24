@@ -6,6 +6,7 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "hud_externs.h"
+#include "psx_gpu.h"
 
 #ifdef AP_WIN
 extern "C" void NFSHS_HostLog(const char *, ...);
@@ -192,7 +193,7 @@ void Hud_GoTpage(int page)
   addr_24 = (u_int)Render_gPacketPtr & 0xffffff;
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *(u_int *)tp1 = *(u_int *)tp1 & 0xff000000 | addr_24;
-  SetDrawMode((DR_MODE *)p,0,0,(page * 0x40 + 0x80U & 0x3ff) >> 6,(RECT *)0x0);
+  SetDrawMode((DR_MODE *)p,0,0,(page * 0x40 + 0x80U & 0x3ff) >> 6,(PSX_RECT *)0x0);
   return;
 }
 
@@ -781,6 +782,11 @@ void Hud_Kill(void)
 void Hud_Init0(void)
 
 {
+  gpu_register_dma_range(gTPage0,sizeof(gTPage0));
+  gpu_register_dma_range(gTPage1,sizeof(gTPage1));
+  gpu_register_dma_range(gHudF4,sizeof(gHudF4));
+  gpu_register_dma_range(gHudFT4,sizeof(gHudFT4));
+  gpu_register_dma_range(gHudG4,sizeof(gHudG4));
   gSprite0 = (SPRT *)reservememadr("HUD1",0x80c,0);
   if (GameSetup_gData.commMode == 1) {
     gSprite1 = (SPRT *)reservememadr("HUD2",0x80c,0);
@@ -893,7 +899,7 @@ void Hud_BuildTimeSprites(SPRT *sprt,char *str,int x,int y)
     if (uVar7 == 0x53) {
       uVar7 = (u_int)bVar5;
     }
-    pcVar6 = (charactertbl *)(intptr_t)Font_Getcharacter(uVar7);
+    pcVar6 = (charactertbl *)(intptr)Font_Getcharacter(uVar7);
     cVar2 = pcVar6->advance;
     Hud_BuildSpriteFromFont(sprt,(char)uVar7,x,y);
     str = str + 1;
@@ -939,8 +945,8 @@ void Hud_Init(void)
   do {
     j = 0;
     do {
-      SetDrawMode(&gTPage0[iVar16][j],0,0,2,(RECT *)0x0);
-      SetDrawMode(&gTPage1[iVar16][j],0,0,3,(RECT *)0x0);
+      SetDrawMode(&gTPage0[iVar16][j],0,0,2,(PSX_RECT *)0x0);
+      SetDrawMode(&gTPage1[iVar16][j],0,0,3,(PSX_RECT *)0x0);
       j = j + 1;
     } while (j < 4);
     iVar16 = iVar16 + 1;
@@ -1477,7 +1483,7 @@ void Hud_BuildTach(int player)
   *(short *)(prim2 + 10) = *(short *)(prim2 + 10) + 2;
   *(short *)(prim2 + 0x12) = -(short)ti2 + 0x10;
   *(short *)(prim2 + 0xe) = *(short *)(prim2 + 0xe) + 2;
-  gSprt1[2].tag = (u_long)(uintptr_t)(u_long *)((u_int)gSprt1[2].tag & 0xff000000 | *(u_int *)tp3 & 0xffffff);
+  gSprt1[2].tag = (u_long)(intptr)(u_long *)((u_int)gSprt1[2].tag & 0xff000000 | *(u_int *)tp3 & 0xffffff);
   *(u_int *)tp3 = *(u_int *)tp3 & 0xff000000 | (u_int)(gSprt1 + 2) & 0xffffff;
   return;
 }
@@ -1633,9 +1639,9 @@ void Hud_BuildNumbers0(int player)
   SPRT *sprt;
   int i;
   int sprt_iter;
-  intptr_t pSprt;
-  intptr_t HudG4;
-  intptr_t HudF4;
+  intptr pSprt;
+  intptr HudG4;
+  intptr HudF4;
   int totalDigits;
   int totalDigits_2;
   u_int tpage_pack;
@@ -1654,17 +1660,17 @@ void Hud_BuildNumbers0(int player)
   u_char bVar1;
   u_char *tp6;
   
-  pSprt = (intptr_t)gSprite0;
+  pSprt = (intptr)gSprite0;
   if (player != 0) {
-    pSprt = (intptr_t)gSprite1;
+    pSprt = (intptr)gSprite1;
   }
-  HudF4 = (intptr_t)gHudF4;
+  HudF4 = (intptr)gHudF4;
   if (player != 0) {
-    HudF4 = (intptr_t)(gHudF4 + 7);
+    HudF4 = (intptr)(gHudF4 + 7);
   }
-  HudG4 = (intptr_t)gHudG4;
+  HudG4 = (intptr)gHudG4;
   if (player != 0) {
-    HudG4 = (intptr_t)(gHudG4 + 4);
+    HudG4 = (intptr)(gHudG4 + 4);
   }
   spritePos_y = 0;
   if (player != 0) {
@@ -1705,10 +1711,10 @@ void Hud_BuildNumbers0(int player)
       digit_dst_b = digit_dst_b + 5;
     } while (value_remain < 6);
     ((POLY_G4 *)HudG4)->tag =
-         (u_long)(uintptr_t)((u_int)((POLY_G4 *)HudG4)->tag & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff);
+         (u_long)(intptr)((u_int)((POLY_G4 *)HudG4)->tag & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff);
     *(u_int *)tp3 = *(u_int *)tp3 & 0xff000000 | HudG4 & 0xffffffU;
     ((POLY_F4 *)HudF4)->tag =
-         (u_long)(uintptr_t)(u_long *)((u_int)((POLY_F4 *)HudF4)->tag & 0xff000000 | HudG4 & 0xffffffU);
+         (u_long)(intptr)(u_long *)((u_int)((POLY_F4 *)HudF4)->tag & 0xff000000 | HudG4 & 0xffffffU);
     *(u_int *)tp3 = *(u_int *)tp3 & 0xff000000 | HudF4 & 0xffffffU;
   }
   if (Hud_BeTheCop == 0) {
@@ -1769,7 +1775,7 @@ void Hud_BuildNumbers0(int player)
       tp6 = Render_gPalettePtr;
       do {
         iVar3 = iVar3 + 1;
-        sprt->tag = (u_long)(uintptr_t)(u_long *)((u_int)sprt->tag & 0xff000000 | *(u_int *)tp6 & 0xffffff);
+        sprt->tag = (u_long)(intptr)(u_long *)((u_int)sprt->tag & 0xff000000 | *(u_int *)tp6 & 0xffffff);
         *(u_int *)tp6 = *(u_int *)tp6 & 0xff000000 | (u_int)sprt & 0xffffff;
         sprt = sprt + 1;
       } while (iVar3 < 0x25);
@@ -1878,11 +1884,11 @@ void Hud_BuildNumbers0(int player)
   }
   tp6 = Render_gPalettePtr;
   ((POLY_G4 *)(HudG4 + 0x48))->tag =
-       (u_long)(uintptr_t)((u_int)((POLY_G4 *)(HudG4 + 0x48))->tag & 0xff000000 |
+       (u_long)(intptr)((u_int)((POLY_G4 *)(HudG4 + 0x48))->tag & 0xff000000 |
        *(u_int *)Render_gPalettePtr & 0xffffff);
   *(u_int *)tp6 = *(u_int *)tp6 & 0xff000000 | (u_int)(HudG4 + 0x48) & 0xffffff;
   ((POLY_F4 *)(HudF4 + 0x48))->tag =
-       (u_long)(uintptr_t)((u_int)((POLY_F4 *)(HudF4 + 0x48))->tag & 0xff000000 | (u_int)(HudG4 + 0x48) & 0xffffff);
+       (u_long)(intptr)((u_int)((POLY_F4 *)(HudF4 + 0x48))->tag & 0xff000000 | (u_int)(HudG4 + 0x48) & 0xffffff);
   *(u_int *)tp6 = *(u_int *)tp6 & 0xff000000 | (u_int)(HudF4 + 0x48) & 0xffffff;
   return;
 }
@@ -1910,16 +1916,16 @@ void Hud_BuildNumbers(int player)
   int iVar1;
   int iVar2;
   int hun;
-  intptr_t HudG4;
+  intptr HudG4;
   POLY_GT4 *prim;
-  intptr_t HudF4;
+  intptr HudF4;
   int ti14;
   int iVar3;
   int w1;
   int iVar4;
   int w2;
   int iVar5;
-  intptr_t pSprt;
+  intptr pSprt;
   int ten;
   int splitY;
   int ti17;
@@ -1943,17 +1949,17 @@ void Hud_BuildNumbers(int player)
   u_char *tp11;
   u_char *tp2;
   
-  pSprt = (intptr_t)gSprite0;
+  pSprt = (intptr)gSprite0;
   if (player != 0) {
-    pSprt = (intptr_t)gSprite1;
+    pSprt = (intptr)gSprite1;
   }
-  HudF4 = (intptr_t)gHudF4;
+  HudF4 = (intptr)gHudF4;
   if (player != 0) {
-    HudF4 = (intptr_t)(gHudF4 + 7);
+    HudF4 = (intptr)(gHudF4 + 7);
   }
-  HudG4 = (intptr_t)gHudG4;
+  HudG4 = (intptr)gHudG4;
   if (player != 0) {
-    HudG4 = (intptr_t)(gHudG4 + 4);
+    HudG4 = (intptr)(gHudG4 + 4);
   }
   splitY = 0;
   if (player != 0) {
@@ -2549,7 +2555,7 @@ int Hud_BuildCdPlayer(int type,int arg1)
     keepup = 1;
   }
   iVar10 = 0;
-  pAVar4 = (AudioMus_tCurrentSong *)(intptr_t)AudioMus_GetCurrentSong();
+  pAVar4 = (AudioMus_tCurrentSong *)(intptr)AudioMus_GetCurrentSong();
   if (pAVar4 == (AudioMus_tCurrentSong *)0x0) {
     return 0;
   }
@@ -3048,7 +3054,7 @@ void Hud_BuildReplay(void)
   iVar5 = 0x33;
   sprt_iter = (int)(gSprite0 + 0x33);
   gSprite0[0x39].tag =
-       (u_long)(uintptr_t)(u_long *)((u_int)gSprite0[0x39].tag & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff);
+       (u_long)(intptr)(u_long *)((u_int)gSprite0[0x39].tag & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff);
   *(u_int *)tp4 = *(u_int *)tp4 & 0xff000000 | (u_int)(tSs2 + 0x39) & 0xffffff;
   do {
     iVar5 = iVar5 + 1;
@@ -3059,12 +3065,12 @@ void Hud_BuildReplay(void)
     sprt_iter = sprt_iter + 0x14;
   } while (iVar5 < 0x38);
   gSprite0[0x38].tag =
-       (u_long)(uintptr_t)(u_long *)((u_int)gSprite0[0x38].tag & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff);
+       (u_long)(intptr)(u_long *)((u_int)gSprite0[0x38].tag & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff);
   *(u_int *)tp5 = *(u_int *)tp5 & 0xff000000 | (u_int)(pSVar3 + 0x38) & 0xffffff;
   gTPage1[0][3].tag =
-       (u_long)(uintptr_t)(u_long *)((u_int)gTPage1[0][3].tag & 0xff000000 | (u_int)(pSVar3 + 0x38) & 0xffffff);
+       (u_long)(intptr)(u_long *)((u_int)gTPage1[0][3].tag & 0xff000000 | (u_int)(pSVar3 + 0x38) & 0xffffff);
   *(u_int *)tp5 = *(u_int *)tp5 & 0xff000000 | 0x13e414;
-  gTPage0[0][3].tag = (u_long)(uintptr_t)(u_long *)((u_int)gTPage0[0][3].tag & 0xff000000 | 0x13e414);
+  gTPage0[0][3].tag = (u_long)(intptr)(u_long *)((u_int)gTPage0[0][3].tag & 0xff000000 | 0x13e414);
   *(u_int *)tp5 = *(u_int *)tp5 & 0xff000000 | 0x13e3b4;
   return;
 }
@@ -3182,9 +3188,9 @@ void Hud_RenderMapView(void)
 
 {
   int tile_pmx_p;
-  intptr_t ft4_iter_b;
-  intptr_t tile_dest_p;
-  intptr_t HudFT4;
+  intptr ft4_iter_b;
+  intptr tile_dest_p;
+  intptr HudFT4;
   int j;
   int player;
   u_char *tp2;
@@ -3195,16 +3201,16 @@ void Hud_RenderMapView(void)
     if (((GameSetup_gData.carInfo[player].HudMap != 0) &&
         (DashHUD_gInfo.showhud[player] != 0)) &&
        (Hud_gWingmanInterface[player] == '\0')) {
-      HudFT4 = (intptr_t)gHudFT4;
+      HudFT4 = (intptr)gHudFT4;
       if (player != 0) {
-        HudFT4 = (intptr_t)(gHudFT4 + 5);
+        HudFT4 = (intptr)(gHudFT4 + 5);
       }
       Draw_StartRenderingView(Hud_gMapView[player]);
       if (GameSetup_gData.carInfo[player].HudMap == 1) {
         Hud_BuildMapMarkers(player);
         tp1 = Render_gPalettePtr;
         ((POLY_FT4 *)HudFT4)->tag =
-             (u_long)(uintptr_t)((u_int)((POLY_FT4 *)HudFT4)->tag & 0xff000000 |
+             (u_long)(intptr)((u_int)((POLY_FT4 *)HudFT4)->tag & 0xff000000 |
              *(u_int *)Render_gPalettePtr & 0xffffff);
         *(u_int *)tp1 = *(u_int *)tp1 & 0xff000000 | HudFT4 & 0xffffffU;
       }
@@ -3213,21 +3219,21 @@ void Hud_RenderMapView(void)
         tp2 = Render_gPalettePtr;
         if (tile_pmx_p == 1) {
           ((POLY_FT4 *)(HudFT4 + 0x28))->tag =
-               (u_long)(uintptr_t)((u_int)((POLY_FT4 *)(HudFT4 + 0x28))->tag & 0xff000000 |
+               (u_long)(intptr)((u_int)((POLY_FT4 *)(HudFT4 + 0x28))->tag & 0xff000000 |
                *(u_int *)Render_gPalettePtr & 0xffffff);
           *(u_int *)tp2 = *(u_int *)tp2 & 0xff000000 | (u_int)(HudFT4 + 0x28) & 0xffffff;
           ((POLY_FT4 *)(HudFT4 + 0x50))->tag =
-               (u_long)(uintptr_t)((u_int)((POLY_FT4 *)(HudFT4 + 0x50))->tag & 0xff000000 |
+               (u_long)(intptr)((u_int)((POLY_FT4 *)(HudFT4 + 0x50))->tag & 0xff000000 |
                (u_int)(HudFT4 + 0x28) & 0xffffff);
           ft4_iter_b = HudFT4 + 0x50;
         }
         else {
           ((POLY_FT4 *)(HudFT4 + 0x78))->tag =
-               (u_long)(uintptr_t)((u_int)((POLY_FT4 *)(HudFT4 + 0x78))->tag & 0xff000000 |
+               (u_long)(intptr)((u_int)((POLY_FT4 *)(HudFT4 + 0x78))->tag & 0xff000000 |
                *(u_int *)Render_gPalettePtr & 0xffffff);
           *(u_int *)tp2 = *(u_int *)tp2 & 0xff000000 | (u_int)(HudFT4 + 0x78) & 0xffffff;
           ((POLY_FT4 *)(HudFT4 + 0xa0))->tag =
-               (u_long)(uintptr_t)((u_int)((POLY_FT4 *)(HudFT4 + 0xa0))->tag & 0xff000000 |
+               (u_long)(intptr)((u_int)((POLY_FT4 *)(HudFT4 + 0xa0))->tag & 0xff000000 |
                (u_int)(HudFT4 + 0x78) & 0xffffff);
           ft4_iter_b = HudFT4 + 0xa0;
         }
@@ -3237,7 +3243,7 @@ void Hud_RenderMapView(void)
       /* 0x8013e3fc + player*0x30 in the PSX image is
          gTPage1[player][1].  Keep the typed native address instead of the
          absolute-image arithmetic emitted by the decompiler. */
-      tile_dest_p = (intptr_t)&gTPage1[player][1];
+      tile_dest_p = (intptr)&gTPage1[player][1];
       *(u_int *)tile_dest_p =
            *(u_int *)tile_dest_p & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
       *(u_int *)tp3 = *(u_int *)tp3 & 0xff000000 | tile_dest_p & 0xffffffU;
@@ -3586,7 +3592,7 @@ void Hud_RenderHudView(void)
       *puVar5 = *puVar5 & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
       *(u_int *)puVar1 = *(u_int *)puVar1 & 0xff000000 | (u_int)puVar5 & 0xffffff;
       if (GameSetup_gData.carInfo[j].HudTach != 0) {
-        gSprt1[1].tag = (u_long)(uintptr_t)(u_long *)((u_int)gSprt1[1].tag & 0xff000000 | (u_int)puVar5 & 0xffffff);
+        gSprt1[1].tag = (u_long)(intptr)(u_long *)((u_int)gSprt1[1].tag & 0xff000000 | (u_int)puVar5 & 0xffffff);
         *(u_int *)puVar1 = *(u_int *)puVar1 & 0xff000000 | (u_int)(gSprt1 + 1) & 0xffffff;
       }
       if (GameSetup_gData.carInfo[j].HudMap != 0) {
@@ -3625,7 +3631,7 @@ void Hud_RenderHudView(void)
         gSprt1 = gSprt1 + 0x3f;
         do {
           i = i + 1;
-          gSprt1->tag = (u_long)(uintptr_t)(u_long *)((u_int)gSprt1->tag & 0xff000000 | *(u_int *)puVar1 & 0xffffff);
+          gSprt1->tag = (u_long)(intptr)(u_long *)((u_int)gSprt1->tag & 0xff000000 | *(u_int *)puVar1 & 0xffffff);
           *(u_int *)puVar1 = *(u_int *)puVar1 & 0xff000000 | (u_int)gSprt1 & 0xffffff;
           gSprt1 = gSprt1 + 1;
         } while (i < 0x47);
@@ -3815,7 +3821,8 @@ HudRender_initMapFrame:
       pcVar3 = pcVar3 + 1;
     }
     Hud_gShowedCDPlayer = 0;
-    if (((simGlobal.gameTicks < 0x240) && (countdown != '\0')) && (Hud_BeTheCop == 0)) {
+    if ((((0x13f < simGlobal.gameTicks) && (simGlobal.gameTicks < 0x240)) &&
+        (countdown != '\0')) && (Hud_BeTheCop == 0)) {
       Hud_Render321Go();
     }
     Hud_RenderHudView();

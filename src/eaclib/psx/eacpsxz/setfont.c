@@ -14,22 +14,22 @@
  */
 #include "../../../nfs4_types.h"
 
-extern "C" unsigned int geti(void *p, char nbits);                 /* getm */
-extern "C" int   shapedepth(unsigned char *shape);                 /* shpdepth */
-extern "C" int   decodeansi(unsigned char **cursor);               /* textcode */
-extern "C" int   decodeshiftjis(unsigned char **cursor);           /* isqrttbl (obj name misnomer) */
-extern "C" void  blockclear(void *dst, int n);                     /* blkfill */
-extern "C" void  inittextdraw(void);                               /* textpsx (game) */
+extern "C" unsigned int geti(void *p, char nbits);     /* getm */
+extern "C" int shapedepth(unsigned char *shape);       /* shpdepth */
+extern "C" int decodeansi(unsigned char **cursor);     /* textcode */
+extern "C" int decodeshiftjis(unsigned char **cursor); /* isqrttbl (obj name misnomer) */
+extern "C" void blockclear(void *dst, int n);          /* blkfill */
+extern "C" void inittextdraw(void);                    /* textpsx (game) */
 
-extern "C" FontDecoder setfont(intptr_t fontId);   /* @0x800F2E94 */
+extern "C" FontDecoder setfont(intptr fontId); /* @0x800F2E94 */
 
 /* setfont @0x800F2E94 : install font header `fontId` as the current text font; returns its glyph decoder. */
-extern "C" FontDecoder setfont(intptr_t fontId)
+extern "C" FontDecoder setfont(intptr fontId)
 {
     unsigned char *font = (unsigned char *)fontId;
     unsigned char *shape;
-    FontDecoder    decode;
-    int            depth;
+    FontDecoder decode;
+    int depth;
 
     currentfont.defaultMetric = 100;
     currentfont.metric10 = (int)*(signed char *)(font + 0x10);
@@ -47,26 +47,31 @@ extern "C" FontDecoder setfont(intptr_t fontId)
     currentfont.fontHeader = font;
     currentfont.shape = shape;
     currentfont.bitmapDepth = shapedepth(shape);
-    depth        = shapedepth(shape);
+    depth = shapedepth(shape);
     currentfont.bitmapRowStride = (int)((unsigned int)(*(short *)(shape + 4) * depth + 0x1f) & 0xffffffe0) >> 3;
 
-    if ((*(unsigned short *)(font + 0xe) & 3) == 2) {
-        decode = decodeshiftjis;                                  /* explicit Shift-JIS flag */
-    } else if (currentfont.glyphCount < 0x100) {
+    if ((*(unsigned short *)(font + 0xe) & 3) == 2)
+    {
+        decode = decodeshiftjis; /* explicit Shift-JIS flag */
+    }
+    else if (currentfont.glyphCount < 0x100)
+    {
         /* small glyph table: probe the encoded stream -- ANSI if the first code is < 0x100 */
         if (geti((void *)(font + 0x20), 2) < 0x100)
             decode = decodeansi;
         else
             decode = decodeshiftjis;
-    } else {
-        decode = decodeshiftjis;                                 /* large table => multi-byte */
+    }
+    else
+    {
+        decode = decodeshiftjis; /* large table => multi-byte */
     }
 
     currentfont.state2C = 0;
     currentfont.state30 = 0;
     currentfont.stateB4 = 0;
     currentfont.decoder = decode;
-    blockclear(currentfont.blitState, 0x40);                     /* currentfont+0x34 */
+    blockclear(currentfont.blitState, 0x40); /* currentfont+0x34 */
     inittextdraw();
     currentfont.stateA4 = 0;
     return decode;

@@ -9,17 +9,21 @@
  */
 
 /* owning-TU def (extern-declared, never defined; BSS) */
-extern "C" { void (*gExitFuncs[32])(void); }
-extern "C" void (*gExitFuncs[32])(void);   /* @0x801349E8 (data-mat pass owns) */
+extern "C"
+{
+    void (*gExitFuncs[32])(void);
+}
+extern "C" void (*gExitFuncs[32])(void); /* @0x801349E8 (data-mat pass owns) */
 
-extern "C" void addexit(void (*fn)(void))  /* @0x800F1CF8 */
+extern "C" void addexit(void (*fn)(void)) /* @0x800F1CF8 */
 {
     int i;
-    for (i = 0; i < 32; i++)               /* already registered? -> done */
+    for (i = 0; i < 32; i++) /* already registered? -> done */
         if (gExitFuncs[i] == fn)
             return;
-    for (i = 0; i < 32; i++)              /* else first empty slot */
-        if (gExitFuncs[i] == 0) {
+    for (i = 0; i < 32; i++) /* else first empty slot */
+        if (gExitFuncs[i] == 0)
+        {
             gExitFuncs[i] = fn;
             return;
         }

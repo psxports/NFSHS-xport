@@ -4,22 +4,28 @@
  *   Rounded reciprocal: result = round(0xFFFFFFFF / x) carrying x's sign (abs, unsigned divide,
  *   round-half-up via remainder vs |x|/2, then re-apply sign).
  */
-extern "C" unsigned fixedinverse(int x)   /* @0x800ED3EC */
+extern "C" unsigned fixedinverse(int x) /* @0x800ED3EC */
 {
-    int sign = x >> 31;                       /* 0 or -1 */
-    unsigned ax = (unsigned)((x ^ sign) - sign);   /* |x| */
+    int sign = x >> 31;                          /* 0 or -1 */
+    unsigned ax = (unsigned)((x ^ sign) - sign); /* |x| */
     unsigned q = 0xFFFFFFFFu / ax;
     unsigned r = 0xFFFFFFFFu % ax;
-    if ((ax >> 1) < r)                        /* round half up */
+    if ((ax >> 1) < r) /* round half up */
         q += 1;
-    return (unsigned)(((int)q ^ sign) - sign);     /* re-apply sign */
+    return (unsigned)(((int)q ^ sign) - sign); /* re-apply sign */
 }
 #ifdef _MSC_VER
-extern "C" unsigned rinverse(int x) { return fixedinverse(x); }
+extern "C" unsigned rinverse(int x)
+{
+    return fixedinverse(x);
+}
 #else
-#if defined(_MSC_VER)
-extern "C" unsigned rinverse(int x) { return fixedinverse(x); }
-#else
+    #if defined(_MSC_VER)
+extern "C" unsigned rinverse(int x)
+{
+    return fixedinverse(x);
+}
+    #else
 extern "C" unsigned rinverse(int x) __attribute__((alias("fixedinverse")));
-#endif
+    #endif
 #endif

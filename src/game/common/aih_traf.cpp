@@ -8,6 +8,7 @@
 #include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aih_traf_externs.h"
+#include "new.h"
 
 /* ---- CheckForCops__14AIHigh_TrafficPi  AIHigh_Traffic::CheckForCops  [AIH_TRAF.CPP:32-56] SLD-VERIFIED ---- */
 Car_tObj *
@@ -237,7 +238,7 @@ void AIHigh_Traffic::HighExecute()
 
     if ((((this->_base_AIHigh_Base).carObj_)->carFlags & 0x400U) == 0) {
 
-      pAVar5 = (AIState_Purgatory *)operator new(8);
+      pAVar5 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar6 = (AIState_Base *) (new(pAVar5) AIState_Purgatory((this->_base_AIHigh_Base).carObj_));
 
@@ -255,7 +256,7 @@ void AIHigh_Traffic::HighExecute()
 
     else {
 
-      pAVar6 = (AIState_Base *)operator new(0x10);
+      pAVar6 = (AIState_Base *)__builtin_new(0x10);
 
       (new(pAVar6) AIState_Base((this->_base_AIHigh_Base).carObj_));
 
@@ -307,7 +308,7 @@ void AIHigh_Traffic::HighExecute()
 
         if (trigger == (trigger_t *)0x0) {
 
-          pAVar9 = (AIState_Normal *)operator new(8);
+          pAVar9 = (AIState_Normal *)__builtin_new(8);
 
           pAVar6 = &(new(pAVar9) AIState_Normal((this->_base_AIHigh_Base).carObj_))->_base_AIState_Base;
 
@@ -333,7 +334,7 @@ void AIHigh_Traffic::HighExecute()
 
           if (*(int *)trigger == 5) {
 
-            pAVar2 = (AIState_RovingTraffic *)operator new(0x18);
+            pAVar2 = (AIState_RovingTraffic *)__builtin_new(0x18);
 
             pAVar2 = (new(pAVar2) AIState_RovingTraffic((this->_base_AIHigh_Base).carObj_,trigger));
 
@@ -363,7 +364,7 @@ void AIHigh_Traffic::HighExecute()
 
     else {
 
-      pAVar6 = (AIState_Base *)operator new(0x10);
+      pAVar6 = (AIState_Base *)__builtin_new(0x10);
 
       (new(pAVar6) AIState_Base((this->_base_AIHigh_Base).carObj_));
 
@@ -431,7 +432,7 @@ void AIHigh_Traffic::HighExecute()
 
           if (uVar11 == 0) {
 
-            pAVar6 = (AIState_Base *)operator new(0x10);
+            pAVar6 = (AIState_Base *)__builtin_new(0x10);
 
             (new(pAVar6) AIState_Base((this->_base_AIHigh_Base).carObj_))
 
@@ -465,7 +466,7 @@ void AIHigh_Traffic::HighExecute()
 
           iVar4 = (int)(((this->_base_AIHigh_Base).carObj_)->N).simRoadInfo.slice;
 
-          this_00 = (AIState_Idle *)operator new(0x10);
+          this_00 = (AIState_Idle *)__builtin_new(0x10);
 
           (new(&this_00->_base_AIState_Base) AIState_Base((this->_base_AIHigh_Base).carObj_));
 
@@ -499,7 +500,7 @@ void AIHigh_Traffic::HighExecute()
 
           iVar4 = (int)(((this->_base_AIHigh_Base).carObj_)->N).simRoadInfo.slice;
 
-          this_00 = (AIState_Idle *)operator new(0x10);
+          this_00 = (AIState_Idle *)__builtin_new(0x10);
 
           (new(&this_00->_base_AIState_Base) AIState_Base((this->_base_AIHigh_Base).carObj_));
 
@@ -551,7 +552,7 @@ LAB_800664c4:
 
       }
 
-      pAVar5 = (AIState_Purgatory *)operator new(8);
+      pAVar5 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar6 = (AIState_Base *) (new(pAVar5) AIState_Purgatory((this->_base_AIHigh_Base).carObj_));
 
@@ -569,7 +570,7 @@ LAB_800664c4:
 
     else {
 
-      pAVar5 = (AIState_Purgatory *)operator new(8);
+      pAVar5 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar6 = (AIState_Base *) (new(pAVar5) AIState_Purgatory((this->_base_AIHigh_Base).carObj_));
 
@@ -601,7 +602,7 @@ LAB_800664c4:
 
 LAB_80066684:
 
-      pAVar9 = (AIState_Normal *)operator new(8);
+      pAVar9 = (AIState_Normal *)__builtin_new(8);
 
       pAVar6 = &(new(pAVar9) AIState_Normal((this->_base_AIHigh_Base).carObj_))->_base_AIState_Base;
 
@@ -619,7 +620,7 @@ LAB_80066684:
 
     else {
 
-      pAVar5 = (AIState_Purgatory *)operator new(8);
+      pAVar5 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar6 = (AIState_Base *) (new(pAVar5) AIState_Purgatory((this->_base_AIHigh_Base).carObj_));
 
@@ -661,7 +662,7 @@ LAB_80066684:
 
       }
 
-      pAVar5 = (AIState_Purgatory *)operator new(8);
+      pAVar5 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar6 = (AIState_Base *) (new(pAVar5) AIState_Purgatory((this->_base_AIHigh_Base).carObj_));
 
@@ -679,7 +680,7 @@ LAB_80066684:
 
     else {
 
-      pAVar5 = (AIState_Purgatory *)operator new(8);
+      pAVar5 = (AIState_Purgatory *)__builtin_new(8);
 
       pAVar6 = (AIState_Base *) (new(pAVar5) AIState_Purgatory((this->_base_AIHigh_Base).carObj_));
 

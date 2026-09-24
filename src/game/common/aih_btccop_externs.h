@@ -9,45 +9,48 @@
 /* ---- vtables: AIHigh_BTC_Cop/HumanCop/Wingman (this obj) + AIState_NonActive/Base ---- */
 extern __vtbl_ptr_type AIHigh_BTC_Cop_vtable[], AIHigh_BTC_HumanCop_vtable[], AIHigh_BTC_Wingman_vtable[], AIState_NonActive_vtable[], AIState_Base_vtable[];
 
-extern "C" { CARDINFO_def *MCRD_getcard(...); }
-int Speech_Dispatch(void);             /* speech.obj flat (was Dispatch__6Speech; cast result to Speaker*) */
-intptr_t Speech_Mobile(Car_tObj *carObj);   /* pointer-width address; cast result to Speaker* */
+extern "C"
+{
+    CARDINFO_def *MCRD_getcard(...);
+}
+int Speech_Dispatch(void);              /* speech.obj flat (was Dispatch__6Speech; cast result to Speaker*) */
+intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; cast result to Speaker* */
 extern AICop_spikeBelt_t AICop_spikeBelt;
 extern AIDataRecord_TrackCurve_t AIDataRecord_TrackCurve[];
 extern "C" AIHigh_Base *highLevelAIObjs[];
-extern "C" AIHigh_CopGameType_t AIHigh_CopGameType;   /* @0x8013c55c */
+extern "C" AIHigh_CopGameType_t AIHigh_CopGameType; /* @0x8013c55c */
 extern AITune_BTC_t AITune_BTC[];
-extern Car_tObj           *Cars_gTrafficCarList[];
-extern Car_tObj      *Cars_gRaceCarList[];      /* 0x8010fa00 */
-extern Car_tObj * AILife_IsCarInAnyVisibleArea(Car_tObj *carObj);
+extern Car_tObj *Cars_gTrafficCarList[];
+extern Car_tObj *Cars_gRaceCarList[]; /* 0x8010fa00 */
+extern Car_tObj *AILife_IsCarInAnyVisibleArea(Car_tObj *carObj);
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData   GameSetup_gData;
-extern "C" Sim_tSimGlobalVar  simGlobal;          /* Sim.obj   (.gameTicks) */
+extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern "C" Sim_tSimSystemVar simVar;
-extern Trk_NewSlice  *BWorldSm_slices;
+extern Trk_NewSlice *BWorldSm_slices;
 extern __vtbl_ptr_type AIHigh_Human_vtable[], AIHigh_BasicPerp_vtable[], AIState_Idle_vtable[];
-extern int                 Cars_gNumTrafficCars;
-extern "C" extern int                 generic128HzClock, stackSpeedUpEnbabledFlag;
-extern int                AIInit_forceHumanHandBrake;
-extern int                AITune_driveSide;
-extern int               Cars_gNumRaceCars;
-extern int            Cars_gNumCars;
-extern int            gNumSlices;
-extern int   AIWorld_IsDriveableLane(int slice, int lane);
-extern int   AIWorld_IsDriveableLaneInSliceRange(int slice, int lookAhead, int rsControl, int dir);
+extern int Cars_gNumTrafficCars;
+extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern int AIInit_forceHumanHandBrake;
+extern int AITune_driveSide;
+extern int Cars_gNumRaceCars;
+extern int Cars_gNumCars;
+extern int gNumSlices;
+extern int AIWorld_IsDriveableLane(int slice, int lane);
+extern int AIWorld_IsDriveableLaneInSliceRange(int slice, int lookAhead, int rsControl, int dir);
 extern int AICop_gRoadBlockState;
-extern int AIWorld_CalcRoadBend(Car_tObj *carObj,int lookAhead);
-extern u_int               fastRandom, randSeed, randtemp;   /* fastrand.obj PRNG state */
-extern intptr_t gWSavePtr;
-extern void AILife_ReencarnateCopByLatPosAndRotation(Car_tObj *carObj,int slice,int travelDirection,int latPos,int rotation1024);
-extern void AIWorld_FindBarrierLessLaneAndPosition(Car_tObj *carObj,int *goodLane,int *goodPosition);
+extern int AIWorld_CalcRoadBend(Car_tObj *carObj, int lookAhead);
+extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
+extern intptr gWSavePtr;
+extern void AILife_ReencarnateCopByLatPosAndRotation(Car_tObj *carObj, int slice, int travelDirection, int latPos, int rotation1024);
+extern void AIWorld_FindBarrierLessLaneAndPosition(Car_tObj *carObj, int *goodLane, int *goodPosition);
 extern void BWorld_InitSpikeBelt(void);
-extern void BWorld_SetSpikeBelt(int slice,int x,int width);
+extern void BWorld_SetSpikeBelt(int slice, int x, int width);
 extern void Hud_BTC_BonusTime(long extratime);
-extern void Hud_BTC_Update(char *perpname,int timeleft,bool userHasControl);
+extern void Hud_BTC_Update(char *perpname, int timeleft, bool userHasControl);
 extern void Hud_BustedOverlayOff(void);
-extern void Hud_BustedOverlayOn(int time,char *name,bool caught,short player);
-extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coorddef *offset,int direction);
+extern void Hud_BustedOverlayOn(int time, char *name, bool caught, short player);
+extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n, int slice, coorddef *offset, int direction);
 extern void Object_ClearCustomObjects(void);
 extern void TrgSfx_RestartTrgSfx(void);
 int AISpeeds_CalcHumanTopSpeed(Car_tObj *carObj);

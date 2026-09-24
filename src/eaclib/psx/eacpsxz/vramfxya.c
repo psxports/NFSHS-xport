@@ -13,35 +13,34 @@
  *     c[3]  : packed VRAM xy = (c[3] & 0xf000f000) | x&0xfff | (y&0xfff)<<16
  *     c+4   : pixel / CLUT source data; CLUT entries are 3 bytes (R,G,B) at byte offsets 0x10,0x11,0x12
  */
-typedef unsigned long u_long;
-typedef struct { short x, y, w, h; } RECT;
+#include "psx.h"
+
 #include "../../../mips_semantics.h"
 
-extern "C" int   shapedepth(unsigned char *shape);   /* shpdepth */
-extern "C" void  LoadImage(RECT *rect, u_long *data); /* PsyQ libgpu */
-extern "C" int   drawpending;                         /* primate */
+extern "C" int shapedepth(unsigned char *shape); /* shpdepth */
+extern "C" int drawpending;                      /* primate */
 
-extern "C" unsigned int checkrect(RECT *rect);                        /* @0x800F6934 */
-extern "C" int  vramimage(RECT *rect, u_long *data);                  /* @0x800F6960 */
-extern "C" void vramfxya(void *shapep, short imgX, short imgY,
-                         short clutX, short clutY);                   /* @0x800F69A8 */
+extern "C" unsigned int checkrect(PSX_RECT *rect);                                        /* @0x800F6934 */
+extern "C" int vramimage(PSX_RECT *rect, u_long *data);                                   /* @0x800F6960 */
+extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, short clutY); /* @0x800F69A8 */
 
-/* checkrect @0x800F6934 : if the RECT is flagged (+4 bit0), set bit0 of the +6 word.  Returns the +4 flag. */
-extern "C" unsigned int checkrect(RECT *rect)
+/* checkrect @0x800F6934 : if the PSX_RECT is flagged (+4 bit0), set bit0 of the +6 word.  Returns the +4 flag. */
+extern "C" unsigned int checkrect(PSX_RECT *rect)
 {
     unsigned int flag = (unsigned short)rect->w & 1;
-    if (flag != 0) {
+    if (flag != 0)
+    {
         flag = (unsigned short)rect->h | 1;
         rect->h = (short)flag;
     }
     return flag;
 }
 
-/* vramimage @0x800F6960 : pre-check the RECT, DMA `data` into VRAM, mark a draw as pending.  Returns 1. */
-extern "C" int vramimage(RECT *rect, u_long *data)
+/* vramimage @0x800F6960 : pre-check the PSX_RECT, DMA `data` into VRAM, mark a draw as pending.  Returns 1. */
+extern "C" int vramimage(PSX_RECT *rect, u_long *data)
 {
     checkrect(rect);
-    LoadImage(rect, data);
+    LoadImagePSX(rect, data);
     drawpending = 1;
     return 1;
 }
@@ -51,96 +50,94 @@ extern "C" int vramimage(RECT *rect, u_long *data)
 extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, short clutY)
 {
     unsigned int *c = (unsigned int *)shapep;
-    unsigned short clut22[256];   /* 512-byte >>1 BGR scratch */
-    unsigned short clut24[262];   /* 524-byte >>3 BGR scratch */
-    RECT          rect;
+    unsigned short clut22[256]; /* 512-byte >>1 BGR scratch */
+    unsigned short clut24[262]; /* 524-byte >>3 BGR scratch */
+    PSX_RECT rect;
 
     if (c == (unsigned int *)0)
         return;
 
-    do {
-        u_long       *data;
-        int           count = (short)c[1];
-        int           i;
+    do
+    {
+        u_long *data;
+        int count = (short)c[1];
+        int i;
         unsigned char *src;
         unsigned short *dst;
 
-        switch ((unsigned char)*c & 0xf7) {
-        case 0x22:                                   /* CLUT, 8->5 bit via >>1 */
-            i   = 0;
-            src = (unsigned char *)c;
-            dst = clut22;
-            if (0 < count) {
-                do {
-                    i = i + 1;
-                    *dst =
-                        (unsigned short)(src[0x10] >> 1) |
-                        (unsigned short)(src[0x12] >> 1) << 10 |
-                        (unsigned short)(src[0x11] >> 1) << 5;
-                    src = src + 3;
-                    dst = dst + 1;
-                } while (i < count);
-            }
-            data = (u_long *)clut22;
-            break;
-
-        case 0x23:                                   /* raw CLUT words */
-            data = (u_long *)(c + 4);
-            break;
-
-        case 0x24:                                   /* CLUT, 8->5 bit via >>3 */
-            i = 0;
-            if (0 < count) {
-                dst = clut24;
+        switch ((unsigned char)*c & 0xf7)
+        {
+            case 0x22: /* CLUT, 8->5 bit via >>1 */
+                i = 0;
                 src = (unsigned char *)c;
-                do {
-                    unsigned char *pB = src + 0x12;
-                    unsigned char *pG = src + 0x11;
-                    unsigned char *pR = src + 0x10;
-                    src = src + 3;
-                    i   = i + 1;
-                    *dst =
-                        (unsigned short)(*pR >> 3) |
-                        (unsigned short)(*pB >> 3) << 10 |
-                        (unsigned short)(*pG >> 3) << 5;
-                    dst = dst + 1;
-                } while (i < count);
-            }
-            data = (u_long *)clut24;
-            break;
+                dst = clut22;
+                if (0 < count)
+                {
+                    do
+                    {
+                        i = i + 1;
+                        *dst = (unsigned short)(src[0x10] >> 1) | (unsigned short)(src[0x12] >> 1) << 10 | (unsigned short)(src[0x11] >> 1) << 5;
+                        src = src + 3;
+                        dst = dst + 1;
+                    } while (i < count);
+                }
+                data = (u_long *)clut22;
+                break;
 
-        case 0x40:
-        case 0x41:
-        case 0x42:
-        case 0x43:                                   /* bitmap chunk -> (imgX,imgY) */
+            case 0x23: /* raw CLUT words */
+                data = (u_long *)(c + 4);
+                break;
+
+            case 0x24: /* CLUT, 8->5 bit via >>3 */
+                i = 0;
+                if (0 < count)
+                {
+                    dst = clut24;
+                    src = (unsigned char *)c;
+                    do
+                    {
+                        unsigned char *pB = src + 0x12;
+                        unsigned char *pG = src + 0x11;
+                        unsigned char *pR = src + 0x10;
+                        src = src + 3;
+                        i = i + 1;
+                        *dst = (unsigned short)(*pR >> 3) | (unsigned short)(*pB >> 3) << 10 | (unsigned short)(*pG >> 3) << 5;
+                        dst = dst + 1;
+                    } while (i < count);
+                }
+                data = (u_long *)clut24;
+                break;
+
+            case 0x40:
+            case 0x41:
+            case 0x42:
+            case 0x43: /* bitmap chunk -> (imgX,imgY) */
             {
                 int bits, w;
-                c[3] = c[3] & 0xf000f000 | (unsigned int)imgX & 0xfff |
-                       ((unsigned int)imgY & 0xfff) << 0x10;
+                c[3] = c[3] & 0xf000f000 | (unsigned int)imgX & 0xfff | ((unsigned int)imgY & 0xfff) << 0x10;
                 *(unsigned char *)c = (unsigned char)*c | 8;
                 rect.x = imgX;
-                rect.y = imgY;                       /* H04: was missing (oracle 0x800F6A80 *(short*)(18+sp)=imgY) */
-                bits   = (short)c[1] * shapedepth((unsigned char *)c);
-                w      = bits + 0xf;
+                rect.y = imgY; /* H04: was missing (oracle 0x800F6A80 *(short*)(18+sp)=imgY) */
+                bits = (short)c[1] * shapedepth((unsigned char *)c);
+                w = bits + 0xf;
                 if (w < 0)
                     w = bits + 0x1e;
-                rect.w = (short)(w >> 4);            /* width in 16-bit VRAM words */
+                rect.w = (short)(w >> 4); /* width in 16-bit VRAM words */
                 rect.h = *(short *)((unsigned char *)c + 6);
-                data   = (u_long *)(c + 4);
+                data = (u_long *)(c + 4);
                 vramimage(&rect, data);
             }
-            goto walk;
+                goto walk;
 
-        default:                                     /* 0x25 etc.: nothing to upload */
-            goto walk;
+            default: /* 0x25 etc.: nothing to upload */
+                goto walk;
         }
 
         /* common CLUT tail (0x22/0x23/0x24) -> (clutX,clutY) */
-        c[3] = c[3] & 0xf000f000 | (unsigned int)clutX & 0xfff |
-               ((unsigned int)clutY & 0xfff) << 0x10;
+        c[3] = c[3] & 0xf000f000 | (unsigned int)clutX & 0xfff | ((unsigned int)clutY & 0xfff) << 0x10;
         *(unsigned char *)c = (unsigned char)*c | 8;
         rect.x = clutX;
-        rect.y = clutY;                          /* H04: was missing (oracle 0x800F6BC4 *(short*)(18+sp)=clutY) */
+        rect.y = clutY; /* H04: was missing (oracle 0x800F6BC4 *(short*)(18+sp)=clutY) */
         rect.w = (short)c[1];
         rect.h = 1;
         vramimage(&rect, data);
@@ -149,7 +146,6 @@ extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, shor
         if ((*c & 0xffffff00) == 0)
             c = (unsigned int *)0;
         else
-            c = (unsigned int *)((unsigned char *)c +
-                                 nfs4_mips_sra_s32((int)*c, 8));
+            c = (unsigned int *)((unsigned char *)c + nfs4_mips_sra_s32((int)*c, 8));
     } while (c != (unsigned int *)0);
 }

@@ -4,18 +4,35 @@
  * the two calls from that function tiny and put all observation-only state in
  * this host translation unit so it cannot alter the recovered stack frame or
  * inject signed-C++ arithmetic into the simulation loop. */
-#include "../../nfs4_types.h"
-#include "../../mips_semantics.h"
+#include "../nfs4_types.h"
+#include "../mips_semantics.h"
 #if NFSHS_DIAGNOSTICS
 #include <io.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-extern "C" __declspec(dllimport) unsigned long __stdcall
-GetEnvironmentVariableA(const char *,char *,unsigned long);
-extern "C" __declspec(dllimport) void __stdcall ExitProcess(unsigned int);
 extern "C" int random(void);
+
+static unsigned long host_environment_get(const char *name, char *buffer, size_t capacity)
+{
+    const char *value = getenv(name);
+    size_t length;
+    if (value == 0)
+        return 0;
+    length = strlen(value);
+    if (capacity != 0)
+    {
+        size_t copied = length < capacity - 1 ? length : capacity - 1;
+        memcpy(buffer, value, copied);
+        buffer[copied] = 0;
+    }
+    return (unsigned long)length;
+}
+
+#define GetEnvironmentVariableA host_environment_get
+#define ExitProcess(code) exit((int)(code))
 
 extern "C" void NFSHS_HostLog(const char *, ...);
 extern "C" void NFSHS_HostRaceStart(Car_tObj *playerCar);

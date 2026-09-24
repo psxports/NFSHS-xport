@@ -20,37 +20,35 @@
 #include "../../../nfs4_types.h"
 
 struct SyncCtrl;
-typedef unsigned int (*SyncIoFn)(intptr_t handle, unsigned int offset, intptr_t dest,
-                                 int chunk, int cbarg, intptr_t ctrl);
+typedef unsigned int (*SyncIoFn)(intptr handle, unsigned int offset, intptr dest, int chunk, int cbarg, intptr ctrl);
 
-typedef struct SyncCtrl {
-    int      cbarg;   /* +0  user callback arg (passed as the io fn's 5th param) */
-    intptr_t handle;  /* +4  file-handle pointer word on PSX */
+typedef struct SyncCtrl
+{
+    int cbarg;           /* +0  user callback arg (passed as the io fn's 5th param) */
+    intptr handle;       /* +4  file-handle pointer word on PSX */
     unsigned int offset; /* +8 source offset (advances by bytes-done) */
-    int      remain;  /* +12 bytes still to transfer */
-    int      done;    /* +16 bytes transferred so far (syncblockio's return), advances */
-    int      chunk;   /* +20 current chunk size (clamped to 0x2000) */
-    intptr_t dest;    /* +24 destination pointer (advances by bytes-done) */
-    SyncIoFn iofn;    /* +28 async io fn (only stored for multi-chunk transfers) */
-    int      op;      /* +32 current async op handle */
+    int remain;          /* +12 bytes still to transfer */
+    int done;            /* +16 bytes transferred so far (syncblockio's return), advances */
+    int chunk;           /* +20 current chunk size (clamped to 0x2000) */
+    intptr dest;         /* +24 destination pointer (advances by bytes-done) */
+    SyncIoFn iofn;       /* +28 async io fn (only stored for multi-chunk transfers) */
+    int op;              /* +32 current async op handle */
 } SyncCtrl;
 
 /* --- async FILE_* API (nfile.obj) --- */
-extern "C" unsigned int FILE_open  (char *name, int a2, int a3, int a4);
-extern "C" unsigned int FILE_close (int fd, int a2, int a3);
-extern "C" unsigned int FILE_size  (int fd, int a2, int a3);
+extern "C" unsigned int FILE_open(char *name, int a2, int a3, int a4);
+extern "C" unsigned int FILE_close(int fd, int a2, int a3);
+extern "C" unsigned int FILE_size(int fd, int a2, int a3);
 extern "C" unsigned int FILE_addbig(char *name, int a2, int a3, int a4);
 extern "C" unsigned int FILE_delbig(int a0, int a1, int a2);
-extern "C" unsigned int FILE_read(intptr_t handle, unsigned int offset, intptr_t dest,
-                                   int chunk, int cbarg, intptr_t ctrl); /* @0x800EC4EC */
-extern "C" void         FILE_waitop    (unsigned int op);
-extern "C" int          FILE_opstatus  (unsigned int op);
+extern "C" unsigned int FILE_read(intptr handle, unsigned int offset, intptr dest, int chunk, int cbarg, intptr ctrl); /* @0x800EC4EC */
+extern "C" void FILE_waitop(unsigned int op);
+extern "C" int FILE_opstatus(unsigned int op);
 extern "C" unsigned int FILE_completeop(unsigned int op);
-extern "C" void         FILE_callbackop(unsigned int op, void *cb);
+extern "C" void FILE_callbackop(unsigned int op, void *cb);
 
-extern "C" void synccallback(int op, int type, SyncCtrl *ctrl);                 /* @0x800EA6CC */
-extern "C" int  syncblockio(intptr_t handle, unsigned int offset, intptr_t dest,
-                             int len, int cbarg, SyncIoFn iofn); /* @0x800EA7E8 */
+extern "C" void synccallback(int op, int type, SyncCtrl *ctrl);                                                 /* @0x800EA6CC */
+extern "C" int syncblockio(intptr handle, unsigned int offset, intptr dest, int len, int cbarg, SyncIoFn iofn); /* @0x800EA7E8 */
 
 /* synccallback @0x800EA6CC : async completion -- on a successful chunk, advance the control block and, if more
  *   remains, re-issue the next chunk; otherwise mark the transfer finished. */
@@ -58,25 +56,32 @@ extern "C" void synccallback(int op, int type, SyncCtrl *c)
 {
     unsigned int done = FILE_completeop((unsigned int)op);
     c->op = 0;
-    if (type == 1) {
+    if (type == 1)
+    {
         unsigned int newoffset = c->offset + done;
         c->dest += done;
         c->done += done;
         c->offset = newoffset;
-        if (done < (unsigned int)c->chunk) {        /* short transfer => this was the last chunk */
+        if (done < (unsigned int)c->chunk)
+        { /* short transfer => this was the last chunk */
             c->remain = 0;
-        } else {
+        }
+        else
+        {
             c->remain -= done;
         }
-        if (0 < c->remain) {
+        if (0 < c->remain)
+        {
             c->chunk = (0x2000 < c->remain) ? 0x2000 : c->remain;
-            c->op = c->iofn(c->handle, c->offset, c->dest, c->chunk,
-                            c->cbarg, (intptr_t)c);
-            if (c->op != 0) {
+            c->op = c->iofn(c->handle, c->offset, c->dest, c->chunk, c->cbarg, (intptr)c);
+            if (c->op != 0)
+            {
                 FILE_callbackop((unsigned int)c->op, (void *)synccallback);
                 return;
             }
-        } else {
+        }
+        else
+        {
             return;
         }
     }
@@ -84,24 +89,27 @@ extern "C" void synccallback(int op, int type, SyncCtrl *c)
 }
 
 /* syncblockio @0x800EA7E8 : run a chunked blocking transfer of `len` bytes via `iofn`; returns bytes moved. */
-extern "C" int syncblockio(intptr_t handle, unsigned int offset, intptr_t dest,
-                            int len, int cbarg, SyncIoFn iofn)
+extern "C" int syncblockio(intptr handle, unsigned int offset, intptr dest, int len, int cbarg, SyncIoFn iofn)
 {
     SyncCtrl c;
-    c.cbarg  = cbarg;
+    c.cbarg = cbarg;
     c.handle = handle;
     c.offset = offset;
     c.remain = len;
-    c.done   = 0;
-    c.dest   = dest;
-    if (len <= 0x2000) {
+    c.done = 0;
+    c.dest = dest;
+    if (len <= 0x2000)
+    {
         c.chunk = len;
-    } else {
-        c.iofn  = iofn;                             /* only needed when re-issuing (matches the binary) */
+    }
+    else
+    {
+        c.iofn = iofn; /* only needed when re-issuing (matches the binary) */
         c.chunk = 0x2000;
     }
-    c.op = iofn(handle, offset, dest, c.chunk, cbarg, (intptr_t)&c);
-    if (c.op != 0) {
+    c.op = iofn(handle, offset, dest, c.chunk, cbarg, (intptr)&c);
+    if (c.op != 0)
+    {
         FILE_callbackop((unsigned int)c.op, (void *)synccallback);
         while ((c.remain != 0) || (c.op != 0))
             FILE_waitop((unsigned int)c.op);
@@ -112,21 +120,23 @@ extern "C" int syncblockio(intptr_t handle, unsigned int offset, intptr_t dest,
 /* FILE_opensync @0x800EA8A8 : blocking open; *out = handle.  Returns 1 if the op succeeded. */
 extern "C" int FILE_opensync(char *name, int a2, int a3, int *out)
 {
-    int          ok = 0;
+    int ok = 0;
     unsigned int op = FILE_open(name, a2, a3, 0);
-    if (op == 0) {
+    if (op == 0)
+    {
         *out = 0;
-    } else {
+    }
+    else
+    {
         FILE_waitop(op);
-        ok   = (FILE_opstatus(op) == 1);
+        ok = (FILE_opstatus(op) == 1);
         *out = (int)FILE_completeop(op);
     }
     return ok;
 }
 
 /* FILE_readsync @0x800EA920 : blocking read (chunked via syncblockio + FILE_read). */
-extern "C" int FILE_readsync(intptr_t handle, unsigned int offset, intptr_t dest,
-                              int len, int cbarg)
+extern "C" int FILE_readsync(intptr handle, unsigned int offset, intptr dest, int len, int cbarg)
 {
     return syncblockio(handle, offset, dest, len, cbarg, FILE_read);
 }
@@ -136,7 +146,8 @@ extern "C" int FILE_closesync(int fd, int a2)
 {
     int result = 0;
     unsigned int op = FILE_close(fd, a2, 0);
-    if (op != 0) {
+    if (op != 0)
+    {
         FILE_waitop(op);
         result = FILE_completeop(op);
     }
@@ -148,7 +159,8 @@ extern "C" int FILE_sizesync(int fd, int a2)
 {
     int result = 0;
     unsigned int op = FILE_size(fd, a2, 0);
-    if (op != 0) {
+    if (op != 0)
+    {
         FILE_waitop(op);
         result = FILE_completeop(op);
     }
@@ -158,13 +170,16 @@ extern "C" int FILE_sizesync(int fd, int a2)
 /* FILE_addbigsync @0x800EA9F8 : blocking add-to-BIG; *out = handle.  Returns 1 if the op succeeded. */
 extern "C" int FILE_addbigsync(char *name, int a2, int a3, int *out)
 {
-    int          ok = 0;
+    int ok = 0;
     unsigned int op = FILE_addbig(name, a2, a3, 0);
-    if (op == 0) {
+    if (op == 0)
+    {
         *out = 0;
-    } else {
+    }
+    else
+    {
         FILE_waitop(op);
-        ok   = (FILE_opstatus(op) == 1);
+        ok = (FILE_opstatus(op) == 1);
         *out = (int)FILE_completeop(op);
     }
     return ok;
@@ -174,7 +189,8 @@ extern "C" int FILE_addbigsync(char *name, int a2, int a3, int *out)
 extern "C" void FILE_delbigsync(int a0, int a1)
 {
     unsigned int op = FILE_delbig(a0, a1, 0);
-    if (op != 0) {
+    if (op != 0)
+    {
         FILE_waitop(op);
         FILE_completeop(op);
     }

@@ -579,7 +579,7 @@ short tTournamentManager::AdvanceToNextTrack()
         }
         (this->fAwards).fCompletedTier = 0;
         this->fBestPlacement[ptVar9->fTournamentID] = '\x01';
-        pvVar5 = (void *)(intptr_t)FECheat_IsCheatEnabled((tCheatCode)(this->fTier + cheat_FinishedTournament));
+        pvVar5 = (void *)(intptr)FECheat_IsCheatEnabled((tCheatCode)(this->fTier + cheat_FinishedTournament));
         if (pvVar5 != (void *)0x1) {
           iVar3 = this->fTier;
           (this->fAwards).fCompletedTier = 1;
@@ -995,7 +995,7 @@ void * tTournamentManager::ValidCar(tCarInfo *carInfo)
   pvVar6 = (void *)0x1;
   if (uVar1 != '\n') {
     pvVar6 = (void *)(uint)(carInfo->fCarClass == uVar1);
-    pvVar3 = (void *)(intptr_t)FECheat_IsCheatEnabled(cheat_FinishedTournament);
+    pvVar3 = (void *)(intptr)FECheat_IsCheatEnabled(cheat_FinishedTournament);
     if ((pvVar3 != (void *)0x0) && (this->fTier == 0)) {
       pvVar6 = (void *)0x1;
     }

@@ -6,29 +6,27 @@
 #include "../../nfs4_types.h"
 #include "textpsx_externs.h"
 
-
 /* ---- fortext4  [TEXTPSX.C:153-179] SLD-VERIFIED ---- */
-void fortext4
-               (int x,int y,void *source,int u,int v,int width,int height,int rowbytes)
+void fortext4(int x, int y, void *source, int u, int v, int width, int height, int rowbytes)
 
 {
-  return;
+    return;
 }
 
 /* ---- inittextdraw  [TEXTPSX.C:254-270] SLD-VERIFIED ---- */
 extern "C" void inittextdraw(void)
 
 {
-  currentfont.textDraw = fortext4;
-  return;
+    currentfont.textDraw = fortext4;
+    return;
 }
 
 /* ---- restoretextdraw  [TEXTPSX.C:280-289] SLD-VERIFIED ---- */
 void restoretextdraw(void)
 
 {
-  currentfont.textDraw = (FontTextDraw)0;
-  return;
+    currentfont.textDraw = (FontTextDraw)0;
+    return;
 }
 
 /* end of textpsx.c */

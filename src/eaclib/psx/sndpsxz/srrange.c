@@ -5,14 +5,16 @@
  *   iSNDrandom's return (reused the clamp flag uVar1); restored from IDA (iSNDrandom returns int).
  */
 
-extern "C" int iSNDrandom(void);   /* srandom */
+extern "C" int iSNDrandom(void); /* srandom */
 
-extern "C" int randrange(int range);   /* @0x8010BCF4 */
+extern "C" int randrange(int range); /* @0x8010BCF4 */
 
 /* randrange @0x8010BCF4 : return a signed random in roughly [-range/4, +range/4]. */
 extern "C" int randrange(int range)
 {
-    if (0x10000 < range) range = 0x10000;
-    else if (range < 0)  range = 0;
+    if (0x10000 < range)
+        range = 0x10000;
+    else if (range < 0)
+        range = 0;
     return (int)((((int)(iSNDrandom() & 0x7fff)) - 0x4000) * range) >> 0xe;
 }

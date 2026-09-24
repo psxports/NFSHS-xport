@@ -5,11 +5,11 @@
  */
 #include "../../../lib/snd.h"
 
-extern "C" int  sndgs[];
-extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag); /* sst */
-extern "C" void STREAM_setgreedylevel(intptr_t stream, int s); /* eacpsxz stream.obj */
+extern "C" int sndgs[];
+extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);  /* sst */
+extern "C" void STREAM_setgreedylevel(intptr stream, int s); /* eacpsxz stream.obj */
 
-extern "C" int SNDSTRM_setgreedylevel(int tag, int s);      /* @0x800E9D30 */
+extern "C" int SNDSTRM_setgreedylevel(int tag, int s); /* @0x800E9D30 */
 
 /* SNDSTRM_setgreedylevel @0x800E9D30 : -10 if uninit, -8 if no such stream, else set its greedy level. */
 extern "C" int SNDSTRM_setgreedylevel(int tag, int s)

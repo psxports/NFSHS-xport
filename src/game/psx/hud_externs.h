@@ -8,12 +8,16 @@
 
 /* Ghidra-ism helpers (3-byte type + byte-concat macro used by color packing) */
 typedef unsigned int undefined3;
-static inline u_int CONCAT31(u_int hi3, u_char lo1) { return (hi3 << 8) | lo1; }
+
+static inline u_int CONCAT31(u_int hi3, u_char lo1)
+{
+    return (hi3 << 8) | lo1;
+}
 
 /* ---- module-local sprite/prim scratch + map state ---- */
 // [owned->defined in hud.cpp] extern SPRT          *gSprite0;          /* 0x... HUD sprite array 0 */
 // [owned->defined in hud.cpp] extern SPRT          *gSprite1;          /* HUD sprite array 1 */
-extern SPRT          *gSprt1;
+extern SPRT *gSprt1;
 // [owned->defined in hud.cpp] extern POLY_F4        gHudF4[];
 // [owned->defined in hud.cpp] extern POLY_F4 gHudF4[];
 // [owned->defined in hud.cpp] extern POLY_FT4       gHudFT4[];
@@ -24,15 +28,15 @@ extern SPRT          *gSprt1;
 // [owned->defined in hud.cpp] extern DR_MODE *gTPage0[];
 // [owned->defined in hud.cpp] extern DR_MODE       *gTPage1[];
 // [owned->defined in hud.cpp] extern DR_MODE *gTPage1[];
-extern "C" u_short        gFontClut;
-extern "C" int            gFlip;             /* 0x8013d7b4 */
+extern "C" u_short gFontClut;
+extern "C" int gFlip; /* 0x8013d7b4 */
 // [owned->defined in hud.cpp] extern int            gMapOffX, gMapOffY, gMapRotate, gMapScaleX, gMapScaleY;
 // [owned->defined in hud.cpp] extern int gMapOffX, gMapOffY, gMapRotate, gMapScaleX, gMapScaleY;
-extern "C" extern DRender_tView  gCView;            /* 0x80116f7c */
+extern "C" extern DRender_tView gCView; /* 0x80116f7c */
 
 /* ---- GPU packet cursors (scratchpad linked-list) ---- */
-extern "C" u_char        *&Render_gPacketPtr;
-extern "C" u_char        *&Render_gPalettePtr;
+extern "C" u_char *&Render_gPacketPtr;
+extern "C" u_char *&Render_gPalettePtr;
 
 /* ---- HUD module globals ---- */
 // [owned->defined in hud.cpp] extern int            Hud_gHudView[2], Hud_gMapView[2], Hud_gTacView[2];
@@ -56,32 +60,32 @@ extern "C" u_char        *&Render_gPalettePtr;
 // [owned->defined in hud.cpp] extern int Hud_gCdActive, Hud_gCdScrollTitle, Hud_gCdLastTick, Hud_gShowedCDPlayer;
 // [owned->defined in hud.cpp] extern int            Hud_BeTheCop;
 // [owned->defined in hud.cpp] extern int Hud_BeTheCop;
-extern "C" short          Hud_NextPerp[2];
-extern "C" int            StatsTimer[2];
+extern "C" short Hud_NextPerp[2];
+extern "C" int StatsTimer[2];
 // [owned->defined in hud.cpp] extern int            FinalBTC_Countdown;
 // [owned->defined in hud.cpp] extern int FinalBTC_Countdown;
 
 /* ---- HudPmx shape tables ---- */
-extern HudPmx_tShape  HudPmx_gShapes[];
-extern HudPmx_tUV     HudPmx_gHudNumberUV[];
+extern HudPmx_tShape HudPmx_gShapes[];
+extern HudPmx_tUV HudPmx_gHudNumberUV[];
 
 /* ---- Cars / sim / setup / camera / dashhud ---- */
-extern Car_tObj      *Cars_gRaceCarList[];      /* 0x8010fa00 */
-extern Car_tObj      *Cars_gHumanRaceCarList[]; /* 0x8010fa48 */
-extern Car_tObj      *Cars_gCopCarList[];
-extern Car_tObj      *Cars_gList[];
-extern Car_tObj      *Cars_gSortedList[];
-extern int            Cars_gNumRaceCars;        /* 0x8013c7f8 */
-extern "C" extern int            Cars_gNumHumanRaceCars;   /* 0x8013c800 */
-extern int            Cars_gNumCars;
-extern int            Cars_gNumCopCars;
-extern "C" extern "C" GameSetup_tData    GameSetup_gData;      /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar  simGlobal;            /* 0x8011e0ac */
-extern camera_info        Camera_gInfo[2];      /* 0x8010f2ac */
-extern dashhud_info       DashHUD_gInfo;
-extern int            Input_gLookBehind[2];
-extern "C" tPadModuleState gPadinfo;                /* 0x8013e89c */
-extern "C" tBTCPerpInfo   BTCPerpInfo[2][10];       /* 0x80120bc0 */
+extern Car_tObj *Cars_gRaceCarList[];      /* 0x8010fa00 */
+extern Car_tObj *Cars_gHumanRaceCarList[]; /* 0x8010fa48 */
+extern Car_tObj *Cars_gCopCarList[];
+extern Car_tObj *Cars_gList[];
+extern Car_tObj *Cars_gSortedList[];
+extern int Cars_gNumRaceCars;                 /* 0x8013c7f8 */
+extern "C" extern int Cars_gNumHumanRaceCars; /* 0x8013c800 */
+extern int Cars_gNumCars;
+extern int Cars_gNumCopCars;
+extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;                /* 0x8011e0ac */
+extern camera_info Camera_gInfo[2];                    /* 0x8010f2ac */
+extern dashhud_info DashHUD_gInfo;
+extern int Input_gLookBehind[2];
+extern "C" tPadModuleState gPadinfo;        /* 0x8013e89c */
+extern "C" tBTCPerpInfo BTCPerpInfo[2][10]; /* 0x80120bc0 */
 
 /* ---- PsyQ libgpu primitive helpers ---- */
 
@@ -90,40 +94,70 @@ extern "C" tBTCPerpInfo   BTCPerpInfo[2][10];       /* 0x80120bc0 */
 /* ---- eaclib memstd ---- */
 
 /* ---- font / textsys ---- */
-extern "C" { extern int   Font_GetUVWH(char c, int *u, int *v, int *w, int *h, int *yo); }
-extern "C" { extern int   Font_Getcharacter(int c); }
-extern void  Font_TextColor(int idx);
-extern void  Font_TextXY(char *s, int x, int y);
-extern "C" { extern char *TextSys_Word(int id); }
-extern "C" { extern int   textpixels(char *s); }
+extern "C"
+{
+    extern int Font_GetUVWH(char c, int *u, int *v, int *w, int *h, int *yo);
+}
+extern "C"
+{
+    extern int Font_Getcharacter(int c);
+}
+extern void Font_TextColor(int idx);
+extern void Font_TextXY(char *s, int x, int y);
+extern "C"
+{
+    extern char *TextSys_Word(int id);
+}
+extern "C"
+{
+    extern int textpixels(char *s);
+}
 
 /* ---- draw / view ---- */
-extern "C" { extern int   Draw_SetView(int a, int b, int c, int d, int e, int f, int g, int h, int i); }
-extern void  Draw_StartRenderingView(int id);
-extern void  Draw_StopRenderingView(int id);
+extern "C"
+{
+    extern int Draw_SetView(int a, int b, int c, int d, int e, int f, int g, int h, int i);
+}
+extern void Draw_StartRenderingView(int id);
+extern void Draw_StopRenderingView(int id);
 
 /* ---- other game helpers ---- */
-extern void  Flare_2DHalo(int a, int b, int c, int d, int e);
-extern int   Stats_GetPosition(Car_tObj *car);
-extern int   Input_WingCommandMode(int player);
-extern "C" { extern int   DashHUD_CheckWrongWay(int player); }
-extern "C" { extern int   DashHUD_HUDCalc(int player); }
-extern void  CopSpeak_Debug(void);
-extern int   AudioMus_Buffered(void);
-extern "C" { extern int   AudioMus_GetCurrentSong(void); }
-extern "C" { extern int   AudioMus_Threshold(void); }
-extern void  AudioCmn_PlayWrongWaySFX(void);
-extern void  HudPmx_Kill(void);
-extern void  Hud_RenderStatsView(void);   /* defined in overlays.cpp */
-extern "C" { extern void  Hud_BTCStats(short player, char flag);   /* defined in overlays.cpp */ }
+extern void Flare_2DHalo(int a, int b, int c, int d, int e);
+extern int Stats_GetPosition(Car_tObj *car);
+extern int Input_WingCommandMode(int player);
+extern "C"
+{
+    extern int DashHUD_CheckWrongWay(int player);
+}
+extern "C"
+{
+    extern int DashHUD_HUDCalc(int player);
+}
+extern void CopSpeak_Debug(void);
+extern int AudioMus_Buffered(void);
+extern "C"
+{
+    extern int AudioMus_GetCurrentSong(void);
+}
+extern "C"
+{
+    extern int AudioMus_Threshold(void);
+}
+extern void AudioCmn_PlayWrongWaySFX(void);
+extern void HudPmx_Kill(void);
+extern void Hud_RenderStatsView(void); /* defined in overlays.cpp */
+extern "C"
+{
+    extern void Hud_BTCStats(short player, char flag); /* defined in overlays.cpp */
+}
 
 /* ---- module-scope statics / cross-module globals (Ghidra-recovered names) ---- */
-extern "C" int            ticks;                 /* global frame tick */
+extern "C" int ticks; /* global frame tick */
 // [owned->defined in hud.cpp] extern int            keepup, trap_unused;
 extern int trap_unused;
 // [owned->defined in hud.cpp] extern int keepup, trap_unused;
 extern int trap_unused;
-extern void           trap(int code);        /* HW/debug trap */
+extern void trap(int code); /* HW/debug trap */
 // [owned->defined in hud.cpp] extern int            HudBustedOverlay, HudBustedOverlayPlayer;
 // [owned->defined in hud.cpp] extern int HudBustedOverlay, HudBustedOverlayPlayer;
 // [owned->defined in hud.cpp] extern int            HudMapOffsetY;
@@ -133,7 +167,7 @@ extern void           trap(int code);        /* HW/debug trap */
 // [owned->defined in hud.cpp] extern int            Hud_Character[];        /* per-char glyph bitmask table */
 // [owned->defined in hud.cpp] extern int            Hud_kTurnSongOffNext;
 // [owned->defined in hud.cpp] extern int Hud_kTurnSongOffNext;
-extern "C" int            Replay_ReplayMode;
+extern "C" int Replay_ReplayMode;
 extern "C" tReplayInterface Replay_ReplayInterface;
 // [owned->defined in hud.cpp] extern int            currentSpriteColor;
 // [owned->defined in hud.cpp] extern int currentSpriteColor;
@@ -147,7 +181,7 @@ extern "C" tReplayInterface Replay_ReplayInterface;
 // [owned->defined in hud.cpp] extern void *day_needle, *night_needle;
 /* MIPS Hud_BuildMapMarkers 0x800D5D80..0x800D5D94 first loads the pointer
    stored at 0x8013C7C0, then scales the slice index by 0x20. */
-extern Trk_NewSlice  *BWorldSm_slices;
+extern Trk_NewSlice *BWorldSm_slices;
 extern "C" Sim_tSimSystemVar simVar;
 /* BTC state */
 // [owned->defined in hud.cpp] extern int            BTC_BonusTime, BTC_BonusTimeTick, BTC_Countdown;

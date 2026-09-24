@@ -11,32 +11,44 @@
  *   `long long` (which would pull in libgcc __divdi3 that the original never used). @VA breadcrumbs.
  */
 
-extern "C" int fixeddiv(int a, int b)   /* @0x800E4404 */
+extern "C" int fixeddiv(int a, int b) /* @0x800E4404 */
 {
     unsigned ua, ub, rem, result, bit;
-    int      neg;
+    int neg;
 
-    if (b == 0) return 0;                                /* @0x800E44A4 div-by-zero -> 0 */
-    neg = (a < 0) ^ (b < 0);                              /* @0x800E4420 sign = sign(a) ^ sign(b) */
-    ua  = (a < 0) ? (unsigned)(0 - a) : (unsigned)a;      /* @0x800E440C |a| */
-    ub  = (b < 0) ? (unsigned)(0 - b) : (unsigned)b;      /* @0x800E4418 |b| */
+    if (b == 0)
+        return 0;                                   /* @0x800E44A4 div-by-zero -> 0 */
+    neg = (a < 0) ^ (b < 0);                        /* @0x800E4420 sign = sign(a) ^ sign(b) */
+    ua = (a < 0) ? (unsigned)(0 - a) : (unsigned)a; /* @0x800E440C |a| */
+    ub = (b < 0) ? (unsigned)(0 - b) : (unsigned)b; /* @0x800E4418 |b| */
 
-    result = (ua / ub) << 16;                             /* @0x800E441C hardware DIV: int part (LO) */
-    rem    = ua % ub;                                     /*             remainder (HI)               */
-    for (bit = 0x8000; bit != 0; bit >>= 1) {             /* @0x800E4448 refine 16 fractional bits    */
+    result = (ua / ub) << 16; /* @0x800E441C hardware DIV: int part (LO) */
+    rem = ua % ub;            /*             remainder (HI)               */
+    for (bit = 0x8000; bit != 0; bit >>= 1)
+    { /* @0x800E4448 refine 16 fractional bits    */
         rem <<= 1;
-        if (rem >= ub) { result |= bit; rem -= ub; }      /*             shift / compare / subtract    */
+        if (rem >= ub)
+        {
+            result |= bit;
+            rem -= ub;
+        } /*             shift / compare / subtract    */
     }
-    return neg ? -(int)result : (int)result;              /* @0x800E4468 reapply sign                 */
+    return neg ? -(int)result : (int)result; /* @0x800E4468 reapply sign                 */
 }
 
 /* `rdiv` = co-equal XDEF label at the same address (EA legacy name). */
 #ifdef _MSC_VER
-extern "C" int rdiv(int a, int b) { return fixeddiv(a,b); }
+extern "C" int rdiv(int a, int b)
+{
+    return fixeddiv(a, b);
+}
 #else
-#if defined(_MSC_VER)
-extern "C" int rdiv(int a, int b) { return fixeddiv(a, b); }
-#else
+    #if defined(_MSC_VER)
+extern "C" int rdiv(int a, int b)
+{
+    return fixeddiv(a, b);
+}
+    #else
 extern "C" int rdiv(int a, int b) __attribute__((alias("fixeddiv")));
-#endif
+    #endif
 #endif

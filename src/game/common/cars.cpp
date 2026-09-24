@@ -1249,7 +1249,7 @@ LAB_80087a54:
   }
   if ((((uVar10 & 0x20) != 0) && (gLeafPixmap != (Draw_tPixMap *)0x0)) &&
      ((0xa0000 < (carObj->N).speedXZ &&
-      (pvVar4 = (void *)(intptr_t)TrgSfx_AddCarExtraCheck((carObj->N).objID,0),
+      (pvVar4 = (void *)(intptr)TrgSfx_AddCarExtraCheck((carObj->N).objID,0),
       pvVar4 != (void *)0x0)))) {
     uVar10 = random();
     iVar9 = ((uVar10 & 7) - 4) * 0x3333;
@@ -1457,7 +1457,7 @@ LAB_80087a54:
   }
   if ((((uVar10 & 0x20) != 0) && (gLeafPixmap != (Draw_tPixMap *)0x0)) &&
      ((0xa0000 < (carObj->N).speedXZ &&
-      (pvVar4 = (void *)(intptr_t)TrgSfx_AddCarExtraCheck((carObj->N).objID,1),
+      (pvVar4 = (void *)(intptr)TrgSfx_AddCarExtraCheck((carObj->N).objID,1),
       pvVar4 != (void *)0x0)))) {
     uVar10 = random();
     iVar9 = ((uVar10 & 7) - 4) * 0x3333;
@@ -1665,7 +1665,7 @@ LAB_80087a54:
   }
   if ((((uVar10 & 0x20) != 0) && (gLeafPixmap != (Draw_tPixMap *)0x0)) &&
      ((0xa0000 < (carObj->N).speedXZ &&
-      (pvVar4 = (void *)(intptr_t)TrgSfx_AddCarExtraCheck((carObj->N).objID,2),
+      (pvVar4 = (void *)(intptr)TrgSfx_AddCarExtraCheck((carObj->N).objID,2),
       pvVar4 != (void *)0x0)))) {
     uVar10 = random();
     iVar9 = ((uVar10 & 7) - 4) * 0x3333;
@@ -1873,7 +1873,7 @@ LAB_80087a54:
   }
   if ((((uVar10 & 0x20) != 0) && (gLeafPixmap != (Draw_tPixMap *)0x0)) &&
      ((0xa0000 < (carObj->N).speedXZ &&
-      (pvVar4 = (void *)(intptr_t)TrgSfx_AddCarExtraCheck((carObj->N).objID,3),
+      (pvVar4 = (void *)(intptr)TrgSfx_AddCarExtraCheck((carObj->N).objID,3),
       pvVar4 != (void *)0x0)))) {
     uVar10 = random();
     iVar9 = ((uVar10 & 7) - 4) * 0x3333;

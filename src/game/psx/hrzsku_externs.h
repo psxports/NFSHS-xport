@@ -8,55 +8,63 @@
 
 /* GTE rotation/transform/perspective macros (PsyQ libgte). Reconstruction treats the GTE pipeline
    as intrinsics: SetRotMatrix/SetTransMatrix load the cop2 regs, gte_rtps/rtpt do the projection. */
-extern void gte_rtps(void);   /* RotTransPers (1 vertex; results read from cop2 SXY/SZ) */
-extern void gte_rtpt(void);   /* RotTransPers3 (3 vertices) */
-extern void gte_lwc2(int reg, int data);   /* load word to cop2 data reg */
-extern void gte_swc2(int reg, void *ptr);  /* store cop2 data reg to memory */
+extern void gte_rtps(void);               /* RotTransPers (1 vertex; results read from cop2 SXY/SZ) */
+extern void gte_rtpt(void);               /* RotTransPers3 (3 vertices) */
+extern void gte_lwc2(int reg, int data);  /* load word to cop2 data reg */
+extern void gte_swc2(int reg, void *ptr); /* store cop2 data reg to memory */
 /* GTE control-reg matrix loads (ctc2). Faithful symbolic intrinsics (no-op placeholders, matching
    the convention in the sealed trsproj/weather modules) -- the matrix build is shown explicitly. */
 #ifdef AP_WIN
 extern void nfs4_gte_set_rot_matrix(const void *);
 extern void nfs4_gte_set_trans_matrix(const void *);
-#define gte_SetRotMatrix(mp)    nfs4_gte_set_rot_matrix(mp)
-#define gte_SetTransMatrix(mp)  nfs4_gte_set_trans_matrix(mp)
+    #define gte_SetRotMatrix(mp) nfs4_gte_set_rot_matrix(mp)
+    #define gte_SetTransMatrix(mp) nfs4_gte_set_trans_matrix(mp)
 #else
-#define gte_SetRotMatrix(mp)    ((void)(mp))   /* ctc2 R11R12..R33  (cop2 ctrl 0..5)  */
-#define gte_SetTransMatrix(mp)  ((void)(mp))   /* ctc2 TRX/TRY/TRZ  (cop2 ctrl 5..7)  */
+    #define gte_SetRotMatrix(mp) ((void)(mp))   /* ctc2 R11R12..R33  (cop2 ctrl 0..5)  */
+    #define gte_SetTransMatrix(mp) ((void)(mp)) /* ctc2 TRX/TRY/TRZ  (cop2 ctrl 5..7)  */
 #endif
 /* Ghidra renders raw GTE COP2 ops as calls through a code-ptr to a HW address: (*(code*)0xADDR)().
    Typedef makes them compile; the faithful gte_ macros are applied in the per-fn BODY pass. */
-typedef void (code)(void);
+typedef void(code)(void);
 typedef long long undefined8;
 typedef unsigned long long ulonglong;
+
 /* Ghidra byte-concat / sub-word extract macros */
-static inline u_int   CONCAT22(u_short hi, u_short lo) { return ((u_int)hi << 16) | lo; }
-static inline u_short SUB42(u_int v, int n) { return (u_short)(v >> (n * 8)); }
+static inline u_int CONCAT22(u_short hi, u_short lo)
+{
+    return ((u_int)hi << 16) | lo;
+}
+
+static inline u_short SUB42(u_int v, int n)
+{
+    return (u_short)(v >> (n * 8));
+}
 
 /* ---- GPU packet cursors + matrices ---- */
-extern "C" char          *&Render_gPacketPtr;
-extern "C" char          *&Render_gPalettePtr;
-extern "C" char          *&Render_gPacketEnd;
-extern "C" short          &Render_gPacketLenLo, &Render_gPacketLenHi;
-extern "C" MATRIX         &Render_gWorldMat;
-extern "C" MATRIX         &Render_gCopMat;
+extern "C" char *&Render_gPacketPtr;
+extern "C" char *&Render_gPalettePtr;
+extern "C" char *&Render_gPacketEnd;
+extern "C" short &Render_gPacketLenLo, &Render_gPacketLenHi;
+extern "C" MATRIX &Render_gWorldMat;
+extern "C" MATRIX &Render_gCopMat;
 
 /* ---- camera / view ---- */
-extern long           Camera_gGeomScreen[2];
-extern "C" int            Draw_gViewOtSize;
-extern "C" int            Draw_gPlayer1View, Draw_gPlayer2View;
+extern long Camera_gGeomScreen[2];
+extern "C" int Draw_gViewOtSize;
+extern "C" int Draw_gPlayer1View, Draw_gPlayer2View;
 
 /* ---- track / setup ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;          /* 0x801131ec */
-extern "C" CTrackSpec     TrackSpec_gSpec;           /* 0x8012327c */
+extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
 // [owned->defined in hrzsku.cpp] extern CHorizonSpec  *Hrz_gTrackSpec;            /* horizon spec (angle/height/frontColor/ringPMX) */
 // [owned->defined in hrzsku.cpp] extern CSkySpec      *Sky_gTrackSpec;            /* sky spec (numStars/frontcolors/...) */
-extern void           trap(int c);
+extern void trap(int c);
 // [owned->defined in hrzsku.cpp] extern CVECTOR       *starColors;        /* reservememadr'd */
 // [owned->defined in hrzsku.cpp] extern SVECTOR       *starPosInSky;
 // [owned->defined in hrzsku.cpp] extern SVECTOR        sunPosInSky, moonPosInSky;   /* SVECTOR values */
 // [owned->defined in hrzsku.cpp] extern int            gfxPmxHeightPercentage[];
 // [owned->defined in hrzsku.cpp] extern Draw_tPixMap  *gpPmx;
-extern "C" int            &Skid_gCtrlScratch_94;
+extern "C" int &Skid_gCtrlScratch_94;
 
 /* ---- sky geometry + colours ---- */
 // [owned->defined in hrzsku.cpp] extern SVECTOR        gSkyMesh[];
@@ -64,20 +72,20 @@ extern "C" int            &Skid_gCtrlScratch_94;
 // [owned->defined in hrzsku.cpp] extern CVECTOR        gHrzRingColor[][5];
 // [owned->defined in hrzsku.cpp] extern SVECTOR       *gRngCoordTop;        /* reservememadr'd */
 // [owned->defined in hrzsku.cpp] extern CVECTOR        Hrz_gSaveCol[];
-extern int            Hrz_gProjResultZ0;
-extern int            Hrz_gProjScratch_9C;
+extern int Hrz_gProjResultZ0;
+extern int Hrz_gProjScratch_9C;
 // [owned->defined in hrzsku.cpp] extern SVECTOR        Hrz_gLightningPosInSky;
 // [owned->defined in hrzsku.cpp] extern char           gSkyPixmapIndex[];
-extern int            gSkyPixmapIndex_dummy;
+extern int gSkyPixmapIndex_dummy;
 
 /* ---- pixmaps ---- */
 // [owned->defined in hrzsku.cpp] extern Draw_tPixMap   gHorizonPixmap[8];
 // [owned->defined in hrzsku.cpp] extern Draw_tPixMap   gHorizonExtraSkyPixmaps;
-extern Draw_tPixMap  *gLightningPixmap[];
+extern Draw_tPixMap *gLightningPixmap[];
 
 /* ---- lightning ---- */
-extern int            Night_gLightning;
-extern char           Night_gShowForks;
+extern int Night_gLightning;
+extern char Night_gShowForks;
 // [owned->defined in hrzsku.cpp] extern tHrz_Lightning gHrz_Lightning;       /* lightning fork buffer (104 B) */
 
 /* ---- chunk vtx buffer ---- */
@@ -87,10 +95,10 @@ extern char           Night_gShowForks;
 /* ---- eaclib ---- */
 
 /* ---- flare / texture / view ---- */
-extern void  Flare_Sun(SVECTOR *v, Draw_FlareCache *fc);
-extern void  Flare_Moon(SVECTOR *v, Draw_FlareCache *fc);
-extern void  Flare_InitLensFlare(void);
-extern void  Draw_SetViewColor(int view, int r, int g, int b);
-extern void  Texture_CloneUVPmx(Draw_tPixMap *dst, int flag, Draw_tPixMap *src);
+extern void Flare_Sun(SVECTOR *v, Draw_FlareCache *fc);
+extern void Flare_Moon(SVECTOR *v, Draw_FlareCache *fc);
+extern void Flare_InitLensFlare(void);
+extern void Draw_SetViewColor(int view, int r, int g, int b);
+extern void Texture_CloneUVPmx(Draw_tPixMap *dst, int flag, Draw_tPixMap *src);
 
 #endif

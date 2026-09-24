@@ -1,6 +1,6 @@
 /* frontend/psx/drawshp.cpp  --  RECONSTRUCTED  (PSX FE styled-rectangle drawing; C++ TU)
  *   Bodies: Ghidra decompiler. Line numbers: PsyQ SLD (8c decl, 8e end).
- *   4 EXT functions; C++ linkage (cfront-mangled; RECT& reference params).
+ *   4 EXT functions; C++ linkage (cfront-mangled; PSX_RECT& reference params).
  *   NOTE: Ghidra lost several register/stack args to the PSXFront draw helpers
  *   (named x/y + dseIndex/dseFlags/dseX/dseY, decl-only) -- genuinely unrecoverable from the binary.
  */
@@ -11,7 +11,7 @@ int kNoColor;   /* 0x800529d0 (EXT data global) */
 /* lines 1-50: file header, #includes, static data, macros (no symbols emitted) */
 
 /* ---- DrawShape_SubtractNFS4RectEdges  (drawshp.cpp:51, code lines 51-81) ---- */
-extern "C" void DrawShape_SubtractNFS4RectEdges(RECT &rect)
+extern "C" void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect)
 
 {
   short y1;
@@ -67,14 +67,14 @@ extern "C" void DrawShape_SubtractNFS4RectEdges(RECT &rect)
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *(uint *)prevDrm = *(uint *)prevDrm & 0xff000000 | linkAddr;
   tpage = GetTPage(2,2,0,0x100);
-  SetDrawMode(dr_mode,0,0,(uint)(u_short)tpage,(RECT *)0x0);
+  SetDrawMode(dr_mode,0,0,(uint)(u_short)tpage,(PSX_RECT *)0x0);
   return;
 }
 
 /* lines 82-91: (static data / macros / comments - no emitted code) */
 
 /* ---- DrawShape_NFS4RoundRectangle  (drawshp.cpp:92, code lines 92-124) ---- */
-extern "C" void DrawShape_NFS4RoundRectangle(int textID,RECT &position,short selected)
+extern "C" void DrawShape_NFS4RoundRectangle(int textID,PSX_RECT &position,short selected)
 
 {
   tTexture_ShapeInfo *shapes;
@@ -121,7 +121,7 @@ extern "C" void DrawShape_NFS4RoundRectangle(int textID,RECT &position,short sel
 /* lines 125-128: (static data / macros / comments - no emitted code) */
 
 /* ---- DrawShape_NFS4Rectangle  (drawshp.cpp:129, code lines 129-166) ---- */
-extern "C" void DrawShape_NFS4Rectangle(RECT &position)
+extern "C" void DrawShape_NFS4Rectangle(PSX_RECT &position)
 
 {
   tTexture_ShapeInfo *shapes;
@@ -182,7 +182,7 @@ extern "C" void DrawShape_NFS4Rectangle(RECT &position)
 /* lines 167-169: (static data / macros / comments - no emitted code) */
 
 /* ---- DrawShape_NFS4TransRectangle  (drawshp.cpp:170, code lines 170-181) ---- */
-extern "C" void DrawShape_NFS4TransRectangle(RECT &r,short opacity)
+extern "C" void DrawShape_NFS4TransRectangle(PSX_RECT &r,short opacity)
 
 {
   int abr;

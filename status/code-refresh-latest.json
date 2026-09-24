@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "project": "Need for Speed: High Stakes",
+  "result": "PASS",
+  "seconds": 5.538,
+  "steps": {
+    "source_index": {
+      "parser_version": "c-source-index-v5",
+      "source_files": 511,
+      "declarations": 9418,
+      "mapped": 0,
+      "ambiguous": 0,
+      "unmapped": 0,
+      "mode": "incremental",
+      "changed_files": [
+        "src/eaclib/psx/sndpsxz/sdpacket.c"
+      ],
+      "affected_functions": 0,
+      "formatted_files": [
+        "src/eaclib/psx/sndpsxz/sdpacket.c"
+      ],
+      "trimmed_files": [],
+      "formatter": "clang-format version 19.1.5",
+      "format_style_sha256": "9997eeb4af43c09f6655b4c29b82b3b6aab53e17afffbdd20050ccf69ae21459",
+      "seconds": 2.063
+    },
+    "source_hygiene": {
+      "void_parameter_suppressions": []
+    },
+    "build": {
+      "seconds": 2.515,
+      "exit_code": 0,
+      "executable": "bin/NFSHS.exe",
+      "sha256": "445a573145abb119fc35b5efab95b1fa626dc3b887e5c62a276487ecfa3b6c41"
+    },
+    "tests": [
+      {
+        "seconds": 0.186,
+        "exit_code": 0,
+        "name": "native-smoke"
+      }
+    ],
+    "artifacts": [],
+    "progress": {
+      "seconds": 0.065,
+      "exit_code": 0
+    },
+    "database": {
+      "integrity": "ok",
+      "foreign_key_errors": 0
+    }
+  },
+  "error": null
+}

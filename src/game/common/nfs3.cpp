@@ -1,4 +1,4 @@
-/* game/common/nfs3.cpp -- RECONSTRUCTED (game boot / module start-up + main() entry; C TU, 11 fns) */
+/* game/common/nfs3.cpp -- RECONSTRUCTED (game boot / module start-up + game entry; C TU, 11 fns) */
 #include "../../nfs4_types.h"
 #include "nfs3_externs.h"
 
@@ -215,9 +215,7 @@ void Nfs2_GameModuleStartUp(int *FrontEndDataStream)
   int iVar1;
   int iVar2;
   
-#ifndef AP_WIN
   Audio_InitDriver(0,0);
-#endif
   restoretextdraw();
   Platform_InitMemory();
   Platform_ResetDCTBuffer();
@@ -230,14 +228,12 @@ void Nfs2_GameModuleStartUp(int *FrontEndDataStream)
   Loading_UpdateLoadingScreen(2);
   Physics_CheckGamedata();
   Clock_SystemStartUp();
-#ifndef AP_WIN
   AudioCmn_LoadGameSamples();
   CopSpeak_StartUp();
   if ((GameSetup_gData.raceType == 1) && (_6Speech_fgSpeech == (Speech *)0x0)) {
     pThis = __builtin_new(0x3a4);
     _6Speech_fgSpeech = Speech_ct((Speech *)pThis);
   }
-#endif
   Render_InitPauseMenu();
   Render_InitTrackRender();
   Loading_UpdateLoadingScreen(4);
@@ -259,13 +255,9 @@ void Nfs2_GameModuleStartUp(int *FrontEndDataStream)
     iVar2 = 0xb000;
   }
   if (iVar2 < iVar1) {
-#ifndef AP_WIN
     AudioMus_SysStartUp(0x6000,0x14000,"ymus");
-#endif
   }
-#ifndef AP_WIN
   AudioMus_BuildPlayList(GameSetup_gData.userSetting.numplaylistsongs,GameSetup_gData.userSetting.playlist);
-#endif
   largestunused();
   return;
 }
@@ -317,14 +309,12 @@ void Nfs2_CleanUpGameModule(void)
     } while (k * 0x10000 >> 0x10 < GameSetup_gData.numCars);
   }
   Replay_StoringReplay();
-#ifndef AP_WIN
   AudioCmn_DeInit();
   if (_6Speech_fgSpeech != (Speech *)0x0) {
     Speech_dt(_6Speech_fgSpeech,3);
     _6Speech_fgSpeech = (Speech *)0x0;
   }
   CopSpeak_CleanUp();
-#endif
   Clock_SystemCleanUp();
   GameSetup_CleanUp();
   Sim_CleanUp();
@@ -332,9 +322,7 @@ void Nfs2_CleanUpGameModule(void)
   BWorld_DeInit();
   Camera_Kill();
   Weather_DeInit();
-#ifndef AP_WIN
   Audio_DeInitDriver();
-#endif
   return;
 }
 
@@ -389,7 +377,7 @@ void NFS4_LoadingIcon(void)
   shapetbl *shp;
   u_int lang;
   char fname [80];
-  RECT r;
+  PSX_RECT r;
   
   sprintf(fname,"%sldic.psh",Paths_Paths[0x25]);
   ldfile = loadfileadr(fname,0);
@@ -437,7 +425,10 @@ void NFS3_CheckForFileOperations(void)
 
 /* ---- main  [NFS3.CPP:703-935] SLD-VERIFIED ---- */
 
-int main(void)
+extern "C"
+{
+// XPORT REVISION: 2026-09-24T13:10:20Z
+int xport_main(int argc, char **argv)
 
 {
   u_int uVar1;
@@ -448,6 +439,10 @@ int main(void)
 #ifdef AP_WIN
   int hostDirectRace;
 #endif
+
+  if (argc < 0 || argv == 0) {
+    return 1;
+  }
   
   __main();
   oldReplayMode = 0;
@@ -606,6 +601,7 @@ int main(void)
     oldReplayMode = (short)GameSetup_gData.replayMode;
     NFS3_CheckForFileOperations();
   } while( true );
+}
 }
 
 

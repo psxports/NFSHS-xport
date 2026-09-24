@@ -5,14 +5,14 @@
  */
 
 extern "C" int sndgs[];
-extern "C" int  iSNDgetchan(unsigned int tag);            /* salloc   */
-extern "C" int  iSNDpatchkey(int chan, int *tag);         /* spatkey  */
-extern "C" int  iSNDcalcpitch(int note);                  /* sclcptch */
-extern "C" int  iSNDplatformpitch(int chan, int pitch);   /* sdriver  */
-extern "C" void iSNDenteraudio(void);                     /* sserver  */
+extern "C" int iSNDgetchan(unsigned int tag);          /* salloc   */
+extern "C" int iSNDpatchkey(int chan, int *tag);       /* spatkey  */
+extern "C" int iSNDcalcpitch(int note);                /* sclcptch */
+extern "C" int iSNDplatformpitch(int chan, int pitch); /* sdriver  */
+extern "C" void iSNDenteraudio(void);                  /* sserver  */
 extern "C" void iSNDleaveaudio(void);
 
-extern "C" int SNDpitchmult(unsigned int tag, unsigned int mult);     /* @0x800E7F08 */
+extern "C" int SNDpitchmult(unsigned int tag, unsigned int mult); /* @0x800E7F08 */
 
 /* SNDpitchmult @0x800E7F08 : set the pitch-multiplier (+0x60) on each voice of `tag` and recompute pitch. */
 extern "C" int SNDpitchmult(unsigned int tag, unsigned int mult)
@@ -23,9 +23,11 @@ extern "C" int SNDpitchmult(unsigned int tag, unsigned int mult)
         return -10;
     iSNDenteraudio();
     chanIdx = iSNDgetchan(tag);
-    if (-1 < chanIdx) {
+    if (-1 < chanIdx)
+    {
         cur[0] = -1;
-        while (iSNDpatchkey(chanIdx, cur) != 0) {
+        while (iSNDpatchkey(chanIdx, cur) != 0)
+        {
             int v = sndgs[0x25] + cur[0] * 100;
             if (*(unsigned short *)(v + 0x60) == (unsigned short)mult)
                 break;

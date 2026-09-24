@@ -4,6 +4,7 @@
  */
 #include "../../nfs4_types.h"
 #include "aicop_externs.h"
+#include "new.h"
 
 
 /* ---- aicop.obj-owned globals (.bss zero) ---- */
@@ -39,7 +40,7 @@ void AICop_StartUp(void)
   char acStack_70 [104];
   
   if (GameSetup_gData.cops != 0) {
-    triggerManagerCops = (AITrigger_TriggerManager *)operator new(0x34c);
+    triggerManagerCops = (AITrigger_TriggerManager *)__builtin_new(0x34c);
     sprintf(acStack_70,"%sTr%02d.cop",Paths_Paths[22],GameSetup_gData.track);
     AICop_rawTriggers = (u_char *)loadfileadrz(acStack_70,0);
     rawTriggers = (char *)AICop_rawTriggers;
@@ -70,7 +71,7 @@ void AICop_Restart(void)
 void AICop_CleanUp(void)
 {
   if (triggerManagerCops != (AITrigger_TriggerManager *)0x0) {
-    operator delete(triggerManagerCops);
+    __builtin_delete(triggerManagerCops);
     triggerManagerCops = (AITrigger_TriggerManager *)0x0;
   }
   if ((AICop_rawTriggers != (u_char *)0x0) && (GameSetup_gData.cops != 0)) {

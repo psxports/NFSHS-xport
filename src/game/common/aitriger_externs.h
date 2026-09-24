@@ -5,7 +5,10 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" { CARDINFO_def *MCRD_getcard(...); }
-extern "C" Sim_tSimGlobalVar  simGlobal;          /* Sim.obj   (.gameTicks) */
+extern "C"
+{
+    CARDINFO_def *MCRD_getcard(...);
+}
+extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 
 #endif /* _GAME_COMMON_aitriger_EXTERNS_H_ */

@@ -5,13 +5,13 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" CVECTOR * Chunk_lightTable;
-extern "C" Chunk              *Track_chunkList;
-extern coorddef * Chunk_chunkCenters;
-extern int  xzsquaredist32(coorddef *, coorddef *);
+extern "C" CVECTOR *Chunk_lightTable;
+extern "C" Chunk *Track_chunkList;
+extern coorddef *Chunk_chunkCenters;
+extern int xzsquaredist32(coorddef *, coorddef *);
 extern int BWorld_gChunkBuildList[];
-int  Math_DistXZ(coorddef *a, coorddef *b);
-void  trap(int code);
+int Math_DistXZ(coorddef *a, coorddef *b);
+void trap(int code);
 void Math_NormalizeVector(coorddef *v);
 
 #endif /* _GAME_COMMON_BWORLDSM_EXTERNS_H_ */

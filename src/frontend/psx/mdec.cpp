@@ -1,7 +1,7 @@
 /* frontend/psx/mdec.cpp  --  RECONSTRUCTED  (PSX MDEC / DCT video-frame decode)
  *   Bodies      : Ghidra decompiler (nfs4-f.exe MIPS), full re-decompile.
  *   Line numbers: PsyQ SLD per-instruction stream (cross-checked 8c-start/8e-end).
- *   Field names : SYM-authentic MDECSTRUCT layout incl. nested RECT framerect/striprect.
+ *   Field names : SYM-authentic MDECSTRUCT layout incl. nested PSX_RECT framerect/striprect.
  *   Linkage     : initmdec/restoremdec/mdec/mdecdone = (unmangled in SYM);
  *                 mdecreset/MDECCompleteHandler = normal C++ (cfront-mangled in SYM).
  *   Locals      : SYM-authentic `mdec` (MDECSTRUCT* cast) + `timeout`; others semantic
@@ -13,7 +13,7 @@
 /* lines 1-91: file header, #includes, static data (DECDCTTAB), macros (no symbols) */
 
 /* ---- initmdec  (mdec.cpp:92, code lines 92-145) ---- */
-intptr_t initmdec(int width,int height,int bpp,int memtype)
+intptr initmdec(int width,int height,int bpp,int memtype)
 
 
 {
@@ -89,13 +89,13 @@ intptr_t initmdec(int width,int height,int bpp,int memtype)
 
   gMDECinfo.numhandles = gMDECinfo.numhandles + 1;
 
-  return (intptr_t)mdec;
+  return (intptr)mdec;
 }
 
 /* lines 146-179: (static data / macros / comments - no emitted code) */
 
 /* ---- restoremdec  (mdec.cpp:180, code lines 180-205) ---- */
-void restoremdec(intptr_t handle)
+void restoremdec(intptr handle)
 
 
 {
@@ -147,7 +147,7 @@ void mdecreset(void)
 /* lines 246-294: (static data / macros / comments - no emitted code) */
 
 /* ---- mdec  (mdec.cpp:295, code lines 295-338) ---- */
-void mdec(intptr_t handle,char *src,int x,int y)
+void mdec(intptr handle,char *src,int x,int y)
 
 
 {
@@ -204,7 +204,7 @@ void mdec(intptr_t handle,char *src,int x,int y)
 /* lines 339-380: (static data / macros / comments - no emitted code) */
 
 /* ---- mdecdone  (mdec.cpp:381, code lines 381-382) ---- */
-int mdecdone(intptr_t handle)
+int mdecdone(intptr handle)
 
 
 {
@@ -230,7 +230,7 @@ void MDECCompleteHandler(void)
   
 
 
-  LoadImage
+  LoadImagePSX
 
             (&mdec->striprect,mdec->stripbuf);
 

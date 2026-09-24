@@ -1351,7 +1351,7 @@ void Newton_CalcDistToClosestPlayerCar(BO_tNewtonObj *n)
   static coorddef dummy;
   int dist;
   u_char bVar1;
-  intptr_t uVar2;
+  intptr uVar2;
   int z;
   int iVar3;
   int oldOptz;
@@ -1439,12 +1439,12 @@ NewtonClosestPlr_simOptz:
       n->groundElevation = iVar3;
     }
     else {
-      gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
       iVar3 = Newton_FindGroundElevationAndNormal(n,&dummy_124);
       uVar2 = gWSavePtr;
       n->groundElevation = iVar3;
-      gWSavePtr = (intptr_t)SetSp((void *)uVar2);
+      gWSavePtr = (intptr)SetSp((void *)uVar2);
       stackSpeedUpEnbabledFlag = 1;
     }
     iVar3 = n->groundElevation;
@@ -1574,7 +1574,7 @@ void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coo
 {
   static coorddef dummy;
   u_char uVar1;
-  intptr_t uVar2;
+  intptr uVar2;
   int iVar3;
   int iVar4;
   int iVar5;
@@ -1668,12 +1668,12 @@ void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coo
         n->groundElevation = iVar3;
       }
       else {
-        gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+        gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
         stackSpeedUpEnbabledFlag = 0;
         iVar3 = Newton_FindGroundElevationAndNormal(n,&dummy_133);
         uVar2 = gWSavePtr;
         n->groundElevation = iVar3;
-        gWSavePtr = (intptr_t)SetSp((void *)uVar2);
+        gWSavePtr = (intptr)SetSp((void *)uVar2);
         stackSpeedUpEnbabledFlag = 1;
       }
       (n->position).y = n->groundElevation + (n->dimension).y;

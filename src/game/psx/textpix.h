@@ -3,7 +3,10 @@
 #define _GAME_PSX_TEXTPIX_H_
 #include "../../nfs4_types.h"
 
-int textnpixels(char *str, int n);   /* :61 */
-extern "C" { int textpixels(char *string);   /* :101 */ }
+int textnpixels(char *str, int n); /* :61 */
+extern "C"
+{
+    int textpixels(char *string); /* :101 */
+}
 
 #endif /* _GAME_PSX_TEXTPIX_H_ */

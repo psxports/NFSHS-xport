@@ -16,38 +16,41 @@
 #include "../../../lib/snd.h"
 #include "../../../mips_semantics.h"
 
-extern "C" int           sndgs[];
-extern "C" int           timerhz;            /* hardware tick rate            */
-extern "C" short         DAT_80147910;       /* last-seen timerhz             */
-extern "C" unsigned short DAT_80147912;      /* deferred-server request count */
+extern "C" int sndgs[];
+extern "C" int timerhz;                 /* hardware tick rate            */
+extern "C" short DAT_80147910;          /* last-seen timerhz             */
+extern "C" unsigned short DAT_80147912; /* deferred-server request count */
 
-extern "C" void SNDI_mutexlock(void);        /* sdfx     */
-extern "C" void SNDI_mutexunlock(void);      /* sdfx     */
-extern "C" void iSNDserve(void);             /* slib     */
-extern "C" int  iSNDcalcpitch(int note);     /* sclcptch */
-extern "C" int  iSNDplatformpitch(int chan, int pitch);   /* sdriver */
-extern "C" void iSNDvol(int chan, int level);             /* sdriver */
-extern "C" void iSNDcalcvol(int chan);                    /* spatkey */
-extern "C" int  SNDstop(int tag);                         /* sstop   */
+extern "C" void SNDI_mutexlock(void);                  /* sdfx     */
+extern "C" void SNDI_mutexunlock(void);                /* sdfx     */
+extern "C" void iSNDserve(void);                       /* slib     */
+extern "C" int iSNDcalcpitch(int note);                /* sclcptch */
+extern "C" int iSNDplatformpitch(int chan, int pitch); /* sdriver */
+extern "C" void iSNDvol(int chan, int level);          /* sdriver */
+extern "C" void iSNDcalcvol(int chan);                 /* spatkey */
+extern "C" int SNDstop(int tag);                       /* sstop   */
 extern "C" void trap(unsigned int code);
 
-extern "C" void iSNDserver(void);                         /* @0x800EA138 */
-extern "C" void iSND100hzserver(void);                    /* @0x800EA254 */
-extern "C" void iSNDenteraudio(void);                     /* @0x800EA534 */
-extern "C" void iSNDleaveaudio(void);                     /* @0x800EA56C */
+extern "C" void iSNDserver(void);      /* @0x800EA138 */
+extern "C" void iSND100hzserver(void); /* @0x800EA254 */
+extern "C" void iSNDenteraudio(void);  /* @0x800EA534 */
+extern "C" void iSNDleaveaudio(void);  /* @0x800EA56C */
 
-#define GB(idx) (((char *)sndgs)[idx])            /* signed byte of sndgs    */
-#define GUB(idx) (((unsigned char *)sndgs)[idx])  /* unsigned byte of sndgs  */
+#define GB(idx) (((char *)sndgs)[idx])           /* signed byte of sndgs    */
+#define GUB(idx) (((unsigned char *)sndgs)[idx]) /* unsigned byte of sndgs  */
 
 /* iSNDserver @0x800EA138 : advance the audio clock -- run iSND100hzserver (sndgs[0x12]) once per elapsed
  *   100 Hz tick to catch sndgs[0x11] up to (real ticks * 100 / timerhz).  Defers if audio is locked. */
 extern "C" void iSNDserver(void)
 {
     unsigned int target;
-    if (GB(0x3e) == 0) {                       /* not already inside the server */
-        if (GB(0x3f) == 0) {                   /* audio not locked */
+    if (GB(0x3e) == 0)
+    { /* not already inside the server */
+        if (GB(0x3f) == 0)
+        { /* audio not locked */
             GB(0x3e) = 1;
-            if (timerhz != DAT_80147910) {
+            if (timerhz != DAT_80147910)
+            {
                 DAT_80147910 = (short)timerhz;
                 sndgs[0x11] = 0;
                 sndgs[0x2b] = 0;
@@ -59,8 +62,10 @@ extern "C" void iSNDserver(void)
             while ((unsigned int)sndgs[0x11] <= target)
                 SND->server100Hz();
             GB(0x3e) = 0;
-        } else {
-            DAT_80147912 = DAT_80147912 + 1;   /* run it later, on leaveaudio */
+        }
+        else
+        {
+            DAT_80147912 = DAT_80147912 + 1; /* run it later, on leaveaudio */
         }
     }
 }
@@ -70,31 +75,37 @@ extern "C" void iSNDserver(void)
  *   and pitch sweep, recomputing SPU pitch/volume (and stopping voices whose sweep table runs out). */
 extern "C" void iSND100hzserver(void)
 {
-    int           i, voice;
-    SndVoice     *p;
-    int           dirty;
-    unsigned int  dv, cur, tgt, sw;
-    int           keep, num;
-    char          ti;
-    int          *tbl;
+    int i, voice;
+    SndVoice *p;
+    int dirty;
+    unsigned int dv, cur, tgt, sw;
+    int keep, num;
+    char ti;
+    int *tbl;
     unsigned char ph;
 
     sndgs[0x11] = nfs4_mips_addu_s32(sndgs[0x11], 1);
     iSNDserve();
     i = 0;
-    if (0 < GB(0x40)) {                        /* run the 100 Hz client callbacks */
-        do {
+    if (0 < GB(0x40))
+    { /* run the 100 Hz client callbacks */
+        do
+        {
             SND->clients100Hz[i]();
             i++;
         } while (i < (int)GB(0x40));
     }
 
     voice = 0;
-    if (GUB(0x11) != 0) {                       /* over every channel */
-        do {
+    if (GUB(0x11) != 0)
+    { /* over every channel */
+        do
+        {
             p = &SND->voices[voice];
-            if (p->f0B == 1 && p->handle >= 0) {                     /* held, valid tag */
-                if (p->f54 != 0) {                                  /* pitch LFO active */
+            if (p->f0B == 1 && p->handle >= 0)
+            { /* held, valid tag */
+                if (p->f54 != 0)
+                { /* pitch LFO active */
                     ph = (unsigned char)(p->f3B + 1);
                     p->f3B = ph;
                     if (p->f39 <= ph)
@@ -104,52 +115,72 @@ extern "C" void iSND100hzserver(void)
                     iSNDplatformpitch(voice, (int)(unsigned)p->f62);
                 }
                 dirty = 0;
-                if (p->f50 != 0) {                                  /* velocity envelope active */
+                if (p->f50 != 0)
+                { /* velocity envelope active */
                     dirty = 1;
                     ph = (unsigned char)(p->f3A + 1);
                     p->f3A = ph;
                     if (p->f38 <= ph)
                         p->f3A = 0;
                 }
-                dv = (unsigned int)p->f14;                           /* portamento step */
-                if (dv != 0) {
+                dv = (unsigned int)p->f14; /* portamento step */
+                if (dv != 0)
+                {
                     dirty = 1;
                     cur = (unsigned int)p->f1C + dv;
                     p->f1C = (int)cur;
                     tgt = (unsigned int)p->f18;
                     keep = ((int)dv < 0) ? ((int)tgt < (int)cur) : ((int)cur < (int)tgt);
-                    if (!keep) { p->f1C = (int)tgt; p->f14 = 0; }
-                    if (p->f1C < 0) { SNDstop(p->handle); goto next_chan; }
+                    if (!keep)
+                    {
+                        p->f1C = (int)tgt;
+                        p->f14 = 0;
+                    }
+                    if (p->f1C < 0)
+                    {
+                        SNDstop(p->handle);
+                        goto next_chan;
+                    }
                 }
                 /* portamento done -> pitch sweep */
-                if (p->f20 != 0) {
+                if (p->f20 != 0)
+                {
                     dirty = 1;
                     p->f24 = nfs4_mips_addu_s32(p->f24, p->f20);
                 }
                 sw = (unsigned int)p->f28;
-                if (sw == 0) {                                      /* advance to next sweep segment */
+                if (sw == 0)
+                { /* advance to next sweep segment */
                     p->f31 = (unsigned char)(p->f31 + 1);
                     ti = (signed char)p->f31;
-                    if ((int)p->f30 <= (int)ti) { SNDstop(p->handle); goto next_chan; }
+                    if ((int)p->f30 <= (int)ti)
+                    {
+                        SNDstop(p->handle);
+                        goto next_chan;
+                    }
                     tbl = (int *)(p->f40 + ti * 8);
                     sw = (unsigned int)tbl[0];
                     p->f28 = (int)sw;
-                    if ((int)sw < 0) p->f28 = 0x7fffffff;
+                    if ((int)sw < 0)
+                        p->f28 = 0x7fffffff;
                     sw = (unsigned int)p->f28;
                     num = nfs4_mips_subu_s32(nfs4_mips_sll_s32(tbl[1], 16), p->f24);
-                    if (sw == 0) trap(0x1c00);
-                    if (sw == 0xffffffff && num == (int)0x80000000) trap(0x1800);
+                    if (sw == 0)
+                        trap(0x1c00);
+                    if (sw == 0xffffffff && num == (int)0x80000000)
+                        trap(0x1800);
                     p->f20 = num / (int)sw;
                     sw = (unsigned int)p->f28;
                 }
                 p->f28 = nfs4_mips_addu_s32((int)sw, -1);
-                if (dirty) {
+                if (dirty)
+                {
                     iSNDcalcvol(voice);
                     if (p->handle >= 0)
                         iSNDvol(voice, (int)p->vol_l);
                 }
             }
-next_chan:
+        next_chan:
             voice++;
         } while (voice < (int)(unsigned)GUB(0x11));
     }
@@ -167,8 +198,10 @@ extern "C" void iSNDleaveaudio(void)
 {
     GB(0x3f) = GB(0x3f) - 1;
     SNDI_mutexunlock();
-    if (GB(0x3f) == 0) {
-        while (DAT_80147912 != 0) {
+    if (GB(0x3f) == 0)
+    {
+        while (DAT_80147912 != 0)
+        {
             DAT_80147912 = DAT_80147912 - 1;
             iSNDserver();
         }
@@ -188,15 +221,18 @@ extern "C" int iSNDserverremove100hzclient(void (*cb)(void))
 {
     int i = 0;
     int more;
-    if (0 < (int)GB(0x40)) {
-        while (SND->clients100Hz[i] != cb) {                  /* find the callback slot */
+    if (0 < (int)GB(0x40))
+    {
+        while (SND->clients100Hz[i] != cb)
+        { /* find the callback slot */
             i++;
             if (GB(0x40) <= i)
-                return 0;                                     /* retail v0 is failed slt */
+                return 0; /* retail v0 is failed slt */
         }
         GB(0x40) = GB(0x40) - 1;
         more = (i < (int)GB(0x40));
-        while (more) {                                        /* compact the tail down one slot */
+        while (more)
+        { /* compact the tail down one slot */
             SND->clients100Hz[i] = SND->clients100Hz[i + 1];
             more = (i + 1 < (int)GB(0x40));
             i++;
@@ -206,4 +242,7 @@ extern "C" int iSNDserverremove100hzclient(void (*cb)(void))
 }
 
 /* owning-TU def (link-harness) */
-extern "C" { int request; }
+extern "C"
+{
+    int request;
+}

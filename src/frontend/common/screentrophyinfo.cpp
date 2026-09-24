@@ -52,7 +52,7 @@ void tScreenTrophyInfo::DrawBackground()
   int colIdx;
   int tournID;
   int bannerXOff = 0;   /* banner x-offset (stack-passed, lost by decompiler) */
-  RECT r;
+  PSX_RECT r;
   tDrawShapeExtended drawFlags;
   tDrawShapeExtended drawFlags2;
   

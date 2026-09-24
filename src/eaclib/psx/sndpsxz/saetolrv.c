@@ -4,9 +4,9 @@
  *   Ghidra nfs4-f.exe.c (saetolrv) + IDA sig (4-arg; Ghidra dropped out_l/out_r as in_a2/in_a3).
  */
 
-extern "C" void iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r);   /* saelib */
+extern "C" void iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r); /* saelib */
 
-extern "C" int iSNDatolrv(int angle, int level, int *out_l, int *out_r);        /* @0x8010B0A8 */
+extern "C" int iSNDatolrv(int angle, int level, int *out_l, int *out_r); /* @0x8010B0A8 */
 
 /* iSNDatolrv @0x8010B0A8 : compute the panned L/R volumes for `angle`/`level` (via the shared saelib pan
  *   law) then take their magnitudes -- this absolute variant ignores phase. */

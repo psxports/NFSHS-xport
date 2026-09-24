@@ -206,7 +206,7 @@ void tCreditManager::SetupCurrCredit()
     }
   }
   if (((this->StartedLines == 0) && (this->StartedTransition != 0)) &&
-     (pvVar3 = (void *)(intptr_t)screenMain->DoneLoadingBackground(), iVar2 = ticks, pvVar3 != (void *)0x0)
+     (pvVar3 = (void *)(intptr)screenMain->DoneLoadingBackground(), iVar2 = ticks, pvVar3 != (void *)0x0)
      ) {
     this->StartedLines = 1;
     this->fLineTicks = iVar2;
@@ -259,7 +259,7 @@ void tCreditManager::DrawCurrCredit()
   byte isHiddenLine;
   int textColor;
   tDrawShapeExtended drawFlags;
-  RECT r;
+  PSX_RECT r;
   char buffer [292];
   short x;
   short tu1;

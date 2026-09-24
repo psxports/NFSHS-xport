@@ -7,26 +7,24 @@
 #include "../../lib/libfns.h"
 
 /* ---- aistate.obj manual vtable symbols (cross-TU; g++ 2.7.2 _vt_<class>) ---- */
-extern __vtbl_ptr_type AIState_Base_vtable[], AIState_Normal_vtable[], AIState_NonActive_vtable[],
-  AIState_Idle_vtable[], AIState_Chase_vtable[], AIState_Offroad_vtable[], AIState_Purgatory_vtable[],
-  AIState_RovingTraffic_vtable[], AIState_Donuts_vtable[], AIState_GotoSlice_vtable[], AIState_Cruise_vtable[];
+extern __vtbl_ptr_type AIState_Base_vtable[], AIState_Normal_vtable[], AIState_NonActive_vtable[], AIState_Idle_vtable[], AIState_Chase_vtable[], AIState_Offroad_vtable[], AIState_Purgatory_vtable[], AIState_RovingTraffic_vtable[], AIState_Donuts_vtable[], AIState_GotoSlice_vtable[], AIState_Cruise_vtable[];
 
-extern Car_tObj         *Cars_gHumanRaceCarList[9];  /* cars.obj */
-extern Car_tObj      *Cars_gSortedList[];
-extern "C" extern GameSetup_tData   GameSetup_gData;
-extern "C" Sim_tSimGlobalVar  simGlobal;          /* Sim.obj   (.gameTicks) */
-extern Trk_NewSlice  *BWorldSm_slices;
-extern int                 Cars_gNumTrafficCars;
-extern int            Cars_gNumCars;
-extern int            gNumSlices;
-extern "C" extern int       Cars_gNumHumanRaceCars;
-extern int       AI_elapsedTime;
+extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
+extern Car_tObj *Cars_gSortedList[];
+extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
+extern Trk_NewSlice *BWorldSm_slices;
+extern int Cars_gNumTrafficCars;
+extern int Cars_gNumCars;
+extern int gNumSlices;
+extern "C" extern int Cars_gNumHumanRaceCars;
+extern int AI_elapsedTime;
 extern int AITune_LifeTimer[];
-extern int AIWorld_CheckForBarrierBetweenLanes(int slice,int lane0,int lane1);
-extern int Newton_CalculateRoadPositionFromSliceAndPosition(int slice,coorddef *position,matrixtdef *matrix);
-extern u_int               fastRandom, randSeed, randtemp;   /* fastrand.obj PRNG state */
+extern int AIWorld_CheckForBarrierBetweenLanes(int slice, int lane0, int lane1);
+extern int Newton_CalculateRoadPositionFromSliceAndPosition(int slice, coorddef *position, matrixtdef *matrix);
+extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
 extern int AITune_MaxTraffic[2][4];
-extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coorddef *offset,int direction);
+extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n, int slice, coorddef *offset, int direction);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
 int AIWorld_ApxSplineDistance(Car_tObj *a, int slice);
 int AIWorld_ApxSplineDistance(int slice, Car_tObj *b); /* overloaded */
@@ -34,7 +32,10 @@ int AIWorld_SplineDistance(Car_tObj *a, Car_tObj *b);
 int AIWorld_SplineDistance(Car_tObj *a, int slice, coorddef *out); /* overloaded in AIWORLD.obj */
 void AIScript_ProcessActionsAndReactions(AIScript_t *script, int flags);
 void AISpeeds_CalcDesiredSpeed(Car_tObj *carObj);
-extern "C" { void AISpeeds_CalcTrafficTopSpeed(Car_tObj *carObj); }
+extern "C"
+{
+    void AISpeeds_CalcTrafficTopSpeed(Car_tObj *carObj);
+}
 void AI_GenericBeginCycle(Car_tObj *carObj);
 void AI_GenericCycle(Car_tObj *carObj);
 void AI_GenericEndCycle(Car_tObj *carObj);

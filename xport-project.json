@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "name": "Need for Speed: High Stakes",
+  "short_name": "NFSHS",
+  "toolset": "../xport/tools",
+  "paths": {
+    "status": "status",
+    "project_tools": "tools",
+    "analysis_database": "status/analysis.sqlite",
+    "native_executable": "bin/NFSHS.exe",
+    "native_working_directory": "bin",
+    "native_solution": "src/platform/win/NFSHS.sln",
+    "native_build": "_build",
+    "callgraph": "status/callgraph.json",
+    "similarity_directory": "status/similarity",
+    "ida_exports": "orig/images",
+    "ida_configs": "tools/ida",
+    "sdk_classification": "status/ghidra/classification.json"
+  },
+  "duckstation": {
+    "host": "127.0.0.1",
+    "gdb_port": 2410,
+    "reserved_gdb_ports": {
+      "audit": 2408,
+      "trace": 2409,
+      "user": 2410,
+      "migration": 2411
+    },
+    "default_role": "user",
+    "data_directory": "tools/duckstation/data/user",
+    "data_directories": {
+      "audit": "tools/duckstation/data/audit",
+      "trace": "tools/duckstation/data/trace",
+      "user": "tools/duckstation/data/user",
+      "migration": "tools/duckstation/data/migration"
+    }
+  },
+  "capabilities": {
+    "redbook_audio": {
+      "enabled": false,
+      "reason": "Supplied NFSHS CUE contains one MODE2/2352 data track and no Red Book AUDIO tracks; music uses XA-ADPCM inside the data track"
+    },
+    "trace_workflow": {
+      "enabled": false,
+      "reason": "NFSHS trace hooks, capture layout, native continuation ABI and stage adapter are not yet evidence-backed"
+    }
+  },
+  "code_refresh": {
+    "report": "status/code-refresh-latest.json",
+    "log": "status/code-refresh-latest.log",
+    "build": {
+      "solution": "src/platform/win/NFSHS.sln",
+      "configuration": "Debug",
+      "platform": "x86",
+      "process_name": "NFSHS.exe"
+    },
+    "tests": [
+      {
+        "name": "native-smoke",
+        "argv": ["{python}", "-B", "tools/test_native_smoke.py"]
+      }
+    ],
+    "artifacts": []
+  },
+  "pipeline_state": {
+    "original_inputs": "blocked_pending_user_supplied_revision",
+    "ida_exports": "blocked_pending_original_image_audit",
+    "psyq_classification": "blocked_pending_original_image_audit",
+    "trace_profile": "blocked_pending_game_layout_audit",
+    "stage_adapter": "blocked_pending_continuation_abi"
+  }
+}

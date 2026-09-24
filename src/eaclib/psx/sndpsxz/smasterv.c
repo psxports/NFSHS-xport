@@ -5,7 +5,7 @@
  */
 #include "../../../lib/snd.h"
 
-extern "C" int SNDmastervol(int vol);             /* @0x800E7FF0 */
+extern "C" int SNDmastervol(int vol); /* @0x800E7FF0 */
 
 /* SNDmastervol @0x800E7FF0 : store the master volume (sndgs[0xf]._1_1_) and refresh all held voices. */
 extern "C" int SNDmastervol(int vol)
@@ -16,10 +16,13 @@ extern "C" int SNDmastervol(int vol)
     iSNDenteraudio();
     SND->f3D = (signed char)vol;
     chan = 0;
-    if (SND->patchcount != 0) {
-        do {
+    if (SND->patchcount != 0)
+    {
+        do
+        {
             SndVoice *slot = &SND->voices[chan];
-            if (slot->f0B == 1 && -1 < slot->handle) {
+            if (slot->f0B == 1 && -1 < slot->handle)
+            {
                 iSNDcalcvol(chan);
                 iSNDvol(chan, (int)slot->vol_l);
             }

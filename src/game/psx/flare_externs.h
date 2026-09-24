@@ -16,63 +16,74 @@ extern void gte_swc2(int reg, void *ptr);
 extern void nfs4_gte_set_rot_matrix(const void *);
 extern void nfs4_gte_set_trans_matrix(const void *);
 extern void nfs4_gte_set_trans_vector(const void *);
-extern void nfs4_gte_set_trans_xyz(int,int,int);
+extern void nfs4_gte_set_trans_xyz(int, int, int);
 extern void nfs4_gte_load_ir_short(const void *);
 extern void nfs4_gte_store_ir_short(void *);
 extern void nfs4_gte_rtir(void);
-extern "C" void NFSHS_HostTraceFlareEmit(const char *,const void *,int,const void *);
+extern "C" void NFSHS_HostTraceFlareEmit(const char *, const void *, int, const void *);
 extern "C" void NFSHS_HostTraceFlareState(const void *);
-extern "C" void NFSHS_HostTraceFlareHaloEntry(
-    const void *,int,int,const void *,const void *,const void *);
-extern "C" void NFSHS_HostTraceFlareHaloRTPS(const void *,const void *,int,int);
-#define gte_SetRotMatrix(mp)    nfs4_gte_set_rot_matrix(mp)
-#define gte_SetTransMatrix(mp)  nfs4_gte_set_trans_matrix(mp)
-#define gte_SetTransVector(vp)  nfs4_gte_set_trans_vector(vp)
-#define gte_ldsv(p)             nfs4_gte_load_ir_short(p)
-#define gte_stsv(p)             nfs4_gte_store_ir_short(p)
-#define gte_stsxy(p)            gte_swc2(14,(p))
-/* flare_Halo2 performs the MIPS >>2 explicitly in flare.cpp after this raw
+extern "C" void NFSHS_HostTraceFlareHaloEntry(const void *, int, int, const void *, const void *, const void *);
+extern "C" void NFSHS_HostTraceFlareHaloRTPS(const void *, const void *, int, int);
+    #define gte_SetRotMatrix(mp) nfs4_gte_set_rot_matrix(mp)
+    #define gte_SetTransMatrix(mp) nfs4_gte_set_trans_matrix(mp)
+    #define gte_SetTransVector(vp) nfs4_gte_set_trans_vector(vp)
+    #define gte_ldsv(p) nfs4_gte_load_ir_short(p)
+    #define gte_stsv(p) nfs4_gte_store_ir_short(p)
+    #define gte_stsxy(p) gte_swc2(14, (p))
+    /* flare_Halo2 performs the MIPS >>2 explicitly in flare.cpp after this raw
    register store; keeping it here as well would shift SZ3 twice. */
-#define gte_stsz(p)             gte_swc2(19,(p))
-#define gte_rtir(...)       nfs4_gte_rtir()
-#define gte_ldtr(x,y,z)         nfs4_gte_set_trans_xyz((x),(y),(z))
-#define gte_rtps_b(...)     gte_rtps()
+    #define gte_stsz(p) gte_swc2(19, (p))
+    #define gte_rtir(...) nfs4_gte_rtir()
+    #define gte_ldtr(x, y, z) nfs4_gte_set_trans_xyz((x), (y), (z))
+    #define gte_rtps_b(...) gte_rtps()
 #else
-#define gte_SetRotMatrix(mp)    ((void)(mp))  /* ctc2 R -> cop2 ctrl 0..4  (5 ctc2)     */
-#define gte_SetTransMatrix(mp)  ((void)(mp))  /* ctc2 TR -> cop2 ctrl 5..7 (3 ctc2)     */
-#define gte_SetTransVector(vp)  ((void)(vp))
-#define gte_ldsv(p)             ((void)(p))   /* mtc2 short-vector -> IR1..3 (3 mtc2)   */
-#define gte_stsv(p)             ((void)(p))   /* mfc2 IR1..3 -> short-vector (3 mfc2)   */
-#define gte_stsxy(p)            ((void)(p))   /* mfc2 SXY2 -> DVECTOR (screen xy)       */
-#define gte_stsz(p)             ((void)(p))   /* mfc2 SZ3  -> short   (projected depth) */
-#define gte_rtir(...)           ((void)0)   /* RotIR / mvmva (transform IR vector)     */
-#define gte_ldtr(...)           ((void)0)   /* load translation vector to cop2         */
-#define gte_rtps_b(...)         ((void)0)   /* RTPS variant (buffered)                 */
+    #define gte_SetRotMatrix(mp) ((void)(mp))   /* ctc2 R -> cop2 ctrl 0..4  (5 ctc2)     */
+    #define gte_SetTransMatrix(mp) ((void)(mp)) /* ctc2 TR -> cop2 ctrl 5..7 (3 ctc2)     */
+    #define gte_SetTransVector(vp) ((void)(vp))
+    #define gte_ldsv(p) ((void)(p))   /* mtc2 short-vector -> IR1..3 (3 mtc2)   */
+    #define gte_stsv(p) ((void)(p))   /* mfc2 IR1..3 -> short-vector (3 mfc2)   */
+    #define gte_stsxy(p) ((void)(p))  /* mfc2 SXY2 -> DVECTOR (screen xy)       */
+    #define gte_stsz(p) ((void)(p))   /* mfc2 SZ3  -> short   (projected depth) */
+    #define gte_rtir(...) ((void)0)   /* RotIR / mvmva (transform IR vector)     */
+    #define gte_ldtr(...) ((void)0)   /* load translation vector to cop2         */
+    #define gte_rtps_b(...) ((void)0) /* RTPS variant (buffered)                 */
 #endif
-   /* PsyQ libgte RotMatrixZ */
-typedef void (code)(void);
+/* PsyQ libgte RotMatrixZ */
+typedef void(code)(void);
 typedef long long undefined8;
 typedef unsigned long long ulonglong;
-static inline u_int   CONCAT22(u_short hi, u_short lo) { return ((u_int)hi << 16) | lo; }
-static inline u_short CONCAT11(u_char hi, u_char lo)   { return (u_short)(((u_int)hi << 8) | lo); }
-static inline u_short SUB42(u_int v, int n) { return (u_short)(v >> (n * 8)); }
+
+static inline u_int CONCAT22(u_short hi, u_short lo)
+{
+    return ((u_int)hi << 16) | lo;
+}
+
+static inline u_short CONCAT11(u_char hi, u_char lo)
+{
+    return (u_short)(((u_int)hi << 8) | lo);
+}
+
+static inline u_short SUB42(u_int v, int n)
+{
+    return (u_short)(v >> (n * 8));
+}
 
 /* ---- GPU packet cursors + matrices ---- */
-extern "C" char         *&Render_gPacketPtr;
-extern "C" char         *&Render_gPalettePtr;
-extern "C" char         *&Render_gPacketEnd;
-extern matrixtdef    gWorldMat;                 /* 0x8010ee40 (36 B = 9 ints, game matrix) */
+extern "C" char *&Render_gPacketPtr;
+extern "C" char *&Render_gPalettePtr;
+extern "C" char *&Render_gPacketEnd;
+extern matrixtdef gWorldMat; /* 0x8010ee40 (36 B = 9 ints, game matrix) */
 
 /* ---- camera / view / draw ---- */
-extern "C" int           Draw_gViewOtSize;          /* 0x8013d7b0 */
-extern "C" short         DrawC_gReflectOffset;       /* 0x8013d814 */
-extern "C" extern int           R3DCar_InMenu;              /* 0x8013d324 */
-extern long          Camera_gGeomScreen[2];      /* 0x8013c7dc; empty format word at +4 */
+extern "C" int Draw_gViewOtSize;       /* 0x8013d7b0 */
+extern "C" short DrawC_gReflectOffset; /* 0x8013d814 */
+extern "C" extern int R3DCar_InMenu;   /* 0x8013d324 */
+extern long Camera_gGeomScreen[2];     /* 0x8013c7dc; empty format word at +4 */
 
 /* ---- track / setup / sim ---- */
-extern "C" CTrackSpec    TrackSpec_gSpec;            /* 0x8012327c */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;          /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar simGlobal;              /* 0x8011e0ac */
+extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
+extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;                /* 0x8011e0ac */
 
 /* ---- flare geometry + colour tables ---- */
 // [owned->defined in flare.cpp] extern Flare_tInfo      Flare_gType[34];          /* 0x8011ff68 (544 B) flare-type defs (chalo/cbeam/flags/scale) */
@@ -84,7 +95,7 @@ extern "C" Sim_tSimGlobalVar simGlobal;              /* 0x8011e0ac */
 // [owned->defined in flare.cpp] extern SVECTOR          Flare_gHex[6];             /* 0x8011fee8 (48 B) */
 // [owned->defined in flare.cpp] extern SVECTOR          Flare_gReflectHex[6];      /* 0x8011ff18 (48 B) */
 // [owned->defined in flare.cpp] extern SVECTOR          Flare_gQuad[4];            /* 0x8011ff48 (32 B) */
-extern Draw_tPixMap    *gFlarePixmap[3];          /* 0x80112b88 */
+extern Draw_tPixMap *gFlarePixmap[3]; /* 0x80112b88 */
 // [owned->defined in flare.cpp] extern CVECTOR          gfrgb;                    /* 0x8013d86c (halo colour scratch)  */
 // [owned->defined in flare.cpp] extern CVECTOR          gfrgb2;                   /* 0x8013d870 (beam colour scratch)  */
 // [owned->defined in flare.cpp] extern int              gscale;                   /* 0x8013d874 */

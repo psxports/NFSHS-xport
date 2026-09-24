@@ -7,20 +7,15 @@
  *   IS that code.  SNDPSXZ is therefore code-complete (sdasync needs no separate .cpp).
  */
 #include "../../../nfs4_types.h"
-
-extern "C" int sndgs[];
-extern "C" int iSNDvalidbank(int bankId);                       /* sbvalid */
-extern "C" int iSNDremovetaggedpatch(unsigned char *bank, int *patch); /* stagpat */
-
-extern "C" int iSNDbankremovepat(int bank, int patch_idx, int *scratch);   /* @0x800FE5B4 */
+#include "../../../lib/snd.h"
 
 /* iSNDbankremovepat @0x800FE5B4 : free patch `patch_idx` of bank `bank` (its tagged SPU data), clearing the
  *   patch pointer (+0x14 for bank type 4, else +0xc).  Returns 0 / -8. */
-extern "C" int iSNDbankremovepat(int bank, int patch_idx, int *scratch)
+int iSNDbankremovepat(int bank, int patch_idx, int *scratch)
 {
     int data = *(int *)(bank * 0xc + sndgs[0x26]);
     int base = (*(char *)(data + 4) == 4) ? data : 0;
-    intptr_t pp;
+    intptr pp;
 
     if (iSNDvalidbank(bank) != 0)
         return -8;

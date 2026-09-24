@@ -7,7 +7,7 @@
 #include "../../mips_semantics.h"
 #include "hrzsku_externs.h"
 #ifdef AP_WIN
-extern "C" void NFSHS_HostAddPrim(void *,void *);
+extern "C" void AddPrim(void *,void *);
 extern "C" void NFSHS_HostTraceSkyProjection(void *);
 extern "C" void NFSHS_HostTraceHorizonCache(void *);
 #endif
@@ -511,7 +511,7 @@ void Hrz_TextureQuad(DVECTOR *pt,char type,char bright,Draw_DCache *sd)
   prim = (POLY_FT4 *)Render_gPacketPtr;
   prev_pkt = (u_char *)Render_gPalettePtr;
 #ifdef AP_WIN
-  NFSHS_HostAddPrim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
 #else
   *(u_int *)Render_gPacketPtr =
@@ -722,7 +722,7 @@ void Hrz_SetDitheringPrim(int dither,int otz)
   p = (u_char *)Render_gPacketPtr;
   prev_pkt_slot = (u_int *)(Render_gPalettePtr + otz * 4);
 #ifdef AP_WIN
-  NFSHS_HostAddPrim(prev_pkt_slot,Render_gPacketPtr);
+  AddPrim(prev_pkt_slot,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
 #else
   *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *prev_pkt_slot & 0xffffff;
@@ -730,7 +730,7 @@ void Hrz_SetDitheringPrim(int dither,int otz)
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *prev_pkt_slot = *prev_pkt_slot & 0xff000000 | pkt_addr24;
 #endif
-  SetDrawMode((DR_MODE *)p,0,dither,0x100,(RECT *)0x0);
+  SetDrawMode((DR_MODE *)p,0,dither,0x100,(PSX_RECT *)0x0);
   return;
 }
 
@@ -882,7 +882,7 @@ void Hrz_BuildSky(void)
               pmx = gHorizonPixmap[*skyMesh_iter];
               if (pmx == (Draw_tPixMap *)0x0) goto HrzBuildSky_meshIterNext;
 #ifdef AP_WIN
-              NFSHS_HostAddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
+              AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                                 Render_gPacketPtr);
 #else
               *(u_int *)Render_gPacketPtr =
@@ -911,7 +911,7 @@ void Hrz_BuildSky(void)
             pmx = gHorizonPixmap[*skyMesh_iter];
             if (pmx == (Draw_tPixMap *)0x0) goto HrzBuildSky_meshIterNext;
 #ifdef AP_WIN
-            NFSHS_HostAddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
+            AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                               Render_gPacketPtr);
             Render_gPacketPtr = Render_gPacketPtr + 0x28;
 #else
@@ -932,7 +932,7 @@ void Hrz_BuildSky(void)
           }
           else {
 #ifdef AP_WIN
-            NFSHS_HostAddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
+            AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                               Render_gPacketPtr);
 #else
             *(u_int *)Render_gPacketPtr =
@@ -1015,7 +1015,7 @@ void Sky_RenderStars(Draw_SkyCache *sd,int otz)
           prim = (TILE_1 *)Render_gPacketPtr;
           puVar5 = (u_int *)(Render_gPalettePtr + otz * 4);
 #ifdef AP_WIN
-          NFSHS_HostAddPrim(puVar5,packetWords);
+          AddPrim(puVar5,packetWords);
           Render_gPacketPtr = Render_gPacketPtr + sizeof(TILE_1);
 #else
           *packetWords = *packetWords & uVar8 | *puVar5 & uVar7;
@@ -1218,7 +1218,7 @@ void Hrz_BuildHorizon(DRender_tView *Vi)
           pmx = gpPmx[iVar17];
           if (Hrz_gTrackSpec->ringPMX[iVar17] != '\x10') {
 #ifdef AP_WIN
-            NFSHS_HostAddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
+            AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                               Render_gPacketPtr);
 #else
             *(u_int *)Render_gPacketPtr =

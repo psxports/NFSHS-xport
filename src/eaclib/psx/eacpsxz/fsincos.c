@@ -5,9 +5,9 @@
  *   intsincos base call):  *psin = s + (c>>2)*P >> 21 ,  *pcos = c - (s>>2)*P >> 21
  *   where (s,c) = intsincos(angle>>6) and P = the 6-bit fractional weight (angle & 0x3F).  16.16.
  */
-extern "C" void intsincos(int angle, int *psin, int *pcos);   /* isincos @0x800EADBC */
+extern "C" void intsincos(int angle, int *psin, int *pcos); /* isincos @0x800EADBC */
 
-static int spch_poly(int f)          /* same weight polynomial as fixdsin */
+static int spch_poly(int f) /* same weight polynomial as fixdsin */
 {
     unsigned int v1 = ((unsigned int)f << 1) + (unsigned int)f;
     v1 = v1 + (v1 << 6);
@@ -18,7 +18,7 @@ static int spch_poly(int f)          /* same weight polynomial as fixdsin */
     return (int)(v1 >> 9);
 }
 
-extern "C" void fixedsincos(int angle, int *psin, int *pcos)   /* @0x800F3670 */
+extern "C" void fixedsincos(int angle, int *psin, int *pcos) /* @0x800F3670 */
 {
     int s, c;
     intsincos(angle >> 6, &s, &c);

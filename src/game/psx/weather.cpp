@@ -1007,13 +1007,13 @@ void Weather_DoWeather(DRender_tView *Vi)
     /* tail: link a DR_MODE primitive into the OT to reset the texture page */
     prim = (DR_MODE *)Render_gPacketPtr;
 #ifdef AP_WIN
-    NFSHS_HostAddPrim(Render_gPalettePtr,prim);
+    AddPrim(Render_gPalettePtr,prim);
 #else
     *(u_int *)prim = *(u_int *)prim & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
     *(u_int *)Render_gPalettePtr = *(u_int *)Render_gPalettePtr & 0xff000000 | (u_int)prim & 0xffffff;
 #endif
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
-    SetDrawMode(prim,0,0,0x20,(RECT *)0x0);
+    SetDrawMode(prim,0,0,0x20,(PSX_RECT *)0x0);
   }
 }
 

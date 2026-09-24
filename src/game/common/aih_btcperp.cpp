@@ -8,6 +8,7 @@
 #include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aih_btcperp_externs.h"
+#include "new.h"
 
 extern int AI_elapsedTime;   /* H21: ai.cpp @0x8013C554 (not in this TU's externs) */
 
@@ -1488,7 +1489,7 @@ switchD_8006094c_default:
 
   case 0:
 
-    pAVar3 = (AIState_Base *)operator new(8);
+    pAVar3 = (AIState_Base *)__builtin_new(8);
 
     pCVar6 = (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_;
 
@@ -1576,7 +1577,7 @@ switchD_8006094c_default:
 
     else if (this->perpMode_ == 2) {
 
-      this_00 = (AIState_Normal *)operator new(8);
+      this_00 = (AIState_Normal *)__builtin_new(8);
 
       pAVar3 = &(new(this_00) AIState_Normal((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -1924,7 +1925,7 @@ void AIHigh_BTC_AIPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
 
   if (bVar3) {
 
-    this_00 = (AIState_Normal *)operator new(8);
+    this_00 = (AIState_Normal *)__builtin_new(8);
 
     pAVar4 = &(new(this_00) AIState_Normal((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -1946,7 +1947,7 @@ void AIHigh_BTC_AIPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
 
   else {
 
-    pAVar5 = (AIState_Cruise *)operator new(0x14);
+    pAVar5 = (AIState_Cruise *)__builtin_new(0x14);
 
     pAVar5 = (new(pAVar5) AIState_Cruise((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_,(cruiseMode_t)1,0x8000
 

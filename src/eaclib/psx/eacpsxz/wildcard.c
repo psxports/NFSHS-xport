@@ -19,24 +19,25 @@
  *       else -> case-insensitive literal (libc tolower); success as soon as pat is exhausted.
  */
 #ifndef _MSC_VER
-#ifndef _MSC_VER
-#ifndef _MSC_VER
+    #ifndef _MSC_VER
+        #ifndef _MSC_VER
 extern "C" char *strrchr(const char *s, int c);
-#endif
-#endif
-#endif   /* libc C31.obj, BIOS A0:0x1F */
-extern "C" int   tolower(int c);                   /* libc C38.obj, BIOS A0:0x26 */
+        #endif
+    #endif
+#endif                         /* libc C31.obj, BIOS A0:0x1F */
+extern "C" int tolower(int c); /* libc C38.obj, BIOS A0:0x26 */
 
-extern "C" char *strrstr (char *s, char *set);    /* @0x800E8940 */
-extern "C" int   wildcard(char *text, char *pat); /* @0x800E89BC */
+extern "C" char *strrstr(char *s, char *set);   /* @0x800E8940 */
+extern "C" int wildcard(char *text, char *pat); /* @0x800E89BC */
 
 /* strrstr @0x800E8940 : rightmost position in `s` of any char of `set` (0 if none). */
 extern "C" char *strrstr(char *s, char *set)
 {
     char *best = 0;
-    for (; *set; set++) {
-        char *p = strrchr(s, *set);     /* libc strrchr, BIOS A0:0x1F */
-        if (best < p)                    /* keep the rightmost (max) hit */
+    for (; *set; set++)
+    {
+        char *p = strrchr(s, *set); /* libc strrchr, BIOS A0:0x1F */
+        if (best < p)               /* keep the rightmost (max) hit */
             best = p;
     }
     return best;
@@ -45,54 +46,74 @@ extern "C" char *strrstr(char *s, char *set)
 /* wildcard @0x800E89BC : boolean+glob pattern match, 1 == match. */
 extern "C" int wildcard(char *text, char *pat)
 {
-    static const char kOps[] = "&|!~^";   /* @0x8013DC48 (wildcard.obj-local rodata) */
+    static const char kOps[] = "&|!~^"; /* @0x8013DC48 (wildcard.obj-local rodata) */
     char *op = strrstr(pat, (char *)kOps);
 
-    if (op) {                              /* split at the rightmost operator */
+    if (op)
+    { /* split at the rightmost operator */
         char ch = *op;
-        int  r;
-        *op = 0;                           /* NUL it so each half is a standalone pattern */
-        if (ch == '&') {                   /* AND */
+        int r;
+        *op = 0; /* NUL it so each half is a standalone pattern */
+        if (ch == '&')
+        { /* AND */
             r = wildcard(text, pat) ? (wildcard(text, op + 1) > 0) : 0;
-        } else if (ch == '^') {            /* XOR */
+        }
+        else if (ch == '^')
+        { /* XOR */
             int l = wildcard(text, pat);
             r = l ^ wildcard(text, op + 1);
-        } else {                           /* '|','!','~' all == OR */
+        }
+        else
+        { /* '|','!','~' all == OR */
             r = (wildcard(text, pat) != 0 || wildcard(text, op + 1) != 0) ? 1 : 0;
         }
-        *op = ch;                          /* restore the operator char */
+        *op = ch; /* restore the operator char */
         return r;
     }
 
     /* no operator -> leaf glob match, anchored at the start of `text` */
-    for (;;) {
+    for (;;)
+    {
         char pc = *pat;
-        if (pc == '*') {                   /* glob: try the rest at each text position */
+        if (pc == '*')
+        { /* glob: try the rest at each text position */
             pat++;
-            for (;;) {
+            for (;;)
+            {
                 if (wildcard(text, pat))
                     return 1;
                 if (*text == 0)
                     return 0;
                 text++;
             }
-        } else if (pc == '?') {            /* any one non-NUL char */
+        }
+        else if (pc == '?')
+        { /* any one non-NUL char */
             if (*text == 0)
                 return 0;
-            text++; pat++;
-        } else if (pc == '#') {            /* any one digit (ctype &4) */
+            text++;
+            pat++;
+        }
+        else if (pc == '#')
+        { /* any one digit (ctype &4) */
             char tc = *text;
             if (!(tc >= '0' && tc <= '9'))
                 return 0;
-            text++; pat++;
-        } else if (pc == '~') {            /* NOT the rest */
+            text++;
+            pat++;
+        }
+        else if (pc == '~')
+        { /* NOT the rest */
             return wildcard(text, pat + 1) < 1;
-        } else {                           /* case-insensitive literal compare */
+        }
+        else
+        { /* case-insensitive literal compare */
             if ((tolower(pc) & 0xFF) != (tolower(*text) & 0xFF))
                 return 0;
-            if (*pat == 0)                 /* pattern exhausted -> match */
+            if (*pat == 0) /* pattern exhausted -> match */
                 return 1;
-            pat++; text++;
+            pat++;
+            text++;
         }
     }
 }

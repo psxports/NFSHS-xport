@@ -6,34 +6,35 @@
  *   then hand off to loadpackadr.  Ghidra nfs4-f.exe.c (loadshapeadr) + disasm-v3 (the strcat's dropped 2nd
  *   arg = `*(int*)&shapeext`; IDA sig (int a1, int a2)) + IDA sig.  Plain C -> extern "C".
  */
-extern "C" char *strcpy(char *dst, const char *src);   /* syslib C25 */
+extern "C" char *strcpy(char *dst, const char *src); /* syslib C25 */
 #ifndef _MSC_VER
-extern "C" int   strlen(const char *s);                /* syslib C27 */
+extern "C" int strlen(const char *s); /* syslib C27 */
 #endif
-extern "C" char *strcat(char *dst, const char *src);   /* syslib C21 */
-extern "C" int   loadpackadr(char *name, void *arg2);  /* nloadpk @0x800E5D5C */
-extern "C" char *shapeext;                             /* default shape-file extension string ptr */
+extern "C" char *strcat(char *dst, const char *src); /* syslib C21 */
+extern "C" int loadpackadr(char *name, void *arg2);  /* nloadpk @0x800E5D5C */
+extern "C" char *shapeext;                           /* default shape-file extension string ptr */
 
-extern "C" int loadshapeadr(char *filename, void *arg2);   /* @0x800F1C3C */
+extern "C" int loadshapeadr(char *filename, void *arg2); /* @0x800F1C3C */
 
 /* loadshapeadr @0x800F1C3C : load shape `filename` (default-extending it), returns loadpackadr's result. */
 extern "C" int loadshapeadr(char *filename, void *arg2)
 {
-    char  buf[128];
+    char buf[128];
     char *p;
-    int   len;
+    int len;
 
     strcpy(buf, filename);
     len = strlen(buf);
-    for (p = buf + len - 1; buf < p; p = p - 1) {
+    for (p = buf + len - 1; buf < p; p = p - 1)
+    {
         char c = *p;
         if (c == '.')
-            goto done;                              /* already has an extension */
+            goto done; /* already has an extension */
         if ((c == ':') || (c == '/') || (c == '\\'))
-            break;                                  /* hit a path separator first */
+            break; /* hit a path separator first */
     }
     if (*p != '.')
-        strcat(buf, shapeext);                      /* append the default extension */
+        strcat(buf, shapeext); /* append the default extension */
 done:
     return loadpackadr(buf, arg2);
 }

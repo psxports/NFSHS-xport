@@ -4,6 +4,4 @@
 #define _GAME_COMMON_CAMERA_EXTERNS_H_
 #include "../../nfs4_types.h"
 
-
-
 #endif /* _GAME_COMMON_CAMERA_EXTERNS_H_ */

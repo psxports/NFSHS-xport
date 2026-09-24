@@ -3,8 +3,8 @@
 #define _GAME_COMMON_CLOCK_H_
 #include "../../nfs4_types.h"
 
-void Clock_MasterInterruptHandler__Fv(void);   /* :115 */
-void Clock_SystemStartUp__Fv(void);   /* :157 */
-void Clock_SystemCleanUp__Fv(void);   /* :182 */
+void Clock_MasterInterruptHandler__Fv(void); /* :115 */
+void Clock_SystemStartUp__Fv(void);          /* :157 */
+void Clock_SystemCleanUp__Fv(void);          /* :182 */
 
 #endif /* _GAME_COMMON_CLOCK_H_ */

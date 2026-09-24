@@ -39,36 +39,36 @@
 // [owned->defined in night.cpp] extern char           Night_gCopCountryLightTbl[][5][2]; /* 0x80120d18 */
 
 /* ---- engine globals ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;          /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar simGlobal;              /* 0x8011e0ac */
-extern "C" CTrackSpec     TrackSpec_gSpec;           /* 0x8012327c */
-extern camera_info    Camera_gInfo[];            /* 0x8010f2ac */
-extern "C" extern char          *Paths_Paths[];             /* 0x80116468 */
-extern "C" tCompRGB      *Chunk_lightTable;          /* 0x8013c818 */
-extern "C" int            Chunk_numLight;            /* 0x8013d4ec */
-extern "C" u_char        *&Render_gPalettePtr;        /* scratch the table-cache aliases */
+extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;                /* 0x8011e0ac */
+extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
+extern camera_info Camera_gInfo[];                     /* 0x8010f2ac */
+extern "C" extern char *Paths_Paths[];                 /* 0x80116468 */
+extern "C" tCompRGB *Chunk_lightTable;                 /* 0x8013c818 */
+extern "C" int Chunk_numLight;                         /* 0x8013d4ec */
+extern "C" u_char *&Render_gPalettePtr;                /* scratch the table-cache aliases */
 
 /* ---- eaclib / syslib / sibling-module helpers ---- */
-extern void  AudioCmn_PlayThunder(int intensity, int azimuth);
-extern void  Hrz_LightningFlicker(int on);
-extern void  Hrz_SetLightingPosInSky(DRender_tView *Vi);
-extern void  Hrz_CalculateLightning(void);
+extern void AudioCmn_PlayThunder(int intensity, int azimuth);
+extern void Hrz_LightningFlicker(int on);
+extern void Hrz_SetLightingPosInSky(DRender_tView *Vi);
+extern void Hrz_CalculateLightning(void);
 extern void *BWorldSm_TunnelFlagSm(BWorldSm_Pos *pos);
-extern int   Camera_GetMode(int player);
+extern int Camera_GetMode(int player);
 
 /* ---- this module (forward decls for intra-TU calls) ---- */
-extern int   Night_FindClosestColor(CVECTOR colorMatch, int *bestIndex);
-extern void  Night_CreateNightTableElement(int colorIndex, long colorH, int bright, u_char *colorval);
-extern void  Night_CreateNightTable(int colorIndex, long colorH, int bright, u_char (*tbl)[256][16]);
-extern void  Night_GenerateNextLightningEvent(void);
-extern void  Night_PauseLightningEffect(int player);
-extern void  Night_DoLightningEffect(DRender_tView *Vi);
-extern void  Night_SetPlayerHeadLightColor(int player, int colorIndex, int bright);
-extern void  Night_SetCopLightColors(int colorIndex, int brighten);
-extern void  Night_SetWeatherColors(int colorIndex);
-extern void  Night_InitPlayerHeadLightColor(int player);
-extern void  Night_InitCopLightColors(void);
-extern void  Night_InitWeatherTables(void);
-extern void  Night_GenerateAllLightTables(void);
+extern int Night_FindClosestColor(CVECTOR colorMatch, int *bestIndex);
+extern void Night_CreateNightTableElement(int colorIndex, long colorH, int bright, u_char *colorval);
+extern void Night_CreateNightTable(int colorIndex, long colorH, int bright, u_char (*tbl)[256][16]);
+extern void Night_GenerateNextLightningEvent(void);
+extern void Night_PauseLightningEffect(int player);
+extern void Night_DoLightningEffect(DRender_tView *Vi);
+extern void Night_SetPlayerHeadLightColor(int player, int colorIndex, int bright);
+extern void Night_SetCopLightColors(int colorIndex, int brighten);
+extern void Night_SetWeatherColors(int colorIndex);
+extern void Night_InitPlayerHeadLightColor(int player);
+extern void Night_InitCopLightColors(void);
+extern void Night_InitWeatherTables(void);
+extern void Night_GenerateAllLightTables(void);
 
 #endif

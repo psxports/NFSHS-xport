@@ -221,7 +221,7 @@ void MenuExtended_GoToTwoPlayerSingleRace(tMenuCommand *command)
   short sVar3;
   tDialogYesNoTri *dlgThis;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogYesNoTri)];
   } YesNoDialogStorage;
   
@@ -332,7 +332,7 @@ int AskTheUserToSaveTheGame(void)
   tDialogMessageString *dlgThis;
   tDialogYesNo YesNoDialog;
   
-  is_cheater = (void *)(intptr_t)FECheat_IsTheUserACryBabyCheater();
+  is_cheater = (void *)(intptr)FECheat_IsTheUserACryBabyCheater();
   answer = 0;
   if (is_cheater != (void *)0x1) {
     tDialogYesNo_ctor(&YesNoDialog);
@@ -639,7 +639,7 @@ void * GenericMenuSaveGame(int showdialog)
       Init_Memcard(true,0);
     }
   }
-  pvVar5 = (void *)(intptr_t)SaveGame(0);
+  pvVar5 = (void *)(intptr)SaveGame(0);
   screenMemcard->message = -1;
   if (successful) {
     DeInit_Memcard();
@@ -667,7 +667,7 @@ void * PinkSlipsPreSave(void)
   void *pvVar3;
   tDialogYesNoTri YesNoDialog;
   
-  pvVar2 = (void *)(intptr_t)FECheat_IsTheUserACryBabyCheater();
+  pvVar2 = (void *)(intptr)FECheat_IsTheUserACryBabyCheater();
   pvVar3 = (void *)0x1;
   if (pvVar2 == (void *)0x1) {
     pvVar3 = (void *)0x1;
@@ -913,7 +913,7 @@ void MenuExtended_GoToTournTrackInfo(tMenuCommand *command)
   tTourneyInfo *tourn;
   tDialogYesNo *popUp;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogYesNo)];
   } popUpStorage;
   
@@ -980,7 +980,7 @@ void MenuExtended_GoToSpecialEventTrackInfo(tMenuCommand *command)
   tTourneyInfo *tourn;
   tDialogYesNo *popUp;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogYesNo)];
   } popUpStorage;
   
@@ -1217,7 +1217,7 @@ void MenuExtended_SellCar(tMenuCommand *command)
   tDialogMessageString *dlgThis;
   tDialogYesNo *popUp;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogYesNo)];
   } popUpStorage;
   
@@ -1345,7 +1345,7 @@ void MenuExtended_PurchaseUpgrade(int upgradeNumber)
   tCarInfo carInfo;
   tDialogYesNo *popUp;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogYesNo)];
   } popUpStorage;
   
@@ -1610,7 +1610,7 @@ void * MenuExtended_DidUserWinBeTheCop(void)
   if ((((carInfo.fCarClass == '\a') && (pvVar1 = (void *)0x0, frontEnd.raceType == '\x01')) &&
       (pvVar1 = (void *)0x0, frontEnd.gameMode != '\x01')) &&
      (GameSetup_gData.numPerps < GameSetup_gData.finalPerpArrests)) {
-    cop_car = (tCarInfo *)(intptr_t)GetCarFromID(&carManager, (short)gCarActivation[carInfo.fCarID + -0x16]
+    cop_car = (tCarInfo *)(intptr)GetCarFromID(&carManager, (short)gCarActivation[carInfo.fCarID + -0x16]
                                 [frontEnd.carCountry[0][carInfo.fCarID]]);
     pvVar1 = (void *)0x0;
     if (cop_car->fAvailable == '\0') {
@@ -1699,7 +1699,7 @@ void MenuExtended_FinishedPlayer1GetName(tMenuCommand *command)
   command->type = kMenu_Command_GoToMenuOneWay;
   ptVar2 = menuDefs;
   if ((ptVar1->needName[1] == 0) || (ptVar1->gotName[1] != 0)) {
-    pvVar5 = (void *)(intptr_t)StatChk_IsRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,&nBestCarIndex);
+    pvVar5 = (void *)(intptr)StatChk_IsRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,&nBestCarIndex);
     if (pvVar5 != (void *)0x0) {
       StatChk_SaveRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,nBestCarIndex);
     }
@@ -1741,7 +1741,7 @@ void MenuExtended_FinishedPlayer2GetName(tMenuCommand *command)
   Car_tStats *dummyCars;
   short nBestCarIndex;
   
-  pvVar3 = (void *)(intptr_t)StatChk_IsRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,&nBestCarIndex);
+  pvVar3 = (void *)(intptr)StatChk_IsRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,&nBestCarIndex);
   if (pvVar3 != (void *)0x0) {
     StatChk_SaveRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,nBestCarIndex);
   }
@@ -1821,7 +1821,7 @@ void MenuExtended_AwardPinkSlipsCar(tMenuCommand *command)
   tCarInfo carInfo;
   tDialogYesNo *retryCancelDialog;
   union {
-    intptr_t align;
+    intptr align;
     byte bytes[sizeof(tDialogYesNo)];
   } retryCancelDialogStorage;
   

@@ -3,7 +3,7 @@
  *   Member-fn decls in nfs4_types.h (non-virtual, ABI-neutral). Bodies: Ghidra decompiler.
  *   TREATMENT: decl lines SLD/8c-verified (28/28); body locals = SYM REG/AUTO/STAT names where
  *   present, semantic temps otherwise; [SYM] tags in comments. Some Scale/DrawShapeExtended args
- *   + a few RECT/fade locals were not recovered by the decompiler (noted inline).
+ *   + a few PSX_RECT/fade locals were not recovered by the decompiler (noted inline).
  */
 #include "screencongrats.h"
 #include "../../mips_semantics.h"
@@ -442,7 +442,7 @@ void tScreenPinkSlipCongrats::DrawCongratsMessage()
   char *word;
   char *name2;
   int otherPlayer;
-  RECT r = {0x29,0x3c,0x1a4,0xc8};
+  PSX_RECT r = {0x29,0x3c,0x1a4,0xc8};
   char buffer [250];
   
   if ((byte)frontEnd.language - 2 < 2) {
@@ -589,7 +589,7 @@ void tScreenTournamentTrophy::DrawCongratsMessage()
   tTourneyInfo *tourneyInfo;
   int firstmessage;
   int secondmessage;
-  RECT r;
+  PSX_RECT r;
   tAwardInformation tInfo;
   char buffer1 [500];
   char buffer2 [500];
@@ -804,7 +804,7 @@ void tScreenBeTheCopCongrats::DrawCongratsMessage()
   char *fmt;
   char *copWord;
   int wordnum;
-  RECT r = {0x29,0x3c,0xc8,0xc8};
+  PSX_RECT r = {0x29,0x3c,0xc8,0xc8};
   char buffer [250];
   
   wordnum = 0x4c;
@@ -870,7 +870,7 @@ void tScreenTournamentCongrats::DrawCongratsMessage()
 
 {
   char *word;
-  RECT r = {0x29,0x3c,0xc8,0x190};
+  PSX_RECT r = {0x29,0x3c,0xc8,0x190};
   tAwardInformation tInfo;
   char buffer [256];
   char money [64];

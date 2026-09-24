@@ -7,12 +7,12 @@
  */
 
 extern "C" int sndgs[];
-extern "C" int iSNDplatformfxinit(int bus, int mode);            /* sdfx     */
-extern "C" int iSNDplatformfxmasterlevel(int bus, int level);    /* sfxlevel */
-extern "C" int SNDfxlevel(int chanTag, int bus, int level);      /* sfxlevel */
+extern "C" int iSNDplatformfxinit(int bus, int mode);         /* sdfx     */
+extern "C" int iSNDplatformfxmasterlevel(int bus, int level); /* sfxlevel */
+extern "C" int SNDfxlevel(int chanTag, int bus, int level);   /* sfxlevel */
 
-extern "C" int SNDfxmasterlevel(int bus, int level);   /* @0x800E6DD0 */
-extern "C" int SNDfxinitbus(int bus, int mode, int arg2, int arg3, int arg4);  /* @0x800E6D58 */
+extern "C" int SNDfxmasterlevel(int bus, int level);                          /* @0x800E6DD0 */
+extern "C" int SNDfxinitbus(int bus, int mode, int arg2, int arg3, int arg4); /* @0x800E6D58 */
 
 /* SNDfxinitbus @0x800E6D58 : initialise effect bus `bus` (mode + depth params), then set its master level. */
 extern "C" int SNDfxinitbus(int bus, int mode, int arg2, int arg3, int arg4)
@@ -32,14 +32,16 @@ extern "C" int SNDfxmasterlevel(int bus, int level)
     int r, i, off;
     sndgs[bus * 4 + 0x28] = level;
     r = iSNDplatformfxmasterlevel(bus, level);
-    if (-1 < r && (r = 0, (char)sndgs[0xf] != 0)) {
+    if (-1 < r && (r = 0, (char)sndgs[0xf] != 0))
+    {
         i = 0;
-        if (((unsigned char *)sndgs)[0x11] != 0) {
+        if (((unsigned char *)sndgs)[0x11] != 0)
+        {
             off = 0;
-            do {
+            do
+            {
                 i++;
-                SNDfxlevel(*(int *)(off + sndgs[0x25]), bus,
-                           (int)(char)*(char *)(off + sndgs[0x25] + bus + 0x35));
+                SNDfxlevel(*(int *)(off + sndgs[0x25]), bus, (int)(char)*(char *)(off + sndgs[0x25] + bus + 0x35));
                 off += 100;
             } while (i < (int)(unsigned)((unsigned char *)sndgs)[0x11]);
         }

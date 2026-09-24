@@ -9,7 +9,7 @@ extern "C" {
 
 /* ---- Stage 1: 34 BSS-zero (.bss/.sbss/front.bss) ---- */
 int gDataRate;                                             /* @80148434 4B */
-intptr_t gEventDats[4];                                    /* PSX @80148048: four pointer words */
+intptr gEventDats[4];                                    /* PSX @80148048: four pointer words */
 int gFilterSetting;                                        /* @8014842c 4B */
 int gGameNum;                                              /* @80148428 4B */
 unsigned short gLastSubTick;                               /* @80148430 2B */
@@ -61,11 +61,11 @@ int sndmm;                                                 /* @80148780 */
 unsigned char sndpd;                                       /* @80147918 */
 #endif
 int sndpp;                                                 /* @80148578 4B */
-intptr_t sndpps[1];                                        /* @80148574 pointer slot */
+intptr sndpps[1];                                        /* @80148574 pointer slot */
 #ifdef AP_WIN
 unsigned char NFSHS_snd_stream_registry_storage[8];        /* sndss @+0, sndStreamMap @+4 */
 #else
-intptr_t sndss[1];                                         /* @8013ea80 pointer slot */
+intptr sndss[1];                                         /* @8013ea80 pointer slot */
 signed char sndStreamMap[4];                               /* @8013ea84 4B */
 #endif
 int timerevent;                                            /* @8013dec4 4B */

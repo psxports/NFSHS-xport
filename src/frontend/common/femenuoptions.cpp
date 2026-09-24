@@ -125,7 +125,7 @@ void SubtractiveBox(int x,int y,int w,int h,int col1,int col2,int col3,int col4)
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *(u_int *)prev_pkt = *(u_int *)prev_pkt & 0xff000000 | pkt_addr24_drm;
   tpage = GetTPage(2,2,0,0x100);
-  SetDrawMode(dr_mode,0,0,(u_int)tpage,(RECT *)0x0);
+  SetDrawMode(dr_mode,0,0,(u_int)tpage,(PSX_RECT *)0x0);
   return;
 }
 
@@ -1017,8 +1017,8 @@ void tMenuItemSlidingMenu::Draw(int offx,int offy,bool selected)
   int yy;
   tTexture_ShapeInfo *shapetop;
   int ww;
-  RECT full;
-  RECT temp;
+  PSX_RECT full;
+  PSX_RECT temp;
   tDrawShapeExtended drawFlags;
   int width;
   int gray;
@@ -1318,7 +1318,7 @@ void tMenuItemSlidingActivated::ProcessInput(tPlayer fromPlayer,tInputKeyType &k
       AudioMus_SysCleanUp();
       AudioMus_SysStartUp(0xc000,0x18000,"ymus");
       AudioMus_PlaySong("game*");
-      pAVar1 = (AudioMus_tSongList *)(intptr_t)AudioMus_GetSongList("*",0);
+      pAVar1 = (AudioMus_tSongList *)(intptr)AudioMus_GetSongList("*",0);
       screenAudio->songlist = pAVar1;
     }
   }
@@ -2381,9 +2381,9 @@ void * CheckForCheats(char *fData)
   for (len = strlen(fData); (int)len < 8; len = len + 1) {
     fData[len] = '\0';
   }
-  pvVar2 = (void *)(intptr_t)FECheat_ActivateCheat(fData);
+  pvVar2 = (void *)(intptr)FECheat_ActivateCheat(fData);
   if ((pvVar2 == (void *)0x0) &&
-     (pvVar2 = (void *)(intptr_t)FECheat_ActivateBonusByCode(fData), pvVar2 == (void *)0x0)) {
+     (pvVar2 = (void *)(intptr)FECheat_ActivateBonusByCode(fData), pvVar2 == (void *)0x0)) {
     return (void *)0x0;
   }
   return (void *)0x1;

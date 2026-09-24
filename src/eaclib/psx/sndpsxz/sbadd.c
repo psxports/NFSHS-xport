@@ -9,25 +9,25 @@
 #include "../../../nfs4_types.h"
 
 extern "C" int sndgs[];
-extern "C" int  iSNDbankalloc(void);                  /* sballoc */
-extern "C" void SNDbankremove(void);                  /* sbremove (the @0x80147860[0x1f] exit hook) */
-extern "C" int  iSNDdownloadbank(intptr_t bankData, intptr_t bankData2);   /* sbdload */
+extern "C" int iSNDbankalloc(void);                                 /* sballoc */
+extern "C" void SNDbankremove(void);                                /* sbremove (the @0x80147860[0x1f] exit hook) */
+extern "C" int iSNDdownloadbank(intptr bankData, intptr bankData2); /* sbdload */
 
-extern "C" int SNDbankadd(int *bank_out, intptr_t bankData);   /* @0x800E7DEC */
+extern "C" int SNDbankadd(int *bank_out, intptr bankData); /* @0x800E7DEC */
 
 /* SNDbankadd @0x800E7DEC : add the bank at `bankData`, writing its slot id to *bank_out.  Returns the
  *   download result, or -10 if audio is down. */
-extern "C" int SNDbankadd(int *bank_out, intptr_t bankData)
+extern "C" int SNDbankadd(int *bank_out, intptr bankData)
 {
-    int  slot;
+    int slot;
     int *e;
     if ((char)sndgs[0xf] == 0)
         return -10;
     slot = iSNDbankalloc();
     *bank_out = slot;
     e = (int *)(sndgs[0x26] + slot * 0xc);
-    e[0] = (int)bankData; /* PORTABILITY-REVIEWED: 32-bit PSX sound-bank table word */
-    e[1] = (int)bankData; /* PORTABILITY-REVIEWED: 32-bit PSX sound-bank table word */
-    sndgs[0x1f] = (int)(intptr_t)SNDbankremove; /* PORTABILITY-REVIEWED: 32-bit PSX hook word */
+    e[0] = (int)bankData;                     /* PORTABILITY-REVIEWED: 32-bit PSX sound-bank table word */
+    e[1] = (int)bankData;                     /* PORTABILITY-REVIEWED: 32-bit PSX sound-bank table word */
+    sndgs[0x1f] = (int)(intptr)SNDbankremove; /* PORTABILITY-REVIEWED: 32-bit PSX hook word */
     return iSNDdownloadbank(bankData, bankData);
 }

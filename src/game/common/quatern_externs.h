@@ -4,10 +4,10 @@
  *   fixed-point helpers are external.
  */
 #ifndef QUATERN_EXTERNS_H
-#define QUATERN_EXTERNS_H
+    #define QUATERN_EXTERNS_H
 
-   /* 16.16 fixed-point multiply */
-    /* 16.16 fixed-point divide */
-          /* 16.16 fixed-point sqrt */
+/* 16.16 fixed-point multiply */
+/* 16.16 fixed-point divide */
+/* 16.16 fixed-point sqrt */
 
 #endif

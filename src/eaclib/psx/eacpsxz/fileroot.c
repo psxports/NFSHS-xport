@@ -22,58 +22,60 @@
 #include "../../../nfs4_types.h"
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
-extern "C" {
-char currentdir[64];
+extern "C"
+{
+    char currentdir[64];
 #ifdef AP_WIN
-char *fsprefix1 = (char *)"cdrom:";
-char *fsprefix2 = (char *)"sim:";
+    char *fsprefix1 = (char *)"cdrom:";
+    char *fsprefix2 = (char *)"sim:";
 #else
-char *fsprefix1; char *fsprefix2;
+    char *fsprefix1;
+    char *fsprefix2;
 #endif
 }
 
 /* ---- CD-ROM filesystem backend (fs 1) ---- */
-extern "C" int CD_Close(int dev);                                 /* @0x800FA65C */
-extern "C" int CD_Read(int dev, int dest, int offset, int len);   /* @0x800FA678 */
-extern "C" int CD_Stopread(int dev);                              /* @0x800FA904 */
-extern "C" int CD_Getinfo(int dev, int a1, int *outSize);         /* @0x800FA920 */
+extern "C" int CD_Close(int dev);                               /* @0x800FA65C */
+extern "C" int CD_Read(int dev, int dest, int offset, int len); /* @0x800FA678 */
+extern "C" int CD_Stopread(int dev);                            /* @0x800FA904 */
+extern "C" int CD_Getinfo(int dev, int a1, int *outSize);       /* @0x800FA920 */
 
 /* ---- PC host (dev link) filesystem backend (fs 2) ---- */
-extern "C" int PCinit(void);                                      /* @0x80106CC4 */
-extern "C" int PCread(int fd, int buf, int len);                  /* @0x80106BE4 */
-extern "C" int PClseek(int fd, int offset, int whence);           /* @0x80106D1C */
-extern "C" int PCwrite(int fd, int buf, int len);                 /* @0x80106D50 */
-extern "C" int PCclose(int fd);                                   /* @0x80106D40 */
-extern "C" int psxdevelopmentsystem(void);                        /* @0x80106CF0 (dev link present?) */
+extern "C" int PCinit(void);                            /* @0x80106CC4 */
+extern "C" int PCread(int fd, int buf, int len);        /* @0x80106BE4 */
+extern "C" int PClseek(int fd, int offset, int whence); /* @0x80106D1C */
+extern "C" int PCwrite(int fd, int buf, int len);       /* @0x80106D50 */
+extern "C" int PCclose(int fd);                         /* @0x80106D40 */
+extern "C" int psxdevelopmentsystem(void);              /* @0x80106CF0 (dev link present?) */
 
-extern "C" int CD_Open(char *name, int flags, int *outp);         /* @0x800FA554 */
-extern "C" int PCopen(char *name, int mode, int a2);              /* @0x80106CA4 */
-extern "C" int PCcreat(char *name, int a1);                       /* @0x80106CD0 */
+extern "C" int CD_Open(char *name, int flags, int *outp); /* @0x800FA554 */
+extern "C" int PCopen(char *name, int mode, int a2);      /* @0x80106CA4 */
+extern "C" int PCcreat(char *name, int a1);               /* @0x80106CD0 */
 
 /* ---- system glue + string helpers ---- */
-extern "C" int addsystemtask(intptr_t fn, int period, int delay); /* @0x800E6AF4 */
-extern "C" int  iFILE_CommandCompleteCallback(int result);        /* @0x800ED020 (nfile) */
-extern "C" int  readfile_systask(void);                           /* below */
+extern "C" int addsystemtask(intptr fn, int period, int delay); /* @0x800E6AF4 */
+extern "C" int iFILE_CommandCompleteCallback(int result);       /* @0x800ED020 (nfile) */
+extern "C" int readfile_systask(void);                          /* below */
 #ifndef _MSC_VER
-extern "C" char *strchr(const char *s, int c);                   /* @0x800F6214 */
+extern "C" char *strchr(const char *s, int c); /* @0x800F6214 */
 #endif
 #ifndef _MSC_VER
-extern "C" char *strncpy(char *d, const char *s, int n);          /* @0x800F6104 */
+extern "C" char *strncpy(char *d, const char *s, int n); /* @0x800F6104 */
 #endif
-extern "C" char *strcpy(char *d, const char *s);                  /* @0x800E5B28 */
-extern "C" char *strcat(char *d, const char *s);                  /* @0x800E78E8 */
+extern "C" char *strcpy(char *d, const char *s); /* @0x800E5B28 */
+extern "C" char *strcat(char *d, const char *s); /* @0x800E78E8 */
 #ifndef _MSC_VER
-extern "C" int   strncmp(const char *a, const char *b, int n);    /* @0x800EB1D0 */
-#endif
-#ifndef _MSC_VER
-extern "C" int   strlen(const char *s);                           /* @0x800E9F74 */
+extern "C" int strncmp(const char *a, const char *b, int n); /* @0x800EB1D0 */
 #endif
 #ifndef _MSC_VER
-extern "C" void *memset(void *d, int c, int n);                   /* @0x800E4318 */
+extern "C" int strlen(const char *s); /* @0x800E9F74 */
 #endif
-extern "C" char *fsprefix1;     /* @0x8013DD34 -> "cdrom:" (CD drive prefix, 6-char compare)  */
-extern "C" char *fsprefix2;     /* @0x8013DD40 -> "sim:"   (PC-host prefix, 4-char compare)   */
-extern "C" char  currentdir[];  /* @0x80140414 cwd, prepended to relative PC paths     */
+#ifndef _MSC_VER
+extern "C" void *memset(void *d, int c, int n); /* @0x800E4318 */
+#endif
+extern "C" char *fsprefix1;   /* @0x8013DD34 -> "cdrom:" (CD drive prefix, 6-char compare)  */
+extern "C" char *fsprefix2;   /* @0x8013DD40 -> "sim:"   (PC-host prefix, 4-char compare)   */
+extern "C" char currentdir[]; /* @0x80140414 cwd, prepended to relative PC paths     */
 
 /* ---- fileroot globals (data-materialization pass owns the addresses) ---- */
 extern "C" int disablecd;            /* nonzero == CD backend disabled                    */
@@ -84,14 +86,16 @@ extern "C" int currentfilesystem;    /* the fs selected by initfileio/setdirecto
  * @0x80140400 (.bss, 20B = 5 ints). The `extern` form below was only a DECLARATION
  * (a promise) -> the storage was never defined in any TU (surfaced by the link harness).
  * Defined here, its owning TU, since ReadCmd is a TU-local struct. Zero-init (BSS). */
-struct ReadCmd {
-    int pending;   /* +0x00 nonzero == a command is queued */
-    int handle;    /* +0x04 dev descriptor (fs byte already masked off) */
-    int dest;      /* +0x08 destination address */
-    int offset;    /* +0x0C file offset */
-    int len;       /* +0x10 byte count */
+struct ReadCmd
+{
+    int pending; /* +0x00 nonzero == a command is queued */
+    int handle;  /* +0x04 dev descriptor (fs byte already masked off) */
+    int dest;    /* +0x08 destination address */
+    int offset;  /* +0x0C file offset */
+    int len;     /* +0x10 byte count */
 };
-ReadCmd readcmd;   /* definition (BSS zero) */
+
+ReadCmd readcmd; /* definition (BSS zero) */
 
 #ifdef AP_WIN
 extern "C" void NFSHS_HostResetDeferredRead(void)
@@ -109,8 +113,13 @@ extern "C" void NFSHS_HostResetDeferredRead(void)
 void FROOT_enterCS(void);
 void FROOT_leaveCS(void);
 #else
-static inline void FROOT_enterCS(void) {}
-static inline void FROOT_leaveCS(void) {}
+static inline void FROOT_enterCS(void)
+{
+}
+
+static inline void FROOT_leaveCS(void)
+{
+}
 #endif
 
 /* initfileio @0x800F3A34 : advertise the CD (unless disabled), and -- if the PC dev link is present --
@@ -118,14 +127,17 @@ static inline void FROOT_leaveCS(void) {}
 extern "C" int initfileio(void)
 {
     if (disablecd == 0)
-        availablefilesystems |= 1;                  /* CD present */
-    if (psxdevelopmentsystem() != 0) {              /* dev link present -> use PC host */
+        availablefilesystems |= 1; /* CD present */
+    if (psxdevelopmentsystem() != 0)
+    { /* dev link present -> use PC host */
         PCinit();
-        addsystemtask((intptr_t)readfile_systask, 0, 0);
-        currentfilesystem    = 2;
+        addsystemtask((intptr)readfile_systask, 0, 0);
+        currentfilesystem = 2;
         availablefilesystems |= 2;
-    } else {
-        currentfilesystem = 0;                      /* no dev link (asm: = psxdevelopmentsystem() == 0) */
+    }
+    else
+    {
+        currentfilesystem = 0; /* no dev link (asm: = psxdevelopmentsystem() == 0) */
     }
     return 0;
 }
@@ -136,33 +148,40 @@ extern "C" int initfileio(void)
 extern "C" void setdirectory(char *dir)
 {
 #ifdef AP_WIN
-    if (strncmp(dir, fsprefix1, 6) == 0) {
+    if (strncmp(dir, fsprefix1, 6) == 0)
+    {
         currentfilesystem = 2;
         currentdir[0] = 0;
         return;
     }
 #endif
     int prefixlen = 0;
-    if (strncmp(dir, fsprefix1, 6) == 0) {              /* CD prefix */
-        if ((availablefilesystems & 3) == 2) return;    /* only the PC host is available */
-        if (strlen(dir) >= 7) return;                   /* must be just the prefix */
+    if (strncmp(dir, fsprefix1, 6) == 0)
+    { /* CD prefix */
+        if ((availablefilesystems & 3) == 2)
+            return; /* only the PC host is available */
+        if (strlen(dir) >= 7)
+            return; /* must be just the prefix */
         prefixlen = 6;
         currentfilesystem = 1;
-    } else if (strncmp(dir, fsprefix2, 4) == 0) {       /* PC-host prefix */
-        if ((availablefilesystems & 2) == 0) return;
+    }
+    else if (strncmp(dir, fsprefix2, 4) == 0)
+    { /* PC-host prefix */
+        if ((availablefilesystems & 2) == 0)
+            return;
         prefixlen = 4;
         currentfilesystem = 2;
     }
-    if (currentfilesystem != 2)                         /* only the PC host stores a cwd */
+    if (currentfilesystem != 2) /* only the PC host stores a cwd */
         return;
     strcpy(currentdir, dir + prefixlen);
-    if (currentdir[63] != 0)                            /* path overflowed the 64-byte buffer */
+    if (currentdir[63] != 0) /* path overflowed the 64-byte buffer */
         return;
     {
         int len = strlen(currentdir);
         if (len <= 0)
             return;
-        if (currentdir[len] != '\\')                    /* (asm reads currentdir[len]) -> add a separator */
+        if (currentdir[len] != '\\') /* (asm reads currentdir[len]) -> add a separator */
             strcat(currentdir, "\\");
     }
 }
@@ -173,23 +192,40 @@ extern "C" void setdirectory(char *dir)
  *   pick a PCopen/PCcreat mode from (flags & 7).  Returns 1 on success, 0 on failure. */
 extern "C" int openfile(char *name, int flags, int *outp)
 {
-    char  namebuf[0x40];
-    int   fs = currentfilesystem;
+    char namebuf[0x40];
+    int fs = currentfilesystem;
     memset(namebuf, 0, 0x40);
 
-    if (strchr(name, ':') != 0) {                       /* a "drive:"/fs prefix is present */
-        if (strncmp(name, fsprefix1, 6) == 0) {         /* CD prefix */
+    if (strchr(name, ':') != 0)
+    { /* a "drive:"/fs prefix is present */
+        if (strncmp(name, fsprefix1, 6) == 0)
+        { /* CD prefix */
 #ifdef AP_WIN
-            fs = 2; name += 6;
+            fs = 2;
+            name += 6;
 #else
-            if ((availablefilesystems & 1) == 0) { *outp = 0; return 0; }
-            fs = 1; name += 6;
+            if ((availablefilesystems & 1) == 0)
+            {
+                *outp = 0;
+                return 0;
+            }
+            fs = 1;
+            name += 6;
 #endif
-        } else if (strncmp(name, fsprefix2, 4) == 0) {  /* PC-host prefix */
-            if ((availablefilesystems & 2) == 0) { *outp = 0; return 0; }
-            fs = 2; name += 4;
-        } else if (currentfilesystem == 1 || name[1] != ':') {
-            int idx = (int)(strchr(name, ':') - name);  /* unknown prefix -> copy the volume, no open */
+        }
+        else if (strncmp(name, fsprefix2, 4) == 0)
+        { /* PC-host prefix */
+            if ((availablefilesystems & 2) == 0)
+            {
+                *outp = 0;
+                return 0;
+            }
+            fs = 2;
+            name += 4;
+        }
+        else if (currentfilesystem == 1 || name[1] != ':')
+        {
+            int idx = (int)(strchr(name, ':') - name); /* unknown prefix -> copy the volume, no open */
             strncpy(namebuf, name, idx + 1);
             namebuf[idx + 2] = 0;
             fs = 0;
@@ -197,12 +233,17 @@ extern "C" int openfile(char *name, int flags, int *outp)
         /* else: bare "X:" with currentfilesystem != 1 -> keep the current fs and the whole name */
     }
 
-    if (fs == 1) {                                      /* CD-ROM */
-        if (CD_Open(name, flags, outp) == 0) { *outp = 0; return 0; }
-        *outp |= 0x1000000;                             /* tag fs byte = 1 */
+    if (fs == 1)
+    { /* CD-ROM */
+        if (CD_Open(name, flags, outp) == 0)
+        {
+            *outp = 0;
+            return 0;
+        }
+        *outp |= 0x1000000; /* tag fs byte = 1 */
         return 1;
     }
-    if (fs != 2)                                        /* fs 0 -> nothing to open */
+    if (fs != 2) /* fs 0 -> nothing to open */
         return 1;
 
     /* fs == 2 : PC host -- prepend the cwd unless the path is absolute */
@@ -210,38 +251,59 @@ extern "C" int openfile(char *name, int flags, int *outp)
         strcpy(namebuf, currentdir);
     strcat(namebuf, name);
 
-    switch (flags & 7) {
-    case 0: *outp = PCopen(namebuf, 2, 0); break;       /* read/write */
-    case 1: *outp = PCopen(namebuf, 0, 0); break;       /* read */
-    case 2:                                             /* read, create if missing */
-        *outp = PCopen(namebuf, 0, 0);
-        if (*outp < 0) *outp = PCcreat(namebuf, 0);
-        break;
-    case 4: {                                           /* truncate-create */
-        int fd = PCopen(namebuf, 0, 0);
-        *outp = fd;
-        if (fd < 0) { *outp = 0; return 0; }
-        PCclose(fd);
-        *outp = PCcreat(namebuf, 0);
-        break;
-    }
-    case 6: *outp = PCcreat(namebuf, 0); break;         /* create */
-    default: *outp = -1; break;                         /* modes 3,5,>=7 invalid */
+    switch (flags & 7)
+    {
+        case 0:
+            *outp = PCopen(namebuf, 2, 0);
+            break; /* read/write */
+        case 1:
+            *outp = PCopen(namebuf, 0, 0);
+            break; /* read */
+        case 2:    /* read, create if missing */
+            *outp = PCopen(namebuf, 0, 0);
+            if (*outp < 0)
+                *outp = PCcreat(namebuf, 0);
+            break;
+        case 4:
+        { /* truncate-create */
+            int fd = PCopen(namebuf, 0, 0);
+            *outp = fd;
+            if (fd < 0)
+            {
+                *outp = 0;
+                return 0;
+            }
+            PCclose(fd);
+            *outp = PCcreat(namebuf, 0);
+            break;
+        }
+        case 6:
+            *outp = PCcreat(namebuf, 0);
+            break; /* create */
+        default:
+            *outp = -1;
+            break; /* modes 3,5,>=7 invalid */
     }
 
-    if (*outp < 0) { *outp = 0; return 0; }
-    *outp = (fs << 0x18) | *outp;                       /* tag fs byte */
+    if (*outp < 0)
+    {
+        *outp = 0;
+        return 0;
+    }
+    *outp = (fs << 0x18) | *outp; /* tag fs byte */
     return 1;
 }
 
 /* closefile @0x800F3E84 : close `handle` on its filesystem; returns the backend's result. */
 extern "C" int closefile(int handle)
 {
-    int fs  = handle >> 0x18;
+    int fs = handle >> 0x18;
     int dev = handle & 0xFFFFFF;
-    int r   = 0;
-    if (fs == 1)      r = CD_Close(dev);
-    else if (fs == 2) r = PCclose(dev);
+    int r = 0;
+    if (fs == 1)
+        r = CD_Close(dev);
+    else if (fs == 2)
+        r = PCclose(dev);
     return r;
 }
 
@@ -249,12 +311,15 @@ extern "C" int closefile(int handle)
  *   Returns 1 if a PC read was queued (0 if the slot was busy), or the CD backend's result. */
 extern "C" int readfile(int handle, int dest, int offset, int len)
 {
-    int fs  = handle >> 0x18;
-    int dev = handle & 0xFFFFFF;                    /* asm masks in the delay slot -> applies to all paths */
-    int r   = 0;
-    if (fs == 1) {
+    int fs = handle >> 0x18;
+    int dev = handle & 0xFFFFFF; /* asm masks in the delay slot -> applies to all paths */
+    int r = 0;
+    if (fs == 1)
+    {
         r = CD_Read(dev, dest, offset, len);
-    } else if (fs == 2) {
+    }
+    else if (fs == 2)
+    {
 #ifdef AP_WIN
         /* The original PSX PC filesystem was a slow serial dev-link, hence
            reads were deferred to a system task.  The native host backend is
@@ -267,12 +332,13 @@ extern "C" int readfile(int handle, int dest, int offset, int len)
         r = 1;
 #else
         FROOT_enterCS();
-        if (readcmd.pending == 0) {                 /* one PC read in flight at a time */
+        if (readcmd.pending == 0)
+        { /* one PC read in flight at a time */
             readcmd.pending = 1;
-            readcmd.handle  = dev;
-            readcmd.dest    = dest;
-            readcmd.offset  = offset;
-            readcmd.len     = len;
+            readcmd.handle = dev;
+            readcmd.dest = dest;
+            readcmd.offset = offset;
+            readcmd.len = len;
             r = 1;
         }
         FROOT_leaveCS();
@@ -286,12 +352,13 @@ extern "C" int readfile(int handle, int dest, int offset, int len)
 extern "C" int readfile_systask(void)
 {
     FROOT_enterCS();
-    if (readcmd.pending != 0) {
+    if (readcmd.pending != 0)
+    {
         int n;
         PClseek(readcmd.handle, readcmd.offset, 0);
         n = PCread(readcmd.handle, readcmd.dest, readcmd.len);
         readcmd.pending = 0;
-        iFILE_CommandCompleteCallback(((n ^ readcmd.len) < 1) ? 1 : 0);   /* n==len -> success */
+        iFILE_CommandCompleteCallback(((n ^ readcmd.len) < 1) ? 1 : 0); /* n==len -> success */
     }
     FROOT_leaveCS();
     return 0;
@@ -300,9 +367,10 @@ extern "C" int readfile_systask(void)
 /* writefile @0x800F4020 : PC host only -- PClseek + PCwrite, then complete the FILE op. */
 extern "C" int writefile(int handle, int buf, int offset, int len)
 {
-    int fs  = handle >> 0x18;
+    int fs = handle >> 0x18;
     int dev = handle & 0xFFFFFF;
-    if (fs == 2) {                                  /* only the PC host supports writing */
+    if (fs == 2)
+    { /* only the PC host supports writing */
         int n;
         PClseek(dev, offset, 0);
         n = PCwrite(dev, buf, len);
@@ -314,11 +382,13 @@ extern "C" int writefile(int handle, int buf, int offset, int len)
 /* getfilesize @0x800F409C : size of `handle` -- CD via CD_Getinfo, PC host via lseek-to-end. */
 extern "C" int getfilesize(int handle)
 {
-    int fs   = handle >> 0x18;
-    int dev  = handle & 0xFFFFFF;
+    int fs = handle >> 0x18;
+    int dev = handle & 0xFFFFFF;
     int size = 0;
-    if (fs == 1)      CD_Getinfo(dev, 0, &size);    /* CD: size returned via out-param */
-    else if (fs == 2) size = PClseek(dev, 0, 2);    /* PC: lseek(SEEK_END) == size */
+    if (fs == 1)
+        CD_Getinfo(dev, 0, &size); /* CD: size returned via out-param */
+    else if (fs == 2)
+        size = PClseek(dev, 0, 2); /* PC: lseek(SEEK_END) == size */
     return size;
 }
 
@@ -326,12 +396,16 @@ extern "C" int getfilesize(int handle)
  *   (if it is this handle's) and complete it.  Called by FILE_cancelop. */
 extern "C" int stopreadfile(int handle)
 {
-    int fs  = handle >> 0x18;
+    int fs = handle >> 0x18;
     int dev = handle & 0xFFFFFF;
-    if (fs == 1) {
+    if (fs == 1)
+    {
         CD_Stopread(dev);
-    } else if (fs == 2) {
-        if (readcmd.pending != 0 && readcmd.handle == dev) {
+    }
+    else if (fs == 2)
+    {
+        if (readcmd.pending != 0 && readcmd.handle == dev)
+        {
             readcmd.pending = 0;
             iFILE_CommandCompleteCallback(1);
         }

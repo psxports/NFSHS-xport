@@ -4,18 +4,20 @@
  */
 
 extern "C" int sndgs[];
-extern "C" int SNDstop(unsigned int tag);   /* sstop */
+extern "C" int SNDstop(unsigned int tag); /* sstop */
 
-extern "C" int SNDstopall(void);            /* @0x800E81A8 */
+extern "C" int SNDstopall(void); /* @0x800E81A8 */
 
 /* SNDstopall @0x800E81A8 : walk the channel pool (sndgs[0x25], count sndgs[4]._1_1_) and SNDstop each
  *   channel by its owning tag. */
 extern "C" int SNDstopall(void)
 {
     int i = 0, off;
-    if (((unsigned char *)sndgs)[0x11] != 0) {
+    if (((unsigned char *)sndgs)[0x11] != 0)
+    {
         off = 0;
-        do {
+        do
+        {
             i++;
             SNDstop(*(unsigned int *)(off + sndgs[0x25]));
             off += 100;

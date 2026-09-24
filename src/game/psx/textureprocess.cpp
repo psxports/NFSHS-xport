@@ -73,12 +73,12 @@ void TextureProcess_ColorClut(int level,int maxlevel,char *data,int numentry,int
     j = j + 1;
   }
   {
-    RECT r;                          /* SYM names the blit rect `r`, block-scoped (shadows the loop's int r) */
+    PSX_RECT r;                          /* SYM names the blit rect `r`, block-scoped (shadows the loop's int r) */
     r.x = (short)cx;
     r.w = (short)numentry;
     r.y = (short)cy;
     r.h = 1;
-    LoadImage(&r,(u_long *)newdata);
+    LoadImagePSX(&r,(u_long *)newdata);
   }
 }
 

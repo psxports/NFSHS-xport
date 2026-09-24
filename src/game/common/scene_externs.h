@@ -3,18 +3,18 @@
  *   (NFS4 PSX scene loader: loads trNNVV.scn custom-object scenes from the scene.viv bigfile,
  *    builds the custom-object list, and a plane-Y geometry helper). */
 #ifndef SCENE_EXTERNS_H
-#define SCENE_EXTERNS_H
+    #define SCENE_EXTERNS_H
 
 /* ---- module globals ---- */
-extern "C" CSceneList *gGameSceneList;          /* 0x8013d408 */
-extern int         Object_customSliceNum;   /* 0x8013d2d4 */
+extern "C" CSceneList *gGameSceneList; /* 0x8013d408 */
+extern int Object_customSliceNum;      /* 0x8013d2d4 */
 
 /* ---- object pool (object.cpp) ---- */
 extern void Object_ClearCustomObjects(void);
 extern void Object_AddCustomObject(SceneElem *elem, int setupSimDataFlag);
 
 /* ---- paths + setup ---- */
-extern "C" extern "C" char           *Paths_Paths[];        /* 0x80116468 */
+extern "C" extern "C" char *Paths_Paths[]; /* 0x80116468 */
 extern "C" extern "C" GameSetup_tData GameSetup_gData;
 
 /* ---- eaclib EACPSXZ: memstd / syncfile / nsync / fixed-point ---- */

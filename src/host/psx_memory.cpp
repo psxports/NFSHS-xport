@@ -1,26 +1,22 @@
-#include "../../nfs4_types.h"
-#include <stdint.h>
-extern "C" volatile uint16_t VOICE_00_LEFT_RIGHT[0x100];
-
-extern "C" unsigned long PsyQ_scratchpad[256];
+#include "../nfs4_types.h"
 
 extern "C" {
-u_char *&Render_gPalettePtr = *(u_char **)((u_char *)PsyQ_scratchpad + 0x000);
-u_char *&Render_gPacketPtr = *(u_char **)((u_char *)PsyQ_scratchpad + 0x004);
-char *&Render_gPacketEnd = *(char **)((u_char *)PsyQ_scratchpad + 0x008);
-int &Render_gMenuRenderFlag = *(int *)((u_char *)PsyQ_scratchpad + 0x00c);
-short &Render_gPacketLenLo = *(short *)((u_char *)PsyQ_scratchpad + 0x010);
-short &Render_gPacketLenHi = *(short *)((u_char *)PsyQ_scratchpad + 0x012);
-MATRIX &Render_gWorldMat = *(MATRIX *)((u_char *)PsyQ_scratchpad + 0x014);
-MATRIX &Render_gNightMat = *(MATRIX *)((u_char *)PsyQ_scratchpad + 0x034);
-MATRIX &Render_gCopMat = *(MATRIX *)((u_char *)PsyQ_scratchpad + 0x054);
-int &INT_1f800084 = *(int *)((u_char *)PsyQ_scratchpad + 0x084);
-int &INT_1f800088 = *(int *)((u_char *)PsyQ_scratchpad + 0x088);
-int &INT_1f80008c = *(int *)((u_char *)PsyQ_scratchpad + 0x08c);
-int &INT_1f800090 = *(int *)((u_char *)PsyQ_scratchpad + 0x090);
-int &Skid_gCtrlScratch_94 = *(int *)((u_char *)PsyQ_scratchpad + 0x094);
-int &Skid_gCtrlScratch_98 = *(int *)((u_char *)PsyQ_scratchpad + 0x098);
-int &gScratchLastWord = *(int *)((u_char *)PsyQ_scratchpad + 0x3fc);
+u_char *&Render_gPalettePtr = *(u_char **)((u_char *)SCRATCHPAD + 0x000);
+u_char *&Render_gPacketPtr = *(u_char **)((u_char *)SCRATCHPAD + 0x004);
+char *&Render_gPacketEnd = *(char **)((u_char *)SCRATCHPAD + 0x008);
+int &Render_gMenuRenderFlag = *(int *)((u_char *)SCRATCHPAD + 0x00c);
+short &Render_gPacketLenLo = *(short *)((u_char *)SCRATCHPAD + 0x010);
+short &Render_gPacketLenHi = *(short *)((u_char *)SCRATCHPAD + 0x012);
+MATRIX &Render_gWorldMat = *(MATRIX *)((u_char *)SCRATCHPAD + 0x014);
+MATRIX &Render_gNightMat = *(MATRIX *)((u_char *)SCRATCHPAD + 0x034);
+MATRIX &Render_gCopMat = *(MATRIX *)((u_char *)SCRATCHPAD + 0x054);
+int &INT_1f800084 = *(int *)((u_char *)SCRATCHPAD + 0x084);
+int &INT_1f800088 = *(int *)((u_char *)SCRATCHPAD + 0x088);
+int &INT_1f80008c = *(int *)((u_char *)SCRATCHPAD + 0x08c);
+int &INT_1f800090 = *(int *)((u_char *)SCRATCHPAD + 0x090);
+int &Skid_gCtrlScratch_94 = *(int *)((u_char *)SCRATCHPAD + 0x094);
+int &Skid_gCtrlScratch_98 = *(int *)((u_char *)SCRATCHPAD + 0x098);
+int &gScratchLastWord = *(int *)((u_char *)SCRATCHPAD + 0x3fc);
 }
 
 extern "C" {
@@ -49,7 +45,7 @@ void **&CD_handleTable = *(void ***)(CD_context + 0x34);
 void *&CD_dirEntryArray = *(void **)(CD_context + 0x38);
 unsigned char (&CD_sectorCache)[0x800] = *(unsigned char (*)[0x800])(CD_context + 0x3c);
 
-intptr_t (&sndss)[1] = *(intptr_t (*)[1])NFSHS_snd_stream_registry_storage;
+intptr (&sndss)[1] = *(intptr (*)[1])NFSHS_snd_stream_registry_storage;
 signed char (&sndStreamMap)[4] = *(signed char (*)[4])(NFSHS_snd_stream_registry_storage + 4);
 int &gVoxInGame = *(int *)(NFSHS_gVoxInGame_storage + 0);
 int &gRepeatCount = *(int *)(NFSHS_gVoxInGame_storage + 4);
@@ -101,7 +97,7 @@ unsigned char &DAT_80147a15 = *(unsigned char *)(NFSHS_sndpd_storage + 0x0fd);
 unsigned char &DAT_80147a16 = *(unsigned char *)(NFSHS_sndpd_storage + 0x0fe);
 unsigned char &DAT_80147a17 = *(unsigned char *)(NFSHS_sndpd_storage + 0x0ff);
 unsigned char &DAT_80147a18 = *(unsigned char *)(NFSHS_sndpd_storage + 0x100);
-intptr_t &DAT_80147e10 = *(intptr_t *)(NFSHS_sndpd_storage + 0x4f8);
+intptr &DAT_80147e10 = *(intptr *)(NFSHS_sndpd_storage + 0x4f8);
 unsigned int *&DAT_80147e14 = *(unsigned int **)(NFSHS_sndpd_storage + 0x4fc);
 unsigned int *&DAT_80147e18 = *(unsigned int **)(NFSHS_sndpd_storage + 0x500);
 unsigned int *&DAT_80147e1c = *(unsigned int **)(NFSHS_sndpd_storage + 0x504);
@@ -111,30 +107,4 @@ int &DAT_80147e28 = *(int *)(NFSHS_sndpd_storage + 0x510);
 int &DAT_80147e2c = *(int *)(NFSHS_sndpd_storage + 0x514);
 unsigned short &DAT_80147e38 = *(unsigned short *)(NFSHS_sndpd_storage + 0x520);
 
-volatile short &SPU_MAIN_VOL_L = *(volatile short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x180);
-volatile short &SPU_MAIN_VOL_R = *(volatile short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x182);
-volatile unsigned int &SPU_VOICE_CHN_FM_MODE = *(volatile unsigned int *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x190);
-volatile unsigned int &SPU_VOICE_CHN_NOISE_MODE = *(volatile unsigned int *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x194);
-volatile unsigned short &SPU_ADDR = *(volatile unsigned short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1a8);
-volatile unsigned short &SOUND_RAM_DATA_TRANSTER_CTRL = *(volatile unsigned short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1ac);
-volatile unsigned short &SPUSTAT = *(volatile unsigned short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1ae);
-volatile short &CD_VOL_L = *(volatile short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1b0);
-volatile short &CD_VOL_R = *(volatile short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1b2);
-volatile short &EXT_VOL_L = *(volatile short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1b4);
-volatile short &EXT_VOL_R = *(volatile short *)((volatile unsigned char *)VOICE_00_LEFT_RIGHT + 0x1b6);
-
-unsigned char PsyQ_low_ram[0x10000];
 }
-
-struct PsyQLowRamInitializer {
-    PsyQLowRamInitializer() {
-        ((unsigned int *)PsyQ_low_ram)[0] = 0x00000003;
-        ((unsigned int *)PsyQ_low_ram)[1] = 0x275a0c80;
-        ((unsigned int *)PsyQ_low_ram)[2] = 0x03400008;
-        ((unsigned int *)(PsyQ_low_ram + 0x108))[0] = 0xa000e1ec;
-        ((unsigned int *)(PsyQ_low_ram + 0x108))[1] = 0x00000004;
-        ((unsigned int *)(PsyQ_low_ram + 0x108))[2] = 0xa000e1f4;
-    }
-};
-
-static PsyQLowRamInitializer gPsyQLowRamInitializer;

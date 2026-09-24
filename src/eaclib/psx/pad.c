@@ -12,8 +12,8 @@
  *   LOCAL NAMES: only PAD_update's 'i' is SYM-authentic (REG $t0 loop index); all other local
  *   names across all 5 fns are SEMANTIC reconstructions (debug info preserved no other locals).
  */
-#include "pad.h"           /* extern "C" prototypes for the 4 exported fns + globals */
-#include "pad_externs.h"   /* libpad + eaclib prototypes */
+#include "pad.h"         /* extern "C" prototypes for the 4 exported fns + globals */
+#include "pad_externs.h" /* libpad + eaclib prototypes */
 
 /* PAD_convert is SYM class STAT (file-local static); forward-declared for PAD_state. */
 static u_short PAD_convert(PAD_COMMON *pad);
@@ -23,13 +23,14 @@ static u_short PAD_convert(PAD_COMMON *pad);
 /* ---- padinit  (pad.c:66, code lines 66-79) ---- */
 void padinit(void)
 {
-  if (gPadinfo.initialized == 0) {
-    PadInitDirect(&Padglobal[0].nopad, &Padglobal[1].nopad);
-    PadStartCom();
-    blockclear(&gPadinfo, 0x54);
-    gPadinfo.initialized = 1;
-    addtimer(PAD_update);
-  }
+    if (gPadinfo.initialized == 0)
+    {
+        PadInitDirect(&Padglobal[0].nopad, &Padglobal[1].nopad);
+        PadStartCom();
+        blockclear(&gPadinfo, 0x54);
+        gPadinfo.initialized = 1;
+        addtimer(PAD_update);
+    }
 }
 
 /* lines 80-82: (static data / macros / comments - no emitted code) */
@@ -37,11 +38,12 @@ void padinit(void)
 /* ---- PAD_restore  (pad.c:83, code lines 83-89) ---- */
 void PAD_restore(void)
 {
-  if (gPadinfo.initialized != 0) {
-    deltimer(PAD_update);
-    PadStopCom();
-    gPadinfo.initialized = 0;
-  }
+    if (gPadinfo.initialized != 0)
+    {
+        deltimer(PAD_update);
+        PadStopCom();
+        gPadinfo.initialized = 0;
+    }
 }
 
 /* lines 90-171: (static data / macros / comments - no emitted code) */
@@ -49,16 +51,18 @@ void PAD_restore(void)
 /* ---- PAD_state  (pad.c:172, code lines 172-186) ---- */
 u_short PAD_state(int padID)
 {
-  uint buttons;
+    uint buttons;
 
-  if ((gPadinfo.initialized == 0) || (7 < (uint)padID)) {
-    buttons = 0;
-  }
-  else {
-    buttons = PAD_convert(gPadinfo.buf + padID);
-    buttons = buttons & 0xffff;
-  }
-  return buttons;
+    if ((gPadinfo.initialized == 0) || (7 < (uint)padID))
+    {
+        buttons = 0;
+    }
+    else
+    {
+        buttons = PAD_convert(gPadinfo.buf + padID);
+        buttons = buttons & 0xffff;
+    }
+    return buttons;
 }
 
 /* lines 187-277: (static data / macros / comments - no emitted code) */
@@ -66,7 +70,7 @@ u_short PAD_state(int padID)
 /* ---- PAD_convert  (pad.c:278, code lines 278-278)  [static] ---- */
 static u_short PAD_convert(PAD_COMMON *pad)
 {
-  return ~(uint)(pad->data).standard.state & 0xffff;
+    return ~(uint)(pad->data).standard.state & 0xffff;
 }
 
 /* lines 279-319: (static data / macros / comments - no emitted code) */
@@ -77,52 +81,56 @@ static u_short PAD_convert(PAD_COMMON *pad)
    data-flow analysis (original source names not in debug info). */
 void PAD_update(void)
 {
-  byte *liveDst;
-  byte *fillDst;
-  char *debTimer;
-  int fillLen;
-  tActiveTime *btnState;
-  int btnOff;
-  int i;
-  int padOff;
-  byte *deltaDst;
-  byte rawBtn;
-  byte debCount;
+    byte *liveDst;
+    byte *fillDst;
+    char *debTimer;
+    int fillLen;
+    tActiveTime *btnState;
+    int btnOff;
+    int i;
+    int padOff;
+    byte *deltaDst;
+    byte rawBtn;
+    byte debCount;
 
-  liveDst = &gPadinfo.buf[0].nopad;
-  deltaDst = &gPadinfo.buf[1].nopad;
-  padOff = 0;
-  do {
-    if ((&Padglobal[0].nopad)[padOff] == '\0') {
-      blockmove(&Padglobal[0].nopad + padOff, liveDst, 8);
-      fillLen = 0x18;
-      fillDst = deltaDst;
-    }
-    else {
-      fillLen = 0x20;
-      fillDst = liveDst;
-    }
-    blockfill(fillDst, fillLen, 0xff);
-    deltaDst = deltaDst + 0x20;
-    padOff = padOff + 8;
-    liveDst = liveDst + 0x20;
-  } while (padOff < 0x10);
-  i = 0;
-  debTimer = &gPadinfo.state[0].time;
-  btnState = gPadinfo.state;
-  btnOff = 0;
-  do {
-    rawBtn = (&gPadinfo.buf[0].nopad)[btnOff];
-    if (((rawBtn == 0) != (bool)btnState->bActive) &&
-       (debCount = *debTimer, *debTimer = debCount + 1, 5 < debCount)) {
-      btnState->bActive = rawBtn == 0;
-      *debTimer = 0;
-    }
-    debTimer = debTimer + 2;
-    btnState = btnState + 1;
-    i = i + 1;
-    btnOff = btnOff + 8;
-  } while (i < 8);
+    liveDst = &gPadinfo.buf[0].nopad;
+    deltaDst = &gPadinfo.buf[1].nopad;
+    padOff = 0;
+    do
+    {
+        if ((&Padglobal[0].nopad)[padOff] == '\0')
+        {
+            blockmove(&Padglobal[0].nopad + padOff, liveDst, 8);
+            fillLen = 0x18;
+            fillDst = deltaDst;
+        }
+        else
+        {
+            fillLen = 0x20;
+            fillDst = liveDst;
+        }
+        blockfill(fillDst, fillLen, 0xff);
+        deltaDst = deltaDst + 0x20;
+        padOff = padOff + 8;
+        liveDst = liveDst + 0x20;
+    } while (padOff < 0x10);
+    i = 0;
+    debTimer = &gPadinfo.state[0].time;
+    btnState = gPadinfo.state;
+    btnOff = 0;
+    do
+    {
+        rawBtn = (&gPadinfo.buf[0].nopad)[btnOff];
+        if (((rawBtn == 0) != (bool)btnState->bActive) && (debCount = *debTimer, *debTimer = debCount + 1, 5 < debCount))
+        {
+            btnState->bActive = rawBtn == 0;
+            *debTimer = 0;
+        }
+        debTimer = debTimer + 2;
+        btnState = btnState + 1;
+        i = i + 1;
+        btnOff = btnOff + 8;
+    } while (i < 8);
 }
 
 /* end of pad.c (~line 375 per SLD) */

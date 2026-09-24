@@ -1,0 +1,19 @@
+{
+  "version": "psx-mips-reuse-v1",
+  "functions": 0,
+  "size_delta_exclusive": 16,
+  "eligible_pairs_compared": 0,
+  "matching_pairs": 0,
+  "kinds": {},
+  "matched_functions": 0,
+  "sequence_groups": 0,
+  "matched_non_skip_functions": 0,
+  "cross_image_pairs": 0,
+  "within_image_pairs": 0,
+  "byte_identical_pairs": 0,
+  "control_shape_differences": 0,
+  "tiny_pattern_pairs": 0,
+  "status_policy": "reuse candidates only; TODO/WIP/DONE/SKIP unchanged",
+  "eligible_pairs_by_size_delta": {},
+  "inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+}

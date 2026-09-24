@@ -5,9 +5,9 @@
 #include "screencongrats_externs.h"
 
 /* member fns declared in nfs4_types.h (5 classes). Instance pointers: */
-extern tScreenPinkSlipCongrats   *screenPinkSlipCongrats;
-extern tScreenTournamentTrophy   *screenTournamentTrophy;
-extern tScreenBeTheCopCongrats   *screenBeTheCopCongrats;
+extern tScreenPinkSlipCongrats *screenPinkSlipCongrats;
+extern tScreenTournamentTrophy *screenTournamentTrophy;
+extern tScreenBeTheCopCongrats *screenBeTheCopCongrats;
 extern tScreenTournamentCongrats *screenTournamentCongrats;
 
 #endif

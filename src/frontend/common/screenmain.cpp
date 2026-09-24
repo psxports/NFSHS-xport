@@ -407,7 +407,7 @@ void tScreenMain::DrawBackground()
   short randomAnim;
   tDrawShapeExtended drawFlags;
   char buffer [32];
-  RECT r;
+  PSX_RECT r;
   char moviename [80];
   
   sVar11 = 0;
@@ -797,7 +797,7 @@ void tScreenMain::Cleanup()
   int i;
   
   VIDEO_destroy(this->hVideo);
-  purgememadr((void *)(intptr_t)this->hVideo);
+  purgememadr((void *)(intptr)this->hVideo);
   for (i = 0; i < 2; ++i) {
     FreeShapes(&this->_base_tScreen, &this->fVideoShapes[i]);
   }

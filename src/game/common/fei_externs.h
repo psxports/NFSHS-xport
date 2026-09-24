@@ -2,6 +2,6 @@
 #ifndef _GAME_COMMON_FEI_EXTERNS_H_
 #define _GAME_COMMON_FEI_EXTERNS_H_
 #include "../../nfs4_types.h"
-extern "C" extern GameSetup_tData   GameSetup_gData;
+extern "C" extern GameSetup_tData GameSetup_gData;
 extern int gUseFrontend;
 #endif

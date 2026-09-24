@@ -4,7 +4,7 @@
 #include "psx.h"
 
 /* Shared host PCM saturation. Former helpers: ima_adpcm.c:clamp_sample and
- * spu_core.c:clamp16. No separate original MIPS function entry. */
+ * psx_spu.c:audio_sample_clamp. No separate original MIPS function entry. */
 static inline sint16 audio_sample_clamp(sint32 value)
 {
     if (value < -32768)

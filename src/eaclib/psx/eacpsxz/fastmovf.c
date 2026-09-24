@@ -13,42 +13,59 @@
 #include "../../../nfs4_types.h"
 #include "../../../mips_semantics.h"
 
-extern "C" char *primptr;                                 /* primate : primitive write cursor */
-extern "C" char *nextprim;                                /* primate : OT link target (prev prim) */
-extern "C" void  SetDrawMove(void *prim, RECT *src, int dx, int dy);   /* syslib P34 @0x8010C698 */
+extern "C" char *primptr;                                               /* primate : primitive write cursor */
+extern "C" char *nextprim;                                              /* primate : OT link target (prev prim) */
+extern "C" void SetDrawMove(void *prim, PSX_RECT *src, int dx, int dy); /* syslib P34 @0x8010C698 */
 
-extern "C" int DAT_801486e8;   /* @0x801486E8 : draw-origin X (int view) */
-extern "C" int DAT_801486ec;   /* @0x801486EC : draw-origin Y (int view) */
-extern "C" int DAT_801486fc;   /* @0x801486FC : clip window left   */
-extern "C" int DAT_80148700;   /* @0x80148700 : clip window top    */
-extern "C" int DAT_80148704;   /* @0x80148704 : clip window right  */
-extern "C" int DAT_80148708;   /* @0x80148708 : clip window bottom */
+extern "C" int DAT_801486e8; /* @0x801486E8 : draw-origin X (int view) */
+extern "C" int DAT_801486ec; /* @0x801486EC : draw-origin Y (int view) */
+extern "C" int DAT_801486fc; /* @0x801486FC : clip window left   */
+extern "C" int DAT_80148700; /* @0x80148700 : clip window top    */
+extern "C" int DAT_80148704; /* @0x80148704 : clip window right  */
+extern "C" int DAT_80148708; /* @0x80148708 : clip window bottom */
 
-extern "C" intptr_t fastmovfxya(unsigned char *shape, int x, int y);   /* @0x80106084 */
+extern "C" intptr fastmovfxya(unsigned char *shape, int x, int y); /* @0x80106084 */
 
 /* fastmovfxya @0x80106084 : clip + single-move blit of shape at (x,y).  Returns the OT head it linked behind
  *   (old nextprim), or the last clip delta if fully clipped away. */
-extern "C" intptr_t fastmovfxya(unsigned char *shape, int x, int y)
+extern "C" intptr fastmovfxya(unsigned char *shape, int x, int y)
 {
     char *p = primptr;
-    int   w = *(short *)(shape + 4);
-    int   h = *(short *)(shape + 6);
+    int w = *(short *)(shape + 4);
+    int h = *(short *)(shape + 6);
     unsigned int packed = *(unsigned int *)(shape + 0xc);
     short u = (short)nfs4_mips_sign_extend(packed, 12);
     short v = (short)nfs4_mips_sign_extend(packed >> 16, 12);
-    intptr_t ret;
+    intptr ret;
 
-    ret = DAT_801486fc - x;                 /* clip left */
-    if (0 < ret) { x += ret; u = u + (short)ret; w -= ret; }
-    ret = (x + w) - DAT_80148704;           /* clip right */
-    if (0 < ret) { w -= ret; }
-    ret = DAT_80148700 - y;                 /* clip top */
-    if (0 < ret) { y += ret; v = v + (short)ret; h -= ret; }
-    ret = (y + h) - DAT_80148708;           /* clip bottom */
-    if (0 < ret) { h -= ret; }
+    ret = DAT_801486fc - x; /* clip left */
+    if (0 < ret)
+    {
+        x += ret;
+        u = u + (short)ret;
+        w -= ret;
+    }
+    ret = (x + w) - DAT_80148704; /* clip right */
+    if (0 < ret)
+    {
+        w -= ret;
+    }
+    ret = DAT_80148700 - y; /* clip top */
+    if (0 < ret)
+    {
+        y += ret;
+        v = v + (short)ret;
+        h -= ret;
+    }
+    ret = (y + h) - DAT_80148708; /* clip bottom */
+    if (0 < ret)
+    {
+        h -= ret;
+    }
 
-    if ((0 < w) && (0 < h)) {
-        RECT src;
+    if ((0 < w) && (0 < h))
+    {
+        PSX_RECT src;
         src.x = u;
         src.y = v;
         src.w = (short)w;
@@ -56,12 +73,10 @@ extern "C" intptr_t fastmovfxya(unsigned char *shape, int x, int y)
         primptr = primptr + 0x18;
         SetDrawMove((void *)p, &src, DAT_801486e8 + x, DAT_801486ec + y);
 
-        ret = (intptr_t)nextprim;
+        ret = (intptr)nextprim;
         /* OT-stitch: insert `p` after `nextprim` (24-bit P_TAG addr field at +0) */
-        *(unsigned int *)p =
-            (*(unsigned int *)p & 0xff000000) | (*(unsigned int *)nextprim & 0x00ffffff);
-        *(unsigned int *)nextprim =
-            (*(unsigned int *)nextprim & 0xff000000) | ((unsigned int)p & 0x00ffffff);
+        *(unsigned int *)p = (*(unsigned int *)p & 0xff000000) | (*(unsigned int *)nextprim & 0x00ffffff);
+        *(unsigned int *)nextprim = (*(unsigned int *)nextprim & 0xff000000) | ((unsigned int)p & 0x00ffffff);
         nextprim = p;
     }
     return ret;

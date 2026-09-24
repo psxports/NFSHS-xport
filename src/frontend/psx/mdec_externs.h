@@ -8,14 +8,15 @@
 extern "C" int timerhz;
 extern "C" int ticks;
 
-extern "C" {
-/* PsyQ libpress (MDEC) */
-void DecDCTReset(int mode);
-void DecDCToutCallback(void (*cb)(void));
-void DecDCTvlc(u_long *bs, u_long *buf);
-void DecDCTin(u_long *buf, long mode);
-void DecDCTout(u_long *buf, long size);
-/* PsyQ libgpu */
-/* eaclib */
+extern "C"
+{
+    /* PsyQ libpress (MDEC) */
+    void DecDCTReset(int mode);
+    void DecDCToutCallback(void (*cb)(void));
+    void DecDCTvlc(u_long *bs, u_long *buf);
+    void DecDCTin(u_long *buf, long mode);
+    void DecDCTout(u_long *buf, long size);
+    /* PsyQ libgpu */
+    /* eaclib */
 }
 #endif

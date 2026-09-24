@@ -6,14 +6,14 @@
 #include "../../lib/libfns.h"
 
 /* ---- globals ---- */
-extern "C" char          *loading_languageNames[]; /* 0x80120d00 */
-extern "C" char          *smallShapeFile;          /* 0x8013d9d0  Loadb.psh progress tiles */
-extern "C" int            totalAvailMem;           /* 0x8013d9dc */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;         /* 0x801131ec */
-extern "C" extern char          *Paths_Paths[];           /* 0x80116468 */
+extern "C" char *loading_languageNames[];              /* 0x80120d00 */
+extern "C" char *smallShapeFile;                       /* 0x8013d9d0  Loadb.psh progress tiles */
+extern "C" int totalAvailMem;                          /* 0x8013d9dc */
+extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" extern char *Paths_Paths[];                 /* 0x80116468 */
 
 /* ---- eaclib / syslib / Draw helpers ---- */
-extern void  Draw_SetEnvironment(int w, int h, int a, int b, int c, int d, int e, int f);
-extern void  Draw_DrawDirectScreen(shapetbl *s, int x, int y);
+extern void Draw_SetEnvironment(int w, int h, int a, int b, int c, int d, int e, int f);
+extern void Draw_DrawDirectScreen(shapetbl *s, int x, int y);
 
 #endif

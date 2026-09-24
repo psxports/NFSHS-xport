@@ -12,54 +12,65 @@
  *   orthonormalizer; meant to be called every frame on matrices that only drift slightly.
  *   HOST-VERIFIED (_test_matrix.c): trnsmult exact + alias-safe; reorthogonalize 3.3x cleanup, det->1.
  */
-extern "C" int  fixedmult(int a, int b);                         /* eacpsxz @0x800E4328 */
-extern "C" void transpose(int *src, int *dst);                  /* eacpsxz @0x800E4358 (trnspos) */
-extern "C" int *transmult(int *a, int *b, int *out);            /* eacpsxz @0x80105F40 (trnsmult.obj) C=A*B */
-#define multiplymatrix transmult                                /* reorthogonalize's matmul callee */
+extern "C" int fixedmult(int a, int b);              /* eacpsxz @0x800E4328 */
+extern "C" void transpose(int *src, int *dst);       /* eacpsxz @0x800E4358 (trnspos) */
+extern "C" int *transmult(int *a, int *b, int *out); /* eacpsxz @0x80105F40 (trnsmult.obj) C=A*B */
+#define multiplymatrix transmult                     /* reorthogonalize's matmul callee */
 /* @0x801237EC (16.16 identity, shared rodata; byte-exact from NFS4.EXE). matrix.obj is the owner;
  * other TUs (e.g. trnsmult, reorthogonalize callers) reference it extern. */
-extern "C" const int identitymatrix[9] = { 65536,0,0, 0,65536,0, 0,0,65536 };
+extern "C" const int identitymatrix[9] = {65536, 0, 0, 0, 65536, 0, 0, 0, 65536};
 
-extern "C" int *addmatrix(int *m1, int *m2, int *out)   /* @0x800F01FC */
+extern "C" int *addmatrix(int *m1, int *m2, int *out) /* @0x800F01FC */
 {
     int i;
-    for (i = 0; i < 9; i++) out[i] = m1[i] + m2[i];
+    for (i = 0; i < 9; i++)
+        out[i] = m1[i] + m2[i];
     return out;
 }
 
-extern "C" int *submatrix(int *m1, int *m2, int *out)   /* @0x800F0234 */
+extern "C" int *submatrix(int *m1, int *m2, int *out) /* @0x800F0234 */
 {
     int i;
-    for (i = 0; i < 9; i++) out[i] = m1[i] - m2[i];
+    for (i = 0; i < 9; i++)
+        out[i] = m1[i] - m2[i];
     return out;
 }
 
-extern "C" int *scalematrix(int *m, int scalar, int *out)   /* @0x800F026C */
+extern "C" int *scalematrix(int *m, int scalar, int *out) /* @0x800F026C */
 {
     int i;
-    for (i = 0; i < 9; i++) out[i] = fixedmult(m[i], scalar);
+    for (i = 0; i < 9; i++)
+        out[i] = fixedmult(m[i], scalar);
     return out;
 }
 
-extern "C" int reorthogonalize(int *M)   /* @0x800F02E4 */
+extern "C" int reorthogonalize(int *M) /* @0x800F02E4 */
 {
-    static const int coef[4] = { 16384, -8192, 6144, -5120 };   /* @0x80123810 (coef[0] unused) */
+    static const int coef[4] = {16384, -8192, 6144, -5120}; /* @0x80123810 (coef[0] unused) */
     int it;
-    for (it = 0; it < 4; it++) {
+    for (it = 0; it < 4; it++)
+    {
         int mt[9], mtm[9], A[9], S[9], acc[9], tmp[9], mcopy[9];
         int i, k;
-        transpose(M, mt);                          /* mt  = M^T            */
-        multiplymatrix(mt, M, mtm);                /* mtm = M^T M          */
-        submatrix(mtm, (int *)identitymatrix, A);  /* A   = M^T M - I      */
-        for (i = 0; i < 9; i++) { S[i] = identitymatrix[i]; acc[i] = identitymatrix[i]; }
-        for (k = 1; k < 4; k++) {
-            multiplymatrix(S, A, tmp);             /* S   = S * A          */
-            for (i = 0; i < 9; i++) S[i] = tmp[i];
-            scalematrix(S, coef[k], tmp);          /* tmp = coef[k] * S^k  */
-            addmatrix(acc, tmp, acc);              /* acc += tmp           */
+        transpose(M, mt);                         /* mt  = M^T            */
+        multiplymatrix(mt, M, mtm);               /* mtm = M^T M          */
+        submatrix(mtm, (int *)identitymatrix, A); /* A   = M^T M - I      */
+        for (i = 0; i < 9; i++)
+        {
+            S[i] = identitymatrix[i];
+            acc[i] = identitymatrix[i];
         }
-        for (i = 0; i < 9; i++) mcopy[i] = M[i];
-        multiplymatrix(mcopy, acc, M);             /* M = M * series       */
+        for (k = 1; k < 4; k++)
+        {
+            multiplymatrix(S, A, tmp); /* S   = S * A          */
+            for (i = 0; i < 9; i++)
+                S[i] = tmp[i];
+            scalematrix(S, coef[k], tmp); /* tmp = coef[k] * S^k  */
+            addmatrix(acc, tmp, acc);     /* acc += tmp           */
+        }
+        for (i = 0; i < 9; i++)
+            mcopy[i] = M[i];
+        multiplymatrix(mcopy, acc, M); /* M = M * series       */
     }
     return 1;
 }

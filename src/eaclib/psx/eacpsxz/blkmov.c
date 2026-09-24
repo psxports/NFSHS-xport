@@ -9,17 +9,20 @@
  *   pure performance details; the observable result is exactly an n-byte memmove, reconstructed here.
  */
 
-extern "C" void blockmove(void *src, void *dst, int n)   /* @0x800E62DC */
+extern "C" void blockmove(void *src, void *dst, int n) /* @0x800E62DC */
 {
     char *s = (char *)src;
     char *d = (char *)dst;
 
-    if (s < d) {                       /* dst higher -> copy backward (overlap-safe) */
+    if (s < d)
+    { /* dst higher -> copy backward (overlap-safe) */
         s += n;
         d += n;
         while (n-- > 0)
             *--d = *--s;
-    } else {                           /* copy forward */
+    }
+    else
+    { /* copy forward */
         while (n-- > 0)
             *d++ = *s++;
     }

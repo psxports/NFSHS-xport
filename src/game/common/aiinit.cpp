@@ -2,8 +2,10 @@
  *   Player-action submission + reaction-table processing. SYM-v3 locals; vs disasm-v2.txt.
  *   NOT original source; SYM-faithful, recompilable C++.
  */
+#include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aiinit_externs.h"
+#include "new.h"
 
 static const int kAIInitNonStandardTable[50] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -429,14 +431,16 @@ void AIInit_InitAICar(Car_tObj *carObj,Udff_tInfo *handle)
   if ((carObj->carFlags & 8U) != 0) {
     scale = AITune_accelerationScale[carObj->carInfo->carType].scale;
   }
-  pAVar3 = new AIDataRecord_AccTable_t((char *)carObj->accTable,scale,(AIDataRecord_WhichRecord_t)3);  /* @was __builtin_new(0x5c)+flat ctor __23AIDataRecord_AccTable_t... */
+  pAVar3 = new((AIDataRecord_AccTable_t *)__builtin_new(sizeof(AIDataRecord_AccTable_t)))
+      AIDataRecord_AccTable_t((char *)carObj->accTable,scale,(AIDataRecord_WhichRecord_t)3);
   carObj->accelerationRecord = pAVar3;
   iVar1 = AIInit_IsNonStandardCarFile(carObj->carInfo->carType);
   if (iVar1 == 0) {
     carObj->curveSpeedTable = (AIDataRecord_CurveSpeedTable_t *)0x0;
   }
   else {
-    pAVar4 = new AIDataRecord_CurveSpeedTable_t(carObj->carName,(AIDataRecord_WhichRecord_t)7);  /* @was __builtin_new(0x58)+flat ctor __30AIDataRecord_CurveSpeedTable_t... */
+    pAVar4 = new((AIDataRecord_CurveSpeedTable_t *)__builtin_new(sizeof(AIDataRecord_CurveSpeedTable_t)))
+        AIDataRecord_CurveSpeedTable_t(carObj->carName,(AIDataRecord_WhichRecord_t)7);
     carObj->curveSpeedTable = pAVar4;
   }
   iVar1 = fixedmult(carObj->max_clacc,0x13333);

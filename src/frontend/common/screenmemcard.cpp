@@ -568,7 +568,7 @@ void tScreenMemcard::DrawBackground()
   int w;
   int x;
   int gray;
-  RECT rr;
+  PSX_RECT rr;
   short gridpos;
   
   this->fMemCardMessageTextSys = -1;

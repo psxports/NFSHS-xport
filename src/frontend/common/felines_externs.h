@@ -5,7 +5,7 @@
 #include "../../nfs4_types.h"
 
 /* game-side C++ helpers (cfront-mangled in originals; normal C++ linkage) */
-int  CalcFadeVal(int col, int target, int amount);
+int CalcFadeVal(int col, int target, int amount);
 void PSXDrawGouraudSquare(int x, int y, int w, int h, int c1, int c2, int c3, int c4);
 void PSXDrawSquare(int col, int x, int y, int w, int h);
 void PSXDrawTransSquare(int col, int x, int y, int w, int h, short opacity);

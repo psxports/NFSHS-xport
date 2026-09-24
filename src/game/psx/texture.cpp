@@ -309,7 +309,7 @@ void Texture_ProcessPaletteCopy(Texture_pal8bit *palCopy,int palStart,int palNum
 {
   Texture_pal8bit *src;
   int i;
-  RECT r;
+  PSX_RECT r;
   short tmpPal [16];
 
   if (palCopy != (Texture_pal8bit *)0x0) {
@@ -324,7 +324,7 @@ void Texture_ProcessPaletteCopy(Texture_pal8bit *palCopy,int palStart,int palNum
         i = i + 1;
         r.y = (short)src->y;
         src = src + 1;
-        LoadImage(&r,(u_long *)tmpPal);
+        LoadImagePSX(&r,(u_long *)tmpPal);
       } while (i < palNum);
     }
   }
@@ -332,13 +332,13 @@ void Texture_ProcessPaletteCopy(Texture_pal8bit *palCopy,int palStart,int palNum
 }
 
 /* ---- Texture_LoadImage__FP4RECTPUl  [TEXTURE.CPP:393-396] SLD-VERIFIED ---- */
-void Texture_LoadImage(RECT *imgrect,u_long *p)
+void Texture_LoadImage(PSX_RECT *imgrect,u_long *p)
 
 {
   if ((imgrect->w & 1U) != 0) {
     imgrect->h = imgrect->h | 1;
   }
-  LoadImage(imgrect,p);
+  LoadImagePSX(imgrect,p);
   return;
 }
 
@@ -349,7 +349,7 @@ void Texture_Vramf(shapetbl *shp,int x,int y,int clutx,int cluty)
   int rowpix;
   int rowround;
   u_char kind;
-  RECT r;
+  PSX_RECT r;
   
   if (shp != (shapetbl *)0x0) {
     do {
@@ -399,7 +399,7 @@ void Texture_Vramcf(shapetbl *shp,int x,int y,int clutx,int cluty)
   int rowall;
   int off;
   short ybot;
-  RECT r;
+  PSX_RECT r;
 
   rowall = shp->width * shapedepth(shp) + 0xf;
   rowbytes = (int)(rowall & 0xfffffff0) >> 3;
@@ -413,12 +413,12 @@ void Texture_Vramcf(shapetbl *shp,int x,int y,int clutx,int cluty)
     r.w = 1;
     r.h = 2;
     r.x = (short)x;
-    LoadImage(&r,(u_long *)((char *)shp + 0xe + off));
+    LoadImagePSX(&r,(u_long *)((char *)shp + 0xe + off));
     r.x = (short)x + 1;
     r.y = ybot + -1;
     r.w = ((int)rowall >> 4) + -1;
     r.h = 1;
-    LoadImage(&r,(u_long *)((char *)shp + 0x12 + off));
+    LoadImagePSX(&r,(u_long *)((char *)shp + 0x12 + off));
     shp->height = shp->height + -1;
     Texture_Vramf(shp,x,y,clutx,cluty);
     shp->height = height;

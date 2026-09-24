@@ -5,8 +5,8 @@
 #include "../../lib/libfns.h"
 
 /* ---- globals (cross-TU) ---- */
-extern int Input_gTime;        /* Input.obj */
-extern "C" int R3DCar_ClockLast;   /* R3DCar.obj */
+extern int Input_gTime;          /* Input.obj */
+extern "C" int R3DCar_ClockLast; /* R3DCar.obj */
 
 /* ---- Input.obj ---- */
 void Input_Store(void);

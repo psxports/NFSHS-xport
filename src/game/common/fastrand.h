@@ -3,7 +3,7 @@
 #define _GAME_COMMON_FASTRAND_H_
 #include "../../nfs4_types.h"
 
-void FastRandom_CleanUp__Fv(void);   /* :13 */
-void FastRandom_StartUp__FUi(unsigned int seeder);   /* :18 */
+void FastRandom_CleanUp__Fv(void);                 /* :13 */
+void FastRandom_StartUp__FUi(unsigned int seeder); /* :18 */
 
 #endif /* _GAME_COMMON_FASTRAND_H_ */

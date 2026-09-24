@@ -15,16 +15,16 @@
  *   overwrites $v0); likewise the per-entry counter++ is the loop-back branch delay slot.
  */
 
-extern "C" unsigned getm   (void *ptr, int nbytes);          /* @0x800F3024 big-endian reader   */
-extern "C" int nfs4_stricmp(const unsigned char *a, const unsigned char *b);   /* @0x800FE520 0 == match           */
-extern "C" unsigned strlen (const char *s);                  /* eacpsxz @0x800E9F74              */
+extern "C" unsigned getm(void *ptr, int nbytes);                             /* @0x800F3024 big-endian reader   */
+extern "C" int nfs4_stricmp(const unsigned char *a, const unsigned char *b); /* @0x800FE520 0 == match           */
+extern "C" unsigned strlen(const char *s);                                   /* eacpsxz @0x800E9F74              */
 
 /* intra-obj forward decls (C-linkage) */
-extern "C" int   typeofbigfile      (void *buf);
-extern "C" int   sizeofbigfileheader(void *buf);
-extern "C" char *locatebigentryz    (void *buf, char *name, int index, int *offset, int *size);
-extern "C" char *locatebigentry     (void *buf, char *name, int index, int *offset, int *size);
-extern "C" int   locatebigoffset    (void *buf, char *name);
+extern "C" int typeofbigfile(void *buf);
+extern "C" int sizeofbigfileheader(void *buf);
+extern "C" char *locatebigentryz(void *buf, char *name, int index, int *offset, int *size);
+extern "C" char *locatebigentry(void *buf, char *name, int index, int *offset, int *size);
+extern "C" int locatebigoffset(void *buf, char *name);
 
 /* write-only sink for the discarded "size" out-param of locatebigoffset (@0x8013DE64, obj-local) */
 static int gLocatebigSizeSink;
@@ -36,7 +36,7 @@ extern "C" int typeofbigfile(void *buf)
 {
     if (getm(buf, 2) == 0xC0FB)
         return 1;
-    if (getm(buf, 4) == 0x42494746u)        /* "BIGF" */
+    if (getm(buf, 4) == 0x42494746u) /* "BIGF" */
         return 2;
     return 0;
 }
@@ -46,10 +46,14 @@ extern "C" int typeofbigfile(void *buf)
  * ===================================================================== */
 extern "C" int sizeofbigfileheader(void *buf)
 {
-    switch (typeofbigfile(buf)) {
-    case 1:  return (int)getm((char *)buf + 2, 2) + 4;
-    case 2:  return (int)getm((char *)buf + 0xC, 4);
-    default: return 0;
+    switch (typeofbigfile(buf))
+    {
+        case 1:
+            return (int)getm((char *)buf + 2, 2) + 4;
+        case 2:
+            return (int)getm((char *)buf + 0xC, 4);
+        default:
+            return 0;
     }
 }
 
@@ -58,10 +62,14 @@ extern "C" int sizeofbigfileheader(void *buf)
  * ===================================================================== */
 extern "C" int bigcount(void *buf)
 {
-    switch (typeofbigfile(buf)) {
-    case 1:  return (int)getm((char *)buf + 4, 2);
-    case 2:  return (int)getm((char *)buf + 8, 4);
-    default: return 0;
+    switch (typeofbigfile(buf))
+    {
+        case 1:
+            return (int)getm((char *)buf + 4, 2);
+        case 2:
+            return (int)getm((char *)buf + 8, 4);
+        default:
+            return 0;
     }
 }
 
@@ -73,33 +81,50 @@ extern "C" int bigcount(void *buf)
  * ===================================================================== */
 extern "C" char *locatebigentryz(void *buf, char *name, int index, int *offset, int *size)
 {
-    char *end  = (char *)buf + sizeofbigfileheader(buf);   /* delay slot before typeofbigfile */
-    int   type = typeofbigfile(buf);
+    char *end = (char *)buf + sizeofbigfileheader(buf); /* delay slot before typeofbigfile */
+    int type = typeofbigfile(buf);
 
     int width, hdr;
-    if (type == 1)      { width = 3; hdr = 6;    }
-    else if (type == 2) { width = 4; hdr = 0x10; }
-    else                { width = 0; hdr = 0;    }   /* falls through to not-found */
+    if (type == 1)
+    {
+        width = 3;
+        hdr = 6;
+    }
+    else if (type == 2)
+    {
+        width = 4;
+        hdr = 0x10;
+    }
+    else
+    {
+        width = 0;
+        hdr = 0;
+    } /* falls through to not-found */
 
     char *p = (char *)buf + hdr;
-    int   counter = 0;
-    int   nameoff = width * 2;                          /* {off, size} then name */
+    int counter = 0;
+    int nameoff = width * 2; /* {off, size} then name */
 
-    while (type != 0 && p < end) {
+    while (type != 0 && p < end)
+    {
         char *ename = p + nameoff;
-        int   matched = (name == 0) ? (counter == index)
-                                    : (nfs4_stricmp((const unsigned char *)ename, (const unsigned char *)name) == 0);
-        if (matched) {
-            if (offset) *offset = (int)getm(p, width);
-            if (size)   *size   = (int)getm(p + width, width);
+        int matched = (name == 0) ? (counter == index) : (nfs4_stricmp((const unsigned char *)ename, (const unsigned char *)name) == 0);
+        if (matched)
+        {
+            if (offset)
+                *offset = (int)getm(p, width);
+            if (size)
+                *size = (int)getm(p + width, width);
             return ename;
         }
-        p = ename + (int)strlen(ename) + 1;             /* next entry */
-        counter++;                                      /* loop-back delay slot */
+        p = ename + (int)strlen(ename) + 1; /* next entry */
+        counter++;                          /* loop-back delay slot */
     }
 
-    if (offset) *offset = 0;
-    if (size)   *size   = 0;
+    if (offset)
+        *offset = 0;
+    if (size)
+        *size = 0;
     return 0;
 }
 

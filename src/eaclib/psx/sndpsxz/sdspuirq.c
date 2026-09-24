@@ -4,22 +4,28 @@
  *   Ghidra nfs4-f.exe.c (sdspuirq).
  */
 
-extern "C" int &DAT_80147e2c;        /* SPU control register base (address) */
+extern "C" int &DAT_80147e2c; /* SPU control register base (address) */
 
-extern "C" int iSNDpsxenablespuirq(void);    /* @0x8010BF80 */
+extern "C" int iSNDpsxenablespuirq(void); /* @0x8010BF80 */
 
 /* iSNDpsxenablespuirq @0x8010BF80 : set the SPU IRQ-enable bit in SPUCNT. */
 extern "C" int iSNDpsxenablespuirq(void)
 {
-    *(unsigned short *)(DAT_80147e2c + 0x1aa) =
-        *(unsigned short *)(DAT_80147e2c + 0x1aa) | 0x40;
+#if defined(AP_WIN)
+    return 0;
+#else
+    *(unsigned short *)(DAT_80147e2c + 0x1aa) = *(unsigned short *)(DAT_80147e2c + 0x1aa) | 0x40;
     return DAT_80147e2c;
+#endif
 }
 
 /* iSNDpsxdisablespuirq @0x8010BFA4 : clear the SPU IRQ-enable bit in SPUCNT. */
 extern "C" int iSNDpsxdisablespuirq(void)
 {
-    *(unsigned short *)(DAT_80147e2c + 0x1aa) =
-        *(unsigned short *)(DAT_80147e2c + 0x1aa) & 0xffbf;
+#if defined(AP_WIN)
+    return 0;
+#else
+    *(unsigned short *)(DAT_80147e2c + 0x1aa) = *(unsigned short *)(DAT_80147e2c + 0x1aa) & 0xffbf;
     return DAT_80147e2c;
+#endif
 }

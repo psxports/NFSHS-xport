@@ -107,7 +107,7 @@ unsigned char DAT_80147a15;                                                     
 unsigned char DAT_80147a16;                                                                /* @80147a16 0B BSS */
 unsigned char DAT_80147a17;                                                                /* @80147a17 0B BSS */
 unsigned char DAT_80147a18;                                                                /* @80147a18 0B BSS */
-intptr_t DAT_80147e10;                                                                     /* @80147e10 packet-context pointer word */
+intptr DAT_80147e10;                                                                     /* @80147e10 packet-context pointer word */
 unsigned int  * DAT_80147e14;                                                              /* @80147e14 0B BSS */
 unsigned int  * DAT_80147e18;                                                              /* @80147e18 0B BSS */
 unsigned int  * DAT_80147e1c;                                                              /* @80147e1c 0B BSS */

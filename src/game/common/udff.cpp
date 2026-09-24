@@ -34,7 +34,7 @@ Udff_tInfo * Udff_Opena(char *name,char *mem,int abortFlag)
       addr->type = UDFF_FILE;
       pcVar1 = (char *)loadfileadrz(name,0);
       addr->memPtr = pcVar1;
-      addr->handle = (intptr_t)pcVar1;
+      addr->handle = (intptr)pcVar1;
       if (pcVar1 != (char *)0x0) {
         return addr;
       }

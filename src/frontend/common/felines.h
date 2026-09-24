@@ -5,7 +5,7 @@
 #include "felines_externs.h"
 
 /* FELINES.CPP is C++ (cfront-mangled in SYM) -> normal C++ linkage. */
-void PSXDrawBrightEndLine(int col,int x,int y,int w,int h,int side,int fade,int darksides);
-void PSXTransDrawBrightEndLine(int col,int x,int y,int w,int h,int side,int fade,int darksides,int opacity);
+void PSXDrawBrightEndLine(int col, int x, int y, int w, int h, int side, int fade, int darksides);
+void PSXTransDrawBrightEndLine(int col, int x, int y, int w, int h, int side, int fade, int darksides, int opacity);
 
 #endif

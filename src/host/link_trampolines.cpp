@@ -1,5 +1,5 @@
 /* link_trampolines.cpp -- AUTO-GENERATED flat->member bridges (LINK phase). */
-#include "../../nfs4_types.h"
+#include "../nfs4_types.h"
 #include <stddef.h>
 #include <stdarg.h>
 
@@ -386,13 +386,13 @@ short TextValue(tListIteratorCar *iterator, tPlayer player) {
   return iterator->TextValue(player);
 }
 int Debounce(void *menu) {
-  return (int)(intptr_t)((tPMenu *)menu)->Debounce();
+  return (int)(intptr)((tPMenu *)menu)->Debounce();
 }
 int IsEnabled(void *item) {
-  return (int)(intptr_t)((tPMenuItem *)item)->IsEnabled();
+  return (int)(intptr)((tPMenuItem *)item)->IsEnabled();
 }
 int IsDisabled(void *item) {
-  return (int)(intptr_t)((tPMenuItem *)item)->IsDisabled();
+  return (int)(intptr)((tPMenuItem *)item)->IsDisabled();
 }
 int ItemEnabledNum(void *menu, int item) {
   return ((tPMenu *)menu)->ItemEnabledNum(item);

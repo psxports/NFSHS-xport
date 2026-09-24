@@ -67,7 +67,7 @@ void tScreenTournSelect::Initialize()
   short js;
   short j;
   short i;
-  RECT r;
+  PSX_RECT r;
   char moviename [80];
   
   this->PreCalculatedTournamentY = -1;
@@ -247,7 +247,7 @@ void tScreenTournSelect::DrawBackground()
   short y;
   tTourneyInfo *tourn;
   char buffer [64];
-  RECT r;
+  PSX_RECT r;
   char moviename [80];
   u_long movieRGB;
   
@@ -394,7 +394,7 @@ void tScreenTournSelect::DrawForeground()
   int DarkGreyCol;
   int YellowCol;
   char buffer [64];
-  RECT r;
+  PSX_RECT r;
   uint movieRGB;
   tDrawShapeExtended drawFlags;
   

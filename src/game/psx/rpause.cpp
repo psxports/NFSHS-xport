@@ -4,13 +4,14 @@
  */
 #include "../../nfs4_types.h"
 #include "rpause_externs.h"
+#include "psx_gpu.h"
 
 
 /* ---- RPause_CopyBackToFrontBuffer__Fv  [RPAUSE.CPP:25-42] SLD-VERIFIED ---- */
 void RPause_CopyBackToFrontBuffer(void)
 
 {
-  RECT rscreen;
+  PSX_RECT rscreen;
   DRAWENV *drawenv;
 
   drawenv = Draw_GetDRAWENV(Draw_gPlayer1View,1);
@@ -43,6 +44,7 @@ void RPause_StopPauseMenu(void)
   RPause_CopyBackToFrontBuffer();
   DrawOTag(Draw_gView[Render_gPauseMenuView].ot[gFlip] +
              Draw_gView[Render_gPauseMenuView].otsize + -1);
+  gpu_present();
   systemtask(0);
   gFlip = 1 - gFlip;
   return;

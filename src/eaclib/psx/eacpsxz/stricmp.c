@@ -2,14 +2,15 @@
  *   Source obj : nfs4\eaclib\psx\stricmp.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col12 / SYM v3)
  *   1 fn @0x800FE520.  stricmp -- case-insensitive ASCII string compare.  Ghidra nfs4-f.exe.c + IDA sig.
  */
-extern "C" int nfs4_stricmp(unsigned char *a, unsigned char *b);   /* @0x800FE520 */
+extern "C" int nfs4_stricmp(unsigned char *a, unsigned char *b); /* @0x800FE520 */
 
 /* stricmp @0x800FE520 : compare `a`/`b` case-insensitively; <0/0/>0 like the C library.  (`c-0x41 < 0x1a`
  *   is the unsigned A..Z test, +0x20 folds to lower case.) */
 extern "C" int nfs4_stricmp(unsigned char *a, unsigned char *b)
 {
     int diff;
-    for (;;) {
+    for (;;)
+    {
         unsigned int ca = (unsigned int)*a;
         if (ca - 0x41 < 0x1a)
             ca = ca + 0x20;

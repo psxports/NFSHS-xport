@@ -10,21 +10,20 @@
  */
 
 extern "C" int sndgs[];
-extern "C" int  iSNDpsxeffectvol(int left, int right);          /* spatkey */
-extern "C" int  iSNDgetchan(unsigned int tag);                  /* salloc  */
-extern "C" int  iSNDpatchkey(int chan, int *tag);               /* spatkey */
-extern "C" int  iSNDplatformfxlevel(int chan, int bus, int fxon); /* sdriver (3-arg) */
-extern "C" void iSNDenteraudio(void);                           /* sserver */
+extern "C" int iSNDpsxeffectvol(int left, int right);            /* spatkey */
+extern "C" int iSNDgetchan(unsigned int tag);                    /* salloc  */
+extern "C" int iSNDpatchkey(int chan, int *tag);                 /* spatkey */
+extern "C" int iSNDplatformfxlevel(int chan, int bus, int fxon); /* sdriver (3-arg) */
+extern "C" void iSNDenteraudio(void);                            /* sserver */
 extern "C" void iSNDleaveaudio(void);
 
-extern "C" int iSNDplatformfxmasterlevel(int bus, int level);   /* @0x801005BC */
-extern "C" int SNDfxlevel(int tag, int bus, int level);         /* @0x801005E8 */
+extern "C" int iSNDplatformfxmasterlevel(int bus, int level); /* @0x801005BC */
+extern "C" int SNDfxlevel(int tag, int bus, int level);       /* @0x801005E8 */
 
 /* iSNDplatformfxmasterlevel @0x801005BC : drive the SPU reverb output volume from the bus master `level`
  *   (the PSX has a single reverb, so `bus` is ignored). */
 extern "C" int iSNDplatformfxmasterlevel(int bus, int level)
 {
-    (void)bus;
     iSNDpsxeffectvol(level * 0x102, level * 0x102);
     return 0;
 }
@@ -40,14 +39,16 @@ extern "C" int SNDfxlevel(int tag, int bus, int level)
         return -10;
     iSNDenteraudio();
     chanIdx = iSNDgetchan((unsigned int)tag);
-    if (-1 < chanIdx) {
+    if (-1 < chanIdx)
+    {
         cur[0] = -1;
-        while (iSNDpatchkey(chanIdx, cur) != 0) {
-            int slot   = sndgs[0x25] + cur[0] * 100 + bus;
+        while (iSNDpatchkey(chanIdx, cur) != 0)
+        {
+            int slot = sndgs[0x25] + cur[0] * 100 + bus;
             int scaled = level * (int)(signed char)*(char *)(slot + 0x34);
             int fxArg;
             *(char *)(slot + 0x35) = (char)level;
-            fxArg = (scaled * sndgs[bus * 4 + 0x28]) / 127;     /* @0x82061029 magic = signed /127 */
+            fxArg = (scaled * sndgs[bus * 4 + 0x28]) / 127; /* @0x82061029 magic = signed /127 */
             iSNDplatformfxlevel(cur[0], bus, fxArg);
         }
     }

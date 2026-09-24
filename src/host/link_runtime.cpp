@@ -4,13 +4,11 @@
  * (gte_rtps__Fv / gte_lwc2__Fii / gte_swc2__FiPv). Define them as C++ to match. */
 #include <string.h>
 #include <stdlib.h>
-#include "../../mips_semantics.h"
+#include "xport.h"
+#include "../mips_semantics.h"
 #if defined(_MSC_VER)
 #include <intrin.h>
 #endif
-/* Common PsyQ scratchpad implementation.  u_long is 32-bit in this target,
- * so this is the PSX's complete 256-word / 1024-byte scratchpad window. */
-extern "C" unsigned long PsyQ_scratchpad[256] = {};
 /* Host-side state corresponding to the PSX low-memory and GTE registers */
 static unsigned int nfs4_gte_data[32];
 struct nfs4_host_matrix { short m[3][3]; short pad; int t[3]; };

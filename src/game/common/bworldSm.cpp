@@ -255,7 +255,7 @@ void BWorldSm_SetSlice(int slice,BWorldSm_Pos *slicePos)
   /* MIPS lbu 0x1c(base): before Track_InitPersistentData, base is zero and
    * address 0x1c is readable PSX RAM.  Use the address-space adapter so the
    * same access does not become a Win32 null-page exception. */
-  uVar1 = PsyQ_readRam8((intptr_t)BWorldSm_slices +
+  uVar1 = PsyQ_readRam8((intptr)BWorldSm_slices +
                         slicePos->slice * sizeof(Trk_NewSlice) +
                         __builtin_offsetof(Trk_NewSlice,chunkIndex));
   slicePos->lastRezRequested = -2;

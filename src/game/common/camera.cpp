@@ -2688,10 +2688,10 @@ void Camera_ResetRelPos(int bitMask)
   int circle_height [3];
   int sin;
   int cos;
-  intptr_t anchorAddress;
+  intptr anchorAddress;
   
   if ((bitMask & 1U) != 0) {
-    anchorAddress = (intptr_t)Camera_gInfo[0].anchor;
+    anchorAddress = (intptr)Camera_gInfo[0].anchor;
     Camera_gInfo[0].relpos.x = nfs4_mips_negu_s32(nfs4_mips_sll_s32(
         nfs4_mips_bits_to_s32((u_int)PsyQ_readRam32(anchorAddress + 0x108)),2));
     Camera_gInfo[0].relpos.y = nfs4_mips_negu_s32(nfs4_mips_sll_s32(
@@ -2700,7 +2700,7 @@ void Camera_ResetRelPos(int bitMask)
         nfs4_mips_bits_to_s32((u_int)PsyQ_readRam32(anchorAddress + 0x110)),2));
   }
   if ((bitMask & 2U) != 0) {
-    anchorAddress = (intptr_t)Camera_gInfo[1].anchor;
+    anchorAddress = (intptr)Camera_gInfo[1].anchor;
     Camera_gInfo[1].relpos.x = nfs4_mips_negu_s32(nfs4_mips_sll_s32(
         nfs4_mips_bits_to_s32((u_int)PsyQ_readRam32(anchorAddress + 0x108)),2));
     Camera_gInfo[1].relpos.y = nfs4_mips_negu_s32(nfs4_mips_sll_s32(

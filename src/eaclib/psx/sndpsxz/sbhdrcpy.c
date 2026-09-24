@@ -8,12 +8,12 @@
 #include "../../../lib/snd.h"
 #include "../../../mips_semantics.h"
 
-extern "C" int SNDbankheadersize(int bankId);          /* sbhdrsze */
+extern "C" int SNDbankheadersize(int bankId); /* sbhdrsze */
 #ifndef _MSC_VER
-extern "C" void *memcpy(void *dst, const void *src, int n);   /* C42 (BIOS thunk) */
+extern "C" void *memcpy(void *dst, const void *src, int n); /* C42 (BIOS thunk) */
 #endif
 
-extern "C" int SNDbankheadercopy(unsigned char *dst, int bankId);   /* @0x800E7BA8 */
+extern "C" int SNDbankheadercopy(unsigned char *dst, int bankId); /* @0x800E7BA8 */
 
 /* SNDbankheadercopy @0x800E7BA8 : memcpy the bank header to `dst`, relocate each patch pointer (+0x14 for
  *   bank type 4, else +0xc) relative to `dst`, then point the bank table entry at `dst`. */
@@ -28,23 +28,24 @@ extern "C" int SNDbankheadercopy(unsigned char *dst, int bankId)
         return size;
     unsigned char *bankData = (unsigned char *)SND->banks[bankId].datablk;
     memcpy(dst, bankData, size);
-    if (*(unsigned short *)(bankData + 6) != 0) {
-        intptr_t oldBase = (intptr_t)bankData;
-        intptr_t newBase = (intptr_t)dst;
+    if (*(unsigned short *)(bankData + 6) != 0)
+    {
+        intptr oldBase = (intptr)bankData;
+        intptr newBase = (intptr)dst;
         i = 0;
-        do {
-            if (bankData[4] == 4) {
+        do
+        {
+            if (bankData[4] == 4)
+            {
                 int sp = *(int *)(bankData + i * 4 + 0x14);
                 if (sp != 0)
-                    *(int *)(dst + i * 4 + 0x14) =
-                        nfs4_mips_addu_s32((int)newBase,
-                            nfs4_mips_subu_s32(sp, (int)oldBase));
-            } else {
+                    *(int *)(dst + i * 4 + 0x14) = nfs4_mips_addu_s32((int)newBase, nfs4_mips_subu_s32(sp, (int)oldBase));
+            }
+            else
+            {
                 int sp = *(int *)(bankData + i * 4 + 0xc);
                 if (sp != 0)
-                    *(int *)(dst + i * 4 + 0xc) =
-                        nfs4_mips_addu_s32((int)newBase,
-                            nfs4_mips_subu_s32(sp, (int)oldBase));
+                    *(int *)(dst + i * 4 + 0xc) = nfs4_mips_addu_s32((int)newBase, nfs4_mips_subu_s32(sp, (int)oldBase));
             }
             i++;
         } while (i < (int)*(unsigned short *)(bankData + 6));

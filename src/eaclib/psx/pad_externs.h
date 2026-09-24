@@ -8,14 +8,15 @@
 #include "../../lib/libfns.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* --- PsyQ libpad (direct mode) --- */
-void PadInitDirect(unsigned char *pad1, unsigned char *pad2);
-void PadStopCom(void);
+    /* --- PsyQ libpad (direct mode) --- */
+    void PadInitDirect(unsigned char *pad1, unsigned char *pad2);
+    void PadStopCom(void);
 
-/* --- eaclib (EACPSXZ) --- */
+    /* --- eaclib (EACPSXZ) --- */
     /* EAC_timerproc = void(*)(void) */
 
 #ifdef __cplusplus

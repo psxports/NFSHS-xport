@@ -8,6 +8,7 @@
 #include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aihigh_externs.h"
+#include "new.h"
 
 /* ---- #75: aihigh.obj-owned anonymous vtables (real nfs4-f.exe bytes; pfn VAs symbolicated) ---- */
 extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
@@ -110,7 +111,7 @@ void AIHigh_StartUp(void)
 
               if ((uVar7 & 0x20) == 0) {
 
-                pAVar1 = (AIHigh_BTC_AIPerp *)operator new(0x18);
+                pAVar1 = (AIHigh_BTC_AIPerp *)__builtin_new(0x18);
 
                 (new((AIHigh_Base *)pAVar1) AIHigh_Base(pCVar8));
 
@@ -120,7 +121,7 @@ void AIHigh_StartUp(void)
 
               }
 
-              this_00 = (AIHigh_BTC_Wingman *)operator new(0x7c);
+              this_00 = (AIHigh_BTC_Wingman *)__builtin_new(0x7c);
 
               iVar9 = iVar11 + 1;
 
@@ -130,7 +131,7 @@ void AIHigh_StartUp(void)
 
             else {
 
-              pAVar3 = (AIHigh_Traffic *)operator new(0x24);
+              pAVar3 = (AIHigh_Traffic *)__builtin_new(0x24);
 
               pAVar1 = (AIHigh_BTC_AIPerp *) (new(pAVar3) AIHigh_Traffic(pCVar8));
 
@@ -140,7 +141,7 @@ void AIHigh_StartUp(void)
 
           else {
 
-            pAVar1 = (AIHigh_BTC_AIPerp *)operator new(0xac);
+            pAVar1 = (AIHigh_BTC_AIPerp *)__builtin_new(0xac);
 
             pAVar1 = (new(pAVar1) AIHigh_BTC_AIPerp(pCVar8));
 
@@ -150,7 +151,7 @@ void AIHigh_StartUp(void)
 
         else {
 
-          pAVar1 = (AIHigh_BTC_AIPerp *)operator new(0x88);
+          pAVar1 = (AIHigh_BTC_AIPerp *)__builtin_new(0x88);
 
           (new((AIHigh_BasicPerp *)pAVar1) AIHigh_BasicPerp(pCVar8));
 
@@ -178,7 +179,7 @@ LAB_8005af74:
 
       else {
 
-        newObj = (AIHigh_BTC_HumanCop *)operator new(0x8c);
+        newObj = (AIHigh_BTC_HumanCop *)__builtin_new(0x8c);
 
         pAVar1 = (AIHigh_BTC_AIPerp *)
 
@@ -246,7 +247,7 @@ LAB_8005af74:
 
             if ((uVar7 & 0x20) == 0) {
 
-              pAVar4 = (AIHigh_Base *)operator new(0x18);
+              pAVar4 = (AIHigh_Base *)__builtin_new(0x18);
 
               (new(pAVar4) AIHigh_Base(pCVar8));
 
@@ -258,7 +259,7 @@ LAB_8005af74:
 
             else {
 
-              pAVar6 = (AIHigh_Cop *)operator new(0x6c);
+              pAVar6 = (AIHigh_Cop *)__builtin_new(0x6c);
 
               pAVar6 = (new(pAVar6) AIHigh_Cop(pCVar8,iVar12));
 
@@ -272,7 +273,7 @@ LAB_8005af74:
 
           else {
 
-            pAVar3 = (AIHigh_Traffic *)operator new(0x24);
+            pAVar3 = (AIHigh_Traffic *)__builtin_new(0x24);
 
             pAVar3 = (new(pAVar3) AIHigh_Traffic(pCVar8));
 
@@ -284,7 +285,7 @@ LAB_8005af74:
 
         else {
 
-          pAVar5 = (AIHigh_Opponent *)operator new(0xc0);
+          pAVar5 = (AIHigh_Opponent *)__builtin_new(0xc0);
 
           pAVar5 = (new(pAVar5) AIHigh_Opponent(pCVar8));
 
@@ -296,7 +297,7 @@ LAB_8005af74:
 
       else {
 
-        this_01 = (AIHigh_Human *)operator new(0xb0);
+        this_01 = (AIHigh_Human *)__builtin_new(0xb0);
 
         pAVar4 = (AIHigh_Base *)(new(this_01) AIHigh_Human(pCVar8))
 
@@ -559,7 +560,7 @@ AIHigh_Base::AIHigh_Base(Car_tObj *carObj)
 
   this->stateType_ = 0;
 
-  this_00 = (AIState_Base *)operator new(8);
+  this_00 = (AIState_Base *)__builtin_new(8);
 
   (new(this_00) AIState_Base(this->carObj_));
 

@@ -1,76 +1,74 @@
-/* Native Win32 replacement for the PsyQ surface used by NFSHS.
+/* Native host replacement for the PsyQ surface used by NFSHS.
  *
- * This file owns the Windows boundary. Game/frontend code is left untouched;
+ * The shared xport platform owns the OS boundary. Game/frontend code is left untouched;
  * STR/MDEC remain out of scope, while timing, input, host files, GPU commands
  * and SPU state have real semantics.
  */
-#define WIN32_LEAN_AND_MEAN
 #include "diagnostics.h"
+#include "psx.h"
+#include "psx_gpu.h"
+#include "xport.h"
+#include "psx_spu.h"
+#include "psx_pad.h"
 
-enum { PSYQ_GPU_VRAM_WIDTH = 1024, PSYQ_GPU_VRAM_HEIGHT = 512 };
-extern "C" {
-extern unsigned short PsyQ_gpu_vram[PSYQ_GPU_VRAM_WIDTH * PSYQ_GPU_VRAM_HEIGHT];
-int PsyQGpuClearImage(int, int, int, int, unsigned char, unsigned char, unsigned char);
-int PsyQGpuLoadImage(int, int, int, int, const unsigned short *);
-int PsyQGpuStoreImage(int, int, int, int, unsigned short *);
-int PsyQGpuMoveImage(int, int, int, int, int, int);
-unsigned short PsyQGpuGetClut(int, int);
-unsigned short PsyQGpuGetTPage(int, int, int, int);
-void PsyQPadInitDirect(unsigned char *, unsigned char *);
-void PsyQPadStart(void);
-void PsyQPadStop(void);
-int PsyQPadGetState(int);
-void PsyQPadPublishDigital(int, int, unsigned short);
-void PsyQSpuAdvance(unsigned int);
-int waveout_is_running(void);
-}
-#define OpenEventA Win32_OpenEventA
-#define EnterCriticalSection Win32_EnterCriticalSection
-#define ExitCriticalSection Win32_ExitCriticalSection
-#define LoadImageA Win32_LoadImageA
-#include <windows.h>
-#include <mmsystem.h>
-#undef OpenEventA
-#undef OpenEvent
-#undef EnterCriticalSection
-#undef ExitCriticalSection
-#undef LoadImageA
-#undef LoadImage
+#undef SetDrawMode
+#undef SetPolyF3
+#undef SetPolyF4
+#undef SetPolyFT4
+#undef SetPolyG4
+#undef SetPolyGT4
+#undef SetSemiTrans
+#undef SetShadeTex
+#undef SetTexWindow
 #include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <stdint.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
+typedef uint32 DWORD;
+typedef uint32 UINT;
+enum { MAX_PATH = 260 };
+
+static DWORD host_clock_millis(void)
+{
+    return (DWORD)(xport_timer_get() / 1000u);
+}
+
+static DWORD host_environment_get(const char *name, char *buffer, size_t capacity)
+{
+    const char *value = getenv(name);
+    size_t length;
+    if (value == 0)
+        return 0;
+    length = strlen(value);
+    if (capacity != 0)
+    {
+        size_t copied = length < capacity - 1 ? length : capacity - 1;
+        memcpy(buffer, value, copied);
+        buffer[copied] = 0;
+    }
+    return (DWORD)length;
+}
+
+#define GetEnvironmentVariableA host_environment_get
+#define GetTickCount host_clock_millis
+#define ExitProcess(code) exit((int)(code))
+
 struct Car_tObj;
 extern int gNumSlices;
 void AILife_PlaceCarAtLocation(Car_tObj *,int,int,int,int,int);
 
-/* The PSX heap reuses blocks between frontend and game phases.  Keep the host
- * arena low-addressed and 16-byte aligned, but retain the original delete/free
- * semantics through an in-arena free list. */
-enum { HOST_OBJECT_ARENA_SIZE = 512 * 1024 * 1024 };
-static unsigned char *gHostObjectArena;
-static unsigned int gHostObjectArenaUsed;
-static unsigned int gHostObjectFreeHead = 0xffffffffU;
+static unsigned char *gHostObjectArena = DRAM;
+static unsigned int gHostObjectArenaUsed = PSX_DRAM_SIZE;
 
-static int NFSHS_HostInitMemory(void) {
-    if (!gHostObjectArena) {
-        gHostObjectArena = (unsigned char *)VirtualAlloc(0, HOST_OBJECT_ARENA_SIZE,
-            MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-        if (!gHostObjectArena) return 0;
-    }
-    return 1;
-}
-
-static uintptr_t g_host_packet_begin;
-static uintptr_t g_host_packet_end;
+static intptr g_host_packet_begin;
+static intptr g_host_packet_end;
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_dma_seen[32768];
+static intptr g_host_dma_seen[32768];
 #endif
 #if NFSHS_DIAGNOSTICS
 static unsigned int g_host_dma_seen_generation[32768];
@@ -79,30 +77,30 @@ static unsigned int g_host_dma_seen_generation[32768];
 static unsigned int g_host_dma_seen_index[32768];
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_dma_seen_predecessor[32768];
+static intptr g_host_dma_seen_predecessor[32768];
 #endif
 #if NFSHS_DIAGNOSTICS
 static unsigned int g_host_dma_generation;
 #endif
-static uintptr_t g_host_added_prims[16384];
+static intptr g_host_added_prims[16384];
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_added_ots[16384];
+static intptr g_host_added_ots[16384];
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_added_callers[16384];
+static intptr g_host_added_callers[16384];
 #endif
 #if NFSHS_DIAGNOSTICS
 static unsigned int g_host_added_links[16384];
 #endif
 static unsigned int g_host_added_generation[16384];
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_prev_added_prims[16384];
+static intptr g_host_prev_added_prims[16384];
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_prev_added_ots[16384];
+static intptr g_host_prev_added_ots[16384];
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_prev_added_callers[16384];
+static intptr g_host_prev_added_callers[16384];
 #endif
 #if NFSHS_DIAGNOSTICS
 static unsigned int g_host_prev_added_generation[16384];
@@ -111,39 +109,38 @@ static unsigned int g_host_prev_added_generation[16384];
 static unsigned int g_host_prev_add_generation;
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_all_added_prims[32769];
+static intptr g_host_all_added_prims[32769];
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_all_added_ots[32769];
+static intptr g_host_all_added_ots[32769];
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_all_added_callers[32769];
+static intptr g_host_all_added_callers[32769];
 #endif
 static unsigned int g_host_add_generation;
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_last_added_prim;
+static intptr g_host_last_added_prim;
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_last_added_end;
+static intptr g_host_last_added_end;
 #endif
 #if NFSHS_DIAGNOSTICS
 static unsigned int g_host_packet_overlap_count;
 #endif
 #if NFSHS_DIAGNOSTICS
-static uintptr_t g_host_addprim_caller_override;
 #endif
 #if NFSHS_DIAGNOSTICS
 static int g_host_dma_tag_fault_seen;
 #endif
 extern "C" void NFSHS_HostLog(const char *, ...);
-struct HostOtRange { uintptr_t begin, end; };
+struct HostOtRange { intptr begin, end; };
 static HostOtRange g_host_ot_ranges[16];
 static unsigned int g_host_ot_range_count;
 
 #if NFSHS_DIAGNOSTICS
 /* Diagnostic history may forget provenance, never stall gameplay.
    Index 32768 is a permanently empty sentinel for a full-table miss. */
-static unsigned int host_history_slot(uintptr_t key)
+static unsigned int host_history_slot(intptr key)
 {
     unsigned int slot=((unsigned int)key>>2)&32767u;
     for(unsigned int n=0;n<32768;n++,slot=(slot+1)&32767u)
@@ -183,7 +180,7 @@ static int host_dma_address_is_current(unsigned int low24)
    heap OT nodes can live in different 16 MiB host regions with the same
    low bits.  Resolve a primitive through the exact AddPrim observation for
    this frame before attempting any high-bit reconstruction. */
-static uintptr_t host_added_prim_resolve(unsigned int low24)
+static intptr host_added_prim_resolve(unsigned int low24)
 {
     low24&=0x00fffffcu;
     unsigned int slot=(low24>>2)&16383u;
@@ -197,7 +194,7 @@ static uintptr_t host_added_prim_resolve(unsigned int low24)
     return 0;
 }
 
-static void host_check_linked_tags(uintptr_t observer)
+static void host_check_linked_tags(intptr observer)
 {
 #if NFSHS_DIAGNOSTICS
 
@@ -219,158 +216,16 @@ static void host_check_linked_tags(uintptr_t observer)
 #endif
 }
 
-struct HostAllocHeader {
-    unsigned int magic;
-    unsigned int size;
-    unsigned int span;
-    unsigned int nextFree;
-};
-
-enum { HOST_ALLOC_MAGIC = 0x4846534eU }; /* "NSFH" little endian */
-enum { HOST_FREE_MAGIC = 0x45455246U };  /* "FREE" little endian */
-
-static HostAllocHeader *host_header_from_offset(unsigned int offset) {
-    return (HostAllocHeader *)(gHostObjectArena + offset);
-}
-
-extern "C" void *NFSHS_HostAlloc(unsigned int size) {
-    if (!NFSHS_HostInitMemory()) return 0;
-    unsigned int payload = (size ? size : 1);
-    if (payload > 0xffffffffU - (unsigned int)sizeof(HostAllocHeader) - 15U) return 0;
-    unsigned int span = (sizeof(HostAllocHeader) + payload + 15U) & ~15U;
-    unsigned int *freeLink = &gHostObjectFreeHead;
-    HostAllocHeader *h = 0;
-    while (*freeLink != 0xffffffffU) {
-        HostAllocHeader *candidate = host_header_from_offset(*freeLink);
-        if (candidate->magic == HOST_FREE_MAGIC && candidate->span >= span) {
-            unsigned int remainder = candidate->span - span;
-            h = candidate;
-            if (remainder >= sizeof(HostAllocHeader) + 16U) {
-                unsigned int splitOffset = *freeLink + span;
-                HostAllocHeader *split = host_header_from_offset(splitOffset);
-                split->magic = HOST_FREE_MAGIC;
-                split->size = 0;
-                split->span = remainder;
-                split->nextFree = candidate->nextFree;
-                *freeLink = splitOffset;
-                h->span = span;
-            } else {
-                *freeLink = candidate->nextFree;
-            }
-            break;
-        }
-        freeLink = &candidate->nextFree;
-    }
-    if (!h) {
-        if (span > HOST_OBJECT_ARENA_SIZE - gHostObjectArenaUsed) return 0;
-        h = (HostAllocHeader *)(gHostObjectArena + gHostObjectArenaUsed);
-        h->span = span;
-        gHostObjectArenaUsed += span;
-    }
-    h->magic = HOST_ALLOC_MAGIC;
-    h->size = size;
-    h->nextFree = 0xffffffffU;
-    void *p = h + 1;
-    memset(p, 0, h->span - sizeof(*h));
-    return p;
-}
-
-extern "C" void NFSHS_HostFree(void *p) {
-    if (!p || !gHostObjectArena) return;
-    HostAllocHeader *h = (HostAllocHeader *)p - 1;
-    uintptr_t headerAddress = (uintptr_t)h;
-    uintptr_t arenaAddress = (uintptr_t)gHostObjectArena;
-    if (headerAddress < arenaAddress ||
-        headerAddress + sizeof(*h) > arenaAddress + gHostObjectArenaUsed ||
-        h->magic != HOST_ALLOC_MAGIC || h->span < sizeof(*h) ||
-        h->span > gHostObjectArenaUsed - (unsigned int)(headerAddress - arenaAddress)) return;
-
-    unsigned int offset = (unsigned int)(headerAddress - arenaAddress);
-    unsigned int *freeLink = &gHostObjectFreeHead;
-    HostAllocHeader *previous = 0;
-    while (*freeLink != 0xffffffffU && *freeLink < offset) {
-        previous = host_header_from_offset(*freeLink);
-        freeLink = &previous->nextFree;
-    }
-    h->magic = HOST_FREE_MAGIC;
-    h->size = 0;
-    h->nextFree = *freeLink;
-    *freeLink = offset;
-
-    if (h->nextFree != 0xffffffffU) {
-        HostAllocHeader *next = host_header_from_offset(h->nextFree);
-        if (offset + h->span == h->nextFree && next->magic == HOST_FREE_MAGIC) {
-            h->span += next->span;
-            h->nextFree = next->nextFree;
-        }
-    }
-    if (previous) {
-        unsigned int previousOffset = (unsigned int)((unsigned char *)previous - gHostObjectArena);
-        if (previousOffset + previous->span == offset && previous->magic == HOST_FREE_MAGIC) {
-            previous->span += h->span;
-            previous->nextFree = h->nextFree;
-        }
-    }
-}
-
-extern "C" unsigned int NFSHS_HostAllocationSize(void *p) {
-    if (!p) return 0;
-    HostAllocHeader *h = (HostAllocHeader *)p - 1;
-    return h->magic == HOST_ALLOC_MAGIC ? h->size : 0;
-}
-
-extern "C" unsigned int NFSHS_HostAvailable(void) {
-    unsigned int available = HOST_OBJECT_ARENA_SIZE - gHostObjectArenaUsed;
-    unsigned int offset = gHostObjectFreeHead;
-    while (offset != 0xffffffffU) {
-        HostAllocHeader *h = host_header_from_offset(offset);
-        if (h->magic != HOST_FREE_MAGIC) break;
-        available += h->span;
-        offset = h->nextFree;
-    }
-    return available;
-}
-
-extern "C" int NFSHS_HostAllocatorSelfTest(void) {
-    unsigned int before = NFSHS_HostAvailable();
-    unsigned char *a = (unsigned char *)NFSHS_HostAlloc(64);
-    unsigned char *b = (unsigned char *)NFSHS_HostAlloc(96);
-    unsigned char *c = (unsigned char *)NFSHS_HostAlloc(128);
-    if (!a || !b || !c) return 1;
-    if (((uintptr_t)a & 15U) || ((uintptr_t)b & 15U) || ((uintptr_t)c & 15U)) return 2;
-    if (NFSHS_HostAllocationSize(a) != 64 || NFSHS_HostAllocationSize(b) != 96 ||
-        NFSHS_HostAllocationSize(c) != 128) return 3;
-    memset(b,0xa5,96);
-    NFSHS_HostFree(b);
-    unsigned char *replacement = (unsigned char *)NFSHS_HostAlloc(48);
-    if (replacement != b || NFSHS_HostAllocationSize(replacement) != 48) return 4;
-    for (unsigned int i=0; i<48; ++i) if (replacement[i] != 0) return 5;
-    NFSHS_HostFree(replacement);
-    NFSHS_HostFree(a);
-    NFSHS_HostFree(c);
-    if (NFSHS_HostAvailable() != before) return 6;
-    unsigned char *combined = (unsigned char *)NFSHS_HostAlloc(240);
-    if (combined != a) return 7;
-    NFSHS_HostFree(combined);
-    if (NFSHS_HostAvailable() != before) return 8;
-    return 0;
-}
-
-struct PsxRect { short x, y, w, h; };
-struct PsxDispEnv { PsxRect disp, screen; unsigned char isinter, isrgb24, pad0, pad1; };
-struct PsxDrawEnv {
-    PsxRect clip; short ofs[2]; PsxRect tw; unsigned short tpage;
-    unsigned char dtd, dfe, isbg, r0, g0, b0; unsigned long dr_env[16];
-};
-struct PsxVector { long vx, vy, vz, pad; };
-struct PsxSVector { short vx, vy, vz, pad; };
-struct PsxMatrix { short m[3][3]; long t[3]; };
+typedef PSX_RECT PsxRect;
+typedef DISPENV PsxDispEnv;
+typedef DRAWENV PsxDrawEnv;
+typedef VECTOR PsxVector;
+typedef SVECTOR PsxSVector;
+typedef MATRIX PsxMatrix;
 struct PsxCdlLoc { unsigned char minute, second, sector, track; };
 struct PsxCdlFile { PsxCdlLoc pos; unsigned long size; char name[16]; };
 
-static HWND g_window;
-static LARGE_INTEGER g_qpc_frequency;
-static LARGE_INTEGER g_qpc_start;
+static int g_window;
 static void (*g_vsync_callback)(void);
 static int g_video_mode;
 static int g_geom_screen = 256;
@@ -388,7 +243,6 @@ static unsigned long long g_host_timer_ticks;
 static unsigned long long g_host_fast_vsync_count;
 static int g_host_fast_test = -1;
 static int g_host_test_verbose = -1;
-static int g_host_timer_resolution_active;
 #if defined(AP_WIN) && NFSHS_DIAGNOSTICS
 /* Temporary deterministic-input harness.  The table is generated from the
  * raw digital-pad packets captured from DuckStation, not reconstructed from
@@ -415,22 +269,6 @@ extern "C" int gTicks;
 extern "C" void NFSHS_HostLog(const char *, ...);
 static void ensure_window(void);
 static void pump_messages(void);
-
-static void host_restore_timer_resolution(void)
-{
-    if (g_host_timer_resolution_active) {
-        timeEndPeriod(1);
-        g_host_timer_resolution_active=0;
-    }
-}
-
-static void host_request_timer_resolution(void)
-{
-    if (!g_host_timer_resolution_active && timeBeginPeriod(1)==TIMERR_NOERROR) {
-        g_host_timer_resolution_active=1;
-        atexit(host_restore_timer_resolution);
-    }
-}
 
 static int host_fast_test_enabled(void)
 {
@@ -630,59 +468,6 @@ return fallback;
 #endif
 }
 
-static LONG WINAPI nfshs_unhandled_exception(EXCEPTION_POINTERS *ep)
-{
-#if NFSHS_DIAGNOSTICS
-
-    EXCEPTION_RECORD *er=ep ? ep->ExceptionRecord : 0;
-    if(er) {
-        unsigned long access=er->NumberParameters>0 ? (unsigned long)er->ExceptionInformation[0] : 0;
-        unsigned long address=er->NumberParameters>1 ? (unsigned long)er->ExceptionInformation[1] : 0;
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("UNHANDLED code=%08lx pc=%p access=%lu address=%08lx",
-                      er->ExceptionCode,er->ExceptionAddress,access,address));
-    }
-#if defined(__i386__) || defined(_M_IX86)
-    if(ep && ep->ContextRecord) {
-        CONTEXT *c=ep->ContextRecord;
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("UNHANDLED_X86 eax=%08lx ebx=%08lx ecx=%08lx edx=%08lx esi=%08lx edi=%08lx ebp=%08lx esp=%08lx",
-            c->Eax,c->Ebx,c->Ecx,c->Edx,c->Esi,c->Edi,c->Ebp,c->Esp));
-        MEMORY_BASIC_INFORMATION mbi;
-        if(c->Esp && VirtualQuery((void *)(uintptr_t)c->Esp,&mbi,sizeof(mbi)) &&
-           mbi.State==MEM_COMMIT && !(mbi.Protect&(PAGE_NOACCESS|PAGE_GUARD))) {
-            unsigned int *stack=(unsigned int *)(uintptr_t)c->Esp;
-            for(int i=0;i<32;i+=8)
-                NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("UNHANDLED_STACK +%02x %08x %08x %08x %08x %08x %08x %08x %08x",
-                    i*4,stack[i],stack[i+1],stack[i+2],stack[i+3],stack[i+4],stack[i+5],stack[i+6],stack[i+7]));
-        }
-        if(c->Ebp>=0x20 && VirtualQuery((void *)(uintptr_t)(c->Ebp-0x20),&mbi,sizeof(mbi)) &&
-           mbi.State==MEM_COMMIT && !(mbi.Protect&(PAGE_NOACCESS|PAGE_GUARD))) {
-            uintptr_t menu=*(uintptr_t *)(uintptr_t)(c->Ebp-0x1c);
-            uintptr_t item=*(uintptr_t *)(uintptr_t)(c->Ebp-0x10);
-            int index=-1;
-            if(menu && VirtualQuery((void *)menu,&mbi,sizeof(mbi)) && mbi.State==MEM_COMMIT &&
-               !(mbi.Protect&(PAGE_NOACCESS|PAGE_GUARD))) {
-                for(int i=0;i<16;i++) if(*(uintptr_t *)(menu+0x10+i*4)==item) { index=i; break; }
-            }
-            uintptr_t vf=0;
-            unsigned int flags=0,text=0;
-            if(item && VirtualQuery((void *)item,&mbi,sizeof(mbi)) && mbi.State==MEM_COMMIT &&
-               !(mbi.Protect&(PAGE_NOACCESS|PAGE_GUARD))) {
-                flags=*(unsigned int *)item;
-                text=*(unsigned int *)(item+4);
-                vf=*(uintptr_t *)(item+0x18);
-            }
-            NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("UNHANDLED_MENU menu=%p item=%p index=%d flags=%08x text=%08x vf=%p",
-                          (void *)menu,(void *)item,index,flags,text,(void *)vf));
-        }
-    }
-#endif
-    return EXCEPTION_EXECUTE_HANDLER;
-
-#else
-    return EXCEPTION_CONTINUE_SEARCH;
-#endif
-}
-
 static unsigned short host_auto_mask(char key)
 {
     switch(key) {
@@ -694,26 +479,10 @@ static unsigned short host_auto_mask(char key)
     return 0;
 }
 
-static unsigned short host_key_mask(WPARAM key)
-{
-    switch(key) {
-      case VK_UP: case 'W':return 0x0010;
-      case VK_RIGHT: case 'D':return 0x0020;
-      case VK_DOWN: case 'S':return 0x0040;
-      case VK_LEFT: case 'A':return 0x0080;
-      case VK_BACK:return 0x0001; case VK_RETURN:return 0x0008;
-      case '1':return 0x0100; case '3':return 0x0200;
-      case 'Q':return 0x0400; case 'E':return 0x0800;
-      case 'I':return 0x1000; case 'L':return 0x2000;
-      case 'K':return 0x4000; case 'J':return 0x8000;
-    }
-    return 0;
-}
-
-enum { HOST_FB_W = 512, HOST_FB_H = 240, HOST_VRAM_W = PSYQ_GPU_VRAM_WIDTH, HOST_VRAM_H = PSYQ_GPU_VRAM_HEIGHT };
+enum { HOST_FB_W = 512, HOST_FB_H = 240, HOST_VRAM_W = 1024, HOST_VRAM_H = 512 };
 static unsigned int g_framebuffer[HOST_FB_W * HOST_FB_H];
 static unsigned long long g_host_pixel_writes;
-#define g_vram PsyQ_gpu_vram
+#define g_vram VRAM
 static PsxDispEnv g_display_env;
 static PsxDrawEnv g_draw_env;
 static unsigned short g_active_tpage;
@@ -747,21 +516,21 @@ static void host_load_flare_readbacks(void)
     g_host_flare_readback_count=0;
     char path[MAX_PATH];
     if(!GetEnvironmentVariableA("NFSHS_FLARE_READBACK_REPLAY",path,sizeof(path))) return;
-    HANDLE file=CreateFileA(path,GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
-    if(file==INVALID_HANDLE_VALUE) return;
-    unsigned char header[12]; DWORD got=0;
-    if(!ReadFile(file,header,sizeof(header),&got,0) || got!=sizeof(header) ||
+    FILE *file=fopen(path,"rb");
+    if(!file) return;
+    unsigned char header[12];
+    if(fread(header,1,sizeof(header),file)!=sizeof(header) ||
        memcmp(header,"N4FRDBK\0",8)!=0 || *(unsigned int *)(header+8)!=1) {
-        CloseHandle(file); return;
+        fclose(file); return;
     }
     while(g_host_flare_readback_count<2048) {
         unsigned char row[54];
-        if(!ReadFile(file,row,sizeof(row),&got,0) || got!=sizeof(row)) break;
+        if(fread(row,1,sizeof(row),file)!=sizeof(row)) break;
         HostFlareReadback *dst=&g_host_flare_readbacks[g_host_flare_readback_count++];
         dst->tick=*(int *)row;
         memcpy(dst->pixels,row+4,50);
     }
-    CloseHandle(file);
+    fclose(file);
 }
 
 extern "C" void NFSHS_HostReplayFlareReadback(void *memory)
@@ -784,12 +553,11 @@ static void host_load_initial_vram(void)
     if(!GetEnvironmentVariableA("NFSHS_INITIAL_VRAM",path,sizeof(path))) return;
     if(GetEnvironmentVariableA("NFSHS_INITIAL_VRAM_TICK",tick_text,sizeof(tick_text)) &&
        NFSHS_HostCurrentGameTicks()<atoi(tick_text)) return;
-    HANDLE file=CreateFileA(path,GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
-    if(file==INVALID_HANDLE_VALUE) return;
-    DWORD got=0;
-    BOOL ok=ReadFile(file,g_vram,(DWORD)sizeof(g_vram),&got,0);
-    CloseHandle(file);
-    if(ok && got==sizeof(g_vram))
+    FILE *file=fopen(path,"rb");
+    if(!file) return;
+    size_t got=fread(g_vram,1,sizeof(g_vram),file);
+    fclose(file);
+    if(got==sizeof(g_vram))
         NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("loaded initial VRAM fixture path=%s bytes=%lu",path,(unsigned long)got));
     else
         memset(g_vram,0,sizeof(g_vram));
@@ -1484,8 +1252,7 @@ static void host_draw_packet(const unsigned char *p)
 
 static int host_readable(const void *p)
 {
-    MEMORY_BASIC_INFORMATION mbi; if(!p||!VirtualQuery(p,&mbi,sizeof(mbi)))return 0;
-    return mbi.State==MEM_COMMIT && !(mbi.Protect&(PAGE_NOACCESS|PAGE_GUARD));
+    return xport_memory_readable(p, 1);
 }
 
 /* Observation-only OT stream.  The payload deliberately excludes each DMA
@@ -1500,7 +1267,7 @@ struct HostOtTraceFrame {
 };
 struct HostOtTracePacket {
     unsigned int zeroRun, words;
-    uintptr_t address, caller;
+    intptr address, caller;
 };
 static int g_host_ot_trace_fd=-2;
 static int g_host_ot_trace_start;
@@ -1513,7 +1280,7 @@ extern "C" void NFSHS_GTE_DebugTransform(void *,void *);
 struct HostDrawQuadCandidate {
     unsigned int marker;
     int tick,call;
-    uintptr_t sd,quad,material;
+    intptr sd,quad,material;
     unsigned char quadBytes[16],materialBytes[4];
     int sxy[4];
     int transformed[4][3];
@@ -1528,7 +1295,7 @@ struct HostDrawQuadCandidate {
 struct HostDrawCPrimEntry {
     unsigned int marker;
     int tick,call,envmap;
-    uintptr_t matrix,translation,obj,overlay,cache,primPtr,mprimPtr;
+    intptr matrix,translation,obj,overlay,cache,primPtr,mprimPtr;
     unsigned char objHead[32];
     unsigned char matrixBytes[36];
     int translationValues[3];
@@ -1554,8 +1321,8 @@ extern "C" void NFSHS_HostTraceDrawCPrimEntry(
     const unsigned char *cache=(const unsigned char *)rawCache;
     HostDrawCPrimEntry record={};
     record.marker=0x5043444eU; record.tick=tick; record.call=call++; record.envmap=envmap;
-    record.matrix=(uintptr_t)matrix; record.translation=(uintptr_t)translation;
-    record.obj=(uintptr_t)obj; record.overlay=(uintptr_t)overlay; record.cache=(uintptr_t)rawCache;
+    record.matrix=(intptr)matrix; record.translation=(intptr)translation;
+    record.obj=(intptr)obj; record.overlay=(intptr)overlay; record.cache=(intptr)rawCache;
     memcpy(&record.primPtr,cache+4,sizeof(record.primPtr));
     memcpy(&record.mprimPtr,cache+8,sizeof(record.mprimPtr));
     memcpy(record.objHead,obj,sizeof(record.objHead));
@@ -1568,7 +1335,7 @@ extern "C" void NFSHS_HostTraceDrawCPrimEntry(
 struct HostR3DCarEntry {
     unsigned int marker;
     int tick,call,carIndex;
-    uintptr_t car;
+    intptr car;
     unsigned char position[12];
     unsigned char render[152];
     unsigned char visible[57];
@@ -1590,7 +1357,7 @@ extern "C" void NFSHS_HostTraceR3DCarEntry(const void *rawCar,const void *rawVis
     if(fd<0 || !rawCar || !rawVisible || tick<startTick || tick>endTick) return;
     const unsigned char *car=(const unsigned char *)rawCar;
     HostR3DCarEntry record={};
-    record.marker=0x4333444eU; record.tick=tick; record.call=call++; record.car=(uintptr_t)rawCar;
+    record.marker=0x4333444eU; record.tick=tick; record.call=call++; record.car=(intptr)rawCar;
     memcpy(&record.carIndex,car+0x254,4);
     memcpy(record.position,car+0x18,12);
     memcpy(record.render,car+0x840,sizeof(record.render));
@@ -1601,7 +1368,7 @@ extern "C" void NFSHS_HostTraceR3DCarEntry(const void *rawCar,const void *rawVis
 struct HostPrimStartResult {
     unsigned int marker;
     int tick,call,result,carIndex;
-    uintptr_t car;
+    intptr car;
     unsigned char center[8];
     unsigned char screenMatrix[32];
     unsigned char cacheHead[80];
@@ -1625,7 +1392,7 @@ extern "C" void NFSHS_HostTracePrimStartResult(
     const unsigned char *car=(const unsigned char *)rawCar;
     HostPrimStartResult record={};
     record.marker=0x5350444eU; record.tick=tick; record.call=call++; record.result=result;
-    record.car=(uintptr_t)rawCar; memcpy(&record.carIndex,car+0x254,4);
+    record.car=(intptr)rawCar; memcpy(&record.carIndex,car+0x254,4);
     memcpy(record.center,center,sizeof(record.center));
     memcpy(record.screenMatrix,screenMatrix,sizeof(record.screenMatrix));
     memcpy(record.cacheHead,cache,sizeof(record.cacheHead));
@@ -1652,7 +1419,7 @@ extern "C" void NFSHS_HostTraceDrawQuadCandidate(
     HostDrawQuadCandidate record={};
     record.marker=0x4451434eU;
     record.tick=tick; record.call=call++;
-    record.sd=(uintptr_t)rawSd; record.quad=(uintptr_t)quad; record.material=(uintptr_t)material;
+    record.sd=(intptr)rawSd; record.quad=(intptr)quad; record.material=(intptr)material;
     memcpy(record.quadBytes,quad,sizeof(record.quadBytes));
     memcpy(record.materialBytes,material,sizeof(record.materialBytes));
     record.sxy[0]=(int)sxy0; record.sxy[1]=(int)sxy1;
@@ -1700,9 +1467,9 @@ extern "C" void NFSHS_HostTraceFlareEmit(
     }
     int tick=NFSHS_HostCurrentGameTicks();
     if(fd<0 || !center || tick<startTick || tick>endTick) return;
-    struct Emit { int tick,otz,xypack; uintptr_t caller; char kind[12]; } record={};
+    struct Emit { int tick,otz,xypack; intptr caller; char kind[12]; } record={};
     record.tick=tick; record.otz=otz; memcpy(&record.xypack,center,4);
-    record.caller=(uintptr_t)caller;
+    record.caller=(intptr)caller;
     if(kind) strncpy(record.kind,kind,sizeof(record.kind)-1);
     _write(fd,&record,sizeof(record));
 }
@@ -1727,13 +1494,13 @@ extern "C" void NFSHS_HostTraceFlareHaloEntry(
     if(fd<0 || !view || !fpt) return;
     struct Entry {
         unsigned marker; int tick,scale,type;
-        uintptr_t view,fpt,fpt2,cache;
+        intptr view,fpt,fpt2,cache;
         int viewPos[3],point[3],point2[3];
     } record={};
     record.marker=0x48454e54U; record.tick=NFSHS_HostCurrentGameTicks();
     record.scale=scale; record.type=type;
-    record.view=(uintptr_t)view; record.fpt=(uintptr_t)fpt;
-    record.fpt2=(uintptr_t)fpt2; record.cache=(uintptr_t)cache;
+    record.view=(intptr)view; record.fpt=(intptr)fpt;
+    record.fpt2=(intptr)fpt2; record.cache=(intptr)cache;
     memcpy(record.viewPos,(const char *)view+8,12);
     memcpy(record.point,fpt,12);
     if(fpt2) memcpy(record.point2,fpt2,12);
@@ -1789,11 +1556,11 @@ static void host_ot_trace_write(const void *data,unsigned int size)
 #endif
 
 extern "C" {
-static uintptr_t host_psyq_ot_tail_resolve(unsigned int next);
-static int host_psyq_ot_tail_contains(uintptr_t address);
+static intptr host_psyq_ot_tail_resolve(unsigned int next);
+static int host_psyq_ot_tail_contains(intptr address);
 }
 
-static int host_ot_or_packet_range(uintptr_t address)
+static int host_ot_or_packet_range(intptr address)
 {
     for(unsigned int i=0;i<g_host_ot_range_count;i++)
         if(address>=g_host_ot_ranges[i].begin && address+4<=g_host_ot_ranges[i].end)
@@ -1801,32 +1568,32 @@ static int host_ot_or_packet_range(uintptr_t address)
     return g_host_packet_begin && address>=g_host_packet_begin && address+4<=g_host_packet_end;
 }
 
-static int host_dma_known_range(uintptr_t address)
+static int host_dma_known_range(intptr address)
 {
     if(host_ot_or_packet_range(address)) return 1;
-    return gHostObjectArena && address>=(uintptr_t)gHostObjectArena &&
-           address+4<=(uintptr_t)gHostObjectArena+gHostObjectArenaUsed;
+    return gHostObjectArena && address>=(intptr)gHostObjectArena &&
+           address+4<=(intptr)gHostObjectArena+gHostObjectArenaUsed;
 }
 
-static uintptr_t host_ot_trace_next(unsigned char *cur,unsigned char *start,unsigned int next)
+static intptr host_ot_trace_next(unsigned char *cur,unsigned char *start,unsigned int next)
 {
-    uintptr_t added=host_added_prim_resolve(next);
+    intptr added=host_added_prim_resolve(next);
     if(added) return added;
-    uintptr_t tail=host_psyq_ot_tail_resolve(next);
+    intptr tail=host_psyq_ot_tail_resolve(next);
     if(tail) return tail;
     /* The PSX DMA tag retains only address bits 23:2.  A native chain can
        alternate between the PE image, packet arena, object arena and OT.
        Resolve all explicitly known native ranges before accepting a readable
        zero-extended PE alias: low 24 bits alone are not unique on Windows. */
-    uintptr_t candidates[4]={
-        ((uintptr_t)cur&~(uintptr_t)0xffffffu)|next,
-        ((uintptr_t)start&~(uintptr_t)0xffffffu)|next,
-        (g_host_packet_begin&~(uintptr_t)0xffffffu)|next,
-        ((uintptr_t)gHostObjectArena&~(uintptr_t)0xffffffu)|next
+    intptr candidates[4]={
+        ((intptr)cur&~(intptr)0xffffffu)|next,
+        ((intptr)start&~(intptr)0xffffffu)|next,
+        (g_host_packet_begin&~(intptr)0xffffffu)|next,
+        ((intptr)gHostObjectArena&~(intptr)0xffffffu)|next
     };
     for(int i=0;i<4;i++)
         if(host_dma_known_range(candidates[i])) return candidates[i];
-    if(host_readable((void *)(uintptr_t)next)) return (uintptr_t)next;
+    if(host_readable((void *)(intptr)next)) return (intptr)next;
     for(int i=0;i<4;i++)
         if(host_readable((void *)candidates[i])) return candidates[i];
     return 0;
@@ -1865,10 +1632,10 @@ static void host_trace_ot(unsigned long *start)
     unsigned char *cur=(unsigned char *)start;
     unsigned int nodes=0,packets=0,zeroRun=0;
     int terminated=0,cycle=0;
-    uintptr_t seen[8192];
+    intptr seen[8192];
     unsigned int seenCount=0;
     while(host_readable(cur) && nodes<100000 && seenCount<8192) {
-        uintptr_t address=(uintptr_t)cur;
+        intptr address=(intptr)cur;
         unsigned int si=0;
         for(;si<seenCount;si++) if(seen[si]==address) break;
         if(si<seenCount) { cycle=1; break; }
@@ -1879,13 +1646,13 @@ static void host_trace_ot(unsigned long *start)
         if(words) { ++packets; zeroRun=0; }
         else ++zeroRun;
         if(rawNext==0x00ffffffu) { terminated=1; break; }
-        uintptr_t next=host_ot_trace_next(cur,(unsigned char *)start,rawNext&0x00fffffcu);
-        if(!next || next==(uintptr_t)cur) break;
+        intptr next=host_ot_trace_next(cur,(unsigned char *)start,rawNext&0x00fffffcu);
+        if(!next || next==(intptr)cur) break;
         cur=(unsigned char *)next;
     }
     int view=-1;
     for(unsigned int i=0;i<g_host_ot_range_count;i++)
-        if((uintptr_t)start==g_host_ot_ranges[i].end-4u) { view=(int)i; break; }
+        if((intptr)start==g_host_ot_ranges[i].end-4u) { view=(int)i; break; }
     HostOtTraceFrame frame={0x46544f4eU,tick,call,view,nodes,packets,zeroRun,
                             (unsigned int)(terminated|(cycle<<1))};
     host_ot_trace_write(&frame,sizeof(frame));
@@ -1894,7 +1661,7 @@ static void host_trace_ot(unsigned long *start)
     seenCount=0;
     zeroRun=0;
     while(host_readable(cur) && seenCount<8192) {
-        uintptr_t address=(uintptr_t)cur;
+        intptr address=(intptr)cur;
         unsigned int si=0;
         for(;si<seenCount;si++) if(seen[si]==address) break;
         if(si<seenCount) break;
@@ -1902,28 +1669,28 @@ static void host_trace_ot(unsigned long *start)
         unsigned int tag=*(unsigned int *)cur;
         unsigned int words=tag>>24,rawNext=tag&0x00ffffffu;
         if(words) {
-            uintptr_t caller=0;
-            unsigned int slot=((unsigned int)(uintptr_t)cur>>2)&16383u;
+            intptr caller=0;
+            unsigned int slot=((unsigned int)(intptr)cur>>2)&16383u;
             unsigned int probes=0;
             while(g_host_added_generation[slot]==g_host_add_generation &&
-                  g_host_added_prims[slot]!=(uintptr_t)cur && ++probes<16384)
+                  g_host_added_prims[slot]!=(intptr)cur && ++probes<16384)
                 slot=(slot+1)&16383u;
             if(g_host_added_generation[slot]==g_host_add_generation &&
-               g_host_added_prims[slot]==(uintptr_t)cur)
+               g_host_added_prims[slot]==(intptr)cur)
                 caller=g_host_added_callers[slot];
             if(!caller) {
-                slot=host_history_slot((uintptr_t)cur);
-                if(g_host_all_added_prims[slot]==(uintptr_t)cur)
+                slot=host_history_slot((intptr)cur);
+                if(g_host_all_added_prims[slot]==(intptr)cur)
                     caller=g_host_all_added_callers[slot];
             }
-            HostOtTracePacket packet={zeroRun,words,(uintptr_t)cur,caller};
+            HostOtTracePacket packet={zeroRun,words,(intptr)cur,caller};
             host_ot_trace_write(&packet,sizeof(packet));
             host_ot_trace_write(cur+4,words*4u);
             zeroRun=0;
         } else ++zeroRun;
         if(rawNext==0x00ffffffu) break;
-        uintptr_t next=host_ot_trace_next(cur,(unsigned char *)start,rawNext&0x00fffffcu);
-        if(!next || next==(uintptr_t)cur) break;
+        intptr next=host_ot_trace_next(cur,(unsigned char *)start,rawNext&0x00fffffcu);
+        if(!next || next==(intptr)cur) break;
         cur=(unsigned char *)next;
     }
 }
@@ -2047,10 +1814,9 @@ static void host_present(void)
         if(nonblack>best_nonblack) best_nonblack=nonblack;
     }
 #endif
-    if(!g_window)return; RECT rc;GetClientRect(g_window,&rc);BITMAPINFO bi;memset(&bi,0,sizeof(bi));
-    bi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);bi.bmiHeader.biWidth=HOST_FB_W;bi.bmiHeader.biHeight=-HOST_FB_H;
-    bi.bmiHeader.biPlanes=1;bi.bmiHeader.biBitCount=32;bi.bmiHeader.biCompression=BI_RGB;
-    HDC dc=GetDC(g_window);StretchDIBits(dc,0,0,rc.right,rc.bottom,0,0,display_width,display_height,g_framebuffer,&bi,DIB_RGB_COLORS,SRCCOPY);ReleaseDC(g_window,dc);
+    if (!g_window)
+        return;
+    xport_present(g_framebuffer, HOST_FB_W, HOST_FB_H, 0, 0, display_width, display_height, WND_TITLE);
 }
 
 /* VRAM is the only render target. Scan out DISPENV, independently of the last
@@ -2093,7 +1859,7 @@ static void host_refresh_scanout(void)
 
 static void host_scanout_vram(void) { host_present(); }
 
-static int host_fast_dma_address(uintptr_t address)
+static int host_fast_dma_address(intptr address)
 {
     if(host_psyq_ot_tail_contains(address)) return 1;
     if(host_added_prim_resolve((unsigned int)address)==address) return 1;
@@ -2101,8 +1867,8 @@ static int host_fast_dma_address(uintptr_t address)
     for(unsigned int i=0;i<g_host_ot_range_count;i++)
         if(address>=g_host_ot_ranges[i].begin && address+4<=g_host_ot_ranges[i].end) return 1;
     if(g_host_packet_begin && address>=g_host_packet_begin && address+4<=g_host_packet_end) return 1;
-    if(gHostObjectArena && address>=(uintptr_t)gHostObjectArena &&
-       address+4<=(uintptr_t)gHostObjectArena+gHostObjectArenaUsed) return 1;
+    if(gHostObjectArena && address>=(intptr)gHostObjectArena &&
+       address+4<=(intptr)gHostObjectArena+gHostObjectArenaUsed) return 1;
     return 0;
 }
 
@@ -2126,7 +1892,7 @@ static void host_draw_ot_fast(unsigned long *start)
     if(render_every==0 || current%(unsigned int)render_every) return;
     unsigned char *cur=(unsigned char *)start;
     int rendered=0;
-    for(int count=0;count<100000 && host_fast_dma_address((uintptr_t)cur);count++) {
+    for(int count=0;count<100000 && host_fast_dma_address((intptr)cur);count++) {
         unsigned int tag=*(unsigned int *)cur;
         unsigned int raw_next=tag&0x00ffffffu;
         unsigned int packet_words=tag>>24;
@@ -2144,8 +1910,8 @@ static void host_draw_ot_fast(unsigned long *start)
         }
         if(raw_next==0x00ffffffu) break;
         unsigned int next=raw_next&0x00fffffcu;
-        uintptr_t candidate=host_ot_trace_next(cur,(unsigned char *)start,next);
-        if(!host_fast_dma_address(candidate) || candidate==(uintptr_t)cur) break;
+        intptr candidate=host_ot_trace_next(cur,(unsigned char *)start,next);
+        if(!host_fast_dma_address(candidate) || candidate==(intptr)cur) break;
         cur=(unsigned char *)candidate;
     }
     if(rendered) host_present();
@@ -2230,7 +1996,7 @@ static void host_draw_ot(unsigned long *start)
         generation=++g_host_dma_generation;
     }
     unsigned char *cur=(unsigned char*)start;
-    uintptr_t previous=0;
+    intptr previous=0;
     int count=0, rendered=0, rasterized=0;
     int codes20=0,codes24=0,codes28=0,codes2c=0,codes30=0,codes34=0,codes38=0,codes3c=0,codes60=0,codes64=0;
     int gt3MinX=32767,gt3MaxX=-32768,gt3MinY=32767,gt3MaxY=-32768;
@@ -2241,14 +2007,14 @@ static void host_draw_ot(unsigned long *start)
     unsigned int near_material_gt3=0,near_material_gt4=0;
     unsigned int corrupt_ot_entries=0;
     while(host_readable(cur)&&count++<100000) {
-        unsigned int seen_slot=((unsigned int)(uintptr_t)cur>>2)&32767u;
+        unsigned int seen_slot=((unsigned int)(intptr)cur>>2)&32767u;
         { unsigned int remaining=32768;
         while((g_host_dma_seen_generation[seen_slot]==generation &&
-              g_host_dma_seen[seen_slot]!=(uintptr_t)cur) && --remaining)
+              g_host_dma_seen[seen_slot]!=(intptr)cur) && --remaining)
             seen_slot=(seen_slot+1)&32767u;
     }
         if(g_host_dma_seen_generation[seen_slot]==generation) {
-            uintptr_t repeat_caller=0,repeat_ot=0;
+            intptr repeat_caller=0,repeat_ot=0;
             if(previous) {
                 unsigned int current_slot=((unsigned int)previous>>2)&16383u;
                 { unsigned int remaining=16384;
@@ -2260,7 +2026,7 @@ static void host_draw_ot(unsigned long *start)
                     repeat_caller=g_host_added_callers[current_slot];
                     repeat_ot=g_host_added_ots[current_slot];
                 } else {
-                    unsigned int all_slot=host_history_slot((uintptr_t)previous);
+                    unsigned int all_slot=host_history_slot((intptr)previous);
                     if(g_host_all_added_prims[all_slot]) {
                         repeat_caller=g_host_all_added_callers[all_slot];
                         repeat_ot=g_host_all_added_ots[all_slot];
@@ -2282,16 +2048,16 @@ static void host_draw_ot(unsigned long *start)
             break;
         }
         g_host_dma_seen_generation[seen_slot]=generation;
-        g_host_dma_seen[seen_slot]=(uintptr_t)cur;
+        g_host_dma_seen[seen_slot]=(intptr)cur;
         g_host_dma_seen_index[seen_slot]=(unsigned int)count;
         g_host_dma_seen_predecessor[seen_slot]=previous;
         unsigned int tag=*(unsigned int*)cur;
         unsigned int raw_next=tag&0x00ffffffu;
         {
-            unsigned int addSlot=((unsigned int)(uintptr_t)cur>>2)&16383u;
+            unsigned int addSlot=((unsigned int)(intptr)cur>>2)&16383u;
             { unsigned int remaining=16384;
         while((g_host_added_generation[addSlot]==g_host_add_generation &&
-                  g_host_added_prims[addSlot]!=(uintptr_t)cur) && --remaining)
+                  g_host_added_prims[addSlot]!=(intptr)cur) && --remaining)
             addSlot=(addSlot+1)&16383u;
     }
             if(g_host_added_generation[addSlot]==g_host_add_generation &&
@@ -2309,7 +2075,7 @@ static void host_draw_ot(unsigned long *start)
            garbage in those bits, which real PSX hardware ignores. */
         unsigned int next=raw_next&0x00fffffcu;
         unsigned int packet_words=tag>>24;
-        if (packet_words && (uintptr_t)cur < g_host_packet_begin && corrupt_ot_entries < 32) {
+        if (packet_words && (intptr)cur < g_host_packet_begin && corrupt_ot_entries < 32) {
             NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("CORRUPT_OT_ENTRY n=%u entry=%p prev=%p start=%p index=%d tag=%08x next=%06x data=%08x,%08x,%08x,%08x prevdata=%08x,%08x,%08x,%08x",
                 corrupt_ot_entries,cur,(void *)previous,start,(int)(((unsigned long *)start-(unsigned long *)cur)),tag,next,
                 ((unsigned int *)cur)[0],((unsigned int *)cur)[1],
@@ -2334,11 +2100,11 @@ static void host_draw_ot(unsigned long *start)
                 int minx=32767,maxx=-32768,miny=32767,maxy=-32768;
                 for(int vi=0;vi<nxy;vi++){int x=host_s16(cur,xyoffs[vi]),y=host_s16(cur,xyoffs[vi]+2);if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;}
                 if(maxy-miny>180 && maxx>=120 && minx<=360) {
-                    uintptr_t addCaller=0,addOt=0;
-                    unsigned int addSlot=((unsigned int)(uintptr_t)cur>>2)&16383u;
+                    intptr addCaller=0,addOt=0;
+                    unsigned int addSlot=((unsigned int)(intptr)cur>>2)&16383u;
                     { unsigned int remaining=16384;
         while((g_host_added_generation[addSlot]==g_host_add_generation &&
-                          g_host_added_prims[addSlot]!=(uintptr_t)cur) && --remaining)
+                          g_host_added_prims[addSlot]!=(intptr)cur) && --remaining)
             addSlot=(addSlot+1)&16383u;
     }
                     if(g_host_added_generation[addSlot]==g_host_add_generation) {
@@ -2361,11 +2127,11 @@ static void host_draw_ot(unsigned long *start)
             int xs[3]={host_s16(cur,8),host_s16(cur,20),host_s16(cur,32)};
             int ys[3]={host_s16(cur,10),host_s16(cur,22),host_s16(cur,34)};
             if(capture_world && world_draw_index==capture_world_index && suspicious_gt3<768) {
-                uintptr_t addCaller=0,addOt=0;
-                unsigned int addSlot=((unsigned int)(uintptr_t)cur>>2)&16383u;
+                intptr addCaller=0,addOt=0;
+                unsigned int addSlot=((unsigned int)(intptr)cur>>2)&16383u;
                 { unsigned int remaining=16384;
         while((g_host_added_generation[addSlot]==g_host_add_generation &&
-                      g_host_added_prims[addSlot]!=(uintptr_t)cur) && --remaining)
+                      g_host_added_prims[addSlot]!=(intptr)cur) && --remaining)
             addSlot=(addSlot+1)&16383u;
     }
                 if(g_host_added_generation[addSlot]==g_host_add_generation) {
@@ -2417,20 +2183,20 @@ static void host_draw_ot(unsigned long *start)
                 }
             }
             if(capture_world && world_draw_index==capture_world_index && capture_gt4_traces<768) {
-                uintptr_t addCaller=0,addOt=0;
-                unsigned int addSlot=((unsigned int)(uintptr_t)cur>>2)&16383u;
+                intptr addCaller=0,addOt=0;
+                unsigned int addSlot=((unsigned int)(intptr)cur>>2)&16383u;
                 { unsigned int remaining=16384;
         while((g_host_added_generation[addSlot]==g_host_add_generation &&
-                      g_host_added_prims[addSlot]!=(uintptr_t)cur) && --remaining)
+                      g_host_added_prims[addSlot]!=(intptr)cur) && --remaining)
             addSlot=(addSlot+1)&16383u;
     }
                 if(g_host_added_generation[addSlot]==g_host_add_generation) {
                     addCaller=g_host_added_callers[addSlot]; addOt=g_host_added_ots[addSlot];
                 } else {
-                    addSlot=((unsigned int)(uintptr_t)cur>>2)&16383u;
+                    addSlot=((unsigned int)(intptr)cur>>2)&16383u;
                     { unsigned int remaining=16384;
         while((g_host_prev_added_generation[addSlot]==g_host_prev_add_generation &&
-                          g_host_prev_added_prims[addSlot]!=(uintptr_t)cur) && --remaining)
+                          g_host_prev_added_prims[addSlot]!=(intptr)cur) && --remaining)
             addSlot=(addSlot+1)&16383u;
     }
                     if(g_host_prev_added_generation[addSlot]==g_host_prev_add_generation) {
@@ -2438,7 +2204,7 @@ static void host_draw_ot(unsigned long *start)
                     }
                 }
                 if(!addCaller) {
-                    unsigned int allSlot=host_history_slot((uintptr_t)cur);
+                    unsigned int allSlot=host_history_slot((intptr)cur);
                     if(g_host_all_added_prims[allSlot]) {
                         addCaller=g_host_all_added_callers[allSlot]; addOt=g_host_all_added_ots[allSlot];
                     }
@@ -2507,19 +2273,19 @@ static void host_draw_ot(unsigned long *start)
             rendered++;
         }
         if(raw_next==0x00ffffffu)break;
-        uintptr_t candidate=host_ot_trace_next(cur,(unsigned char *)start,next);
-        if(!candidate||candidate==(uintptr_t)cur)break;
-        previous=(uintptr_t)cur;
+        intptr candidate=host_ot_trace_next(cur,(unsigned char *)start,next);
+        if(!candidate||candidate==(intptr)cur)break;
+        previous=(intptr)cur;
         cur=(unsigned char*)candidate;
     }
     if(g_host_probe_last_packet) {
         const unsigned char *pp=g_host_probe_last_packet;
-        unsigned int slot=((unsigned int)(uintptr_t)pp>>2)&16383u;
+        unsigned int slot=((unsigned int)(intptr)pp>>2)&16383u;
         { unsigned int remaining=16384;
-        while((g_host_added_generation[slot]==g_host_add_generation && g_host_added_prims[slot]!=(uintptr_t)pp) && --remaining)
+        while((g_host_added_generation[slot]==g_host_add_generation && g_host_added_prims[slot]!=(intptr)pp) && --remaining)
             slot=(slot+1)&16383u;
     }
-        uintptr_t caller=(g_host_added_generation[slot]==g_host_add_generation)?g_host_added_callers[slot]:0;
+        intptr caller=(g_host_added_generation[slot]==g_host_add_generation)?g_host_added_callers[slot]:0;
         NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("PIXEL_FINAL tick=%d call=%u packet=%p caller=%p code=%02x color=%06x xy=(%d,%d)(%d,%d)(%d,%d)(%d,%d) tp=%04x cl=%04x uv=(%u,%u)(%u,%u)(%u,%u)(%u,%u)",
             NFSHS_HostCurrentGameTicks(),diagnostic_calls,pp,(void*)caller,pp[7]&0xfc,g_host_probe_last_color,
             host_s16(pp,8),host_s16(pp,10),host_s16(pp,20),host_s16(pp,22),host_s16(pp,32),host_s16(pp,34),host_s16(pp,44),host_s16(pp,46),
@@ -2638,7 +2404,7 @@ extern "C" void NFSHS_HostTraceOtProducerSpan(const char *domain,const void *beg
     char line[256];
     int count=_snprintf(line,sizeof(line),
         "{\"tick\":%d,\"domain\":\"%s\",\"begin\":%u,\"end\":%u}\n",
-        NFSHS_HostCurrentGameTicks(),domain,(unsigned int)(uintptr_t)begin,(unsigned int)(uintptr_t)end);
+        NFSHS_HostCurrentGameTicks(),domain,(unsigned int)(intptr)begin,(unsigned int)(intptr)end);
     if(count>0 && count<(int)sizeof(line)) _write(fd,line,count);
 
 #else
@@ -2687,8 +2453,6 @@ extern "C" void NFSHS_HostPumpTimers(void)
     static unsigned long long lastLogged = 0;
     ensure_window();
     pump_messages();
-    LARGE_INTEGER now;
-    QueryPerformanceCounter(&now);
     /* The PSX libpad ISR updates the two PadInitDirect buffers asynchronously.
        The native backend owns that hardware boundary, so refresh the same
        buffers here before original timer subscribers (including PAD_update)
@@ -2701,8 +2465,7 @@ extern "C" void NFSHS_HostPumpTimers(void)
            deleting the callbacks or changing the counter values they see. */
         wanted = g_host_timer_ticks + 1;
     } else {
-        wanted = (unsigned long long)
-            (((now.QuadPart - g_qpc_start.QuadPart) * 128) / g_qpc_frequency.QuadPart);
+        wanted = (unsigned long long)(xport_timer_get() * 128u / 1000000u);
     }
     /* Avoid an unbounded catch-up burst after a debugger pause. */
     if (wanted > g_host_timer_ticks + 16) g_host_timer_ticks = wanted - 16;
@@ -2720,68 +2483,22 @@ extern "C" void NFSHS_HostPumpTimers(void)
 
 #define host_log NFSHS_HostLog
 
-static LRESULT CALLBACK nfs4_window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-    if (msg == WM_CLOSE) { DestroyWindow(hwnd); return 0; }
-    if (msg == WM_DESTROY) { g_window=0; PostQuitMessage(0); ExitProcess(0); return 0; }
-    if (msg == WM_KEYDOWN || msg == WM_KEYUP) {
-        unsigned short button=host_key_mask(wp);
-        if (msg == WM_KEYDOWN) g_pad_buttons |= button;
-        else g_pad_buttons &= (unsigned short)~button;
-        NFSHS_DIAGNOSTIC_CALL(host_log("WM_KEY%s vk=%u mask=%04x buttons=%04x",
-            msg == WM_KEYDOWN ? "DOWN" : "UP",(unsigned)wp,button,g_pad_buttons));
-        return 0;
-    }
-    if (msg == WM_KILLFOCUS) {
-        g_pad_buttons = 0;
-        return 0;
-    }
-    if (msg == WM_PAINT) { PAINTSTRUCT ps; BeginPaint(hwnd,&ps); EndPaint(hwnd,&ps); host_present(); return 0; }
-    return DefWindowProcA(hwnd, msg, wp, lp);
-}
-
 static void ensure_window(void)
 {
     static int initialized;
     if (g_window || initialized) return;
     initialized=1;
-    host_request_timer_resolution();
 #if NFSHS_DIAGNOSTICS
     g_host_collect_render_stats=!host_fast_test_enabled() || host_test_verbose_enabled();
 #endif
-    SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX|SEM_NOOPENFILEERRORBOX);
-    SetUnhandledExceptionFilter(nfshs_unhandled_exception);
-    {
-        char value[8];
-        if(GetEnvironmentVariableA("NFSHS_HEADLESS",value,sizeof(value))) {
-            QueryPerformanceFrequency(&g_qpc_frequency);
-            QueryPerformanceCounter(&g_qpc_start);
-            return;
-        }
-    }
-    HINSTANCE instance = GetModuleHandleA(0);
-    WNDCLASSA wc;
-    memset(&wc, 0, sizeof(wc));
-    wc.lpfnWndProc = nfs4_window_proc;
-    wc.hInstance = instance;
-    wc.hCursor = LoadCursorA(0, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wc.lpszClassName = "NFSHSNativeWindow";
-    RegisterClassA(&wc);
-    g_window = CreateWindowA(wc.lpszClassName, "Need for Speed: High Stakes - native port",
-        WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 660, 520,
-        0, 0, instance, 0);
-    QueryPerformanceFrequency(&g_qpc_frequency);
-    QueryPerformanceCounter(&g_qpc_start);
+    xport_set_headless(getenv("NFSHS_HEADLESS") != 0);
+    g_window = xport_window_init();
 }
 
 static void pump_messages(void)
 {
-    MSG msg;
-    while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessageA(&msg);
-    }
+    if (!xport_poll())
+        exit(0);
 }
 
 static void set_packet(void *packet, unsigned char words, unsigned char opcode)
@@ -2793,28 +2510,44 @@ static void set_packet(void *packet, unsigned char words, unsigned char opcode)
 
 extern "C" {
 
-/* ---- Win32 lifecycle / timing ------------------------------------------------ */
-int NFSHS_HostResetGraph(int) { ensure_window(); return 0; }
-void NFSHS_HostFlushCache(void) {}
-void NFSHS_HostResetCallback(void) { g_vsync_callback = 0; }
+/* ---- Host lifecycle / timing ------------------------------------------------- */
+void FlushCache(void) {}
+int ResetCallback(void) { g_vsync_callback = 0; return 0; }
 void SetVideoMode(int mode) { g_video_mode = mode; }
 int GetVideoMode(void) { return g_video_mode; }
-int NFSHS_HostVSync(int mode)
+int VSync(int mode)
 {
+    static int testExitVsyncs = -1;
     ensure_window(); pump_messages();
     if (mode >= 0) {
         if (host_fast_test_enabled()) ++g_host_fast_vsync_count;
-        else Sleep(16);
+        else xport_timer_wait_frame(60);
     }
     if (g_vsync_callback) g_vsync_callback();
-    if (mode >= 0 && !waveout_is_running()) PsyQSpuAdvance(735);
+    if (mode >= 0 && !xport_audio_is_running()) {
+        sint16 samples[735 * 2] = {0};
+        spu_render(samples, 735);
+    }
+    if (mode >= 0) {
+        if (testExitVsyncs < 0) {
+            const char *value = getenv("NFSHS_TEST_EXIT_VSYNCS");
+            testExitVsyncs = value ? atoi(value) : 0;
+        }
+        if (testExitVsyncs && (int)g_host_fast_vsync_count >= testExitVsyncs) {
+            printf("audio_metrics submitted=%u nonzero=%u peak=%u overruns=%u\n",
+                   (unsigned)g_xport_audio_submitted_buffers,
+                   (unsigned)g_xport_audio_nonzero_buffers,
+                   (unsigned)g_xport_audio_peak,
+                   (unsigned)g_xport_audio_callback_overruns);
+            exit(g_xport_audio_nonzero_buffers && g_xport_audio_peak ? 0 : 97);
+        }
+    }
     if (host_fast_test_enabled())
         return (int)g_host_fast_vsync_count;
-    LARGE_INTEGER now; QueryPerformanceCounter(&now);
-    return (int)(((now.QuadPart - g_qpc_start.QuadPart) * 60) / g_qpc_frequency.QuadPart);
+    return (int)(xport_timer_get() * 60u / 1000000u);
 }
 void *VSyncCallback(void *cb) { void *old=(void *)g_vsync_callback; g_vsync_callback=(void(*)(void))cb; return old; }
-int GetRCnt(int) { return NFSHS_HostVSync(-1); }
+int GetRCnt(int) { return VSync(-1); }
 int SetRCnt(int, unsigned short, int) { return 1; }
 int StartRCnt(int) { return 1; }
 long OpenEvent(...) { return 1; }
@@ -2825,36 +2558,6 @@ void ExitCriticalSection(void) {}
 void *DMACallback(int, void *cb) { return cb; }
 void *InterruptCallback(int, void *cb) { return cb; }
 
-/* ---- GPU packet construction and display state ------------------------------ */
-PsxDrawEnv *SetDefDrawEnv(PsxDrawEnv *e,int x,int y,int w,int h)
-{
-    memset(e,0,sizeof(*e)); e->clip.x=x; e->clip.y=y; e->clip.w=w; e->clip.h=h;
-    e->ofs[0]=x; e->ofs[1]=y; e->tpage=10; e->dtd=1;
-    e->dfe=(unsigned char)(g_video_mode ? h<289 : h<257); return e;
-}
-PsxDispEnv *SetDefDispEnv(PsxDispEnv *e,int x,int y,int w,int h)
-{ memset(e,0,sizeof(*e)); e->disp.x=x;e->disp.y=y;e->disp.w=w;e->disp.h=h; return e; }
-void SetDrawEnv(void *p,PsxDrawEnv *env);
-PsxDrawEnv *PutDrawEnv(PsxDrawEnv *e)
-{
-    if(e) {
-        /* PsyQ 0x800EDD70..0x800EDDB4 builds and submits DRAWENV.dr_env;
-           copying the struct alone leaves the GPU's ABR/window/mask stale. */
-        unsigned int packet[16]={0};
-        SetDrawEnv(packet,e);
-        packet[0]|=0x00ffffffu;
-        /* DRAWENV declares dr_env as u_long; do not alias that array through
-           unsigned int* under the host compiler's -O2 strict aliasing. */
-        memcpy(e->dr_env,packet,sizeof(packet));
-        g_draw_env=*e;
-        host_apply_draw_environment_packet((const unsigned char *)packet);
-    }
-    return e;
-}
-PsxDispEnv *PutDispEnv(PsxDispEnv *e) { if(e)g_display_env=*e; return e; }
-void NFSHS_HostSetDispMask(int enabled) { ensure_window(); if(enabled) host_scanout_vram(); }
-long NFSHS_HostDrawSync(long) { pump_messages(); return 0; }
-void NFSHS_HostDrawOTag(unsigned long *ot) { ensure_window(); pump_messages(); host_draw_ot(ot); }
 struct HostPsyQOtTail {
     unsigned long termTag;
     unsigned long termPayload[4];
@@ -2865,48 +2568,24 @@ static HostPsyQOtTail g_host_psyq_ot_tail = {
     0x04ffffffUL, {0,0,0,0}, 0,
     {0x80000000UL,0,0,0x00010002UL}
 };
-static uintptr_t host_psyq_ot_tail_resolve(unsigned int next)
+static intptr host_psyq_ot_tail_resolve(unsigned int next)
 {
-    uintptr_t term=(uintptr_t)&g_host_psyq_ot_tail.termTag;
-    uintptr_t link=(uintptr_t)&g_host_psyq_ot_tail.linkTag;
+    intptr term=(intptr)&g_host_psyq_ot_tail.termTag;
+    intptr link=(intptr)&g_host_psyq_ot_tail.linkTag;
     next&=0x00fffffcu;
     if(next==((unsigned int)term&0x00fffffcu)) return term;
     if(next==((unsigned int)link&0x00fffffcu)) return link;
     return 0;
 }
-static int host_psyq_ot_tail_contains(uintptr_t address)
+static int host_psyq_ot_tail_contains(intptr address)
 {
-    uintptr_t begin=(uintptr_t)&g_host_psyq_ot_tail;
+    intptr begin=(intptr)&g_host_psyq_ot_tail;
     return address>=begin && address+4<=begin+sizeof(g_host_psyq_ot_tail);
-}
-unsigned long *NFSHS_HostClearOTagR(unsigned long *ot,int n)
-{
-    if (!ot || n<=0) return ot;
-    if(n>65536 || !NFSHS_HostReadableRange(ot,(unsigned int)n*4u)) {
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ClearOTagR rejected ot=%p n=%d",ot,n));
-        return ot;
-    }
-    /* Retail PsyQ ClearOTagR (MIPS 0x800EDC08) does not end ot[0]
-       directly.  It points through the fixed SYS.obj tail at
-       0x8012375C and 0x80123748: two four-word DMA packets containing
-       the harmless GP0 0x80 self-copy and zero commands. */
-    g_host_psyq_ot_tail.linkTag = 0x04000000UL |
-        ((unsigned long)(uintptr_t)&g_host_psyq_ot_tail.termTag & 0x00ffffffUL);
-    for(int i=0;i<n;i++) {
-        ot[i]=i ? ((unsigned long)(uintptr_t)&ot[i-1]&0x00ffffffUL) :
-            ((unsigned long)(uintptr_t)&g_host_psyq_ot_tail.linkTag & 0x00ffffffUL);
-    }
-    if (g_host_ot_range_count < sizeof(g_host_ot_ranges)/sizeof(g_host_ot_ranges[0])) {
-        g_host_ot_ranges[g_host_ot_range_count].begin=(uintptr_t)ot;
-        g_host_ot_ranges[g_host_ot_range_count].end=(uintptr_t)(ot+n);
-        ++g_host_ot_range_count;
-    }
-    return ot;
 }
 void NFSHS_HostBeginPacketArena(void *begin,void *end)
 {
-    g_host_packet_begin=(uintptr_t)begin;
-    g_host_packet_end=(uintptr_t)end;
+    g_host_packet_begin=(intptr)begin;
+    g_host_packet_end=(intptr)end;
 }
 void NFSHS_HostBeginDMAFrame(void)
 {
@@ -2936,15 +2615,15 @@ void NFSHS_HostValidateOTPhase(const char *phase,void *otBase,int otSize,void *u
 #if NFSHS_DIAGNOSTICS
 
     if (!phase || !otBase || otSize <= 0 || otSize > 65536) return;
-    uintptr_t otBegin=(uintptr_t)otBase;
-    uintptr_t otEnd=otBegin+(uintptr_t)otSize*4u;
-    uintptr_t packetUsedEnd=(uintptr_t)usedEnd;
+    intptr otBegin=(intptr)otBase;
+    intptr otEnd=otBegin+(intptr)otSize*4u;
+    intptr packetUsedEnd=(intptr)usedEnd;
     unsigned char *cur=(unsigned char *)(otEnd-4u);
-    uintptr_t previous=0;
-    uintptr_t seen[8192];
+    intptr previous=0;
+    intptr seen[8192];
     int seenCount=0;
     while (host_readable(cur) && seenCount < (int)(sizeof(seen)/sizeof(seen[0]))) {
-        uintptr_t address=(uintptr_t)cur;
+        intptr address=(intptr)cur;
         for (int i=0;i<seenCount;i++) if (seen[i]==address) {
             NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("OT_PHASE_CYCLE phase=%s step=%d cur=%p prev=%p ot=%p..%p packet=%p..%p",
                 phase,seenCount,cur,(void *)previous,(void *)otBegin,(void *)otEnd,
@@ -2956,10 +2635,10 @@ void NFSHS_HostValidateOTPhase(const char *phase,void *otBase,int otSize,void *u
         unsigned int rawNext=tag&0x00ffffffu;
         if (rawNext==0x00ffffffu) return;
         unsigned int next=rawNext&0x00fffffcu;
-        uintptr_t base=address&~(uintptr_t)0xffffffu;
-        uintptr_t candidate=base|next;
+        intptr base=address&~(intptr)0xffffffu;
+        intptr candidate=base|next;
         if (!host_readable((void *)candidate)) {
-            candidate=(otBegin&~(uintptr_t)0xffffffu)|next;
+            candidate=(otBegin&~(intptr)0xffffffu)|next;
         }
         if (!host_readable((void *)candidate)) {
             NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("OT_PHASE_UNREADABLE phase=%s step=%d cur=%p prev=%p tag=%08x next=%06x",
@@ -2985,8 +2664,8 @@ void NFSHS_HostValidateOTPhase(const char *phase,void *otBase,int otSize,void *u
     }
         if(g_host_prev_added_generation[probe]==g_host_prev_add_generation) previousPacket=1;
         if (!inOt && !currentPacket) {
-            uintptr_t owner=0,ownerOt=0;
-            uintptr_t predecessorWriter=0,predecessorPrim=0;
+            intptr owner=0,ownerOt=0;
+            intptr predecessorWriter=0,predecessorPrim=0;
             for(unsigned int wi=0;wi<16384;wi++) {
                 if(g_host_added_generation[wi]==g_host_add_generation &&
                    g_host_added_ots[wi]==previous) {
@@ -2994,7 +2673,7 @@ void NFSHS_HostValidateOTPhase(const char *phase,void *otBase,int otSize,void *u
                     predecessorPrim=g_host_added_prims[wi];
                 }
             }
-            unsigned int allSlot=host_history_slot((uintptr_t)candidate);
+            unsigned int allSlot=host_history_slot((intptr)candidate);
             if(g_host_all_added_prims[allSlot]) {
                 owner=g_host_all_added_callers[allSlot];
                 ownerOt=g_host_all_added_ots[allSlot];
@@ -3004,7 +2683,7 @@ void NFSHS_HostValidateOTPhase(const char *phase,void *otBase,int otSize,void *u
                 (void *)owner,(void *)ownerOt,(void *)predecessorWriter,(void *)predecessorPrim,
                 (void *)otBegin,(void *)otEnd,
                 (void *)g_host_packet_begin,(void *)packetUsedEnd));
-            if ((uintptr_t)cur >= g_host_packet_begin+48u && host_readable(cur-48u)) {
+            if ((intptr)cur >= g_host_packet_begin+48u && host_readable(cur-48u)) {
                 unsigned int *w=(unsigned int *)cur;
                 NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("OT_PHASE_FOREIGN_WORDS phase=%s at=%p m12=%08x,%08x,%08x,%08x,%08x,%08x,%08x,%08x,%08x,%08x,%08x,%08x cur=%08x,%08x,%08x,%08x",
                     phase,cur,w[-12],w[-11],w[-10],w[-9],w[-8],w[-7],w[-6],w[-5],
@@ -3025,154 +2704,11 @@ void NFSHS_HostValidateOTPhase(const char *phase,void *otBase,int otSize,void *u
 #endif
 void NFSHS_HostEndPacketArena(void *usedEnd)
 {
-    NFSHS_DIAGNOSTIC_CALL(host_check_linked_tags((uintptr_t)__builtin_return_address(0)));
-    uintptr_t end=(uintptr_t)usedEnd;
+    NFSHS_DIAGNOSTIC_CALL(host_check_linked_tags((intptr)__builtin_return_address(0)));
+    intptr end=(intptr)usedEnd;
     if(end>=g_host_packet_begin && end<=g_host_packet_end)
         g_host_packet_end=end;
 }
-#if NFSHS_DIAGNOSTICS
-void NFSHS_HostSetAddPrimCaller(void *caller)
-{
-#if NFSHS_DIAGNOSTICS
-
-    g_host_addprim_caller_override=(uintptr_t)caller;
-
-#else
-
-#endif
-}
-#endif
-void NFSHS_HostAddPrim(void *otPtr,void *primPtr)
-{
-    unsigned int *ot=(unsigned int *)otPtr,*prim=(unsigned int *)primPtr;
-    if(!ot || !prim) return;
-#if NFSHS_DIAGNOSTICS
-    uintptr_t caller=g_host_addprim_caller_override ? g_host_addprim_caller_override :
-        (uintptr_t)__builtin_return_address(0);
-    g_host_addprim_caller_override=0;
-    host_check_linked_tags(caller);
-    static unsigned int bad_old_head_count;
-    unsigned int oldHead=*ot&0x00ffffffu;
-    if (!host_dma_address_is_current(oldHead) && bad_old_head_count < 64) {
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ADDPRIM_BAD_OLD_HEAD n=%u prim=%p ot=%p caller=%p old=%06x tag=%08x packet=%p..%p ranges=%u",
-            bad_old_head_count++,primPtr,otPtr,(void *)caller,oldHead,*prim,
-            (void *)g_host_packet_begin,(void *)g_host_packet_end,g_host_ot_range_count));
-    }
-    unsigned int allSlot=host_history_slot((uintptr_t)prim);
-    if(allSlot==32768) {
-        memset(g_host_all_added_prims,0,sizeof(g_host_all_added_prims));
-        memset(g_host_all_added_ots,0,sizeof(g_host_all_added_ots));
-        memset(g_host_all_added_callers,0,sizeof(g_host_all_added_callers));
-        allSlot=host_history_slot((uintptr_t)prim);
-    }
-    g_host_all_added_prims[allSlot]=(uintptr_t)prim;
-    g_host_all_added_ots[allSlot]=(uintptr_t)ot;
-    g_host_all_added_callers[allSlot]=caller;
-    static unsigned int facade_prim_count;
-    const unsigned char *primBytes=(const unsigned char *)prim;
-    if ((primBytes[7]&0xfc)==0x3c &&
-        *(const unsigned short *)(primBytes+26)==0x0084 &&
-        *(const unsigned short *)(primBytes+14)==0x1e40 &&
-        facade_prim_count<128) {
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("FACADE_ADD n=%u prim=%p caller=%p ot=%p xy=(%d,%d)(%d,%d)(%d,%d)(%d,%d)",
-            facade_prim_count++,primPtr,(void *)caller,otPtr,
-            host_s16(primBytes,8),host_s16(primBytes,10),host_s16(primBytes,20),host_s16(primBytes,22),
-            host_s16(primBytes,32),host_s16(primBytes,34),host_s16(primBytes,44),host_s16(primBytes,46)));
-    }
-    static unsigned int bad_prim_range_count;
-    if (g_host_packet_begin &&
-        ((uintptr_t)prim < g_host_packet_begin || (uintptr_t)prim >= g_host_packet_end) &&
-        bad_prim_range_count < 128) {
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ADDPRIM_OUTSIDE_ARENA n=%u prim=%p ot=%p caller=%p tag=%08x packet=%p..%p",
-            bad_prim_range_count,primPtr,otPtr,(void *)caller,*prim,
-            (void *)g_host_packet_begin,(void *)g_host_packet_end));
-        ++bad_prim_range_count;
-    }
-    if ((uintptr_t)prim >= g_host_packet_begin && (uintptr_t)prim < g_host_packet_end) {
-        unsigned int bytes=((*prim>>24)+1u)*4u;
-        if (g_host_last_added_end && (uintptr_t)prim < g_host_last_added_end &&
-            (uintptr_t)prim != g_host_last_added_prim && g_host_packet_overlap_count < 128) {
-            NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ADDPRIM_OVERLAP n=%u prim=%p bytes=%u previous=%p previousEnd=%p ot=%p caller=%p tag=%08x",
-                g_host_packet_overlap_count,primPtr,bytes,(void *)g_host_last_added_prim,
-                (void *)g_host_last_added_end,otPtr,(void *)caller,*prim));
-            ++g_host_packet_overlap_count;
-        }
-        g_host_last_added_prim=(uintptr_t)prim;
-        g_host_last_added_end=(uintptr_t)prim+bytes;
-    }
-    #endif
-    unsigned int slot=((unsigned int)(uintptr_t)prim>>2)&16383u;
-    unsigned int probes=0;
-    while(g_host_added_generation[slot]==g_host_add_generation &&
-          g_host_added_prims[slot]!=(uintptr_t)prim) {
-        if(++probes==16384) {
-            MessageBoxA(0,"The native DMA address table is full.","NFSHS fatal error",MB_OK|MB_ICONERROR);
-            ExitProcess(94);
-        }
-        slot=(slot+1)&16383u;
-    }
-    if(g_host_added_generation[slot]==g_host_add_generation) {
-#if NFSHS_DIAGNOSTICS
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ADDPRIM_DUP prim=%p oldOt=%p newOt=%p oldCaller=%p newCaller=%p tag=%08x",
-            primPtr,(void*)g_host_added_ots[slot],otPtr,(void*)g_host_added_callers[slot],
-            (void*)caller,*prim));
-#endif
-    } else {
-        g_host_added_generation[slot]=g_host_add_generation;
-        g_host_added_prims[slot]=(uintptr_t)prim;
-#if NFSHS_DIAGNOSTICS
-        g_host_added_ots[slot]=(uintptr_t)ot;
-        g_host_added_callers[slot]=caller;
-        g_host_added_links[slot]=*ot&0x00ffffffu;
-#endif
-    }
-    *prim=(*prim&0xff000000u)|(*ot&0x00ffffffu);
-    *ot=(*ot&0xff000000u)|((unsigned int)(uintptr_t)prim&0x00ffffffu);
-}
-
-void PsyQGpuHostAddPrim(void *otPtr,void *primPtr,void *caller)
-{
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostSetAddPrimCaller(caller));
-    NFSHS_HostAddPrim(otPtr,primPtr);
-}
-int NFSHS_HostClearImage(PsxRect *r,unsigned char rr,unsigned char gg,unsigned char bb) { return r ? PsyQGpuClearImage(r->x,r->y,r->w,r->h,rr,gg,bb) : -1; }
-int NFSHS_HostLoadImage(PsxRect *r,unsigned long *p) {
-    if(!r||!p)return-1;
-    unsigned short*s=(unsigned short*)p; unsigned int hash=2166136261u,nonzero=0;
-    for(int y=0;y<r->h;y++)for(int x=0;x<r->w;x++) {
-        unsigned short value=*s++; hash=(hash^value)*16777619u; if(value)++nonzero;
-    }
-    int result=PsyQGpuLoadImage(r->x,r->y,r->w,r->h,(const unsigned short*)p);
-#if NFSHS_DIAGNOSTICS
-    ++g_vram_load_calls; g_vram_load_words+=(unsigned int)(r->w*r->h);
-    if(g_vram_load_calls<=80 || r->w*r->h>=256 || (g_vram_load_calls&255u)==0)
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("VRAM_LOAD call=%u rect=(%d,%d %dx%d) words=%d nonzero=%u hash=%08x src=%p",
-                      g_vram_load_calls,r->x,r->y,r->w,r->h,r->w*r->h,nonzero,hash,p));
-#endif
-    return result;
-}
-unsigned short NFSHS_HostLoadTPage(unsigned long *pixels,int tp,int abr,int x,int y,int w,int h) {
-    if(!pixels || w<=0 || h<=0 || tp<0 || tp>2) return 0;
-    /* PsyQ's width is in texels while LoadImage's rectangle width is in
-       16-bit VRAM words: four 4-bpp, two 8-bpp, or one 16-bpp texel. */
-    PsxRect rect;
-    rect.x=(short)x; rect.y=(short)y;
-    rect.w=(short)((w + ((1 << (2-tp))-1)) >> (2-tp));
-    rect.h=(short)h;
-    if(NFSHS_HostLoadImage(&rect,pixels)<0) return 0;
-    return (unsigned short)(((tp&3)<<7)|((abr&3)<<5)|((y&0x100)>>4)|((x&0x3ff)>>6));
-}
-int NFSHS_HostStoreImage(PsxRect *r,unsigned long *p)
-{
-    if(!r||!p)return-1;
-    unsigned short*d=(unsigned short*)p;
-    /* PsyQ _drs, MIPS 0x800EF124..0x800EF148, sends the packed RECT
-       coordinates unchanged to GP0(C0). The GPU masks X/Y to 10/9 bits
-       and wraps each transfer pixel, including negative/off-edge rectangles.
-       Do not replace off-screen reads with zero: lens flare samples use them. */
-    return PsyQGpuStoreImage(r->x,r->y,r->w,r->h,d);
-}
-int NFSHS_HostMoveImage(PsxRect *r,int dx,int dy) { return r ? PsyQGpuMoveImage(r->x,r->y,r->w,r->h,dx,dy) : -1; }
 void SetPolyF3(void *p)  { set_packet(p,4,0x20); }
 void SetPolyF4(void *p)  { set_packet(p,5,0x28); }
 void SetPolyFT4(void *p) { set_packet(p,9,0x2c); }
@@ -3180,8 +2716,6 @@ void SetPolyG4(void *p)  { set_packet(p,8,0x38); }
 void SetPolyGT4(void *p) { set_packet(p,12,0x3c); }
 void SetSemiTrans(void *p,int on) { if(p) ((unsigned char*)p)[7]=(unsigned char)((((unsigned char*)p)[7]&~2)|(on?2:0)); }
 void SetShadeTex(void *p,int on) { if(p) ((unsigned char*)p)[7]=(unsigned char)((((unsigned char*)p)[7]&~1)|(on?1:0)); }
-int NFSHS_HostGetClut(int x,int y) { return PsyQGpuGetClut(x,y); }
-int NFSHS_HostGetTPage(int tp,int abr,int x,int y) { return PsyQGpuGetTPage(tp,abr,x,y); }
 void SetDrawMode(void *p,int dfe,int dtd,int tpage,PsxRect *tw)
 {
     set_packet(p,2,0xe1);
@@ -3199,60 +2733,7 @@ static unsigned int host_draw_area_word(unsigned int command,int x,int y)
     if(y<0)y=0;if(y>=HOST_VRAM_H)y=HOST_VRAM_H-1;
     return command|((unsigned int)y<<10)|(unsigned int)x;
 }
-void SetDrawArea(void *p,PsxRect *r)
-{
-    if(!p || !r)return;
-    /* SetDrawArea 0x800EE330..0x800EE37C: E3(x,y), E4(x+w-1,y+h-1). */
-    unsigned int *d=(unsigned int *)p;
-    d[0]=(d[0]&0x00ffffffu)|0x02000000u;
-    d[1]=host_draw_area_word(0xe3000000u,r->x,r->y);
-    d[2]=host_draw_area_word(0xe4000000u,r->x+r->w-1,r->y+r->h-1);
-}
-void SetDrawEnv(void *p,PsxDrawEnv *env)
-{
-    if(!p || !env) return;
-    unsigned int *d=(unsigned int *)p;
-    int x0=env->clip.x,y0=env->clip.y;
-    int x1=(unsigned short)env->clip.x+(unsigned short)env->clip.w-1;
-    int y1=(unsigned short)env->clip.y+(unsigned short)env->clip.h-1;
-    d[1]=host_draw_area_word(0xe3000000u,x0,y0);
-    d[2]=host_draw_area_word(0xe4000000u,x1,y1);
-    d[3]=0xe5000000u|((unsigned int)(env->ofs[1]&0x7ff)<<11)|
-         (unsigned int)(env->ofs[0]&0x7ff);
-    d[4]=0xe1000000u|(env->tpage&0x9ffu)|(env->dtd?0x200u:0u)|(env->dfe?0x400u:0u);
-    {
-        unsigned char *tw=(unsigned char *)&env->tw;
-        short *tws=(short *)&env->tw;
-        d[5]=0xe2000000u|((unsigned int)(tw[0]>>3)<<10)|
-             ((unsigned int)(tw[2]>>3)<<15)|
-             ((unsigned int)((-tws[3]&0xff)>>3)<<5)|
-             (unsigned int)((-tws[2]&0xff)>>3);
-    }
-    d[6]=0xe6000000u;
-    int words=6;
-    if(env->isbg) {
-        int rx=env->clip.x,ry=env->clip.y;
-        unsigned int color=((unsigned int)env->b0<<16)|((unsigned int)env->g0<<8)|env->r0;
-        /* NFS4's linked PsyQ 4.3 body at 0x800EE588..0x800EE5E8 always
-           subtracts DRAWENV.ofs and emits GP0 0x60; it has no aligned 0x02
-           fast-fill branch. */
-        rx-=env->ofs[0]; ry-=env->ofs[1]; d[7]=0x60000000u|color;
-        d[8]=((unsigned int)(unsigned short)ry<<16)|(unsigned short)rx;
-        d[9]=((unsigned int)(unsigned short)env->clip.h<<16)|(unsigned short)env->clip.w;
-        words=9;
-    }
-    d[0]=(d[0]&0x00ffffffu)|((unsigned int)words<<24);
-}
 void SetDrawMove(void *p,PsxRect *,int,int) { set_packet(p,5,0x80); }
-void SetDrawStp(void *p,int on)
-{
-    if(!p)return;
-    /* 0x800EE394..0x800EE3B8: DR_STP is E6 + NOP, not an opcode flag. */
-    unsigned int *words=(unsigned int *)p;
-    words[0]=(words[0]&0x00ffffffu)|0x02000000u;
-    words[1]=0xe6000000u|(on?1u:0u);
-    words[2]=0;
-}
 void SetTexWindow(void *p,PsxRect *tw)
 {
     set_packet(p,2,0xe2);
@@ -3274,6 +2755,8 @@ void NFSHS_HostInitGeom(void) {
     NFSHS_GTE_WriteControl(25,0);
 }
 void NFSHS_HostSetGeomScreen(int h) { g_geom_screen=h; NFSHS_GTE_SetGeomScreen(h); }
+void InitGeom(void) { NFSHS_HostInitGeom(); }
+void SetGeomScreen(int h) { NFSHS_HostSetGeomScreen(h); }
 extern void NFSHS_GTE_SetFarColor(int,int,int);
 void SetFarColor(int r,int g,int b) { NFSHS_GTE_SetFarColor(r,g,b); }
 void SetFogNear(int a,int dvpw) {
@@ -3306,7 +2789,8 @@ PsxMatrix *NFSHS_HostRotMatrix(PsxSVector *r,PsxMatrix *m)
     m->m[2][1]=(short)(cz*sx>>12)-(short)(sz_nsy*cx>>12);
     return m;
 }
-PsxMatrix *RotMatrixZ(long r,PsxMatrix *m)
+PsxMatrix *RotMatrix(PsxSVector *r,PsxMatrix *m) { return NFSHS_HostRotMatrix(r,m); }
+PsxMatrix *RotMatrixZ(sint32 r,PsxMatrix *m)
 {
     int s,c; host_psyq_sincos((int)r,&s,&c);
     int m00=m->m[0][0],m01=m->m[0][1],m02=m->m[0][2];
@@ -3318,21 +2802,16 @@ PsxMatrix *RotMatrixZ(long r,PsxMatrix *m)
 int NFSHS_GTE_VectorNormal(const void *,void *);
 int VectorNormal(PsxVector *v,PsxVector *o)
 { return NFSHS_GTE_VectorNormal(v,o); }
-long VectorNormalS(PsxVector *v,PsxSVector *o)
+sint32 VectorNormalS(PsxVector *v,PsxSVector *o)
 { PsxVector q; int n=VectorNormal(v,&q);o->vx=(short)q.vx;o->vy=(short)q.vy;o->vz=(short)q.vz;return n; }
 
 /* ---- Controller: keyboard mapped to a digital PSX pad ----------------------- */
-void PadInitDirect(unsigned char *p1,unsigned char *p2) { PsyQPadInitDirect(p1,p2); }
-void PadStartCom(void) { PsyQPadStart(); }
-void PadStopCom(void) { PsyQPadStop(); }
-int PadGetState(int port) { return PsyQPadGetState(port); }
-int PadInfoMode(...) { return 0; }
-void PadSetAct(...) {}
-int PadSetActAlign(...) { return 1; }
-void PadSetMainMode(...) {}
 void NFSHS_HostPadPoll(void)
 {
-    pump_messages(); unsigned short keys=0xffff;
+    pump_messages();
+    unsigned short keys=0xffff;
+    uint32 buttons=xport_input_read(0);
+    g_pad_buttons=(unsigned short)((buttons>>8)|(buttons<<8));
 #if NFSHS_DIAGNOSTICS
     // Headless input tests supply menu commands/PAD replay themselves. Do not
     // let unrelated desktop typing inject keys into that opt-in test run.
@@ -3389,11 +2868,11 @@ void NFSHS_HostPadPoll(void)
 #endif
     static unsigned short last_keys=0xffff;
     if(keys!=last_keys){NFSHS_DIAGNOSTIC_CALL(host_log("pad keys=%04x",keys));last_keys=keys;}
-    PsyQPadPublishDigital(0,1,keys);
+    pad_publish(0,1,keys);
     /* Only one keyboard-backed controller exists.  Advertising the same pad
        on port two made every frontend pulse execute twice, eventually drawing
        an uninitialized player-two car-select screen. */
-    PsyQPadPublishDigital(0x10,0,0xffff);
+    pad_publish(1,0,0xffff);
 }
 
 /* ---- Host file calls --------------------------------------------------------- */
@@ -3416,9 +2895,7 @@ long PClseek(int fd,long off,int whence) { long r=_lseek(fd,off,whence); NFSHS_D
 
 /* ---- CD surface.  Synchronous command behavior is sufficient for extracted files. */
 int CdInit(void) { return 1; } int CdReset(int) { return 1; } void CdSetDebug(int) {}
-int CdControl(unsigned char, unsigned char *, unsigned char *r) { if(r) memset(r,0,8); return 1; }
-int CdControlB(unsigned char c,unsigned char *p,unsigned char *r) { return CdControl(c,p,r); }
-void *CdReadyCallback(void *cb) { return cb; } void *CdDataCallback(void *cb) { return cb; }
+void *CdDataCallback(void *cb) { return cb; }
 int CdSync(int,unsigned char *r) { if(r)memset(r,0,8);return 2; } int CdDataSync(int) { return 0; }
 int CdDiskReady(int) { return 2; } int CdFlush(void) { return 1; } int CdGetDiskType(void) { return 2; }
 int CdGetToc(void *) { return 0; } int CdGetSector(void *,int) { return 0; }
@@ -3504,7 +2981,104 @@ static int host_platform_memory_self_test(void) {
     if (!a || !b || !c) return 1;
     if (b - a != 4 || c - b != 8) return 2;
     if (peek != c) return 3;
-    if (((uintptr_t)a & 3U) || ((uintptr_t)b & 3U) || ((uintptr_t)c & 3U)) return 4;
+    if (((intptr)a & 3U) || ((intptr)b & 3U) || ((intptr)c & 3U)) return 4;
+    return 0;
+}
+
+extern "C" int initmemadr(int,int);
+extern "C" int largestunused(void);
+extern "C" int getblocksize(void *);
+extern "C" void *reservememadr(char *,int,int);
+extern "C" int purgememadr(void *);
+void *__builtin_new(unsigned int);
+void __builtin_delete(void *);
+
+static int host_eac_allocator_self_test(void)
+{
+    int before;
+    void *low;
+    void *high;
+    initmemadr((int)(intptr)(DRAM + 0x148b0c),PSX_DRAM_SIZE - 0x148b0c);
+    before = largestunused();
+    low = reservememadr(0,64,0);
+    high = reservememadr(0,96,0x10);
+    if (!low || !high)
+        return 1;
+    if (getblocksize(low) != 64 || getblocksize(high) != 96)
+        return 2;
+    purgememadr(low);
+    purgememadr(high);
+    if (largestunused() != before)
+        return 3;
+    low = __builtin_new(8);
+    if (!low)
+        return 4;
+    if ((uint8 *)low < DRAM || (uint8 *)low >= DRAM + PSX_DRAM_SIZE)
+        return 5;
+    __builtin_delete(low);
+    return largestunused() == before ? 0 : 6;
+}
+
+static int host_spu_self_test(void)
+{
+    uint8 block[16] = {0, 3};
+    sint32 samples[2048 * 2] = {0};
+    uint32 peak = 0;
+    for (int index = 2; index < 16; ++index)
+        block[index] = 0x77;
+    SpuInit();
+    if (!spu_upload(0x1000, block, sizeof(block)))
+        return 1;
+    SpuSetVoiceVolume(0,0x3fff,0x3fff);
+    SpuSetVoicePitch(0,0x1000);
+    SpuSetVoiceStartAddr(0,0x1000);
+    SpuSetVoiceLoopStartAddr(0,0x1000);
+    SsSetMVol(0x3fff,0x3fff);
+    SpuSetKey(SPU_ON,SPU_KEYCH(0));
+    spu_mix(samples, 2048);
+    for (int index = 0; index < 2048 * 2; ++index) {
+        sint32 sample = samples[index];
+        uint32 magnitude = (uint32)(sample < 0 ? -sample : sample);
+        if (magnitude > peak)
+            peak = magnitude;
+    }
+    printf("spu_selftest peak=%u\n", (unsigned)peak);
+    return peak ? 0 : 2;
+}
+
+static int host_gte_trig_self_test(void)
+{
+    if (ccos(0) < 4000)
+        return 1;
+    if (csin(0) < -64 || csin(0) > 64)
+        return 2;
+    if (ccos(377) < 3400 || ccos(377) > 3500 || ccos(-377) < 3400 || ccos(-377) > 3500)
+        return 3;
+    if (csin(377) < 2200 || csin(377) > 2300 || csin(-377) < -2300 || csin(-377) > -2200)
+        return 4;
+    if (csin(0x400) < 4000)
+        return 5;
+    if (ccos(0x800) > -4000)
+        return 6;
+    return 0;
+}
+
+static int host_pad_packet_self_test(void)
+{
+    uint8 first[8];
+    uint8 second[8];
+    sint32 index;
+    PadInitDirect(first, second);
+    PadStartCom();
+    pad_publish(0, 1, 0xb7de);
+    if (first[0] != 0 || first[1] != 0x41 || first[2] != 0xde || first[3] != 0xb7)
+        return 1;
+    pad_publish(1, 0, 0);
+    for (index = 0; index < (sint32)sizeof(second); ++index)
+    {
+        if (second[index] != 0xff)
+            return 2;
+    }
     return 0;
 }
 
@@ -3512,20 +3086,31 @@ extern "C" void NFSHS_ConfigurePsyQHost(void);
 
 extern "C" {
 void __main(void) {
-    NFSHS_ConfigurePsyQHost();
 #if NFSHS_DIAGNOSTICS
 
     char allocatorTest[2];
     if (GetEnvironmentVariableA("NFSHS_ALLOCATOR_SELFTEST",allocatorTest,sizeof(allocatorTest)))
-        ExitProcess((UINT)NFSHS_HostAllocatorSelfTest());
+        ExitProcess((UINT)host_eac_allocator_self_test());
     char platformMemoryTest[2];
     if (GetEnvironmentVariableA("NFSHS_PLATFORM_MEMORY_SELFTEST",platformMemoryTest,
                                 sizeof(platformMemoryTest)))
         ExitProcess((UINT)host_platform_memory_self_test());
+    char spuTest[2];
+    if (GetEnvironmentVariableA("NFSHS_SPU_SELFTEST",spuTest,sizeof(spuTest))) {
+        NFSHS_ConfigurePsyQHost();
+        ExitProcess((UINT)host_spu_self_test());
+    }
+    char gteTrigTest[2];
+    if (GetEnvironmentVariableA("NFSHS_GTE_TRIG_SELFTEST",gteTrigTest,sizeof(gteTrigTest)))
+        ExitProcess((UINT)host_gte_trig_self_test());
+    char padPacketTest[2];
+    if (GetEnvironmentVariableA("NFSHS_PAD_PACKET_SELFTEST",padPacketTest,sizeof(padPacketTest)))
+        ExitProcess((UINT)host_pad_packet_self_test());
 
 #else
 
 #endif
+    NFSHS_ConfigurePsyQHost();
 }
 void __pure_virtual(void) { ExitProcess(3); }
 

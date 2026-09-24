@@ -4,10 +4,10 @@
  *   Ghidra nfs4-f.exe.c (sdcdvol) + IDA sig.  Ghidra-ism: void(void) typing dropped both args -- IDA shows
  *   2 (pan, vol), passed in $a0/$a1 from SNDcdvol.
  */
-extern "C" int iSNDpvtolrv(int pan, int level, int *out_l, int *out_r);   /* spvtolrv */
-extern "C" int &DAT_80147e2c;   /* SPU control register base (address) */
+extern "C" int iSNDpvtolrv(int pan, int level, int *out_l, int *out_r); /* spvtolrv */
+extern "C" int &DAT_80147e2c;                                           /* SPU control register base (address) */
 
-extern "C" void iSNDplatformcdpanvol(int pan, int vol);   /* @0x801094EC */
+extern "C" void iSNDplatformcdpanvol(int pan, int vol); /* @0x801094EC */
 
 /* iSNDplatformcdpanvol @0x801094EC : derive CD L/R from (pan, vol) and write SPU_CD_VOL_L/R (base+0x1b0/2),
  *   scaling each by 0x102 and clamping to 15-bit. */
@@ -15,8 +15,6 @@ extern "C" void iSNDplatformcdpanvol(int pan, int vol)
 {
 #if defined(AP_WIN)
     /* The MIPS implementation writes the PSX SPU MMIO registers at base+0x1b0/0x1b2 */
-    (void)pan;
-    (void)vol;
     return;
 #else
     int outL = 0, outR = 0;

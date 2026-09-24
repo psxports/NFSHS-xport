@@ -12,34 +12,39 @@
  */
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
-extern "C" { int gTickSet; int gTickVal; int gTicks; }
+extern "C"
+{
+    int gTickSet;
+    int gTickVal;
+    int gTicks;
+}
 
-extern "C" int  gTicks;       /* @0x8014xxxx, advanced by Clock ISR (data-mat pass owns) */
-extern "C" int  gTickVal;     /* last-sampled tick (elapsedticks state)                  */
-extern "C" int  gTickSet;     /* baseline tick (resettick)                               */
-extern "C" int  systemtask(int);   /* @0x800E6C04 per-frame vsync/idle pump (lbl_D6C04)  */
+extern "C" int gTicks;          /* @0x8014xxxx, advanced by Clock ISR (data-mat pass owns) */
+extern "C" int gTickVal;        /* last-sampled tick (elapsedticks state)                  */
+extern "C" int gTickSet;        /* baseline tick (resettick)                               */
+extern "C" int systemtask(int); /* @0x800E6C04 per-frame vsync/idle pump (lbl_D6C04)  */
 
-extern "C" int gettick(void)        /* @0x800E8220 */
+extern "C" int gettick(void) /* @0x800E8220 */
 {
     return gTicks;
 }
 
-extern "C" int elapsedticks(void)   /* @0x800E8230 */
+extern "C" int elapsedticks(void) /* @0x800E8230 */
 {
     int prev = gTickVal;
-    int now  = gettick();
+    int now = gettick();
     gTickVal = now;
     return now - prev;
 }
 
-extern "C" void resettick(void)     /* @0x800E8260 */
+extern "C" void resettick(void) /* @0x800E8260 */
 {
-    gTicks   = 0;
+    gTicks = 0;
     gTickVal = gTicks;
     gTickSet = gTicks;
 }
 
-extern "C" void timedwait(int n)    /* @0x800E8284 */
+extern "C" void timedwait(int n) /* @0x800E8284 */
 {
     int target = gettick() + n;
     while (gettick() - target < 0)

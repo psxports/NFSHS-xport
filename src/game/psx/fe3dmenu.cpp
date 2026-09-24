@@ -180,10 +180,10 @@ void Draw_MenuRenderingView(Car_tObj *carObj,DRender_tView *Vi,int posX,int posY
     sd = (Draw_CarCache *)getScratchAddr(0);
     R3DCar_InMenu = R3DCar_InMenu | 0x80;
     Render_gMenuRenderFlag = Render_gMenuRenderFlag ^ 1;
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     R3DCar_InsertCarFacetMenu(carObj,Vi);
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     R3DCar_InsertCarFacetMenuII(carObj,light);
     R3DCar_InMenu = R3DCar_InMenu & 0x7f;

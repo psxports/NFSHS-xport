@@ -4,9 +4,9 @@
  *   used by saetolrv/saetodv.  Ghidra nfs4-f.exe.c (saelib) + IDA sig (4-arg; Ghidra __thiscall).
  */
 
-extern "C" int iSNDsin(int phase);     /* ssine */
+extern "C" int iSNDsin(int phase); /* ssine */
 
-extern "C" int iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r);   /* @0x8010C894 */
+extern "C" int iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r); /* @0x8010C894 */
 
 /* iSNDlibatodlrv @0x8010C894 : split `level` into left/right gains for pan `angle` via a quarter-wave sine
  *   crossfade (angle>>6 indexes the sine table), each clamped to 0..0x7f. */

@@ -8,33 +8,52 @@
  *   fastintcos is the 4-byte entry that just does a += 0x100 (90 deg) and falls into fastintsin.
  *   gSinTable @0x80137464 is SHARED (also isincos) -> extern; the data pass owns its definition.
  */
-extern "C" const int gSinTable[257];   /* @0x80137464 quarter sine, 16.16 */
+extern "C" const int gSinTable[257]; /* @0x80137464 quarter sine, 16.16 */
 
-extern "C" int fastintsin(int a)   /* @0x800F18E8 (alias intsin) */
+extern "C" int fastintsin(int a) /* @0x800F18E8 (alias intsin) */
 {
     int pos = a & 0xFF;
-    switch ((a >> 8) & 3) {
-    case 0:  return  gSinTable[pos];
-    case 1:  return  gSinTable[256 - pos];
-    case 2:  return -gSinTable[pos];
-    default: return -gSinTable[256 - pos];
+    switch ((a >> 8) & 3)
+    {
+        case 0:
+            return gSinTable[pos];
+        case 1:
+            return gSinTable[256 - pos];
+        case 2:
+            return -gSinTable[pos];
+        default:
+            return -gSinTable[256 - pos];
     }
 }
 
-extern "C" int fastintcos(int a)   /* @0x800F18E4 (alias intcos); a += 90deg, fall into sin */
+extern "C" int fastintcos(int a) /* @0x800F18E4 (alias intcos); a += 90deg, fall into sin */
 {
     return fastintsin(a + 0x100);
 }
 
 #ifdef _MSC_VER
-extern "C" int intsin(int a) { return fastintsin(a); }
-extern "C" int intcos(int a) { return fastintcos(a); }
+extern "C" int intsin(int a)
+{
+    return fastintsin(a);
+}
+
+extern "C" int intcos(int a)
+{
+    return fastintcos(a);
+}
 #else
-#if defined(_MSC_VER)
-extern "C" int intsin(int a) { return fastintsin(a); }
-extern "C" int intcos(int a) { return fastintcos(a); }
-#else
+    #if defined(_MSC_VER)
+extern "C" int intsin(int a)
+{
+    return fastintsin(a);
+}
+
+extern "C" int intcos(int a)
+{
+    return fastintcos(a);
+}
+    #else
 extern "C" int intsin(int a) __attribute__((alias("fastintsin")));
 extern "C" int intcos(int a) __attribute__((alias("fastintcos")));
-#endif
+    #endif
 #endif

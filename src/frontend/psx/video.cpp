@@ -22,13 +22,13 @@
 /* STR/MDEC is deliberately outside the native-port scope.  Keep the public
    frontend video surface valid without allocating streams or touching a
    synthetic handle, so screen transitions cannot wait on PSX movie I/O. */
-intptr_t VIDEO_create(int,int,int,int,int) { return 0; }
-void VIDEO_destroy(intptr_t) {}
-void VIDEO_spoolfile(intptr_t,char *) {}
-void VIDEO_startplayback(intptr_t) {}
-void VIDEO_abortplayback(intptr_t) {}
-extern "C" VIDEOSTATE VIDEO_state(intptr_t) { return VIDEOSTATE_IDLE; }
-int VIDEO_updateframexy(intptr_t,int,int) { return 0; }
+intptr VIDEO_create(int,int,int,int,int) { return 0; }
+void VIDEO_destroy(intptr) {}
+void VIDEO_spoolfile(intptr,char *) {}
+void VIDEO_startplayback(intptr) {}
+void VIDEO_abortplayback(intptr) {}
+extern "C" VIDEOSTATE VIDEO_state(intptr) { return VIDEOSTATE_IDLE; }
+int VIDEO_updateframexy(intptr,int,int) { return 0; }
 void videoupdatetime(VIDEOSTRUCT *) {}
 int videodecode(VIDEOSTRUCT *,STREAMCHUNKHDR *,int,int) { return 0; }
 #else
@@ -36,7 +36,7 @@ int videodecode(VIDEOSTRUCT *,STREAMCHUNKHDR *,int,int) { return 0; }
 /* lines 1-61: file header, #includes, static data, macros (no symbols emitted) */
 
 /* ---- VIDEO_create  (video.cpp:62, code lines 62-102) ---- */
-intptr_t VIDEO_create(int width,int height,int fps,int streambuffersize,int memtype)
+intptr VIDEO_create(int width,int height,int fps,int streambuffersize,int memtype)
 
 
 {
@@ -95,13 +95,13 @@ intptr_t VIDEO_create(int width,int height,int fps,int streambuffersize,int memt
 
   vid->state = VIDEOSTATE_IDLE;
 
-  return (intptr_t)vid;
+  return (intptr)vid;
 }
 
 /* lines 103-119: (static data / macros / comments - no emitted code) */
 
 /* ---- VIDEO_destroy  (video.cpp:120, code lines 120-136) ---- */
-void VIDEO_destroy(intptr_t handle)
+void VIDEO_destroy(intptr handle)
 
 
 {
@@ -127,7 +127,7 @@ void VIDEO_destroy(intptr_t handle)
 /* lines 137-138: (static data / macros / comments - no emitted code) */
 
 /* ---- VIDEO_spoolfile  (video.cpp:139, code lines 139-155) ---- */
-void VIDEO_spoolfile(intptr_t handle,char *fname)
+void VIDEO_spoolfile(intptr handle,char *fname)
 
 
 {
@@ -153,7 +153,7 @@ void VIDEO_spoolfile(intptr_t handle,char *fname)
 /* lines 156-157: (static data / macros / comments - no emitted code) */
 
 /* ---- VIDEO_startplayback  (video.cpp:158, code lines 158-179) ---- */
-void VIDEO_startplayback(intptr_t handle)
+void VIDEO_startplayback(intptr handle)
 
 
 {
@@ -179,7 +179,7 @@ void VIDEO_startplayback(intptr_t handle)
 /* lines 180-181: (static data / macros / comments - no emitted code) */
 
 /* ---- VIDEO_abortplayback  (video.cpp:182, code lines 182-195) ---- */
-void VIDEO_abortplayback(intptr_t handle)
+void VIDEO_abortplayback(intptr handle)
 
 
 {
@@ -201,7 +201,7 @@ void VIDEO_abortplayback(intptr_t handle)
 /* lines 196-197: (static data / macros / comments - no emitted code) */
 
 /* ---- VIDEO_state  (video.cpp:198, code lines 198-247) ---- */
-extern "C" VIDEOSTATE VIDEO_state(intptr_t handle)
+extern "C" VIDEOSTATE VIDEO_state(intptr handle)
 
 
 {
@@ -261,7 +261,7 @@ extern "C" VIDEOSTATE VIDEO_state(intptr_t handle)
 /* lines 248-256: (static data / macros / comments - no emitted code) */
 
 /* ---- VIDEO_updateframexy  (video.cpp:257, code lines 257-335) ---- */
-int VIDEO_updateframexy(intptr_t handle,int x,int y)
+int VIDEO_updateframexy(intptr handle,int x,int y)
 
 
 {
@@ -331,7 +331,7 @@ VIDEOupdateFrame_incCounter:
 
           }
 
-          STREAM_release(vid->videotap,(intptr_t)chunk);
+          STREAM_release(vid->videotap,(intptr)chunk);
           if (!dropped) {
 
             return 1;

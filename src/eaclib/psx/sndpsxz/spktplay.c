@@ -20,47 +20,45 @@
  *   ===== voice ch = sndgs[0x25] + note*100 (the global channel pool slot) =====
  */
 
-extern "C" intptr_t sndpps[];            /* @0x80148574 -- player pointer array (one slot) */
-extern "C" int  sndgs[];                  /* (char)sndgs[0xf]=init, sndgs[0x25]=channel pool base */
-extern "C" int  iSNDplatformrate;         /* @0x80147840 -- platform sample rate (pitch calc) */
+extern "C" intptr sndpps[];      /* @0x80148574 -- player pointer array (one slot) */
+extern "C" int sndgs[];          /* (char)sndgs[0xf]=init, sndgs[0x25]=channel pool base */
+extern "C" int iSNDplatformrate; /* @0x80147840 -- platform sample rate (pitch calc) */
 
 /* ---- backends ---- */
-extern "C" int  iSNDplatformpacketoverhead(void);                           /* sdpacket */
-extern "C" int  iSNDplatformpacketplaycreate(int slot, void *mem);
+extern "C" int iSNDplatformpacketoverhead(void); /* sdpacket */
+extern "C" int iSNDplatformpacketplaycreate(int slot, void *mem);
 /* H10: 9-arg per oracle call @0x80102C94 (a0..a3 + sp+16/20/24/28/32). sdpacket's def reads 8
  *   (volAngle,level,pitch,a6,fxlevel,hdr-ptr); a9=hdr+0xc is pushed-but-unused, matching the binary. */
-extern "C" int  iSNDplatformpacketplay(int p, int note, int volAngle, int level,
-                                       int pitch, int a6, int fxlevel, intptr_t rate, intptr_t a9);
+extern "C" int iSNDplatformpacketplay(int p, int note, int volAngle, int level, int pitch, int a6, int fxlevel, intptr rate, intptr a9);
 extern "C" void iSNDplatformpacketplaydestroy(int p);
-extern "C" int  iSNDallocchan(int a, int b, int c, int *out);               /* salloc */
-extern "C" intptr_t iSNDfreechan(int note);
-extern "C" void iSNDcalcpitch(int note);                                    /* sclcptch */
-extern "C" void iSNDcalcvol(int note);                                      /* spatkey  */
-extern "C" int  SNDstop(int voice);                                         /* sstop    */
-extern "C" void iSNDenteraudio(void);                                       /* sserver  */
+extern "C" int iSNDallocchan(int a, int b, int c, int *out); /* salloc */
+extern "C" intptr iSNDfreechan(int note);
+extern "C" void iSNDcalcpitch(int note); /* sclcptch */
+extern "C" void iSNDcalcvol(int note);   /* spatkey  */
+extern "C" int SNDstop(int voice);       /* sstop    */
+extern "C" void iSNDenteraudio(void);    /* sserver  */
 extern "C" void iSNDleaveaudio(void);
 
-#define MI(p,o)  (*(int*)((p)+(o)))
-#define MB(p,o)  (*(unsigned char*)((p)+(o)))
-#define MSB(p,o) (*(signed char*)((p)+(o)))
-#define MH(p,o)  (*(short*)((p)+(o)))
-#define MUH(p,o) (*(unsigned short*)((p)+(o)))
+#define MI(p, o) (*(int *)((intptr)(p) + (o)))
+#define MB(p, o) (*(unsigned char *)((intptr)(p) + (o)))
+#define MSB(p, o) (*(signed char *)((intptr)(p) + (o)))
+#define MH(p, o) (*(short *)((intptr)(p) + (o)))
+#define MUH(p, o) (*(unsigned short *)((intptr)(p) + (o)))
 
 /* forward decls (mutual) */
-extern "C" int iSNDpacketplayoverhead(int n);                /* @0x801028BC */
-extern "C" int SNDPKTPLAY_overhead(int n);                   /* @0x801028D0 */
-extern "C" int SNDPKTPLAY_create(intptr_t mem, int memsize, SndPacketReleaseCallback relcb,
-                                  SndPacketNotifyCallback notifycb); /* @0x801028FC */
-extern "C" int SNDPKTPLAY_start(int p, intptr_t rate, intptr_t hdr, int *params); /* @0x80102A10 */
-extern "C" int SNDPKTPLAY_submit(int p, intptr_t *frame);     /* @0x80102CFC */
-extern "C" int SNDPKTPLAY_submitspace(int p);                /* @0x80102E70 */
-extern "C" int SNDPKTPLAY_unsafeframesoutstanding(int p);    /* @0x80102EC4 */
-extern "C" int SNDPKTPLAY_framesoutstanding(int p);          /* @0x80102EEC */
-extern "C" int SNDPKTPLAY_purge(int p, int lo, int hi);      /* @0x80102F3C */
-extern "C" int SNDPKTPLAY_stop(int p);                       /* @0x80103118 */
-extern "C" int SNDPKTPLAY_destroy(int p);                    /* @0x801031F4 */
-extern "C" intptr_t iSNDpacketget(int p, int idx, int *out); /* @0x80103248 */
-extern "C" unsigned int iSNDpacketfreeframes(int p, int idx, int bytes);     /* @0x801033C4 */
+extern "C" int iSNDpacketplayoverhead(int n);                                                                                /* @0x801028BC */
+extern "C" int SNDPKTPLAY_overhead(int n);                                                                                   /* @0x801028D0 */
+extern "C" int SNDPKTPLAY_create(intptr mem, int memsize, SndPacketReleaseCallback relcb, SndPacketNotifyCallback notifycb); /* @0x801028FC */
+extern "C" int SNDPKTPLAY_start(int p, intptr rate, intptr hdr, int *params);                                                /* @0x80102A10 */
+extern "C" int SNDPKTPLAY_submit(int p, intptr *frame);                                                                      /* @0x80102CFC */
+extern "C" int SNDPKTPLAY_submitspace(int p);                                                                                /* @0x80102E70 */
+extern "C" int SNDPKTPLAY_unsafeframesoutstanding(int p);                                                                    /* @0x80102EC4 */
+extern "C" int SNDPKTPLAY_framesoutstanding(int p);                                                                          /* @0x80102EEC */
+extern "C" int SNDPKTPLAY_purge(int p, int lo, int hi);                                                                      /* @0x80102F3C */
+extern "C" int SNDPKTPLAY_stop(int p);                                                                                       /* @0x80103118 */
+extern "C" int SNDPKTPLAY_destroy(int p);                                                                                    /* @0x801031F4 */
+extern "C" intptr iSNDpacketget(int p, int idx, int *out);                                                                   /* @0x80103248 */
+extern "C" unsigned int iSNDpacketfreeframes(int p, int idx, int bytes);                                                     /* @0x801033C4 */
 
 static SndPacketPlayer *packet_player(int p)
 {
@@ -89,28 +87,26 @@ extern "C" int SNDPKTPLAY_overhead(int n)
 
 /* SNDPKTPLAY_create @0x801028FC : claim a player slot in `mem`, size its frame ring, store the callbacks.
  *   Returns the slot index, or a negative error. */
-extern "C" int SNDPKTPLAY_create(intptr_t mem, int memsize, SndPacketReleaseCallback relcb,
-                                  SndPacketNotifyCallback notifycb)
+extern "C" int SNDPKTPLAY_create(intptr mem, int memsize, SndPacketReleaseCallback relcb, SndPacketNotifyCallback notifycb)
 {
     int slot, off;
     SndPacketPlayer *ppp;
     if ((char)sndgs[0xf] == 0)
         return -10;
     slot = 0;
-    if (sndpps[0] != 0)                          /* no free slot */
+    if (sndpps[0] != 0) /* no free slot */
         return -9;
     off = iSNDplatformpacketplaycreate(slot, (void *)mem);
     if (off < 0)
         return -6;
-    iSNDplatformpacketoverhead();                /* (side effect / sizing, result discarded) */
+    iSNDplatformpacketoverhead(); /* (side effect / sizing, result discarded) */
     ppp = (SndPacketPlayer *)(mem + off);
     iSNDplatformpacketoverhead();
-    sndpps[slot] = (intptr_t)ppp;
+    sndpps[slot] = (intptr)ppp;
     ppp->memoryBase = mem;
     ppp->release = relcb;
     ppp->notify = notifycb;
-    ppp->ringSize = (short)((unsigned)(memsize - off -
-        (int)(sizeof(SndPacketPlayer) + sizeof(SndPacketFrame))) / sizeof(SndPacketFrame));
+    ppp->ringSize = (short)((unsigned)(memsize - off - (int)(sizeof(SndPacketPlayer) + sizeof(SndPacketFrame))) / sizeof(SndPacketFrame));
     ppp->voice = -1;
     return slot;
 }
@@ -120,7 +116,7 @@ extern "C" int SNDPKTPLAY_create(intptr_t mem, int memsize, SndPacketReleaseCall
  *   Ghidra's hdr/arg3 param naming is swapped), computes the playback pitch/duration, and hands off to the
  *   platform.  Returns the voice id, or a negative error.
  *   Args (per the caller, sst): rate = locked rate word, hdr = 0x14-byte header, params = 5-word params. */
-extern "C" int SNDPKTPLAY_start(int p, intptr_t rate, intptr_t hdr, int *params)
+extern "C" int SNDPKTPLAY_start(int p, intptr rate, intptr hdr, int *params)
 {
     SndPacketPlayer *ppp;
     int note, allocOut, ch, s3len, t4, v1, dur, r;
@@ -129,7 +125,8 @@ extern "C" int SNDPKTPLAY_start(int p, intptr_t rate, intptr_t hdr, int *params)
     ppp = packet_player(p);
     iSNDenteraudio();
     note = iSNDallocchan(*(int *)hdr, MB(rate, 2), MSB(hdr, 6), &allocOut);
-    if (note < 0) {
+    if (note < 0)
+    {
         iSNDleaveaudio();
         return -9;
     }
@@ -149,34 +146,34 @@ extern "C" int SNDPKTPLAY_start(int p, intptr_t rate, intptr_t hdr, int *params)
     else
         s3len = nfs4_mips_sll_s32(MSB(params, 7) - 0x40, 8) & 0xffff;
 
-    MB(ch, 0xa)   = 0xff;
+    MB(ch, 0xa) = 0xff;
     MUH(ch, 0x5c) = MUH(hdr, 4);
-    MI(ch, 0x14)  = 0;
+    MI(ch, 0x14) = 0;
     MUH(ch, 0x60) = MUH(params, 0xc);
-    MI(ch, 0x20)  = 0;
-    MI(ch, 0x28)  = 0x7fffffff;
-    MI(ch, 0x24)  = 0x7f0000;
-    MI(ch, 0x1c)  = nfs4_mips_sll_s32(MSB(params, 8), 0x10);
-    MB(ch, 0x2c)  = MB(hdr, 7);
-    MB(ch, 0x2e)  = MB(hdr, 8);
-    MB(ch, 0x30)  = 1;
-    MB(ch, 0x31)  = 0;
-    MB(ch, 0x32)  = 0;
-    MB(ch, 0x33)  = 1;
-    MB(ch, 0x2f)  = MB(params, 9);   /* H09: src was hdr (oracle 0x80102B90 *(u8)(9+$s4=params)) */
-    MB(ch, 0x34)  = MB(hdr, 9);      /* H09: src was params (oracle 0x80102BAC *(u8)(9+$s5=hdr)) */
-    MB(ch, 0x35)  = MB(params, 10);  /* H09: src was hdr (oracle 0x80102BB8 *(u8)(10+$s4=params)) */
-    MH(ch, 0x5a)  = (short)(MSB(hdr, 10) * 100);
-    MB(ch, 0x37)  = 0;
-    MB(ch, 0x36)  = 0;
-    MB(ch, 0x3d)  = MB(params, 7);   /* H09: src was hdr (oracle 0x80102BE8 *(u8)(7+$s4=params)) */
-    MI(ch, 0x40)  = 0;
-    MI(ch, 0x44)  = 0;
-    MI(ch, 0x48)  = 0;
-    MI(ch, 0x4c)  = 0;
-    MI(ch, 0x50)  = 0;
-    MI(ch, 0x54)  = 0;
-    MH(ch, 0x5e)  = 0;
+    MI(ch, 0x20) = 0;
+    MI(ch, 0x28) = 0x7fffffff;
+    MI(ch, 0x24) = 0x7f0000;
+    MI(ch, 0x1c) = nfs4_mips_sll_s32(MSB(params, 8), 0x10);
+    MB(ch, 0x2c) = MB(hdr, 7);
+    MB(ch, 0x2e) = MB(hdr, 8);
+    MB(ch, 0x30) = 1;
+    MB(ch, 0x31) = 0;
+    MB(ch, 0x32) = 0;
+    MB(ch, 0x33) = 1;
+    MB(ch, 0x2f) = MB(params, 9);  /* H09: src was hdr (oracle 0x80102B90 *(u8)(9+$s4=params)) */
+    MB(ch, 0x34) = MB(hdr, 9);     /* H09: src was params (oracle 0x80102BAC *(u8)(9+$s5=hdr)) */
+    MB(ch, 0x35) = MB(params, 10); /* H09: src was hdr (oracle 0x80102BB8 *(u8)(10+$s4=params)) */
+    MH(ch, 0x5a) = (short)(MSB(hdr, 10) * 100);
+    MB(ch, 0x37) = 0;
+    MB(ch, 0x36) = 0;
+    MB(ch, 0x3d) = MB(params, 7); /* H09: src was hdr (oracle 0x80102BE8 *(u8)(7+$s4=params)) */
+    MI(ch, 0x40) = 0;
+    MI(ch, 0x44) = 0;
+    MI(ch, 0x48) = 0;
+    MI(ch, 0x4c) = 0;
+    MI(ch, 0x50) = 0;
+    MI(ch, 0x54) = 0;
+    MH(ch, 0x5e) = 0;
 
     iSNDcalcpitch(note);
     iSNDcalcvol(note);
@@ -187,15 +184,13 @@ extern "C" int SNDPKTPLAY_start(int p, intptr_t rate, intptr_t hdr, int *params)
     {
         long long pr = (long long)v1 * (int)0x82061029;
         int high = nfs4_mips_bits_to_s32((unsigned int)((unsigned long long)pr >> 32));
-        dur = nfs4_mips_subu_s32(
-            nfs4_mips_sra_s32(nfs4_mips_addu_s32(high, v1), 0xd),
-            nfs4_mips_sra_s32(v1, 0x1f));
+        dur = nfs4_mips_subu_s32(nfs4_mips_sra_s32(nfs4_mips_addu_s32(high, v1), 0xd), nfs4_mips_sra_s32(v1, 0x1f));
     }
     /* H10: oracle (0x80102C94) passes 9 args; was 6 with dur/rate/hdr+0xc in the wrong slots and
        ch[0x2d]/ch[0x62]/params[0xe] missing.  a0..a3 + sp+16/20/24/28/32. */
-    r = iSNDplatformpacketplay(p, note, s3len, MSB(ch, 0x2d), MUH(ch, 0x62),
-                               MUH(params, 0xe), dur, rate, hdr + 0xc);
-    if (r < 0) {
+    r = iSNDplatformpacketplay(p, note, s3len, MSB(ch, 0x2d), MUH(ch, 0x62), MUH(params, 0xe), dur, rate, hdr + 0xc);
+    if (r < 0)
+    {
         iSNDfreechan(note);
         iSNDleaveaudio();
         return r;
@@ -206,7 +201,7 @@ extern "C" int SNDPKTPLAY_start(int p, intptr_t rate, intptr_t hdr, int *params)
 
 /* SNDPKTPLAY_submit @0x80102CFC : append a frame (descriptor `frame`) to the player's ring.  Returns the
  *   submit sequence number, or -0xD if the ring is full. */
-extern "C" int SNDPKTPLAY_submit(int p, intptr_t *frame)
+extern "C" int SNDPKTPLAY_submit(int p, intptr *frame)
 {
     SndPacketPlayer *ppp;
     SndPacketFrame *slot;
@@ -215,7 +210,8 @@ extern "C" int SNDPKTPLAY_submit(int p, intptr_t *frame)
         return -10;
     ppp = packet_player(p);
     iSNDenteraudio();
-    if (ppp->outstanding < ppp->ringSize - 1) {
+    if (ppp->outstanding < ppp->ringSize - 1)
+    {
         idx = ppp->readIndex + ppp->outstanding;
         if (ppp->ringSize <= idx)
             idx -= ppp->ringSize;
@@ -223,8 +219,10 @@ extern "C" int SNDPKTPLAY_submit(int p, intptr_t *frame)
         slot->size = (int)frame[1];
         slot->sequence = ppp->sequence;
         i = 0;
-        if (*((unsigned char *)&ppp->rateWord + 2) != 0) {
-            do {
+        if (*((unsigned char *)&ppp->rateWord + 2) != 0)
+        {
+            do
+            {
                 slot->sample[i] = frame[3 + i];
                 i++;
             } while (i < (int)*((unsigned char *)&ppp->rateWord + 2));
@@ -233,7 +231,9 @@ extern "C" int SNDPKTPLAY_submit(int p, intptr_t *frame)
         ppp->bytesPending = ppp->bytesPending + (int)frame[1];
         seq = ppp->sequence;
         ppp->sequence = ppp->sequence + 1;
-    } else {
+    }
+    else
+    {
         seq = -0xd;
     }
     iSNDleaveaudio();
@@ -273,33 +273,40 @@ extern "C" int SNDPKTPLAY_purge(int p, int lo, int hi)
 {
     SndPacketPlayer *ppp;
     short total;
-    int   rd, wr, i;
+    int rd, wr, i;
 
     if ((char)sndgs[0xf] == 0)
         return -10;
     ppp = packet_player(p);
     iSNDenteraudio();
-    wr    = ppp->readIndex;
+    wr = ppp->readIndex;
     total = ppp->outstanding;
-    rd    = ppp->readIndex;
-    if (0 < total) {
+    rd = ppp->readIndex;
+    if (0 < total)
+    {
         i = 0;
-        do {
+        do
+        {
             SndPacketFrame *fr = packet_frames(ppp) + rd;
-            if (fr->sequence < lo || hi < fr->sequence) {
+            if (fr->sequence < lo || hi < fr->sequence)
+            {
                 packet_frames(ppp)[wr] = *fr;
                 wr++;
-                if (ppp->ringSize <= wr) {
+                if (ppp->ringSize <= wr)
+                {
                     wr = 0;
                 }
-            } else {                               /* remove */
+            }
+            else
+            { /* remove */
                 ppp->outstanding = ppp->outstanding - 1;
                 ppp->bytesPending = ppp->bytesPending - fr->size;
                 if (ppp->release != 0)
                     ppp->release(fr->sample[0]);
             }
             rd++;
-            if (ppp->ringSize <= rd) {
+            if (ppp->ringSize <= rd)
+            {
                 rd = 0;
             }
             i++;
@@ -319,7 +326,8 @@ extern "C" int SNDPKTPLAY_stop(int p)
     iSNDenteraudio();
     SNDstop(ppp->voice);
     SNDPKTPLAY_purge(p, 0, 0x7fffffff);
-    if (ppp->release != 0 && ppp->lastChannel >= 0) {
+    if (ppp->release != 0 && ppp->lastChannel >= 0)
+    {
         ppp->release(packet_frames(ppp)[ppp->lastChannel].sample[0]);
     }
     ppp->voice = -1;
@@ -340,25 +348,27 @@ extern "C" int SNDPKTPLAY_destroy(int p)
 /* iSNDpacketget @0x80103248 : platform pull -- hand out the next sample pointer for channel `idx` of the
  *   head frame, advancing the ring (and firing the release callback) once the last channel is taken.
  *   Writes the frame size to *out.  Returns the channel's sample pointer (0 if none). */
-extern "C" intptr_t iSNDpacketget(int p, int idx, int *out)
+extern "C" intptr iSNDpacketget(int p, int idx, int *out)
 {
     SndPacketPlayer *ppp = packet_player(p);
     short m;
-    intptr_t result;
+    intptr result;
     SndPacketFrame *fr;
 
-    if ((unsigned)(idx + 1) == (unsigned)*((unsigned char *)&ppp->rateWord + 2) &&
-        ppp->lastChannel >= 0) {
+    if ((unsigned)(idx + 1) == (unsigned)*((unsigned char *)&ppp->rateWord + 2) && ppp->lastChannel >= 0)
+    {
         m = ppp->lastChannel;
         ppp->lastChannel = (short)0xffff;
         if (ppp->release != 0)
             ppp->release(packet_frames(ppp)[m].sample[0]);
     }
     result = 0;
-    if (ppp->outstanding != 0) {
+    if (ppp->outstanding != 0)
+    {
         fr = packet_frames(ppp) + ppp->readIndex;
         *out = fr->size;
-        if ((unsigned)(idx + 1) == (unsigned)*((unsigned char *)&ppp->rateWord + 2)) {
+        if ((unsigned)(idx + 1) == (unsigned)*((unsigned char *)&ppp->rateWord + 2))
+        {
             ppp->lastChannel = ppp->readIndex;
             ppp->outstanding = ppp->outstanding - 1;
             ppp->readIndex = ppp->readIndex + 1;
@@ -378,7 +388,8 @@ extern "C" unsigned int iSNDpacketfreeframes(int p, int idx, int bytes)
 {
     SndPacketPlayer *ppp = packet_player(p);
     unsigned int v = (unsigned int)*((unsigned char *)&ppp->rateWord + 2);
-    if ((unsigned)(idx + 1) == v) {
+    if ((unsigned)(idx + 1) == v)
+    {
         v = ppp->bytesConsumed - bytes;
         ppp->bytesConsumed = (int)v;
         if (ppp->notify != 0)
@@ -388,4 +399,7 @@ extern "C" unsigned int iSNDpacketfreeframes(int p, int idx, int bytes)
 }
 
 /* owning-TU def (extern-declared, never defined; link-harness) */
-extern "C" { int iSNDplatformrate; }
+extern "C"
+{
+    int iSNDplatformrate;
+}

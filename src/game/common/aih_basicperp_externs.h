@@ -9,21 +9,21 @@
 /* ---- vtable: AIHigh_BasicPerp (this obj) ---- */
 extern __vtbl_ptr_type AIHigh_BasicPerp_vtable[];
 
-intptr_t Speech_Mobile(Car_tObj *carObj);   /* pointer-width address; cast result to Speaker* */
+intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; cast result to Speaker* */
 extern "C" AIHigh_Base *highLevelAIObjs[];
-extern Car_tObj         *Cars_gHumanRaceCarList[9];  /* cars.obj */
+extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gCopCarList[];
-extern "C" extern GameSetup_tData   GameSetup_gData;
-extern "C" Sim_tSimGlobalVar  simGlobal;          /* Sim.obj   (.gameTicks) */
-extern Trk_NewSlice  *BWorldSm_slices;
-extern int                 Cars_gNumCopCars;
-extern int                AITune_driveSide;
-extern int            Cars_gNumCars;
-extern "C" extern int       Cars_gNumHumanRaceCars;
+extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
+extern Trk_NewSlice *BWorldSm_slices;
+extern int Cars_gNumCopCars;
+extern int AITune_driveSide;
+extern int Cars_gNumCars;
+extern "C" extern int Cars_gNumHumanRaceCars;
 extern int AISpeeds_GetLegalSpeed(int slice);
 extern int AITune_oneWay;
-extern int AIWorld_CheckForBarrierBetweenLanes(int slice,int lane0,int lane1);
+extern int AIWorld_CheckForBarrierBetweenLanes(int slice, int lane0, int lane1);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
 
 #endif /* _GAME_COMMON_CAMERA_EXTERNS_H_ */

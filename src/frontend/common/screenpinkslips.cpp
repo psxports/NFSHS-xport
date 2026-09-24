@@ -22,7 +22,7 @@ void tScreenPinkSlips::DrawBackground()
   short i;
   short tv;
   int iVar8;
-  RECT r;
+  PSX_RECT r;
   tTrackInformation trackInfo;
   char moviename [80];
   short shapeY;
@@ -174,7 +174,7 @@ void tScreenPinkSlips::Initialize()
 
 {
   int iVar1;
-  RECT r;
+  PSX_RECT r;
   char moviename [80];
   tTrackInformation trackInfo;
   

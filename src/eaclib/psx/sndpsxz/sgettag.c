@@ -9,34 +9,36 @@
  */
 #include "../../../nfs4_types.h"
 
-extern "C" int iSNDgetdata(unsigned char *p, int n);   /* sgetdata */
+extern "C" int iSNDgetdata(unsigned char *p, int n); /* sgetdata */
 
-extern "C" int iSNDgettag(intptr_t *cursor, unsigned int *outId, int *outVal, intptr_t *outPtr); /* @0x8010BD50 */
+extern "C" int iSNDgettag(intptr *cursor, unsigned int *outId, int *outVal, intptr *outPtr); /* @0x8010BD50 */
 
 /* iSNDgettag @0x8010BD50 : returns 1 while a tag was read, 0 at end of stream (id 0xff). */
-extern "C" int iSNDgettag(intptr_t *cursor, unsigned int *outId, int *outVal, intptr_t *outPtr)
+extern "C" int iSNDgettag(intptr *cursor, unsigned int *outId, int *outVal, intptr *outPtr)
 {
-    char          *p = (char *)*cursor;
-    unsigned char  id;
-    intptr_t       at;
-    unsigned int   len;
-    int            r;
+    char *p = (char *)*cursor;
+    unsigned char id;
+    intptr at;
+    unsigned int len;
+    int r;
 
-    while (*p == -4) {                          /* skip 0xfc padding tags */
-        *cursor = (intptr_t)(p + 1);
+    while (*p == -4)
+    { /* skip 0xfc padding tags */
+        *cursor = (intptr)(p + 1);
         p = p + 1;
     }
     id = *(unsigned char *)*cursor;
     *outId = (unsigned int)id;
     if (id == 0xff)
-        return 0;                               /* end of stream */
+        return 0; /* end of stream */
     at = *cursor;
     *cursor = at + 1;
     if (*outId == 0xfd || *outId == 0xfe)
-        return 1;                               /* marker tag (no data) */
+        return 1; /* marker tag (no data) */
 
     len = (unsigned int)*(unsigned char *)(at + 1);
-    if (len == 0xff) {                          /* extended 4-byte length */
+    if (len == 0xff)
+    { /* extended 4-byte length */
         *cursor = at + 2;
         len = (unsigned int)iSNDgetdata((unsigned char *)(at + 2), 4);
         *cursor = *cursor + 3;
@@ -44,7 +46,8 @@ extern "C" int iSNDgettag(intptr_t *cursor, unsigned int *outId, int *outVal, in
     at = *cursor;
     *cursor = at + 1;
     *outPtr = at + 1;
-    if (len < 5) {
+    if (len < 5)
+    {
         r = iSNDgetdata((unsigned char *)*cursor, (int)len);
         *outVal = r;
     }

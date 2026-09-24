@@ -13,71 +13,75 @@
  */
 #include "../../../mips_semantics.h"
 
-extern "C" void *reservememadr(char *name, int size, int classid);  /* eacpsxz @0x800E533C (memstd) */
-extern "C" int   purgememadr (void *p);                             /* eacpsxz @0x800E5540 (memstd) */
-extern "C" void  ClearOTagR(unsigned long *ot, int n);              /* PsyQ libgpu */
-extern "C" int   DrawSync(int mode);                                /* PsyQ libgpu */
+extern "C" void *reservememadr(char *name, int size, int classid); /* eacpsxz @0x800E533C (memstd) */
+extern "C" int purgememadr(void *p);                               /* eacpsxz @0x800E5540 (memstd) */
+extern "C" void ClearOTagR(unsigned long *ot, int n);              /* PsyQ libgpu */
+extern "C" int DrawSync(int mode);                                 /* PsyQ libgpu */
 
 /* ---- shared GPU draw-list globals (data-materialization pass owns the definitions) ---- */
-extern "C" int   maxot;          /* ordering-table length (set to 16 here)        */
-extern "C" int   maxprim;        /* primitive capacity                            */
-extern "C" char *otbuf;          /* base of the "Draw Lists" allocation           */
-extern "C" char *otbl;           /* active OT pointer (== otbuf)                   */
-extern "C" char *otbl2;          /* @0x8013DE74 : 2nd OT buffer (otbuf + maxot*4)  */
-extern "C" char *primbuf;        /* active primitive buffer (otbuf + maxot*8)      */
-extern "C" char *primbase;       /* primitive buffer base                         */
-extern "C" char *primbuf2;       /* @0x8013DE88 : 2nd prim buffer (primbuf+52*maxprim) */
-extern "C" char *primptr;        /* current primitive write cursor                */
-extern "C" char *nextprim;       /* next primitive link target (== otbl)          */
-extern "C" int   oti;            /* OT index                                      */
-extern "C" int   otp;            /* OT page/parity                                */
-extern "C" int   drawpending;    /* a DrawOTag is in flight                       */
-extern "C" int   linkmodeflag;   /* link/draw mode passed to initlinkmode         */
-extern "C" int   semitrans;      /* semi-transparency mode (settrans)             */
+extern "C" int maxot;        /* ordering-table length (set to 16 here)        */
+extern "C" int maxprim;      /* primitive capacity                            */
+extern "C" char *otbuf;      /* base of the "Draw Lists" allocation           */
+extern "C" char *otbl;       /* active OT pointer (== otbuf)                   */
+extern "C" char *otbl2;      /* @0x8013DE74 : 2nd OT buffer (otbuf + maxot*4)  */
+extern "C" char *primbuf;    /* active primitive buffer (otbuf + maxot*8)      */
+extern "C" char *primbase;   /* primitive buffer base                         */
+extern "C" char *primbuf2;   /* @0x8013DE88 : 2nd prim buffer (primbuf+52*maxprim) */
+extern "C" char *primptr;    /* current primitive write cursor                */
+extern "C" char *nextprim;   /* next primitive link target (== otbl)          */
+extern "C" int oti;          /* OT index                                      */
+extern "C" int otp;          /* OT page/parity                                */
+extern "C" int drawpending;  /* a DrawOTag is in flight                       */
+extern "C" int linkmodeflag; /* link/draw mode passed to initlinkmode         */
+extern "C" int semitrans;    /* semi-transparency mode (settrans)             */
 
-extern "C" void *initlinkmode(void *unused, int maxprimArg, int linkmode)   /* @0x800F05F4 */
+extern "C" void *initlinkmode(void *unused, int maxprimArg, int linkmode) /* @0x800F05F4 */
 {
-    (void)unused;                                  /* 1st arg is unused by the asm */
-    maxot   = 16;
+    (void)unused; /* 1st arg is unused by the asm */
+    maxot = 16;
     maxprim = maxprimArg;
     if (otbuf != 0)
-        purgememadr(otbuf);                        /* free the previous draw-list buffer */
+        purgememadr(otbuf); /* free the previous draw-list buffer */
 
     {
-        int size = nfs4_mips_bits_to_s32(
-            (13U * (unsigned int)maxprim + (unsigned int)maxot) << 3);
+        int size = nfs4_mips_bits_to_s32((13U * (unsigned int)maxprim + (unsigned int)maxot) << 3);
         char *buf = (char *)reservememadr("Draw Lists", size, 0x10);
         otbuf = buf;
-        otbl  = buf;
-        otbl2     = buf + maxot * 4;               /* @0x8013DE74 second OT (double-buffer) */
-        primbuf   = buf + maxot * 8;
-        primbase  = primbuf;
-        primbuf2  = primbuf + 52 * maxprim;        /* @0x8013DE88 second prim buffer        */
+        otbl = buf;
+        otbl2 = buf + maxot * 4; /* @0x8013DE74 second OT (double-buffer) */
+        primbuf = buf + maxot * 8;
+        primbase = primbuf;
+        primbuf2 = primbuf + 52 * maxprim; /* @0x8013DE88 second prim buffer        */
         ClearOTagR((unsigned long *)otbl, maxot);
         linkmodeflag = linkmode;
         oti = 0;
         otp = 0;
         drawpending = 0;
-        primptr  = primbuf;
+        primptr = primbuf;
         nextprim = otbl;
     }
     return otbuf;
 }
 
-extern "C" void waitdraw(void)   /* @0x800F06E0 */
+extern "C" void waitdraw(void) /* @0x800F06E0 */
 {
-    if (drawpending != 0) {
+    if (drawpending != 0)
+    {
         DrawSync(0);
         drawpending = 0;
     }
 }
 
-extern "C" int settrans(int mode)   /* @0x800F070C */
+extern "C" int settrans(int mode) /* @0x800F070C */
 {
     if (mode >= 0)
-        semitrans = (mode == 0) ? 1 : 3;           /* mode>0 -> 3, mode==0 -> 1, mode<0 -> query */
+        semitrans = (mode == 0) ? 1 : 3; /* mode>0 -> 3, mode==0 -> 1, mode<0 -> query */
     return semitrans >> 1;
 }
 
 /* owning-TU def (extern-declared, never defined; link-harness) */
-extern "C" { char *otbl2; char *primbuf2; }
+extern "C"
+{
+    char *otbl2;
+    char *primbuf2;
+}

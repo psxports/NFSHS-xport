@@ -9,14 +9,13 @@
 
 #include "../../../nfs4_types.h"
 
-extern "C" int iSNDresolvetaggedpatch(unsigned char *bank, intptr_t patchBase,
-                                       int *scratch); /* stagpat */
+extern "C" int iSNDresolvetaggedpatch(unsigned char *bank, intptr patchBase, int *scratch); /* stagpat */
 
-extern "C" int iSNDdownloadbank(intptr_t bankData, intptr_t patchData);   /* @0x8010266C */
+extern "C" int iSNDdownloadbank(intptr bankData, intptr patchData); /* @0x8010266C */
 
 /* iSNDdownloadbank @0x8010266C : rebase + resolve all patches of the bank at `bankData`.  Returns 7 (all
  *   ok) or 8 (a patch failed). */
-extern "C" int iSNDdownloadbank(intptr_t bankData, intptr_t patchData)
+extern "C" int iSNDdownloadbank(intptr bankData, intptr patchData)
 {
     int scratch[512];
     int i, ret = 7;
@@ -24,13 +23,16 @@ extern "C" int iSNDdownloadbank(intptr_t bankData, intptr_t patchData)
 
     for (i = 0; i < 512; i += 2)
         scratch[i] = -1;
-    if (*(short *)(bankData + 6) != 0) {
+    if (*(short *)(bankData + 6) != 0)
+    {
         i = 0;
-        do {
-            intptr_t fieldAddr = bankData + i * 4 + (type4 ? 0x14 : 0xc);
+        do
+        {
+            intptr fieldAddr = bankData + i * 4 + (type4 ? 0x14 : 0xc);
             int off = *(int *)fieldAddr;
-            if (off != 0) {
-                intptr_t bank = fieldAddr + off;
+            if (off != 0)
+            {
+                intptr bank = fieldAddr + off;
                 *(int *)fieldAddr = (int)bank; /* PORTABILITY-REVIEWED: 32-bit resolved pointer stored in bank image */
                 if (iSNDresolvetaggedpatch((unsigned char *)bank, patchData, scratch) != 7)
                     ret = 8;

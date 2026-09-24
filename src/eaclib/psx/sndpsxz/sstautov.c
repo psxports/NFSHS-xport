@@ -5,11 +5,11 @@
  */
 #include "../../../lib/snd.h"
 
-extern "C" int  sndgs[];
-extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag); /* sst */
-extern "C" void SNDautovol(int chan, int steps, int targetVol);   /* sautovol */
+extern "C" int sndgs[];
+extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);     /* sst */
+extern "C" void SNDautovol(int chan, int steps, int targetVol); /* sautovol */
 
-extern "C" int SNDSTRM_autovol(int tag, int steps, int vol);   /* @0x800E9DE8 */
+extern "C" int SNDSTRM_autovol(int tag, int steps, int vol); /* @0x800E9DE8 */
 
 /* SNDSTRM_autovol @0x800E9DE8 : store the target vol (+0x54) and start an auto-volume ramp over steps/10. */
 extern "C" int SNDSTRM_autovol(int tag, int steps, int vol)

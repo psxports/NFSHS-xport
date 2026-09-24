@@ -9,6 +9,7 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "aih_opp_externs.h"
+#include "new.h"
 
 extern int          AI_elapsedTime;     /* H24: ai.cpp @0x8013C554 (not in this TU's externs) */
 extern "C" AIHigh_Base *highLevelAIObjs[];  /* H24: @0x8010CD38 (not in this TU's externs) */
@@ -313,7 +314,7 @@ void AIHigh_Opponent::HighExecute()
 
   case 0:
 
-    pAVar1 = (AIState_Normal *)operator new(8);
+    pAVar1 = (AIState_Normal *)__builtin_new(8);
 
     pAVar2 = &(new(pAVar1) AIState_Normal((this->_base_AIHigh_Player)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 
@@ -383,7 +384,7 @@ LAB_800638c0:
 
       }
 
-      pAVar7 = (AIState_Chase *)operator new(0x94);
+      pAVar7 = (AIState_Chase *)__builtin_new(0x94);
 
       pAVar7 = (new(pAVar7) AIState_Chase((this->_base_AIHigh_Player)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_,
 
@@ -463,7 +464,7 @@ LAB_800638c0:
 
       ((this->_base_AIHigh_Player)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_)->desiredDirection = iVar5;
 
-      pAVar1 = (AIState_Normal *)operator new(8);
+      pAVar1 = (AIState_Normal *)__builtin_new(8);
 
       pAVar2 = &(new(pAVar1) AIState_Normal((this->_base_AIHigh_Player)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_))->_base_AIState_Base;
 

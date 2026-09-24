@@ -8,9 +8,9 @@
  *   @+4 } at base + 0x10 + i*8.  `name` is a packed 4-char tag; `dataoffset` is relative to the file
  *   base.  shapepointer/shapename bounds-check the (unsigned) index against the count.
  */
-extern "C" int   shapecount  (void *shapefile);                       /* @0x800F0AAC */
-extern "C" void *shapepointer(void *shapefile, unsigned int index);   /* @0x800F0AB8 */
-extern "C" void  shapename   (void *shapefile, unsigned int index, void *dst);  /* @0x800F0AE0 */
+extern "C" int shapecount(void *shapefile);                                /* @0x800F0AAC */
+extern "C" void *shapepointer(void *shapefile, unsigned int index);        /* @0x800F0AB8 */
+extern "C" void shapename(void *shapefile, unsigned int index, void *dst); /* @0x800F0AE0 */
 
 /* shapecount @0x800F0AAC : number of shapes in the file (header +0x08). */
 extern "C" int shapecount(void *shapefile)
@@ -22,9 +22,9 @@ extern "C" int shapecount(void *shapefile)
 extern "C" void *shapepointer(void *shapefile, unsigned int index)
 {
     char *sf = (char *)shapefile;
-    int   count = *(int *)(sf + 8);
+    int count = *(int *)(sf + 8);
     if ((int)index < count)
-        return sf + *(int *)(sf + index * 8 + 0x14);   /* entry[index].dataoffset (0x10+i*8+4) */
+        return sf + *(int *)(sf + index * 8 + 0x14); /* entry[index].dataoffset (0x10+i*8+4) */
     return 0;
 }
 
@@ -32,8 +32,8 @@ extern "C" void *shapepointer(void *shapefile, unsigned int index)
 extern "C" void shapename(void *shapefile, unsigned int index, void *dst)
 {
     char *sf = (char *)shapefile;
-    int   count = *(int *)(sf + 8);
-    int   name  = ((int)index < count) ? *(int *)(sf + index * 8 + 0x10) : 0;
+    int count = *(int *)(sf + 8);
+    int name = ((int)index < count) ? *(int *)(sf + index * 8 + 0x10) : 0;
     /* asm uses swr/swl -> unaligned 4-byte store; copy byte-wise to stay alignment-safe */
     ((char *)dst)[0] = (char)(name);
     ((char *)dst)[1] = (char)(name >> 8);

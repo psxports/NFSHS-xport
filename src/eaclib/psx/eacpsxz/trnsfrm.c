@@ -7,9 +7,9 @@
  *   fixedmult (16.16).  The asm computes the 3 components into stack temps and writes them to `out`
  *   only at the end, so `out` may safely alias `vec` or `mat`.
  */
-extern "C" int fixedmult(int a, int b);                        /* eacpsxz @0x800E4328 (lbl_D4328) */
+extern "C" int fixedmult(int a, int b); /* eacpsxz @0x800E4328 (lbl_D4328) */
 
-extern "C" int *transform(int *vec, int *mat, int *out)        /* @0x800EAED8 */
+extern "C" int *transform(int *vec, int *mat, int *out) /* @0x800EAED8 */
 {
     int o0, o1, o2;
     o0 = fixedmult(vec[0], mat[0]) + fixedmult(vec[1], mat[3]) + fixedmult(vec[2], mat[6]);

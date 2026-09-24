@@ -15,7 +15,7 @@
  *   this TU's headers pulled in (the SYM format attributes each type to the first .obj that
  *   references it; profile.obj, early in link order, absorbed them):
  *     TCB, EXEC, DIRENTRY, PAD_PSX, PAD_NEGCON, PAD_ANALOG, PAD_MOUSE, PAD_COMMON, VECTOR, SVECTOR,
- *     CVECTOR, DVECTOR, RVECTOR, CRVECTOR3, CRVECTOR4, RECT, DR_ENV, DRAWENV, DISPENV, shapetbl,
+ *     CVECTOR, DVECTOR, RVECTOR, CRVECTOR3, CRVECTOR4, PSX_RECT, DR_ENV, DRAWENV, DISPENV, shapetbl,
  *     coorddef, cdstreamstruct, linedef, SHAPETABLEENTRY (+ union ._5); typedef aliases SHAPE,
  *     LIBCOORD, CDSTREAM, LINE, size_t, u_char, ...
  *

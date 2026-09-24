@@ -16,123 +16,128 @@
 #include "../../../nfs4_types.h"
 #include "../../../mips_semantics.h"
 
-extern "C" int  shapedepth(unsigned char *shape);            /* shpdepth */
-extern "C" int  shapetoclutid(unsigned int *shape);          /* shpclut */
-extern "C" int  vramimage(RECT *rect, u_long *data);         /* vramfxya */
-extern "C" intptr_t fastmovfxya(unsigned char *shape, int x, int y); /* fastmovf sibling */
-extern "C" char *primptr;                                    /* primate : primitive write cursor */
-extern "C" char *nextprim;                                   /* primate : OT link target (prev prim) */
-extern "C" int   semitrans;                                  /* primate : semi-transparency mode */
-extern "C" unsigned short DAT_801486e8;  /* @0x801486E8 : draw-origin X */
-extern "C" unsigned short DAT_801486ec;  /* @0x801486EC : draw-origin Y */
+extern "C" int shapedepth(unsigned char *shape);                   /* shpdepth */
+extern "C" int shapetoclutid(unsigned int *shape);                 /* shpclut */
+extern "C" int vramimage(PSX_RECT *rect, u_long *data);            /* vramfxya */
+extern "C" intptr fastmovfxya(unsigned char *shape, int x, int y); /* fastmovf sibling */
+extern "C" char *primptr;                                          /* primate : primitive write cursor */
+extern "C" char *nextprim;                                         /* primate : OT link target (prev prim) */
+extern "C" int semitrans;                                          /* primate : semi-transparency mode */
+extern "C" unsigned short DAT_801486e8;                            /* @0x801486E8 : draw-origin X */
+extern "C" unsigned short DAT_801486ec;                            /* @0x801486EC : draw-origin Y */
 
-extern "C" intptr_t movfxya(unsigned char *shape, int x, int y);  /* @0x800F0738 */
+extern "C" intptr movfxya(unsigned char *shape, int x, int y); /* @0x800F0738 */
 
 /* movfxya @0x800F0738 : draw shape at (x,y). */
-extern "C" intptr_t movfxya(unsigned char *shape, int x, int y)
+extern "C" intptr movfxya(unsigned char *shape, int x, int y)
 {
-    int  depth = shapedepth(shape);
-    intptr_t ret = 0;
+    int depth = shapedepth(shape);
+    intptr ret = 0;
 
-    if ((*shape & 8) == 0) {                          /* (a) not in VRAM -> upload */
-        RECT rect;
+    if ((*shape & 8) == 0)
+    { /* (a) not in VRAM -> upload */
+        PSX_RECT rect;
         rect.x = DAT_801486e8 + (short)x;
         rect.y = DAT_801486ec + (short)y;
         rect.w = *(short *)(shape + 4);
         rect.h = *(short *)(shape + 6);
         ret = vramimage(&rect, (u_long *)(shape + 0x10));
-    } else if (((*shape & 3) == 2) && ((semitrans & 2) == 0)) {   /* (b) */
+    }
+    else if (((*shape & 3) == 2) && ((semitrans & 2) == 0))
+    { /* (b) */
         ret = fastmovfxya(shape, x, y);
-    } else {                                          /* (c) tile into GPU rects */
+    }
+    else
+    { /* (c) tile into GPU rects */
         short height = *(short *)(shape + 6);
-        int   yRow   = 0;
+        int yRow = 0;
         ret = height;
-        if (0 < height) {
+        if (0 < height)
+        {
             int unaffRowH = 0;
-            do {
+            do
+            {
                 unsigned int packed = *(unsigned int *)(shape + 0xc);
                 unsigned int vCoord = nfs4_mips_sign_extend(packed >> 16, 12) + yRow;
-                int          rowH   = 0xff - (vCoord & 0xff);
-                int          xDone;
+                int rowH = 0xff - (vCoord & 0xff);
+                int xDone;
                 if (height - yRow < rowH)
                     rowH = height - yRow;
                 xDone = 0;
-                if (0 < *(short *)(shape + 4)) {
-                    int   vPage = (int)(vCoord & 0x100) >> 4;
-                    short yPos  = (short)yRow + (short)y;
-                    int   uAcc  = 0;
-                    do {
-                        char        *prim  = primptr;
-                        int          uCoord = nfs4_mips_sign_extend(packed, 12);
-                        int          uBase, uNext, colW, clampW;
+                if (0 < *(short *)(shape + 4))
+                {
+                    int vPage = (int)(vCoord & 0x100) >> 4;
+                    short yPos = (short)yRow + (short)y;
+                    int uAcc = 0;
+                    do
+                    {
+                        char *prim = primptr;
+                        int uCoord = nfs4_mips_sign_extend(packed, 12);
+                        int uBase, uNext, colW, clampW;
                         unsigned int uTile;
                         unsigned char vc, vc2;
-                        char         c5, c12;
-                        short        sx, sx2, sy2, sy10;
+                        char c5, c12;
+                        short sx, sx2, sy2, sy10;
 
                         if (uAcc < 0)
                             uAcc = uAcc + 0xf;
-                        uBase  = nfs4_mips_sll_s32(uCoord, 4);
-                        uTile  = uCoord + (uAcc >> 4);
-                        uNext  = (uTile & 0xffffffc0) << 4;
-                        colW   = (uBase / depth + xDone) - uNext / depth;
+                        uBase = nfs4_mips_sll_s32(uCoord, 4);
+                        uTile = uCoord + (uAcc >> 4);
+                        uNext = (uTile & 0xffffffc0) << 4;
+                        colW = (uBase / depth + xDone) - uNext / depth;
                         clampW = 0xff - colW;
                         if (*(short *)(shape + 4) - xDone < clampW)
                             clampW = *(short *)(shape + 4) - xDone;
 
                         primptr = primptr + 0x28;
-                        *(unsigned char *)(prim + 3)  = 9;
-                        *(unsigned char *)(prim + 7)  = (unsigned char)(semitrans | 0x2c);
-                        *(short *)(prim + 0xe)        = (short)shapetoclutid((unsigned int *)shape);
+                        *(unsigned char *)(prim + 3) = 9;
+                        *(unsigned char *)(prim + 7) = (unsigned char)(semitrans | 0x2c);
+                        *(short *)(prim + 0xe) = (short)shapetoclutid((unsigned int *)shape);
 
-                        c5  = (char)colW;
+                        c5 = (char)colW;
                         c12 = c5 + (char)clampW;
-                        vc  = (unsigned char)vCoord;
-                        *(char *)(prim + 0xc)  = c5;          /* u0 */
-                        *(char *)(prim + 0xd)  = (char)vc;    /* v0 */
-                        *(char *)(prim + 0x14) = c12;         /* u1 */
-                        *(char *)(prim + 0x15) = (char)vc;    /* v1 */
-                        *(char *)(prim + 0x1c) = c5;          /* u2 */
-                        *(char *)(prim + 0x24) = c12;         /* u3 */
+                        vc = (unsigned char)vCoord;
+                        *(char *)(prim + 0xc) = c5;        /* u0 */
+                        *(char *)(prim + 0xd) = (char)vc;  /* v0 */
+                        *(char *)(prim + 0x14) = c12;      /* u1 */
+                        *(char *)(prim + 0x15) = (char)vc; /* v1 */
+                        *(char *)(prim + 0x1c) = c5;       /* u2 */
+                        *(char *)(prim + 0x24) = c12;      /* u3 */
                         vc2 = vc + (unsigned char)rowH;
-                        *(char *)(prim + 0x1d) = (char)vc2;   /* v2 */
-                        *(char *)(prim + 0x25) = (char)vc2;   /* v3 */
-                        *(unsigned short *)(prim + 0x16) =
-                            (unsigned short)((*shape & 3) << 7) | (unsigned short)vPage |
-                            (unsigned short)((int)(uTile & 0x3c0) >> 6);   /* tpage */
+                        *(char *)(prim + 0x1d) = (char)vc2;                                                                                                           /* v2 */
+                        *(char *)(prim + 0x25) = (char)vc2;                                                                                                           /* v3 */
+                        *(unsigned short *)(prim + 0x16) = (unsigned short)((*shape & 3) << 7) | (unsigned short)vPage | (unsigned short)((int)(uTile & 0x3c0) >> 6); /* tpage */
 
-                        if (clampW < 1) clampW = 1;
+                        if (clampW < 1)
+                            clampW = 1;
                         unaffRowH = rowH;
-                        if (rowH < 1) unaffRowH = 1;
+                        if (rowH < 1)
+                            unaffRowH = 1;
 
-                        sx   = (short)xDone + (short)x;
+                        sx = (short)xDone + (short)x;
                         sy10 = sx + (short)clampW;
-                        *(short *)(prim + 8)    = sx;
+                        *(short *)(prim + 8) = sx;
                         *(short *)(prim + 0x18) = sx;
-                        sx2  = yPos + (short)unaffRowH;
+                        sx2 = yPos + (short)unaffRowH;
                         *(short *)(prim + 0x1a) = sx2;
                         *(short *)(prim + 0x22) = sx2;
-                        *(short *)(prim + 0xa)  = yPos;
+                        *(short *)(prim + 0xa) = yPos;
                         *(short *)(prim + 0x12) = yPos;
                         *(short *)(prim + 0x10) = sy10;
                         *(short *)(prim + 0x20) = sy10;
 
                         /* OT-stitch: insert `prim` after `nextprim` (24-bit P_TAG addr field at +0) */
-                        *(unsigned int *)prim =
-                            (*(unsigned int *)prim & 0xff000000) |
-                            (*(unsigned int *)nextprim & 0x00ffffff);
-                        *(unsigned int *)nextprim =
-                            (*(unsigned int *)nextprim & 0xff000000) |
-                            ((unsigned int)prim & 0x00ffffff);
+                        *(unsigned int *)prim = (*(unsigned int *)prim & 0xff000000) | (*(unsigned int *)nextprim & 0x00ffffff);
+                        *(unsigned int *)nextprim = (*(unsigned int *)nextprim & 0xff000000) | ((unsigned int)prim & 0x00ffffff);
 
-                        xDone   = xDone + clampW;
+                        xDone = xDone + clampW;
                         nextprim = prim;
-                        uAcc    = xDone * depth;
+                        uAcc = xDone * depth;
                     } while (xDone < *(short *)(shape + 4));
                 }
-                yRow   = yRow + unaffRowH;
+                yRow = yRow + unaffRowH;
                 height = *(short *)(shape + 6);
-                ret    = 0;
+                ret = 0;
             } while (yRow < height);
         }
     }

@@ -1,11 +1,13 @@
 /* game/common/anim.cpp -- RECONSTRUCTED from Ghidra 12.0.4 decompile + PsyQ SYM v3.
  *   anim.obj = 18 fns: AnimScript C++ class (3 ctors + SetAnimAttrib/GetAnimFrameInfo/
  *   GetTimedAnimPosRot[x2 overload]/GetStatus) + 10 free Anim_* fns. AnimScript non-virtual
- *   (20 B, declared in nfs4_types.h). Faithful C++: `new AnimScript(..)`, obj->Method(..).
+ *   (20 B, declared in nfs4_types.h). Uses EAC allocation plus placement construction.
  *   Verified vs disasm-v2.txt. NOT original source; SYM-faithful, recompilable C++.
  */
+#include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "anim_externs.h"
+#include "new.h"
 
 
 /* ---- anim.obj-owned globals (SYM-typed; .data=real EXE bytes, .bss=zero) ---- */
@@ -131,7 +133,7 @@ int Anim_Handle(int num)
     iVar2 = iVar2 + 1;
     ppAVar3 = ppAVar3 + 1;
   } while (iVar2 < 0x20);
-  pAVar1 = new AnimScript(num);
+  pAVar1 = new((AnimScript *)__builtin_new(sizeof(AnimScript))) AnimScript(num);
   animSlots[iVar2] = pAVar1;
   return iVar2;
 }

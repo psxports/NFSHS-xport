@@ -280,7 +280,7 @@ void tFEApplication::Redraw()
   int i;
   short height;
   char buffer [32];
-  RECT r;
+  PSX_RECT r;
   tMenuCommand emptycommand;
   tInputKeyType JustOneToPass;
   tInputKeyType JustOneToPass_l85;
@@ -348,7 +348,7 @@ void tFEApplication::Redraw()
   r.h = (short)screenheight;
   *(u_int *)Render_gPacketPtr =
        *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-  pkt_addr24_p1 = (u_int)((intptr_t)Render_gPacketPtr & 0xffffffU);
+  pkt_addr24_p1 = (u_int)((intptr)Render_gPacketPtr & 0xffffffU);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *(u_int *)prev_pkt_p1 = *(u_int *)prev_pkt_p1 & 0xff000000 | pkt_addr24_p1;
   SetDrawArea((DR_AREA *)daprim,&r);
@@ -418,7 +418,7 @@ Redraw_vtableCallback9:
     r.w = 0x200;
     *(u_int *)Render_gPacketPtr =
          *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-    pkt_addr24_p2 = (u_int)((intptr_t)Render_gPacketPtr & 0xffffffU);
+    pkt_addr24_p2 = (u_int)((intptr)Render_gPacketPtr & 0xffffffU);
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     *(u_int *)prev_pkt_p1 = *(u_int *)prev_pkt_p1 & 0xff000000 | pkt_addr24_p2;
     r.h = height;

@@ -33,7 +33,7 @@ void FeDraw_SetABRMode(int abr)
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   *(uint *)prevPrim = *(uint *)prevPrim & 0xff000000 | linkAddr;
   tpage = GetTPage(2,abr,0,0x100);
-  SetDrawMode(dr_mode,0,0,(u_long)(u_short)tpage,(RECT *)0x0);
+  SetDrawMode(dr_mode,0,0,(u_long)(u_short)tpage,(PSX_RECT *)0x0);
   return;
 }
 

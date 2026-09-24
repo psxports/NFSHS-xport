@@ -10,17 +10,17 @@
  *            DAT_80148788 = high-water mark (words), DAT_8014878c = {block:u16, size:u16}[] entry table.
  */
 
-extern "C" int            &sndmm;            /* pool base (byte address) */
-extern "C" short          &DAT_80148784;     /* live allocation count    */
-extern "C" short          &DAT_80148786;     /* pool size in words       */
-extern "C" int            &DAT_80148788;     /* high-water mark (words)   */
-extern "C" unsigned short &DAT_8014878c;     /* {block,size}[] entry table */
-extern "C" void           trap(unsigned int code);
+extern "C" int &sndmm;                   /* pool base (byte address) */
+extern "C" short &DAT_80148784;          /* live allocation count    */
+extern "C" short &DAT_80148786;          /* pool size in words       */
+extern "C" int &DAT_80148788;            /* high-water mark (words)   */
+extern "C" unsigned short &DAT_8014878c; /* {block,size}[] entry table */
+extern "C" void trap(unsigned int code);
 
-extern "C" int  iSNDmemconstrain(int *block, int *size);   /* @0x801061A8 */
-extern "C" int *iSNDmeminit(int membase, int memsize);     /* @0x801061D4 */
-extern "C" unsigned int iSNDmemrestore(void);              /* @0x801061F4 */
-extern "C" int  iSNDmalloc(int size);                      /* @0x80106238 */
+extern "C" int iSNDmemconstrain(int *block, int *size); /* @0x801061A8 */
+extern "C" int *iSNDmeminit(int membase, int memsize);  /* @0x801061D4 */
+extern "C" unsigned int iSNDmemrestore(void);           /* @0x801061F4 */
+extern "C" int iSNDmalloc(int size);                    /* @0x80106238 */
 
 /* iSNDmemconstrain @0x801061A8 : clamp a candidate [block, size] so block+size stays within the pool top. */
 extern "C" int iSNDmemconstrain(int *block, int *size)
@@ -53,30 +53,40 @@ extern "C" unsigned int iSNDmemrestore(void)
  *   inserting the new {block,size} entry in sorted order.  Returns the byte address or 0 on failure. */
 extern "C" int iSNDmalloc(int size)
 {
-    int          idx = 0;
-    int          need, ret = 0;
-    int          local_block;
+    int idx = 0;
+    int need, ret = 0;
+    int local_block;
     unsigned int local_avail;
 
-    if (DAT_80148784 < 0x80) {
+    if (DAT_80148784 < 0x80)
+    {
         need = size + 3 >> 2;
-        if (DAT_80148784 == 0) {                         /* empty pool -> whole thing free */
+        if (DAT_80148784 == 0)
+        { /* empty pool -> whole thing free */
             local_avail = (unsigned int)DAT_80148786;
             local_block = 0;
             iSNDmemconstrain(&local_block, (int *)&local_avail);
-        } else {
-            for (;;) {                                   /* scan the gaps between entries */
-                if (idx == 0) {
-                    local_avail = (unsigned int)(&DAT_8014878c)[0];      /* up to entry[0].block */
+        }
+        else
+        {
+            for (;;)
+            { /* scan the gaps between entries */
+                if (idx == 0)
+                {
+                    local_avail = (unsigned int)(&DAT_8014878c)[0]; /* up to entry[0].block */
                     local_block = 0;
-                } else {
+                }
+                else
+                {
                     local_block = (int)(&DAT_8014878c)[(idx - 1) * 2] + (int)(&DAT_8014878c)[(idx - 1) * 2 + 1];
                     local_avail = (unsigned int)(&DAT_8014878c)[idx * 2] - local_block;
                 }
                 iSNDmemconstrain(&local_block, (int *)&local_avail);
-                if ((int)local_avail < need) {
+                if ((int)local_avail < need)
+                {
                     idx++;
-                    if ((int)(unsigned int)DAT_80148784 <= idx) {        /* past the last entry -> tail gap */
+                    if ((int)(unsigned int)DAT_80148784 <= idx)
+                    { /* past the last entry -> tail gap */
                         local_block = (int)(&DAT_8014878c)[(idx - 1) * 2] + (int)(&DAT_8014878c)[(idx - 1) * 2 + 1];
                         local_avail = (unsigned int)DAT_80148786 - local_block;
                         iSNDmemconstrain(&local_block, (int *)&local_avail);
@@ -85,19 +95,20 @@ extern "C" int iSNDmalloc(int size)
                     continue;
                 }
                 {
-                    unsigned int u = (unsigned int)DAT_80148784;          /* shift entries up to open slot idx */
-                    while (idx < (int)u) {
-                        *(unsigned int *)((int)&DAT_8014878c + u * 4) =
-                            *(unsigned int *)((int)&DAT_8014878c + (u - 1) * 4);
+                    unsigned int u = (unsigned int)DAT_80148784; /* shift entries up to open slot idx */
+                    while (idx < (int)u)
+                    {
+                        *(unsigned int *)((int)&DAT_8014878c + u * 4) = *(unsigned int *)((int)&DAT_8014878c + (u - 1) * 4);
                         u--;
                     }
                 }
                 break;
             }
         }
-        if (need <= (int)local_avail) {                  /* commit the new entry */
+        if (need <= (int)local_avail)
+        { /* commit the new entry */
             (&DAT_8014878c)[idx * 2 + 1] = (unsigned short)need;
-            (&DAT_8014878c)[idx * 2]     = (unsigned short)local_block;
+            (&DAT_8014878c)[idx * 2] = (unsigned short)local_block;
             DAT_80148784 = DAT_80148784 + 1;
             ret = sndmm + local_block * 4;
             if (DAT_80148788 < local_block + need)

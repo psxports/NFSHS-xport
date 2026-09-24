@@ -8,40 +8,49 @@
 #include "../../../nfs4_types.h"
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
-extern "C" { int gSysTaskCount; int gSysTaskLastTick; }
-extern "C" int libticks;          /* free-running tick counter */
-#ifdef AP_WIN /* PORTABILITY-REVIEWED: native monotonic timer source */
-extern "C" int gTicks;            /* timer.cpp blocking-wait clock */
-extern "C" int ticks;             /* game/frontend frame clock */
+extern "C"
+{
+    int gSysTaskCount;
+    int gSysTaskLastTick;
+}
+extern "C" int libticks; /* free-running tick counter */
+#ifdef AP_WIN            /* PORTABILITY-REVIEWED: native monotonic timer source */
+extern "C" int gTicks;   /* timer.cpp blocking-wait clock */
+extern "C" int ticks;    /* game/frontend frame clock */
 extern "C" void NFSHS_HostPumpTimers(void);
 #endif
-extern "C" int gSysTaskCount;     /* live task count */
-extern "C" int gSysTaskLastTick;  /* last tick the task list ran */
+extern "C" int gSysTaskCount;    /* live task count */
+extern "C" int gSysTaskLastTick; /* last tick the task list ran */
 extern "C" SystemTaskSlot systemtasksubs[16];
 
-extern "C" int          addsystemtask(intptr_t taskFn, int period, int delay);   /* @0x800E6AF4 */
-extern "C" intptr_t     delsystemtask(intptr_t fn);                              /* @0x800E6BA8 */
-extern "C" unsigned int systemtask(int arg1);                                    /* @0x800E6C04 */
+extern "C" int addsystemtask(intptr taskFn, int period, int delay); /* @0x800E6AF4 */
+extern "C" intptr delsystemtask(intptr fn);                         /* @0x800E6BA8 */
+extern "C" unsigned int systemtask(int arg1);                       /* @0x800E6C04 */
 
 /* addsystemtask @0x800E6AF4 : register a periodic task (or update its slot); returns the running count. */
-extern "C" int addsystemtask(intptr_t taskFn, int period, int delay)
+extern "C" int addsystemtask(intptr taskFn, int period, int delay)
 {
     int tick = libticks;
     int activeAdds = gSysTaskCount;
     int selected = -1;
     gSysTaskCount = activeAdds + 1;
-    for (int i = 0; i < 0x10; ++i) {
+    for (int i = 0; i < 0x10; ++i)
+    {
         SystemTaskSlot *slot = &systemtasksubs[i];
-        if (slot->callback == taskFn) {
+        if (slot->callback == taskFn)
+        {
             selected = i;
-        } else if (slot->callback == 0 && selected == -1) {
+        }
+        else if (slot->callback == 0 && selected == -1)
+        {
             if (activeAdds == 0)
                 selected = i;
             else
                 activeAdds = activeAdds - 1;
         }
     }
-    if (selected != -1) {
+    if (selected != -1)
+    {
         SystemTaskSlot *slot = &systemtasksubs[selected];
         slot->callback = taskFn;
         slot->period = period;
@@ -53,11 +62,13 @@ extern "C" int addsystemtask(intptr_t taskFn, int period, int delay)
 }
 
 /* delsystemtask @0x800E6BA8 : remove the task whose fn matches; returns the cleared fn (or end-marker). */
-extern "C" intptr_t delsystemtask(intptr_t fn)
+extern "C" intptr delsystemtask(intptr fn)
 {
-    for (int i = 0; i < 0x10; ++i) {
-        if (systemtasksubs[i].callback == fn) {
-            intptr_t ret = systemtasksubs[i].callback;
+    for (int i = 0; i < 0x10; ++i)
+    {
+        if (systemtasksubs[i].callback == fn)
+        {
+            intptr ret = systemtasksubs[i].callback;
             if (ret == fn)
                 systemtasksubs[i].callback = 0;
             return ret;
@@ -75,13 +86,16 @@ extern "C" unsigned int systemtask(int arg1)
        root counter from the host monotonic clock. */
     NFSHS_HostPumpTimers();
 #endif
-    if (gSysTaskLastTick != libticks) {
+    if (gSysTaskLastTick != libticks)
+    {
         gSysTaskLastTick = libticks;
-        for (int i = 0; i < 0x10; ++i) {
+        for (int i = 0; i < 0x10; ++i)
+        {
             SystemTaskSlot *slot = &systemtasksubs[i];
-            if (slot->callback != 0 && slot->deadline <= libticks && slot->busy == 0) {
+            if (slot->callback != 0 && slot->deadline <= libticks && slot->busy == 0)
+            {
                 unsigned int r;
-                int          t;
+                int t;
                 slot->busy = 1;
                 r = ((unsigned int (*)(int, int))slot->callback)(arg1, libticks - slot->deadline);
                 t = libticks;

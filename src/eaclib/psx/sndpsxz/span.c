@@ -9,29 +9,34 @@
  */
 #include "../../../lib/snd.h"
 
-extern "C" int SNDpan(int handle, int pan)   /* @0x800E6884 */
+extern "C" int SNDpan(int handle, int pan) /* @0x800E6884 */
 {
     if (SND->enabled == 0)
         return -10;
 
     iSNDenteraudio();
     int chan = iSNDgetchan(handle);
-    if (chan >= 0) {
+    if (chan >= 0)
+    {
         int iter = -1;
-        while (iSNDpatchkey(chan, &iter)) {
+        while (iSNDpatchkey(chan, &iter))
+        {
             SndVoice *v = &SND->voices[iter];
             if (v->pan_cur == (signed char)pan)
-                break;                                   /* already at target -> done */
+                break; /* already at target -> done */
             int p = pan;
-            if (v->f33 != 1) {
+            if (v->f33 != 1)
+            {
                 v->pan_cur = (signed char)pan;
-                p = (pan - 0x40) * v->f33 + 0x40;        /* scale about centre */
+                p = (pan - 0x40) * v->f33 + 0x40; /* scale about centre */
             }
             p = v->pan + p - 0x40;
-            if (p >= 0x80) p = 0x7F;
-            if (p < 0)     p = 0;
+            if (p >= 0x80)
+                p = 0x7F;
+            if (p < 0)
+                p = 0;
             if (v->pancurve != 0)
-                p = ((signed char *)v->pancurve)[p];     /* pan curve remap */
+                p = ((signed char *)v->pancurve)[p]; /* pan curve remap */
             iSNDplatform3dpos(iter, ((p - 0x40) << 8) & 0xFF00, 0);
         }
     }

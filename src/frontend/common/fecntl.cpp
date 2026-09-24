@@ -9,7 +9,7 @@
  *           81 STRTAG + 710 MOS + 125 MOE + 11 ENTAG + 44 TPDEF + 15 FIELD + 1 UNTAG  (112 distinct
  *           type names). These are the PsyQ / libgte / libgpu / libpad standard types this TU's
  *           headers pulled in (PAD_PSX, PAD_NEGCON, PAD_ANALOG, MATRIX, VECTOR, SVECTOR, CVECTOR,
- *           RVECTOR, CRVECTOR3/4, RECT, DR_ENV, ...). The SYM debug format attributes each type to
+ *           RVECTOR, CRVECTOR3/4, PSX_RECT, DR_ENV, ...). The SYM debug format attributes each type to
  *           the first .obj that references it; Fecntl.obj (early in link order) absorbed them.
  *
  *   All 112 types are ALREADY reconstructed in ../../nfs4_types.h (verified present). There is no

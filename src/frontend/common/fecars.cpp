@@ -1354,7 +1354,7 @@ void * tListIteratorCar::ValidCar(tPlayer atIndex,char carNumber)
       if (((int)(u_int)ptVar5[(u_char)carNumber].fCountries >>
            ((int)frontEnd.carCountry[i][carID] & 0x1fU) & 1U) != 0) {
         trackManager.GetTrack((u_short)(u_char)frontEnd.track[0],trackInfo);
-        pvVar6 = (void *)(intptr_t)FECheat_IsCheatEnabled(cheat_AllCops);
+        pvVar6 = (void *)(intptr)FECheat_IsCheatEnabled(cheat_AllCops);
         if (pvVar6 != (void *)0x0) goto ValidCar_filter10Path;
         if ((u_int)(u_char)trackInfo.fCountry == (int)frontEnd.carCountry[i][carID]) {
           result = (void *)0x1;

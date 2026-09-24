@@ -6,9 +6,10 @@
 #include "../../lib/libfns.h"
 
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData   GameSetup_gData;
+extern "C" extern GameSetup_tData GameSetup_gData;
 extern SndBnk_t gSndBnk[7];
-extern int AudioCmn_AddBank(char *filename,int size,char *pdata,int BankNum);
+extern char Xfade[129];
+extern int AudioCmn_AddBank(char *filename, int size, char *pdata, int BankNum);
 
-extern "C" char           *Paths_Paths[];   /* 0x80116468 (paths.obj) */
-#endif /* _GAME_COMMON_AUDIOENG_EXTERNS_H_ */
+extern "C" char *Paths_Paths[]; /* 0x80116468 (paths.obj) */
+#endif                          /* _GAME_COMMON_AUDIOENG_EXTERNS_H_ */

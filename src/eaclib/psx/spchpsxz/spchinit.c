@@ -15,42 +15,40 @@
 extern "C" int &gRepeatCount;
 #endif
 
-extern "C" intptr_t gMemAlloc;     /* user alloc callback pointer carrier */
-extern "C" intptr_t gMemFree;      /* user free callback pointer carrier */
-extern "C" int gSPCH_Initialized;  /* 0x1789a34 when initialised */
-extern "C" intptr_t gSampleRequest;    /* sample-request callback */
-extern "C" intptr_t gSentenceRuleTest; /* sentence rule-test callback */
-extern "C" intptr_t gSentenceRuleSet;  /* sentence rule-set callback */
-extern "C" int &gVoxInGame;         /* in-game speech enable (-1 = on) */
-extern "C" int &gRepeatCount;       /* repeated-event counter */
-extern "C" int gGameNum;           /* current game/race number (shared w/ spchbank cycle-bit hash) */
-extern "C" int gDataRate;          /* sample data rate */
-extern "C" int gFilterSetting;     /* active filter setting */
+extern "C" intptr gMemAlloc;         /* user alloc callback pointer carrier */
+extern "C" intptr gMemFree;          /* user free callback pointer carrier */
+extern "C" int gSPCH_Initialized;    /* 0x1789a34 when initialised */
+extern "C" intptr gSampleRequest;    /* sample-request callback */
+extern "C" intptr gSentenceRuleTest; /* sentence rule-test callback */
+extern "C" intptr gSentenceRuleSet;  /* sentence rule-set callback */
+extern "C" int &gVoxInGame;          /* in-game speech enable (-1 = on) */
+extern "C" int &gRepeatCount;        /* repeated-event counter */
+extern "C" int gGameNum;             /* current game/race number (shared w/ spchbank cycle-bit hash) */
+extern "C" int gDataRate;            /* sample data rate */
+extern "C" int gFilterSetting;       /* active filter setting */
 
-extern "C" void iSPCH_DisposeBanks(void);                      /* spchbank */
-extern "C" void iSPCH_InitBanks(void);                         /* spchbank */
-extern "C" intptr_t iSPCH_BankMemAlloc(unsigned int numBanks); /* spchbank */
-extern "C" void iSPCH_InitEventDat(void);                      /* spchevnt */
-extern "C" void iSPCH_InitEventQueue(void);                    /* spchevnt */
-extern "C" int *iSPCH_EACseedrandom(unsigned int seed);        /* spchrand: true typed state pointer */
-extern "C" void iSPCH_ClearChosen(void);                       /* spchpick */
-extern "C" int  SPCH_SetPreLoadTicks(int ticks);              /* spchpick */
+extern "C" void iSPCH_DisposeBanks(void);                    /* spchbank */
+extern "C" void iSPCH_InitBanks(void);                       /* spchbank */
+extern "C" intptr iSPCH_BankMemAlloc(unsigned int numBanks); /* spchbank */
+extern "C" void iSPCH_InitEventDat(void);                    /* spchevnt */
+extern "C" void iSPCH_InitEventQueue(void);                  /* spchevnt */
+extern "C" int *iSPCH_EACseedrandom(unsigned int seed);      /* spchrand: true typed state pointer */
+extern "C" void iSPCH_ClearChosen(void);                     /* spchpick */
+extern "C" int SPCH_SetPreLoadTicks(int ticks);              /* spchpick */
 
-extern "C" intptr_t iSPCH_MemAlloc(int numBytes, char *message);             /* @0x800EB5A4 */
-extern "C" void iSPCH_MemFree(void *mem);                                   /* @0x800EB5D4 */
-extern "C" void SPCH_Deinit(void);                                          /* @0x800EB600 */
-extern "C" void iSPCH_InitInGame(void);                                     /* @0x800EB654 */
-extern "C" int  SPCH_GetSampleDataRate(int numSamples, int rate, int channels); /* @0x800EB66C */
-extern "C" intptr_t SPCH_InitBankMem(intptr_t memAllocFn, intptr_t memFreeFn,
-                                      int numBanks);                         /* @0x800EB6F0 */
-extern "C" int  SPCH_Init(intptr_t sampleRequestCb, unsigned int gameNum,
-                            int dataRate); /* @0x800EB748 */
+extern "C" intptr iSPCH_MemAlloc(int numBytes, char *message);                         /* @0x800EB5A4 */
+extern "C" void iSPCH_MemFree(void *mem);                                              /* @0x800EB5D4 */
+extern "C" void SPCH_Deinit(void);                                                     /* @0x800EB600 */
+extern "C" void iSPCH_InitInGame(void);                                                /* @0x800EB654 */
+extern "C" int SPCH_GetSampleDataRate(int numSamples, int rate, int channels);         /* @0x800EB66C */
+extern "C" intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks); /* @0x800EB6F0 */
+extern "C" int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate);  /* @0x800EB748 */
 
 /* iSPCH_MemAlloc @0x800EB5A4 : forward a0/a1 to the user's allocator and preserve v0. */
-extern "C" intptr_t iSPCH_MemAlloc(int numBytes, char *message)
+extern "C" intptr iSPCH_MemAlloc(int numBytes, char *message)
 {
     if (gMemAlloc != 0)
-        return (intptr_t)((void *(*)(int, char *))gMemAlloc)(numBytes, message);
+        return (intptr)((void *(*)(int, char *))gMemAlloc)(numBytes, message);
     return 0;
 }
 
@@ -64,11 +62,12 @@ extern "C" void iSPCH_MemFree(void *mem)
 /* SPCH_Deinit @0x800EB600 : tear down the speech system (only if it was initialised). */
 extern "C" void SPCH_Deinit(void)
 {
-    if (gSPCH_Initialized == 0x1789a34) {
-        gSampleRequest    = 0;
+    if (gSPCH_Initialized == 0x1789a34)
+    {
+        gSampleRequest = 0;
         gSentenceRuleTest = 0;
         gSPCH_Initialized = 0;
-        gSentenceRuleSet  = 0;
+        gSentenceRuleSet = 0;
         iSPCH_DisposeBanks();
         iSPCH_InitEventDat();
     }
@@ -77,7 +76,7 @@ extern "C" void SPCH_Deinit(void)
 /* iSPCH_InitInGame @0x800EB654 : reset the in-game speech state. */
 extern "C" void iSPCH_InitInGame(void)
 {
-    gVoxInGame   = -1;
+    gVoxInGame = -1;
     gRepeatCount = 0;
 }
 
@@ -98,30 +97,29 @@ extern "C" int SPCH_GetSampleDataRate(int numSamples, int rate, int channels)
 
 /* SPCH_InitBankMem @0x800EB6F0 : register the alloc/free callbacks and allocate `numBanks` bank slots.
  *   Returns the bank array (gVoxBanks) or 0 if not initialised / no alloc callback. */
-extern "C" intptr_t SPCH_InitBankMem(intptr_t memAllocFn, intptr_t memFreeFn,
-                                      int numBanks)
+extern "C" intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks)
 {
-    intptr_t result = 0;
-    if (gSPCH_Initialized == 0x1789a34 && memAllocFn != 0 && memFreeFn != 0) {
+    intptr result = 0;
+    if (gSPCH_Initialized == 0x1789a34 && memAllocFn != 0 && memFreeFn != 0)
+    {
         gMemAlloc = memAllocFn;
-        gMemFree  = memFreeFn;
-        result    = iSPCH_BankMemAlloc((unsigned int)numBanks);
+        gMemFree = memFreeFn;
+        result = iSPCH_BankMemAlloc((unsigned int)numBanks);
     }
     return result;
 }
 
 /* SPCH_Init @0x800EB748 : initialise the speech system for game `gameNum` -- seed the PRNG, clear the
  *   pick/event/bank state, and mark it live.  Returns 1. */
-extern "C" int SPCH_Init(intptr_t sampleRequestCb, unsigned int gameNum,
-                           int dataRate)
+extern "C" int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate)
 {
-    gMemAlloc         = 0;
-    gMemFree          = 0;
+    gMemAlloc = 0;
+    gMemFree = 0;
     gSentenceRuleTest = 0;
-    gSentenceRuleSet  = 0;
-    gSampleRequest    = sampleRequestCb;
-    gGameNum          = (int)gameNum;
-    gDataRate         = dataRate;
+    gSentenceRuleSet = 0;
+    gSampleRequest = sampleRequestCb;
+    gGameNum = (int)gameNum;
+    gDataRate = dataRate;
     iSPCH_EACseedrandom(gameNum);
     iSPCH_ClearChosen();
     SPCH_SetPreLoadTicks(0);

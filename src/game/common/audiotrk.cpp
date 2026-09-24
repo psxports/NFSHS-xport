@@ -554,7 +554,7 @@ int AudioTrk_PreLoad(void)
     iVar10 = *(int *)BWorldSm_slices;
     iVar9 = *(int *)(BWorldSm_slices + 8);
     bVar1 = false;
-    uVar3 = (u_int)(uintptr_t)BWorldSm_slices;
+    uVar3 = (u_int)(intptr)BWorldSm_slices;
     gettick();
     iVar12 = uVar3 + 0x280;
     iVar11 = gGameAudioList->numElements_;

@@ -7,7 +7,6 @@
 #include "../../mips_semantics.h"
 #include "audioeng_externs.h"
 
-
 /* ---- audioeng.obj-owned globals (SYM-typed; .data=real EXE bytes, .bss=zero) ---- */
 AudioEng_t   *AudioEng_g[2];   /* @0x8013c734  (bss(zero)) */
 
@@ -135,13 +134,6 @@ void AudioEng_Update(void)
   u_short uVar14;
   u_short uVar15;
   AudioEng_t *pAVar16;
-  int local_48;
-  char local_44;
-  u_char local_40;
-  u_char local_3d;
-  u_short local_3c;
-  u_short local_38;
-  u_short local_36;
   int local_30;
   
   local_30 = 0;
@@ -149,12 +141,10 @@ void AudioEng_Update(void)
     if ((1 < local_30) || (pAVar13 = AudioEng_g[local_30], pAVar13 == (AudioEng_t *)0x0)) {
       return;
     }
-    iVar4 = (u_int)(u_char)pAVar13->plypos * 0xc + 0x5a;
     pAVar12 = pAVar13->queue + (u_char)pAVar13->plypos;
-    gettick();
+    iVar4 = gettick();
     if (pAVar13->plypos != pAVar13->setpos) {
-      iVar8 = iVar4;
-      gettick();
+      iVar8 = gettick();
       if (pAVar13->tick < iVar8) {
         pAVar13->tick = iVar4 + 2;
         pAVar10 = pAVar13;
@@ -180,16 +170,16 @@ void AudioEng_Update(void)
               if (pAVar10->chan[0].patchnum < '@') {
                 uVar5 = (u_int)pAVar12->exh;
 code_r_8007b9f4:
-                uVar5 = (u_int)(u_char)""[uVar5];
+                uVar5 = (u_int)(u_char)Xfade[uVar5];
               }
               else {
                 if (pAVar12->sep == 0) {
                   uVar5 = 0x80 - pAVar12->exh;
                   goto code_r_8007b9f4;
                 }
-                uVar5 = (int)((u_int)(u_char)""[0x80 - (u_int)pAVar12->exh] * 0x2f) >> 6;
+                uVar5 = (int)((u_int)(u_char)Xfade[0x80 - (u_int)pAVar12->exh] * 0x2f) >> 6;
               }
-              iVar9 = iVar8 * (u_int)(u_char)""[uVar7] * uVar5;
+              iVar9 = iVar8 * (u_int)(u_char)Xfade[uVar7] * uVar5;
             }
             uVar7 = iVar9 * (u_int)pAVar12->vol >> 0x15;
             if (0x7f < uVar7) {
@@ -235,17 +225,17 @@ code_r_8007b9f4:
             uVar15 = sVar1 + sVar2;
             uVar14 = sVar1 - sVar2;
           }
-          SNDplaysetdef(&local_48);
-          local_44 = pAVar13->bhandle;
-          local_48 = (int)pAVar10->chan[0].patchnum;
-          local_40 = 0;
-          local_3c = (u_short)pAVar13->dop;
-          local_3d = 1;
-          local_36 = 0;
+          SNDplaysetdef(&playopts);
+          playopts.bhandle = pAVar13->bhandle;
+          playopts.patnum = (int)pAVar10->chan[0].patchnum;
+          playopts.vol = 0;
+          playopts.pitchmult = (u_short)pAVar13->dop;
+          playopts.use3dpos = 1;
+          playopts.elevation = 0;
           iVar8 = pAVar10->left[0].handle;
           if (iVar8 == -1) {
-            local_38 = uVar14;
-            iVar8 = SNDplay(&local_48);
+            playopts.azimuth = uVar14;
+            iVar8 = SNDplay(&playopts);
             pAVar10->left[0].handle = iVar8;
             pAVar11->delay[0] = '\x02';
             pAVar10->left[0].vol = '\0';
@@ -295,8 +285,8 @@ code_r_8007b9f4:
               pAVar11->delay[0] = cVar6;
               iVar8 = (int)cVar6;
               if (iVar8 == -1) {
-                local_38 = uVar15;
-                iVar8 = SNDplay(&local_48);
+                playopts.azimuth = uVar15;
+                iVar8 = SNDplay(&playopts);
                 pAVar10->right[0].handle = iVar8;
                 pAVar10->right[0].vol = '\0';
                 pAVar10->right[0].azim = uVar15;
@@ -351,7 +341,7 @@ void AudioEng_LoadDef(char *filename,char *name,int handle,long offset,long size
   pAVar1 = (AudioEng_tDef *)reservememadr(name,size,0x10);
   *ed = pAVar1;
   if (pAVar1 != (AudioEng_tDef *)0x0) {
-    FILE_readsync(handle,offset,(intptr_t)*ed,size,0x64);   /* oracle 0x8007be1c: a0=h a1=off a2=*ed a3=size stk=0x64 */
+    FILE_readsync(handle,offset,(intptr)*ed,size,0x64);   /* oracle 0x8007be1c: a0=h a1=off a2=*ed a3=size stk=0x64 */
   }
   return;
 }
@@ -487,7 +477,7 @@ int AudioEng_StartUp(int player,char *carname)
       pdata = (char *)reservememadr(pThis,local_38,0x10);
       if (pdata != (char *)0x0) {
         bVar1 = true;
-        FILE_readsync(local_40,local_3c,(intptr_t)pdata,local_38,0x64);   /* oracle 0x8007c0c8: a0=h a1=off a2=pdata a3=size stk=0x64 */
+        FILE_readsync(local_40,local_3c,(intptr)pdata,local_38,0x64);   /* oracle 0x8007c0c8: a0=h a1=off a2=pdata a3=size stk=0x64 */
         iVar17 = AudioCmn_AddBank((char *)pThis,local_38,pdata,player);
         pAVar3->bhandle = (char)gSndBnk[player].bnkID;
       }

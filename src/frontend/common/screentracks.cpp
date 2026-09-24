@@ -24,8 +24,8 @@ void tScreenTrackSelect::DrawBackground()
   byte videoFinished;
   short shapeY;
   int movieFrame_p;
-  RECT r;
-  RECT r2;
+  PSX_RECT r;
+  PSX_RECT r2;
   tTrackInformation trackInfo;
   char moviename [80];
   u_char *cur_pkt;
@@ -182,7 +182,7 @@ void tScreenTrackSelect::Initialize()
   int iVar1;
   tVideoWall *this_00;
   tTrackInformation trackInfo;
-  RECT r;
+  PSX_RECT r;
   char moviename [80];
   
   frontEnd.pinkSlipsTrackIndex = '\0';
@@ -224,7 +224,7 @@ void tScreenTrackSelect::Cleanup()
 
 {
   VIDEO_destroy(this->hVideo);
-  purgememadr((void *)(intptr_t)this->hVideo);
+  purgememadr((void *)(intptr)this->hVideo);
   this->_base_tScreen.Cleanup();
   return;
 }
@@ -401,7 +401,7 @@ tScreenTrackSelect::~tScreenTrackSelect()
 {
   int elapsed;
   short shapeY;
-  RECT r;
+  PSX_RECT r;
   char moviename [80];
   return;
 }

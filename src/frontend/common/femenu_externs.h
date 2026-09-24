@@ -19,22 +19,34 @@ extern __vtbl_ptr_type tMenuItemGoToMenuButton_vtable[];
 extern __vtbl_ptr_type tMenu_vtable[];
 
 /* ===== globals ===== */
-extern "C" u_char        *&Render_gPacketPtr, *&Render_gPalettePtr;
+extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 extern tFEApplication *FEApp;
-extern tPlayer        gMenu_SubMenuPlayer;
+extern tPlayer gMenu_SubMenuPlayer;
 
 /* ===== text / audio / app ===== */
-extern "C" { int   TextSys_Word(int id); }
-extern "C" { int   TextSys_WordX(int id); }
-extern "C" { int   TextSys_WordY(int id); }
-void  FETextRender_Title(short word);
-extern "C" { void  FETextRender_MenuTextPositioned(short word, short x, short y, tMenuTextState state, tMenuTextType type); }
-void  AudioCmn_PlayFESFX(int sfx);
-void  AudioCmn_PlayFESFXVol(int sfx, int vol);
-void  DisplayHelp(tFEApplication *app, int which);
+extern "C"
+{
+    int TextSys_Word(int id);
+}
+extern "C"
+{
+    int TextSys_WordX(int id);
+}
+extern "C"
+{
+    int TextSys_WordY(int id);
+}
+void FETextRender_Title(short word);
+extern "C"
+{
+    void FETextRender_MenuTextPositioned(short word, short x, short y, tMenuTextState state, tMenuTextType type);
+}
+void AudioCmn_PlayFESFX(int sfx);
+void AudioCmn_PlayFESFXVol(int sfx, int vol);
+void DisplayHelp(tFEApplication *app, int which);
 
 /* ===== fefades.obj fade helper (overloaded) + libgpu ===== */
-int   CalcFadeVal(int color, int fade);
-int   CalcFadeVal(int color, int packedRGB, int fade);
+int CalcFadeVal(int color, int fade);
+int CalcFadeVal(int color, int packedRGB, int fade);
 
 #endif

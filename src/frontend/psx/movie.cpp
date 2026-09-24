@@ -4,6 +4,7 @@
  *   Externs declared from Ghidra sigs (movie_externs.h).
  */
 #include "movie.h"
+#include "psx_gpu.h"
 
 /* ---- Movie.obj STAT (file-local) globals ---- */
 static int     width, height;                       /* 0x80052a24/28 */
@@ -49,7 +50,7 @@ void Movie_Init(char movie)
   CdControlB('\f',(u_char *)0x0,(u_char *)0x0);
   DecDCToutCallback((void *)0x0);
   CdDataCallback((void *)0x0);
-  CdReadyCallback((void *)0x0);
+  CdReadyCallback(0);
   DecDCTvlcSize(0);
   return;
 }
@@ -68,7 +69,7 @@ void Movie_DeInit(void)
   DecDCToutCallback((void *)0x0);
   StUnSetRing();
   CdDataCallback((void *)0x0);
-  CdReadyCallback((void *)0x0);
+  CdReadyCallback(0);
   CdControlB('\v',(u_char *)0x0,(u_char *)0x0);
   CdControlB('\t',(u_char *)0x0,(u_char *)0x0);
   CdControlB('\f',(u_char *)0x0,(u_char *)0x0);
@@ -277,6 +278,7 @@ int Movie_Play(char movie)
       FntFlush(-1);
     }
     Movie_DownloadFrame();
+    gpu_present();
     download = 1;
     PAD_update();
     pad_p1 = PAD_state(0);
@@ -385,7 +387,7 @@ void strCallback(void)
     StCdIntrFlag = 0;
   }
   if (download != 0) {
-    LoadImage(&dec.slice,(u_long *)dec.imgbuf);
+    LoadImagePSX(&dec.slice,(u_long *)dec.imgbuf);
   }
   if (isFirstSlice != 0) {
     bottom = (int)PPWBottom;
@@ -503,7 +505,7 @@ u_long * strNext(DECENV *dec)
   int bottom;
   int cnt;
   int wt;
-  RECT rect;
+  PSX_RECT rect;
   u_long *addr;
   CDSECTOR *sector;
   

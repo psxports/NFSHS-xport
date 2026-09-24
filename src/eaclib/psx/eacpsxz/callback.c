@@ -3,18 +3,20 @@
  *   2 fns @[0x800FE424 .. 0x800FE480].  A tiny mutex pool (32 entries) used to guard callback re-entry.
  *   Ghidra nfs4-f.exe.c (callback) + IDA sigs (allocmutex returns the slot ptr; void return dropped it).
  */
-extern "C" short mutexbuf;   /* short[32*2] : 32 mutex slots (4 bytes each, first word = taken flag) */
+extern "C" short mutexbuf; /* short[32*2] : 32 mutex slots (4 bytes each, first word = taken flag) */
 
-extern "C" short *allocmutex(void);            /* @0x800FE424 */
-extern "C" void   freemutex(void *mutex);      /* @0x800FE480 */
+extern "C" short *allocmutex(void);     /* @0x800FE424 */
+extern "C" void freemutex(void *mutex); /* @0x800FE480 */
 
 /* allocmutex @0x800FE424 : claim the first free mutex slot (mark taken); returns its pointer. */
 extern "C" short *allocmutex(void)
 {
-    int    i = 0;
+    int i = 0;
     short *p = &mutexbuf;
-    do {
-        if (*p == 0) {
+    do
+    {
+        if (*p == 0)
+        {
             *p = 1;
             break;
         }

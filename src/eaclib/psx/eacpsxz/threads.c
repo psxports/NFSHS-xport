@@ -3,10 +3,10 @@
  *   2 fns @[0x800FE408 .. 0x800FE41C].  Minimal cooperative-thread stubs (the PSX build is single-threaded).
  *   Ghidra nfs4-f.exe.c (threads) + IDA sigs.
  */
-extern "C" int g_currentthread;   /* id of the running thread */
+extern "C" int g_currentthread; /* id of the running thread */
 
-extern "C" unsigned int iscurrentthread(int id);   /* @0x800FE408 */
-extern "C" void         yieldthread(void);         /* @0x800FE41C */
+extern "C" unsigned int iscurrentthread(int id); /* @0x800FE408 */
+extern "C" void yieldthread(void);               /* @0x800FE41C */
 
 /* iscurrentthread @0x800FE408 : 1 if `id` is the running thread. */
 extern "C" unsigned int iscurrentthread(int id)

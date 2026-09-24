@@ -5,17 +5,20 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" u_char *&Render_gPacketPtr;    /* GPU packet build cursor (byte-arith) */
-extern "C" u_char *&Render_gPalettePtr;   /* GPU packet build cursor (byte-arith) */
-extern "C" tTexture_ShapeInfo *gHelpShapes;   /* shape table (PSXFront) */
+extern "C" u_char *&Render_gPacketPtr;      /* GPU packet build cursor (byte-arith) */
+extern "C" u_char *&Render_gPalettePtr;     /* GPU packet build cursor (byte-arith) */
+extern "C" tTexture_ShapeInfo *gHelpShapes; /* shape table (PSXFront) */
 
-extern "C" {  /* PsyQ libgpu */
+extern "C"
+{ /* PsyQ libgpu */
 }
 
 /* game-side C++ helpers (cfront-mangled in originals; normal C++ linkage) */
-void FETextRender_MenuTextPositionedJustify(short id, short x, short y, short j,
-                                            tMenuTextState st, tMenuTextType ty);
-extern "C" { void DrawShapeExtended(int index, int flags, int x, int y, int fade, int abr, tDrawShapeExtended *extra); }
+void FETextRender_MenuTextPositionedJustify(short id, short x, short y, short j, tMenuTextState st, tMenuTextType ty);
+extern "C"
+{
+    void DrawShapeExtended(int index, int flags, int x, int y, int fade, int abr, tDrawShapeExtended *extra);
+}
 void PSXDrawSquare(int col, int x, int y, int w, int h);
 void PSXDrawTransSquare(int col, int x, int y, int w, int h, short opacity);
 void PSXDrawTransGouraudSquare(int x, int y, int w, int h, int opacity, int c1, int c2, int c3, int c4);

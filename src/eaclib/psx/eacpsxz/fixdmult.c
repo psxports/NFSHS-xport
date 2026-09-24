@@ -17,18 +17,24 @@
  *   Behavior-faithful (asm decoded to C); @VA breadcrumb.
  */
 
-extern "C" int fixedmult(int a, int b)   /* @0x800E4328  (shared with rmult) */
+extern "C" int fixedmult(int a, int b) /* @0x800E4328  (shared with rmult) */
 {
     return (int)(((long long)a * (long long)b + 0x8000) >> 16);
 }
 
 /* `rmult` = co-equal XDEF label at the same address (FIXDMULT.ASM declares both). */
 #ifdef _MSC_VER
-extern "C" int rmult(int a, int b) { return fixedmult(a,b); }
+extern "C" int rmult(int a, int b)
+{
+    return fixedmult(a, b);
+}
 #else
-#if defined(_MSC_VER)
-extern "C" int rmult(int a, int b) { return fixedmult(a, b); }
-#else
+    #if defined(_MSC_VER)
+extern "C" int rmult(int a, int b)
+{
+    return fixedmult(a, b);
+}
+    #else
 extern "C" int rmult(int a, int b) __attribute__((alias("fixedmult")));
-#endif
+    #endif
 #endif

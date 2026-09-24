@@ -311,7 +311,7 @@ extern "C" void AudioCmn_LoadAsyncSfx(int bank,int patch,void *pbank,int size)
     do {
       iVar1 = SNDmemlargestunused(local_30);
       if (size <= iVar1 + -0x1000) {
-        local_30[0] = SNDbankadd(&pAVar2->handle,(intptr_t)pbank);
+        local_30[0] = SNDbankadd(&pAVar2->handle,(intptr)pbank);
         if (local_30[0] == 7) {
           name = SNDbankheadersize(pAVar2->handle);
           pThis = reservememadr("SFXHDR",name,0x10)
@@ -695,16 +695,8 @@ extern "C" void AudioCmn_LoadFESamples(void)
 void AudioCmn_LoadGameSamples(void)
 {
   char filename[100];
-  char*TrackGenBank[11];
-  char **ppcVar1;
-  u_int *puVar2;
-  char **ppcVar3;
-  u_int *puVar4;
-  char *pcVar5;
-  char *pcVar6;
-  char *pcVar7;
+  const char *languageSuffix;
   char acStack_a8 [104];
-  u_int local_40 [12];
   
   AudioEng_StartUp(0,GameSetup_gCarNames[0] + GameSetup_gData.carInfo[0].carType * 5);
   if (GameSetup_gData.commMode == 1) {
@@ -713,27 +705,14 @@ void AudioCmn_LoadGameSamples(void)
   AudioEng_StartServer();
   strcpy(acStack_a8, gAudioBasePath);
   strcat(acStack_a8, "Gen");
-  ppcVar1 = Audio_gLangAssignmentTable + 1;
-  puVar2 = local_40;
-  do {
-    puVar4 = puVar2;
-    ppcVar3 = ppcVar1;
-    pcVar5 = ppcVar3[1];
-    pcVar6 = ppcVar3[2];
-    pcVar7 = ppcVar3[3];
-    *puVar4 = (u_int)(uintptr_t)*ppcVar3;
-    puVar4[1] = (u_int)(uintptr_t)pcVar5;
-    puVar4[2] = (u_int)(uintptr_t)pcVar6;
-    puVar4[3] = (u_int)(uintptr_t)pcVar7;
-    ppcVar1 = ppcVar3 + 4;
-    puVar2 = puVar4 + 4;
-  } while (ppcVar3 + 4 != Audio_gLangAssignmentTable + 9);
-  pcVar5 = ppcVar3[5];
-  pcVar6 = ppcVar3[6];
-  puVar4[4] = Audio_gFESFXTable.languages;
-  puVar4[5] = (u_int)(uintptr_t)pcVar5;
-  puVar4[6] = (u_int)(uintptr_t)pcVar6;
-  strcat(acStack_a8, (char *)local_40[(int)Audio_gFESFXTable.languages]);
+  languageSuffix = "Eng";
+  if (Audio_gFESFXTable.languages == 1) {
+    languageSuffix = "Ger";
+  }
+  else if (Audio_gFESFXTable.languages == 2) {
+    languageSuffix = "Fre";
+  }
+  strcat(acStack_a8, languageSuffix);
   AudioCmn_LoadBank(acStack_a8,3);
   gSndBnk[5].bnkID = -2;
   gSndBnk[2].bnkID = -3;
@@ -1020,7 +999,7 @@ void freeVoiceChannel(int sndPlayer)
   void *pThis;
   
   if (sndPlayer != -1) {
-    pThis = (void *)(intptr_t)gaChannel[sndPlayer].Partial;
+    pThis = (void *)(intptr)gaChannel[sndPlayer].Partial;
     if (pThis != (void *)0xffffffff) {   /* @0x80078108: Partial == -1 sentinel (disasm-v3) */
       SNDautovol(pThis,5,-1);
       gaChannel[sndPlayer].Partial = -1;
@@ -1034,31 +1013,20 @@ void freeVoiceChannel(int sndPlayer)
 /* ---- AudioCmn_PlayDoppleredSound__Fiiiiii  [@0x80078140] ---- */
 int AudioCmn_PlayDoppleredSound(int bhandle,int patchNum,int azimuth,int vol,int bend,int doppler)
 {
-#ifdef AP_WIN
-  return -1;
-#else
   int shandle;
   SNDPLAYOPTS playopts;
   int iVar1;
   int iVar2;
   u_int bank;
-  int local_30;
-  char local_2c;
-  u_char local_29;
-  u_char local_28;
-  u_char local_27;
-  u_char local_25;
-  u_short local_24;
-  u_short local_20;
   
-  SNDplaysetdef(&local_30);
-  local_2c = (char)bhandle;
+  SNDplaysetdef(&playopts);
+  playopts.bhandle = (char)bhandle;
   if (patchNum == 0x7d) {
-    local_28 = (u_char)(gMasterSFXLevel * vol >> 7);
+    playopts.vol = (u_char)(gMasterSFXLevel * vol >> 7);
     goto LAB_8007828c;
   }
   if (bhandle == -4) {
-    local_28 = (u_char)(gMasterFENarrationLevel * 0x81 >> 7);
+    playopts.vol = (u_char)(gMasterFENarrationLevel * 0x81 >> 7);
     goto LAB_8007828c;
   }
   iVar2 = gMasterAmbientLevel;
@@ -1070,7 +1038,7 @@ LAB_8007827c:
   else {
     if (bhandle != gSndBnk[5].bnkID) {
       if ((patchNum == 0x16) || (patchNum == 0x12)) {
-        local_28 = (u_char)(gMasterSFXLevel * vol >> 7);
+        playopts.vol = (u_char)(gMasterSFXLevel * vol >> 7);
         goto LAB_8007828c;
       }
       iVar2 = gMasterSFXLevel;
@@ -1088,47 +1056,46 @@ LAB_8007827c:
     iVar1 = vol * 0x82;
   }
 LAB_80078280:
-  local_28 = (u_char)(iVar2 * iVar1 >> 0xe);
+  playopts.vol = (u_char)(iVar2 * iVar1 >> 0xe);
 LAB_8007828c:
-  local_30 = patchNum;
+  playopts.patnum = patchNum;
   if (patchNum == 99) {
-    local_30 = 1;
+    playopts.patnum = 1;
   }
-  local_27 = (u_char)bend;
-  local_24 = (u_short)(doppler >> 4);
-  local_25 = Audio_direct3davail != 0;
+  playopts.bend = (u_char)bend;
+  playopts.pitchmult = (u_short)(doppler >> 4);
+  playopts.use3dpos = Audio_direct3davail != 0;
   if (Audio_direct3davail == 0) {
     if (gStereoMode == 0) {
-      local_29 = 0x40;
+      playopts.pan = 0x40;
     }
     else if (azimuth - 0x4000U < 0x8000) {
-      local_29 = (u_char)((u_int)(0xbfff - azimuth) >> 8);
+      playopts.pan = (u_char)((u_int)(0xbfff - azimuth) >> 8);
     }
     else {
-      local_29 = (u_char)((u_int)(azimuth + 0x4000) >> 8);
+      playopts.pan = (u_char)((u_int)(azimuth + 0x4000) >> 8);
     }
   }
   else {
-    local_20 = (u_short)azimuth;
+    playopts.azimuth = (u_short)azimuth;
   }
-  if (local_2c < -1) {
-    if (local_2c == -4) {
+  if (playopts.bhandle < -1) {
+    if (playopts.bhandle == -4) {
       bank = 2;
     }
     else {
-      bank = (u_int)(local_2c == -3);
+      bank = (u_int)(playopts.bhandle == -3);
     }
     iVar2 = AudioCmn_GetAsyncSfx(bank,patchNum,false);
-    local_2c = (char)iVar2;
-    local_30 = 0;
+    playopts.bhandle = (char)iVar2;
+    playopts.patnum = 0;
   }
   iVar2 = -1;
-  if (-1 < local_2c) {
-    SNDplay(&local_30);
+  if (-1 < playopts.bhandle) {
+    iVar2 = SNDplay(&playopts);
   }
   NumSFXOn = NumSFXOn + 1;
   return iVar2;
-#endif
 }
 
 /* ---- AudioCmn_PlaySound__Fiiiii  [@0x800783a0] ---- */
@@ -1614,10 +1581,10 @@ void AudioCmn_TrafficSFX(int iChan,int iSFXnum,int freq,int doppler,int dst,int 
     iSFXnum_00 = CopSpeak_GetEnginePatch(iSFXnum,0);
     iDopplerIn = (iVar3 * 0x50 >> 10) << 4;
     AudioCmn_PlaySFX(iChan + 4,iSFXnum_00,0x40,iDopplerIn,
-               (int)(iVar2 * (u_int)(u_char)""[((dir >> 0xc) - (dir >> 10)) + 0x40]) >> 7,azimuth);
+               (int)(iVar2 * (u_int)(u_char)Xfade[((dir >> 0xc) - (dir >> 10)) + 0x40]) >> 7,azimuth);
     iVar3 = CopSpeak_GetEnginePatch(iSFXnum,1);
     AudioCmn_PlaySFX(iChan + 8,iVar3,0x40,iDopplerIn,
-               (int)(iVar2 * (u_int)(u_char)""[(dir >> 10) - ((dir >> 0xc) + -0x40)]) >> 7,azimuth);
+               (int)(iVar2 * (u_int)(u_char)Xfade[(dir >> 10) - ((dir >> 0xc) + -0x40)]) >> 7,azimuth);
     iVar3 = iVar2 * relvel;
     if (0x280000 < relvel) {
       iVar3 = iVar2 * 0x280000;

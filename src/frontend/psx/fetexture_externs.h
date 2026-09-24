@@ -4,11 +4,21 @@
 #define _FRONTEND_PSX_FETEXTURE_EXTERNS_H_
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
-extern "C" {
-     /* shape-table entry for index */
-extern "C" { int   unpacksize(void *src);                 /* decompressed size */ }
-extern "C" { void  unpack(void *src, void *dst);          /* shpsubs decompressor */ }
-extern "C" { void  Texture_GetClutId(unsigned int bpp, int *xclut, int *yclut); }
-   /* upload to VRAM */
+extern "C"
+{
+    /* shape-table entry for index */
+    extern "C"
+    {
+        int unpacksize(void *src); /* decompressed size */
+    }
+    extern "C"
+    {
+        void unpack(void *src, void *dst); /* shpsubs decompressor */
+    }
+    extern "C"
+    {
+        void Texture_GetClutId(unsigned int bpp, int *xclut, int *yclut);
+    }
+    /* upload to VRAM */
 }
 #endif

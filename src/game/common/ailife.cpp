@@ -259,10 +259,10 @@ void AILife_PlaceCarAtLocation(Car_tObj *carObj,int rotation1024)
     AILife_SetInitialSlicePositionOrientationEtc(carObj);
   }
   else {
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);  /* @0x57D38 disasm-v2: scratchpad sp swap */
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);  /* @0x57D38 disasm-v2: scratchpad sp swap */
     stackSpeedUpEnbabledFlag = 0;
     AILife_SetInitialSlicePositionOrientationEtc(carObj);
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);  /* @0x57D60 disasm-v2: restore sp */
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);  /* @0x57D60 disasm-v2: restore sp */
     stackSpeedUpEnbabledFlag = 1;
   }
   if (carObj->currentSpeed == 0) {

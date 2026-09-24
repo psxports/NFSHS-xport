@@ -14,21 +14,23 @@
 
 #include "../../../mips_semantics.h"
 
-extern "C" int  fixedmult(int a, int b);                       /* eacpsxz @0x800E4328 (lbl_D4328) */
-extern "C" void blockmove(void *src, void *dst, int n);        /* eacpsxz @0x800E62DC (lbl_D62DC) */
+extern "C" int fixedmult(int a, int b);                 /* eacpsxz @0x800E4328 (lbl_D4328) */
+extern "C" void blockmove(void *src, void *dst, int n); /* eacpsxz @0x800E62DC (lbl_D62DC) */
 
-extern "C" int *transmult(int *a, int *b, int *out)            /* @0x80105F40 */
+extern "C" int *transmult(int *a, int *b, int *out) /* @0x80105F40 */
 {
     int scratch[9];
     int i, k;
-    for (i = 0; i < 3; i++) {
-        for (k = 0; k < 3; k++) {
+    for (i = 0; i < 3; i++)
+    {
+        for (k = 0; k < 3; k++)
+        {
             int acc = fixedmult(a[i * 3 + 0], b[0 * 3 + k]);
             acc = nfs4_mips_addu_s32(acc, fixedmult(a[i * 3 + 1], b[1 * 3 + k]));
             acc = nfs4_mips_addu_s32(acc, fixedmult(a[i * 3 + 2], b[2 * 3 + k]));
             scratch[i * 3 + k] = acc;
         }
     }
-    blockmove(scratch, out, 0x24);                              /* 9 ints -> output (alias-safe) */
+    blockmove(scratch, out, 0x24); /* 9 ints -> output (alias-safe) */
     return out;
 }

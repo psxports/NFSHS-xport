@@ -5,7 +5,7 @@
 
 extern "C" int sndgs[];
 
-extern "C" int SNDbankheadersize(int bankId);   /* @0x800E7B64 */
+extern "C" int SNDbankheadersize(int bankId); /* @0x800E7B64 */
 
 /* SNDbankheadersize @0x800E7B64 : bank @ sndgs[0x26]+bankId*0xc, +0 = data ptr, [data+8] = header size. */
 extern "C" int SNDbankheadersize(int bankId)

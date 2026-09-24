@@ -2833,7 +2833,7 @@ void R3DCar_InsertAllListFacet(DRender_tView *Vi)
   
   piVar5 = sortMinStorage;
   piVar7 = sortMaxStorage;
-  gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   iVar13 = 0;
   if (Vi->player == 0) {
@@ -2946,16 +2946,16 @@ void R3DCar_InsertAllListFacet(DRender_tView *Vi)
   DrawC_gScreenMat.t[0] = 0;
   DrawC_gScreenMat.t[1] = 0;
   DrawC_gScreenMat.t[2] = 0;
-  gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
   ppCVar14 = Cars_gList;
   stackSpeedUpEnbabledFlag = 0;
   for (iVar13 = 0; iVar13 < Cars_gNumCars; iVar13 = iVar13 + 1) {
     pCVar12 = *ppCVar14;
-    gWSavePtr = (intptr_t)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
     ppCVar14 = ppCVar14 + 1;
     stackSpeedUpEnbabledFlag = 1;
     R3DCar_InsertCarFacetZ(pCVar12,Vi);
-    gWSavePtr = (intptr_t)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     R3DCar_InsertCarFacetII(pCVar12);
   }

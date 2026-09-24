@@ -8,12 +8,12 @@
 #include <stdarg.h>
 
 /* ---- FEMenuExtended.obj-OWNED globals -- DEFINED here (self-contained; .bss zero; SYM-typed) ---- */
-RECT         gHelpPos;   /* @0x80052b58  (bss(zero)) */
+PSX_RECT         gHelpPos;   /* @0x80052b58  (bss(zero)) */
 
 
 /* ---- MenuNFS4_DrawTextBox  [FEMENUEXTENDED.CPP:66-137] SLD-VERIFIED ---- */
 
-void MenuNFS4_DrawTextBox(int helpText,RECT &r,int initialWidth,short drawOffset,short fSelFade,
+void MenuNFS4_DrawTextBox(int helpText,PSX_RECT &r,int initialWidth,short drawOffset,short fSelFade,
                bool drawArrows,bool reflected)
 
 {
@@ -26,7 +26,7 @@ void MenuNFS4_DrawTextBox(int helpText,RECT &r,int initialWidth,short drawOffset
   int textpix;
   int dist;
   DRAWENV *drenv;
-  RECT temp;
+  PSX_RECT temp;
   tDrawShapeExtended drawFlags;
   char buffer [64];
   DR_AREA *daprim;
@@ -158,7 +158,7 @@ void tMenuItemGoToMenuNFS4Button::Draw(int x,int y,bool selected)
   int iVar3;
   u_int uVar4;
   short dist;
-  RECT rect;
+  PSX_RECT rect;
   char buffer [64];
   
   if ((selected != 0) || (dist = 0xe, 1 < this->fOffset + -0xe)) {
@@ -331,7 +331,7 @@ void tMenuItemNFS4LeftRightChoice::Draw(int x,int y,bool selected)
   bool bVar3;
   short sVar4;
   int iVar5;
-  RECT rect;
+  PSX_RECT rect;
   
   iVar5 = selected;
   if ((iVar5 != 0) || (dist = 0xe, 1 < this->fOffset + -0xe)) {
@@ -482,7 +482,7 @@ void tMenuItemOptionsLeftRightChoice::Draw(int x,int y,bool selected)
   tListIterator *ptVar5;
   short y_00;
   int iVar6;
-  RECT r;
+  PSX_RECT r;
   tDrawShapeExtended drawFlags;
   
   left = gHelpShapes;
@@ -547,7 +547,7 @@ void tMenuItemOptionsTwoItemChoice::Draw(int x,int y,bool selected)
   short sVar6;
   __vtbl_ptr_type (*pa_Var7) [6];
   int iVar8;
-  RECT r;
+  PSX_RECT r;
   tDrawShapeExtended drawFlags;
   int ColTextOn;
   int ColTextOff;
@@ -931,7 +931,7 @@ void tMenuNFS4Bottom::Draw()
   tMenuItem *ptVar1;
   __vtbl_ptr_type (*pa_Var2) [11];
   int i;
-  RECT r;
+  PSX_RECT r;
   
   r.x = 0x39;
   r.y = 0xc6;
@@ -1320,9 +1320,9 @@ void tMenuItemGoToMenuNFS4Button::Draw(bool selected)
   int textpix;
   int h;
   int w;
-  RECT temp;
+  PSX_RECT temp;
   tDrawShapeExtended drawFlags;
-  RECT rect;
+  PSX_RECT rect;
   int ColTextOn;
   int ColTextOff;
   
@@ -1330,8 +1330,8 @@ void tMenuItemGoToMenuNFS4Button::Draw(bool selected)
 }
 
 /* ---- MenuNFS4_SetHelpPos__FR4RECT  [@0x800?] ---- RECONSTRUCTED 2026-06-12 (Ghidra @NFS4.EXE.c:5887).
- *  Skipped from the FEMenuExtended pass; trivial RECT copy into gHelpPos (defined above @0x80052b58). */
-extern "C" void MenuNFS4_SetHelpPos(RECT *r)
+ *  Skipped from the FEMenuExtended pass; trivial PSX_RECT copy into gHelpPos (defined above @0x80052b58). */
+extern "C" void MenuNFS4_SetHelpPos(PSX_RECT *r)
 {
   gHelpPos.x = r->x;
   gHelpPos.y = r->y;

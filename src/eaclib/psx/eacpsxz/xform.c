@@ -13,8 +13,8 @@
  */
 #include "../../../nfs4_types.h"
 
-extern "C" void intsincos  (int angle, int *psin, int *pcos);   /* @0x800EADBC (integer angle) */
-extern "C" void fixedsincos(int angle, int *psin, int *pcos);   /* @0x800F3670 (fixed angle)   */
+extern "C" void intsincos(int angle, int *psin, int *pcos);   /* @0x800EADBC (integer angle) */
+extern "C" void fixedsincos(int angle, int *psin, int *pcos); /* @0x800F3670 (fixed angle)   */
 
 /* xformy @0x800E5AC4 : Y-axis rotation (integer angle). */
 extern "C" void xformy(matrixtdef *out, int angle)
@@ -22,9 +22,15 @@ extern "C" void xformy(matrixtdef *out, int angle)
     int s, c;
     intsincos(angle, &s, &c);
     int *m = out->m;
-    m[0] = c;  m[1] = 0;        m[2] = -s;
-    m[3] = 0;  m[4] = 0x10000;  m[5] = 0;
-    m[6] = s;  m[7] = 0;        m[8] = c;
+    m[0] = c;
+    m[1] = 0;
+    m[2] = -s;
+    m[3] = 0;
+    m[4] = 0x10000;
+    m[5] = 0;
+    m[6] = s;
+    m[7] = 0;
+    m[8] = c;
 }
 
 /* fixedxformx @0x800EABAC : X-axis rotation (fixed angle). */
@@ -33,9 +39,15 @@ extern "C" void fixedxformx(matrixtdef *out, int angle)
     int s, c;
     fixedsincos(angle, &s, &c);
     int *m = out->m;
-    m[0] = 0x10000;  m[1] = 0;   m[2] = 0;
-    m[3] = 0;        m[4] = c;   m[5] = s;
-    m[6] = 0;        m[7] = -s;  m[8] = c;
+    m[0] = 0x10000;
+    m[1] = 0;
+    m[2] = 0;
+    m[3] = 0;
+    m[4] = c;
+    m[5] = s;
+    m[6] = 0;
+    m[7] = -s;
+    m[8] = c;
 }
 
 /* fixedxformy @0x800EAC10 : Y-axis rotation (fixed angle). */
@@ -44,9 +56,15 @@ extern "C" void fixedxformy(matrixtdef *out, int angle)
     int s, c;
     fixedsincos(angle, &s, &c);
     int *m = out->m;
-    m[0] = c;  m[1] = 0;        m[2] = -s;
-    m[3] = 0;  m[4] = 0x10000;  m[5] = 0;
-    m[6] = s;  m[7] = 0;        m[8] = c;
+    m[0] = c;
+    m[1] = 0;
+    m[2] = -s;
+    m[3] = 0;
+    m[4] = 0x10000;
+    m[5] = 0;
+    m[6] = s;
+    m[7] = 0;
+    m[8] = c;
 }
 
 /* fixedxformz @0x800EAC74 : Z-axis rotation (fixed angle). */
@@ -55,7 +73,13 @@ extern "C" void fixedxformz(matrixtdef *out, int angle)
     int s, c;
     fixedsincos(angle, &s, &c);
     int *m = out->m;
-    m[0] = c;   m[1] = s;  m[2] = 0;
-    m[3] = -s;  m[4] = c;  m[5] = 0;
-    m[6] = 0;   m[7] = 0;  m[8] = 0x10000;
+    m[0] = c;
+    m[1] = s;
+    m[2] = 0;
+    m[3] = -s;
+    m[4] = c;
+    m[5] = 0;
+    m[6] = 0;
+    m[7] = 0;
+    m[8] = 0x10000;
 }

@@ -5,8 +5,10 @@
  *   __vtbl_ptr_type entries); deleting dtors. Each ctor/dtor installs AIDataRecord_<C>_vtable.
  *   Faithful C++ (option A). NOT original source; SYM-faithful, recompilable. vs disasm-v2.
  */
+#include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aidatarecord_externs.h"
+#include "new.h"
 
 /* ---- aidatarecord.obj-owned globals (.bss zero) ---- */
 AIDataRecord_BestLine_t *AIDataRecord_BestLine;   /* @0x8013c5a0  (bss(zero)) */
@@ -199,9 +201,11 @@ void AIDataRecord_t::StartUp1(void)
 
   } while (-1 < iVar2);
 
-  AIDataRecord_BestLine = new AIDataRecord_BestLine_t((AIDataRecord_WhichRecord_t)5);
+  AIDataRecord_BestLine = new((AIDataRecord_BestLine_t *)__builtin_new(sizeof(AIDataRecord_BestLine_t)))
+      AIDataRecord_BestLine_t((AIDataRecord_WhichRecord_t)5);
 
-  AIDataRecord_TrackCurve = new AIDataRecord_TrackCurve_t((AIDataRecord_WhichRecord_t)6);
+  AIDataRecord_TrackCurve = new((AIDataRecord_TrackCurve_t *)__builtin_new(sizeof(AIDataRecord_TrackCurve_t)))
+      AIDataRecord_TrackCurve_t((AIDataRecord_WhichRecord_t)6);
 
   return;
 

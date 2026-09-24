@@ -5,9 +5,9 @@
  *   iSNDgettag is the 4-arg (cursor,&id,&val,&ptr) form (Ghidra showed 2, the others adjacent on stack).
  */
 #include "../../../nfs4_types.h"
-extern "C" int iSNDgettag(intptr_t *cursor, unsigned int *id, int *val, intptr_t *ptr); /* sgettag */
+extern "C" int iSNDgettag(intptr *cursor, unsigned int *id, int *val, intptr *ptr); /* sgettag */
 
-extern "C" void SNDattributessetdef(int *attr);                         /* @0x801035B0 */
+extern "C" void SNDattributessetdef(int *attr);                                        /* @0x801035B0 */
 extern "C" void iSNDpatchtohdr(short *sampleData, int *hdr, int *attr, int *extraOut); /* @0x801035E4 */
 
 /* SNDattributessetdef @0x801035B0 : reset a 0xc-byte attribute block to defaults (level -1, pan 0x40,
@@ -15,11 +15,11 @@ extern "C" void iSNDpatchtohdr(short *sampleData, int *hdr, int *attr, int *extr
 extern "C" void SNDattributessetdef(int *attr)
 {
     *attr = -1;
-    *((unsigned char *)attr + 7)  = 0x7f;
-    *((unsigned char *)attr + 8)  = 0x40;
-    *((unsigned char *)attr + 6)  = 0;
+    *((unsigned char *)attr + 7) = 0x7f;
+    *((unsigned char *)attr + 8) = 0x40;
+    *((unsigned char *)attr + 6) = 0;
     *(unsigned short *)((char *)attr + 4) = 0;
-    *((unsigned char *)attr + 9)  = 0;
+    *((unsigned char *)attr + 9) = 0;
     *((unsigned char *)attr + 10) = 0;
     *((unsigned char *)attr + 0xb) = 0;
 }
@@ -28,26 +28,35 @@ extern "C" void SNDattributessetdef(int *attr)
  *   + extra word (`extraOut`) from the sample's tag stream (after its 4- or 8-byte prefix per flags bit 1). */
 extern "C" void iSNDpatchtohdr(short *sampleData, int *hdr, int *attr, int *extraOut)
 {
-    intptr_t cursor;
+    intptr cursor;
     unsigned int id;
     int val;
-    intptr_t ptr;
+    intptr ptr;
     SNDattributessetdef(attr);
-    cursor = (intptr_t)(sampleData + 4);
+    cursor = (intptr)(sampleData + 4);
     if ((*((unsigned char *)sampleData + 3) & 2) == 0)
-        cursor = (intptr_t)(sampleData + 2);
-    *(unsigned short *)hdr      = 0x5622;
+        cursor = (intptr)(sampleData + 2);
+    *(unsigned short *)hdr = 0x5622;
     *((unsigned char *)hdr + 2) = 1;
     *((unsigned char *)hdr + 3) = 5;
     *extraOut = 0;
-    while (iSNDgettag(&cursor, &id, &val, &ptr) != 0) {
-        if (id == 0x80)      *((unsigned char *)attr + 0xb) = (unsigned char)val;
-        else if (id == 0x82) *((unsigned char *)hdr + 2)    = (unsigned char)val;
-        else if (id == 0x84) *(unsigned short *)hdr         = (unsigned short)val;
-        else if (id == 0x85) *extraOut                      = val;
-        else if (id == 0x13) *((unsigned char *)attr + 9)   = (unsigned char)val;
-        else if (id == 0xa)  *((unsigned char *)attr + 0xa) = (unsigned char)val;
-        else if (id == 5)    *attr                          = val;
-        else if (id == 6)    *((unsigned char *)attr + 6)   = (unsigned char)val;
+    while (iSNDgettag(&cursor, &id, &val, &ptr) != 0)
+    {
+        if (id == 0x80)
+            *((unsigned char *)attr + 0xb) = (unsigned char)val;
+        else if (id == 0x82)
+            *((unsigned char *)hdr + 2) = (unsigned char)val;
+        else if (id == 0x84)
+            *(unsigned short *)hdr = (unsigned short)val;
+        else if (id == 0x85)
+            *extraOut = val;
+        else if (id == 0x13)
+            *((unsigned char *)attr + 9) = (unsigned char)val;
+        else if (id == 0xa)
+            *((unsigned char *)attr + 0xa) = (unsigned char)val;
+        else if (id == 5)
+            *attr = val;
+        else if (id == 6)
+            *((unsigned char *)attr + 6) = (unsigned char)val;
     }
 }
