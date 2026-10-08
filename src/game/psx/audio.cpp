@@ -38,7 +38,7 @@ extern "C" void Audio_InitDriver(int buffersize,int spusize)
     SNDSYS_vectortoreal();
     memReserve = 0;
     Audio_gHeap = reservememadr("audio heap",0x1000,0);
-    SNDSYS_init(Audio_gHeap,0x1000,memReserve);
+    SNDSYS_init((int)(intptr)Audio_gHeap,0x1000);
     AudioCmn_InitReverb();
   }
   if (0 < buffersize) {
@@ -123,7 +123,7 @@ int AudioCmn_AddBank(char *filename,int size,char *pdata,int BankNum)
   if (iVar2 == 7) {
     iVar2 = SNDbankheadersize(bhandle);
     destBuf = (char *)reservememadr(pool_name,iVar2,0);
-    SNDbankheadercopy(destBuf,bhandle);
+    SNDbankheadercopy((unsigned char *)destBuf,bhandle);
     iVar2 = SNDbankheadersize(bhandle);
     size = size - iVar2;
   }

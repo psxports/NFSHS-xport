@@ -7,7 +7,7 @@
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 

@@ -61,14 +61,14 @@ intptr initmdec(int width,int height,int bpp,int memtype)
 
   bufsize = bpp * 0x1e0 + (area >> 8) * 0x300;
   buf = reservememadr("MDEC buffers",bufsize,memtype);
-  mdec->stripbuf = (u_long *)buf;
+  mdec->stripbuf = (uint32 *)buf;
 
   blockclear(buf,bufsize);
   stride = width * bpp;
 
   mdec->striprect.w = (short)bpp;
 
-  mdec->vlcbuf = (u_long *)((u_char *)mdec->stripbuf + bpp * 0x1e0);
+  mdec->vlcbuf = (uint32 *)((u_char *)mdec->stripbuf + bpp * 0x1e0);
   if (stride < 0) {
 
     stride = stride + 0xf;
@@ -175,7 +175,7 @@ void mdec(intptr handle,char *src,int x,int y)
 
   gMDECinfo.hDecode = handle;
 
-  DecDCTvlc((u_long *)(src + 8),mdec->vlcbuf);
+  DecDCTvlc((uint32 *)(src + 8),mdec->vlcbuf);
 
   mode = 2;
 

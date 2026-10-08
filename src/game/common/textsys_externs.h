@@ -4,7 +4,7 @@
     #define TEXTSYS_EXTERNS_H
 
 /* ---- libc + harvested + SYM ---- */
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 
 extern "C" char *wordFile;        /* word-data blob (char*) */
 extern "C" char *langFileName[6]; /* per-language filenames (dims 1 6) */

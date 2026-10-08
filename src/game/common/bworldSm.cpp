@@ -16,7 +16,7 @@ int          gNumSlices;   /* @0x8013c7c8  (bss(zero)) */
 void         *sim_File;   /* @0x8013c7cc  (bss(zero)) */
 Group        *sim_ItemPtr;   /* @0x8013c7d0  (bss(zero)) */
 int          gMaxFindQuadSliceIterations;   /* @0x8013c7d4  (bss(zero)) */
-u_long       BWSM_NormalCacheSysTime;   /* @0x8013c7d8  (bss(zero)) */
+uint32       BWSM_NormalCacheSysTime;   /* @0x8013c7d8  (bss(zero)) */
 
 
 /* ---- intra-TU forward declarations ---- */
@@ -171,13 +171,13 @@ void RawFindClosestSlice(coorddef *pt,BWorldSm_Pos *slicePos)
         iVar2 = pt->x;
       }
       piVar5 = (int *)(BWorldSm_slices + iVar7);
-      iVar7 = iVar2 - *piVar5 >> 9;
-      iVar2 = pt->z - piVar5[2] >> 9;
+      iVar7 = (iVar2 - *piVar5) >> 9;
+      iVar2 = (pt->z - piVar5[2]) >> 9;
       iVar2 = iVar7 * iVar7 + iVar2 * iVar2;
       if (iVar8 < gNumSlices + -2) {
         iVar6 = (int)(BWorldSm_slices + iVar8);
-        iVar7 = pt->x - *(int *)(iVar6 + 0x20) >> 9;
-        iVar6 = pt->z - *(int *)(iVar6 + 0x28) >> 9;
+        iVar7 = (pt->x - *(int *)(iVar6 + 0x20)) >> 9;
+        iVar6 = (pt->z - *(int *)(iVar6 + 0x28)) >> 9;
         if (iVar7 * iVar7 + iVar6 * iVar6 < iVar2) {
           iVar7 = iVar8 + 1;
         }
@@ -193,8 +193,8 @@ LAB_8007ec3c:
               trap(0x1800);
             }
             piVar5 = (int *)(BWorldSm_slices + (iVar6 % gNumSlices));
-            iVar3 = pt->x - *piVar5 >> 9;
-            iVar4 = pt->z - piVar5[2] >> 9;
+            iVar3 = (pt->x - *piVar5) >> 9;
+            iVar4 = (pt->z - piVar5[2]) >> 9;
             if (iVar3 * iVar3 + iVar4 * iVar4 < iVar2) {
               iVar7 = iVar6;
             }
@@ -209,8 +209,8 @@ LAB_8007ec3c:
           }
           else {
             iVar7 = (int)(BWorldSm_slices + iVar8);
-            iVar6 = pt->x - *(int *)(iVar7 + -0x20) >> 9;
-            iVar3 = pt->z - *(int *)(iVar7 + -0x18) >> 9;
+            iVar6 = (pt->x - *(int *)(iVar7 + -0x20)) >> 9;
+            iVar3 = (pt->z - *(int *)(iVar7 + -0x18)) >> 9;
             iVar7 = iVar8;
             if (iVar6 * iVar6 + iVar3 * iVar3 < iVar2) {
               iVar7 = iVar8 + -1;
@@ -227,8 +227,8 @@ LAB_8007ec3c:
           trap(0x1800);
         }
         piVar5 = (int *)(BWorldSm_slices + iVar7);
-        iVar6 = pt->x - *piVar5 >> 9;
-        iVar3 = pt->z - piVar5[2] >> 9;
+        iVar6 = (pt->x - *piVar5) >> 9;
+        iVar3 = (pt->z - piVar5[2]) >> 9;
         if (iVar2 <= iVar6 * iVar6 + iVar3 * iVar3) goto LAB_8007ec3c;
       }
       bVar1 = iVar8 != iVar7;
@@ -505,8 +505,8 @@ int RawFindClosestQuad(coorddef *pt,BWorldSm_Pos *slicePos)
       slicePos->quad = bVar1 - 2;
     }
     cp = Chunk_chunkCenters + slicePos->chunk;
-    sVar3 = (short)(pt->x - cp->x >> 10);
-    sVar4 = (short)(pt->z - cp->z >> 10);
+    sVar3 = (short)((pt->x - cp->x) >> 10);
+    sVar4 = (short)((pt->z - cp->z) >> 10);
     vertices = (CCOORD16 *)(Track_chunkList[slicePos->chunk].vertexBuf + 1);
     GetFirstStmQuadPts(slicePos,vertices);
     BworldSm_UpdateSimQuad(slicePos);
@@ -745,9 +745,9 @@ int FindClosestQuad(coorddef *pt,BWorldSm_Pos *slicePos)
     pTVar7 = slicePos->simQuad;
     for (iVar6 = 0; (pTVar7 == (Trk_NewSimQuad *)0x0 && (iVar6 < 10)); iVar6 = iVar6 + 1) {
       corrPt.x = corrPt.x +
-                    (BWorldSm_slices[slicePos->slice].center[0] - corrPt.x >> 5);
+                    ((BWorldSm_slices[slicePos->slice].center[0] - corrPt.x) >> 5);
       corrPt.z = corrPt.z +
-                    (BWorldSm_slices[slicePos->slice].center[2] - corrPt.z >> 5);
+                    ((BWorldSm_slices[slicePos->slice].center[2] - corrPt.z) >> 5);
       RawFindClosestQuad(&corrPt,slicePos);
       pTVar7 = slicePos->simQuad;
     }
@@ -847,7 +847,7 @@ int BWorldSm_FindEdgeOff(coorddef *pt,BWorldSm_Pos *slicePos1,BWorldSm_Pos *slic
   u_int uVar2;
   
   iVar1 = PointDirection(slicePos1->quadPts + 2,slicePos1->quadPts + 3,pt);
-  uVar2 = iVar1 < -0x18000 ^ 1;
+  uVar2 = (iVar1 < -0x18000) ^ 1;
   iVar1 = PointDirection(slicePos1->quadPts + 3,slicePos1->quadPts,pt);
   if (-1 < iVar1) {
     uVar2 = uVar2 | 8;
@@ -860,8 +860,8 @@ int BWorldSm_FindEdgeOff(coorddef *pt,BWorldSm_Pos *slicePos1,BWorldSm_Pos *slic
   if (-1 < iVar1) {
     uVar2 = uVar2 | 4;
   }
-  *heightDiff = (slicePos2->quadPts[0].y + slicePos2->quadPts[1].y + slicePos2->quadPts[2].y +
-                 slicePos2->quadPts[3].y >> 2) - pt->y;
+  *heightDiff = ((slicePos2->quadPts[0].y + slicePos2->quadPts[1].y +
+                  slicePos2->quadPts[2].y + slicePos2->quadPts[3].y) >> 2) - pt->y;
   return uVar2;
 }
 
@@ -922,7 +922,7 @@ void * BWorldSm_TunnelFlagSm(BWorldSm_Pos *slicePos)
 /* ---- NormalCache_AddEntry__FP12BWorldSm_Pos  [@0x8008002c] ---- */
 void NormalCache_AddEntry(BWorldSm_Pos *slicePos)
 {
-  u_long oldestTime;
+  uint32 oldestTime;
   int oldestInd;
   tNormalCacheEntry*ce;
   int i;
@@ -1104,7 +1104,7 @@ void Check_Rot(BWorldSm_Pos *slicePos)
     vecZ.y = local_2c;
     vecZ.z = local_28;
     slicePos->forward = vecX;
-    crossproduct(&vecX,&vecZ,&slicePos->normal);
+    crossproduct(&vecX.x,&vecZ.x,&slicePos->normal.x);
     Math_NormalizeVector(&slicePos->normal);
     if (0xffff < (slicePos->normal).y) {
       (slicePos->normal).y = 0xfff9;

@@ -45,8 +45,8 @@ extern "C" int iSNDpsxkeyoff(int mask);                                         
 extern "C" unsigned int iSNDpsxeffecton(int mask);                                              /* spatkey */
 extern "C" unsigned int iSNDpsxeffectoff(int mask);                                             /* spatkey */
 extern "C" unsigned int iSNDsetvol(int chan, int left, int right);                              /* spatkey */
-extern "C" void iSNDatolrv(unsigned int pan, int level, int *outL, int *outR);                  /* saetolrv */
-extern "C" void iSNDatodlrv(unsigned int pan, int level, int *outL, int *outR, int pL, int pR); /* saetodv  */
+extern "C" int iSNDatolrv(int pan, int level, int *outL, int *outR);                            /* saetolrv */
+extern "C" int iSNDatodlrv(int angle, int level, int *out_l, int *out_r, int prevL, int prevR); /* saetodv  */
 
 extern "C" int iSNDstop(unsigned int chan);  /* @0x800FFE90 */
 extern "C" int iSNDvol(int chan, int level); /* @0x801000F8 */

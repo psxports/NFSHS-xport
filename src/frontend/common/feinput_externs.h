@@ -6,7 +6,7 @@
 
 /* ===== globals ===== */
 extern "C" tPadModuleState gPadinfo;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" int ticks;
 extern "C" int FeTools_gScrollTicksOut;  /* @0x800517d0 */
 extern "C" int debounce[];               /* @0x80052b60 */

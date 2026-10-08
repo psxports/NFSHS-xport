@@ -4,15 +4,15 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" int ticks;
 extern tGlobalMenuDefs *menuDefs;
 /* (gFE_bgIndex/gFE_bgFadeVal are NOT globals: SYM STAT = DrawBackground-local statics
    lastpercentage/perfade @0x800528e0/e4 -- Ghidra mis-named them. Defined in the .cpp.) */
-extern "C" extern int gMasterSFXLevel, gMasterMusicLevel, gMasterEngineLevel, gMasterAmbientLevel;
+extern "C" int gMasterSFXLevel, gMasterMusicLevel, gMasterEngineLevel, gMasterAmbientLevel;
 extern "C" int gMasterFENarrationLevel, gStereoMode, Audio_direct3davail;
 extern SndBnk_t gSndBnk[7];
-extern "C" extern SPEECHINFO ginfo;
+extern "C" SPEECHINFO ginfo;
 extern int kRGBVals[28];
 extern "C" char textDefinitions[14][6];
 extern "C"

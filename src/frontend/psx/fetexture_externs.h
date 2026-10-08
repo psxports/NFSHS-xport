@@ -9,11 +9,11 @@ extern "C"
     /* shape-table entry for index */
     extern "C"
     {
-        int unpacksize(void *src); /* decompressed size */
+        long unpacksize(void *src); /* decompressed size */
     }
     extern "C"
     {
-        void unpack(void *src, void *dst); /* shpsubs decompressor */
+        long unpack(void *src, void *dst); /* shpsubs decompressor */
     }
     extern "C"
     {

@@ -19,10 +19,10 @@ extern "C"
     int gTicks;
 }
 
-extern "C" int gTicks;          /* @0x8014xxxx, advanced by Clock ISR (data-mat pass owns) */
-extern "C" int gTickVal;        /* last-sampled tick (elapsedticks state)                  */
-extern "C" int gTickSet;        /* baseline tick (resettick)                               */
-extern "C" int systemtask(int); /* @0x800E6C04 per-frame vsync/idle pump (lbl_D6C04)  */
+extern "C" int gTicks;                   /* @0x8014xxxx, advanced by Clock ISR (data-mat pass owns) */
+extern "C" int gTickVal;                 /* last-sampled tick (elapsedticks state)                  */
+extern "C" int gTickSet;                 /* baseline tick (resettick)                               */
+extern "C" unsigned int systemtask(int); /* @0x800E6C04 per-frame vsync/idle pump (lbl_D6C04)  */
 
 extern "C" int gettick(void) /* @0x800E8220 */
 {

@@ -1,8 +1,8 @@
 /* vtables_tlist.cpp -- #75 data-materialization: tList-family vtables (10), faithful member-cast.
- * Real nfs4-f.exe bytes + REAL method addresses: (int(*)(...))&Class::method; overloaded methods
+ * Real nfs4-f.exe bytes and real method addresses; overloaded methods
  * use a typed member-pointer cast (ret from header, params from mangle). @0xVA breadcrumbs. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 
 static int NFS4_VT_THUNK _vtdtor_tListIterator(tListIterator *p){ p->~tListIterator(); return 0; }
 static int NFS4_VT_THUNK _vtdtor_tListIteratorCar(tListIteratorCar *p){ p->~tListIteratorCar(); return 0; }

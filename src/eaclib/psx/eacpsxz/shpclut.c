@@ -9,8 +9,8 @@
 extern "C" short GetClut(int x, int y); /* syslib P01 */
 #endif
 
-extern "C" u_char *getshapeclut(shapetbl *shape);  /* @0x800F6C3C */
-extern "C" int shapetoclutid(unsigned int *shape); /* @0x800F6C94 */
+extern "C" u_char *getshapeclut(shapetbl *shape);    /* @0x800F6C3C */
+extern "C" int shapetoclutid(const void *shapeData); /* @0x800F6C94 */
 
 /* getshapeclut : follow the chunk chain (tag low byte == '#'/0x23) to the CLUT chunk; 0 if none. */
 extern "C" u_char *getshapeclut(shapetbl *shape)
@@ -33,8 +33,9 @@ extern "C" u_char *getshapeclut(shapetbl *shape)
 }
 
 /* shapetoclutid : like getshapeclut but returns the GPU clut id (GetClut of the chunk's packed x/y). */
-extern "C" int shapetoclutid(unsigned int *shape)
+extern "C" int shapetoclutid(const void *shapeData)
 {
+    const unsigned int *shape = (const unsigned int *)shapeData;
     for (;;)
     {
         if (shape == 0)
@@ -44,7 +45,7 @@ extern "C" int shapetoclutid(unsigned int *shape)
         if ((*shape & 0xffffff00) == 0)
             shape = 0;
         else
-            shape = (unsigned int *)((u_char *)shape + nfs4_mips_sra_s32((int)*shape, 8));
+            shape = (const unsigned int *)((const u_char *)shape + nfs4_mips_sra_s32((int)*shape, 8));
     }
     return (int)GetClut((int)(shape[3] << 0x14) >> 0x14, (int)(shape[3] << 4) >> 0x14);
 }

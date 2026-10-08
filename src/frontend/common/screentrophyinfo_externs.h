@@ -5,7 +5,7 @@
 #include "../../lib/libfns.h"
 
 /* --- globals --- */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tTournamentManager tournamentManager;
 extern tScreenTrophyRoom *screenTrophyRoom;
 extern int kRGBVals[28];
@@ -40,7 +40,7 @@ extern "C"
 }
 extern "C"
 {
-    void FETextRender_WordWrapTextRGBJustify(char *s, PSX_RECT *r, int rgb, int j, int a, bool b);
+    int FETextRender_WordWrapTextRGBJustify(char *s, PSX_RECT *r, int rgb, int j, int a, bool b);
 }
 void ScaleShapeExtended(int a, int b, int c, int d, int e, int f, tDrawShapeExtended *ext);
 extern "C"

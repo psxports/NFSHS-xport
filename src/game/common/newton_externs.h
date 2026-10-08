@@ -35,7 +35,7 @@ extern int gNumSlices;
 /* ---- Collide ---- */
 extern "C"
 {
-    extern int Collide_TestWithPlane(void *n, coorddef *normal, coorddef *pos);
+    extern void Collide_TestWithPlane(void *n, coorddef *normal, coorddef *pos);
 }
 
 /* ---- Physics (physics.obj) ---- */
@@ -52,7 +52,7 @@ extern AICop_spikeBelt_t AICop_spikeBelt;
 /* ---- Cars ---- */
 extern void Cars_SetCarUpForHiRezSim(Car_tObj *car);
 extern Car_tObj *Cars_gHumanRaceCarList[];
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 
 /* ---- Force feedback ---- */
 extern void Force_HitWall(int impulse);
@@ -65,10 +65,10 @@ extern "C"
 }
 
 /* ---- globals ---- */
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal;
 extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
-extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern "C" int generic128HzClock, stackSpeedUpEnbabledFlag;
 extern intptr gWSavePtr;
 
 #endif /* NEWTON_EXTERNS_H */

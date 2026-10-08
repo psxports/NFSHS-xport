@@ -6,8 +6,8 @@
 #include "fetracks.h"
 
 /* FETracks.obj-OWNED globals -- DEFINED here (self-contained; .data=real EXE bytes) */
-tTrackInformation gTrackInfo_FETrackList = {102, 101u, 116u, 114u, 107u, 46u, 116u, 114u, 107, 107, 0, 0, 0, 0, 0, 0, 7596, -32766, 0, 0, 0, -2147336244};   /* @0x80010fd0 */
-tTrackInformation gTrackInfo_Tourney = {116, 111u, 117u, 114u, 110u, 46u, 116u, 114u, 110, 110, 30, 5, 0, 0, 30, 0, 1310, 0, 1310, 0, 0, 1310};   /* @0x8001159c */
+tTrackInformation gTrackInfo_FETrackList = {102, 101u, 116u, 114u, 107u, 46u, 116u, 114u, 107, 107, 0, 0, 0, 0, 0, 0, -84, 2, 0, 0, 0, -52};   /* @0x80010fd0 */
+tTrackInformation gTrackInfo_Tourney = {116, 111u, 117u, 114u, 110u, 46u, 116u, 114u, 110, 110, 30, 5, 0, 0, 30, 0, 30, 0, 30, 0, 0, 30};   /* @0x8001159c */
 short        CountryMeasurement[8] = { 0, 1, 0, 1, 1, 0, 1, 1 };   /* @0x80051610 */
 int          tracks_maxTrackIndex;   /* @0x80051620  (bss(zero)) */
 
@@ -35,7 +35,7 @@ void tTrackManager::Initialize()
 /* ---- tTrackManager::LoadTracks  [FETRACKS.CPP:46-59] SLD-VERIFIED ---- */
 void tTrackManager::LoadTracks(tSaveTrackInfo &load)
 {
-  u_long i;
+  uint32 i;
 
   i = 0;
   do {
@@ -76,13 +76,13 @@ void tTrackManager::GetTrack(short trackNumber,tTrackInformation &trackInfo)
 void tTrackManager::LoadDescription()
 
 {
-  u_long *addr;
-  u_long uVar1;
+  uint32 *addr;
+  uint32 uVar1;
   tTrackInformation *dst;
   char *pcVar2;
   char *data;
   int iVar3;
-  u_long i;
+  uint32 i;
   u_int uVar4;
   char *input;
   char filename [80];
@@ -90,7 +90,7 @@ void tTrackManager::LoadDescription()
   data = filename;
   sprintf(data,"%s%s",Paths_Paths[0x25],"fetrk.trk");
   this->ReleaseDescription();
-  addr = (u_long *)loadfileadr(filename,0x10);
+  addr = (uint32 *)loadfileadr(filename,0x10);
   if (addr == 0) {
     this->fNumTracks = 0;
     this->fTracks = 0;
@@ -158,7 +158,7 @@ void tTrackManager::SetClassAvailable(tTrackClassType trackClass,bool avail)
 {
   char *pcVar1;
   u_int uVar2;
-  u_long i;
+  uint32 i;
   int iVar3;
   
   uVar2 = 0;
@@ -185,7 +185,7 @@ tTrackInformation * tTrackManager::GetTrackByID(short track)
 {
   tTrackInformation *ptVar1;
   u_int uVar2;
-  u_long i;
+  uint32 i;
   
   uVar2 = 0;
   if (this->fNumTracks != 0) {

@@ -394,7 +394,7 @@ void tDialogHelp::Draw()
 {
   short sVar1;
   short sVar2;
-  __vtbl_ptr_type (*pa_Var3) [10];
+  __vtbl_ptr_type *pa_Var3;
   u_int numLetters;
   int iVar5;
   u_char padType;
@@ -408,9 +408,9 @@ void tDialogHelp::Draw()
   short y;
   char buffer [80];
   
-  pa_Var3 = (this->_base_tDialogBase)._base_tScreen._vf;
-  NFS4_VCALL0((*pa_Var3)[10].pfn,
-              (u_char *)this + (*pa_Var3)[10].delta);
+  pa_Var3 = &(*(this->_base_tDialogBase)._base_tScreen._vf)[0];
+  NFS4_VCALL0(pa_Var3[10].pfn,
+              (u_char *)this + pa_Var3[10].delta);
   iVar6 = (this->_base_tDialogBase).startTicks;
   if (iVar6 + 0x32 <= ticks) {
     iVar6 = ((ticks - iVar6) + -0x32) / 3;
@@ -586,7 +586,7 @@ void tDialogMessageString::Draw()
     r.h = (this->_base_tDialogBase).height - ((this->_base_tDialogBase).reservedheight + 8);
     FETextRender_SetABR(1,true);
     if (this->Centerit == 0) {
-      FETextRender_WordWrapTextRGB(this->string,&r,col);
+      FETextRender_WordWrapTextRGB(this->string,r,col);
     }
     else {
       FETextRender_FullTextRGB(this->string,
@@ -637,26 +637,27 @@ short tDialogInteractive::Run()
 {
   short sVar1;
   bool bVar2;
-  __vtbl_ptr_type (*pa_Var3) [10];
+  __vtbl_ptr_type *pa_Var3;
   tInputKeyType tVar4;
   tMenu *currentMenu;
   tInputKeyType *ptVar7;
   int i;
   tPlayer player;
-  u_long debounce;
+  uint32 debounce;
   tInputKeyType keyVal [2];
   tMenuCommand command;
   
   this->fCurrentlyRunning = 1;
   ((tDialogBase *)this)->Display();
-  pa_Var3 = (this->_base_tDialogMessageString)._base_tDialogBase._base_tScreen._vf;
-  NFS4_VCALL0((*pa_Var3)[10].pfn,
-              (u_char *)this + (*pa_Var3)[10].delta);
+  pa_Var3 = &(*(this->_base_tDialogMessageString)._base_tDialogBase._base_tScreen._vf)[0];
+  NFS4_VCALL0(pa_Var3[10].pfn,
+              (u_char *)this + pa_Var3[10].delta);
   this->ReadyToReturnValue = 0;
   while (this->ReadyToReturnValue == 0) {
     command.type = kMenu_Command_None;
     ptVar7 = keyVal;
-    for (player = kPlayerOne; player < 2; player = (tPlayer)(player + kPlayerTwo)) {
+    for (int playerIndex = 0; playerIndex < 2; ++playerIndex) {
+      player = (tPlayer)playerIndex;
       tVar4 = FEInput_GetKeyFromPlayer(player,-1);
       *ptVar7 = tVar4;
       if (tVar4 == kInput_KeyType_NoKey) {
@@ -684,9 +685,9 @@ short tDialogInteractive::Run()
         tVar4 = *ptVar7;
       }
       if (tVar4 != kInput_KeyType_NoKey) {
-        pa_Var3 = (this->_base_tDialogMessageString)._base_tDialogBase._base_tScreen._vf;
-        NFS4_VCALL_INT_PTR_PTR((*pa_Var3)[9].pfn,
-                  (u_char *)this + (*pa_Var3)[9].delta,player,ptVar7,&command);
+        pa_Var3 = &(*(this->_base_tDialogMessageString)._base_tDialogBase._base_tScreen._vf)[0];
+        NFS4_VCALL_INT_PTR_PTR(pa_Var3[9].pfn,
+                  (u_char *)this + pa_Var3[9].delta,player,ptVar7,&command);
       }
       ptVar7 = ptVar7 + 1;
     }

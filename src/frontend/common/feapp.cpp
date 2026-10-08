@@ -7,7 +7,7 @@
 /* ---- FEApp.obj-OWNED globals -- DEFINED here (self-contained; .bss zero; types match the
    feapp_externs.h decls all FE TUs consume). FEApp = the global FE application pointer. ---- */
 int             currentVideo;     /* FE play-movie index (SYM STAT; externed as shared int) */
-int             gLargestUnused;   /* @0x800514b8  largest unused heap block (SYM u_long, extern "C" int) */
+int             gLargestUnused;   /* @0x800514b8  largest unused heap block (SYM uint32, extern "C" int) */
 tFEApplication *FEApp;            /* @0x800514c0  global FE application pointer */
 
 
@@ -237,7 +237,7 @@ void tFEApplication::DrawHelpIcons()
   else {
     string2[1] = '\0';
     pcVar2 = TextSys_Word(0xfc);
-    sprintf(string,pcVar2);
+    sprintf(string,"%s",pcVar2);
     i = strlen(string);
     while (i = i - 1, -1 < (int)i) {
       x = (short)y;
@@ -639,19 +639,19 @@ tAppCommand tFEApplication::MainLoop(tMenu *newMenu)
   u_char wasSubMenu;
   tInputKeyType *ptVar19;
   tDialogMessageString *this_tDialogMessageString_l311;
-  u_long ticks_l351;
+  uint32 ticks_l351;
   int player;
   PinkSlipsErrorCode err;
   short i;
   tPlayer inputStartPlayer;
   tPlayer inputEndPlayer;
-  u_long ticksAtLastInput [2];
+  uint32 ticksAtLastInput [2];
   char string [80];
   tMenuCommand command [2];
   tInputKeyType keyVal [2];
   tCarInfo carInfo;
   short stackBackupPin;
-  u_long tick;
+  uint32 tick;
   int demoLoopLastInputTick;
   
   stackBackupPin = -1;
@@ -1176,7 +1176,7 @@ tAppCommand tFEApplication::RunPostGame()
       tUserNameMenuItem *item = &menuDefs->menuItemUserName2;
       tOptionsMenu *menu = &menuDefs->menuPostGamePlayer2Name;
       item->fPlayer = 1;
-      item->fData = frontEnd.playerNameList[4];
+      item->fData = frontEnd.playerNameList[1];
       item->fMaxStringLength = 7;
       item->fCurrentRow = 0;
       item->fCurrentColumn = 0;

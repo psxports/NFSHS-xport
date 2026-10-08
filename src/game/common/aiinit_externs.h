@@ -8,7 +8,7 @@
 /* AIDataRecord ctors use placement construction on __builtin_new storage */
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern AIPhysic_Config_t AIPhysicConfig;
 extern AISpeeds_tLeaderBoard leaderBoard;
@@ -17,7 +17,7 @@ extern AI_tInfo AI_Info;
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj (byte-match backport) */
 extern Car_tObj *Cars_gAIRaceCarList[9];    /* cars.obj */
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" char *Paths_Paths[]; /* 0x80116468 (paths.obj) */
 extern Udff_tInfo *Udff_Opena(char *name, char *mem, int abortFlag);
 extern accelscale_t AITune_accelerationScale[];

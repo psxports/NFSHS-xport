@@ -29,14 +29,14 @@ extern "C" int iSNDplatformpacketoverhead(void); /* sdpacket */
 extern "C" int iSNDplatformpacketplaycreate(int slot, void *mem);
 /* H10: 9-arg per oracle call @0x80102C94 (a0..a3 + sp+16/20/24/28/32). sdpacket's def reads 8
  *   (volAngle,level,pitch,a6,fxlevel,hdr-ptr); a9=hdr+0xc is pushed-but-unused, matching the binary. */
-extern "C" int iSNDplatformpacketplay(int p, int note, int volAngle, int level, int pitch, int a6, int fxlevel, intptr rate, intptr a9);
+extern "C" int iSNDplatformpacketplay(int p, int note, unsigned short volAngle, unsigned char level, int pitch, int a6, unsigned char fxlevel, unsigned short *rate);
 extern "C" void iSNDplatformpacketplaydestroy(int p);
 extern "C" int iSNDallocchan(int a, int b, int c, int *out); /* salloc */
 extern "C" intptr iSNDfreechan(int note);
-extern "C" void iSNDcalcpitch(int note); /* sclcptch */
-extern "C" void iSNDcalcvol(int note);   /* spatkey  */
-extern "C" int SNDstop(int voice);       /* sstop    */
-extern "C" void iSNDenteraudio(void);    /* sserver  */
+extern "C" int iSNDcalcpitch(int note);   /* sclcptch */
+extern "C" void iSNDcalcvol(int note);    /* spatkey  */
+extern "C" int SNDstop(unsigned int tag); /* sstop    */
+extern "C" void iSNDenteraudio(void);     /* sserver  */
 extern "C" void iSNDleaveaudio(void);
 
 #define MI(p, o) (*(int *)((intptr)(p) + (o)))
@@ -186,9 +186,8 @@ extern "C" int SNDPKTPLAY_start(int p, intptr rate, intptr hdr, int *params)
         int high = nfs4_mips_bits_to_s32((unsigned int)((unsigned long long)pr >> 32));
         dur = nfs4_mips_subu_s32(nfs4_mips_sra_s32(nfs4_mips_addu_s32(high, v1), 0xd), nfs4_mips_sra_s32(v1, 0x1f));
     }
-    /* H10: oracle (0x80102C94) passes 9 args; was 6 with dur/rate/hdr+0xc in the wrong slots and
-       ch[0x2d]/ch[0x62]/params[0xe] missing.  a0..a3 + sp+16/20/24/28/32. */
-    r = iSNDplatformpacketplay(p, note, s3len, MSB(ch, 0x2d), MUH(ch, 0x62), MUH(params, 0xe), dur, rate, hdr + 0xc);
+    /* Original callee reads through argument eight; caller's ninth stack word is unused */
+    r = iSNDplatformpacketplay(p, note, s3len, MSB(ch, 0x2d), MUH(ch, 0x62), MUH(params, 0xe), dur, (unsigned short *)rate);
     if (r < 0)
     {
         iSNDfreechan(note);

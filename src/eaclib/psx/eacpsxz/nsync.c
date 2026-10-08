@@ -31,8 +31,8 @@ extern "C" intptr FILE_atomic(intptr fn, int idle, int retries, void *args);    
 extern "C" int asyncidle(void);                                                                     /* @0x800F6114 */
 
 /* ---- memstd allocator (eaclib/psx/eacpsxz/memstd.cpp) ---- */
-extern "C" void *reservememadr(char *name, int size, int classid); /* @0x800E533C */
-extern "C" int purgememadr(void *p);                               /* @0x800E5540 */
+extern "C" void *reservememadr(const char *name, int size, int classid); /* @0x800E533C */
+extern "C" int purgememadr(void *p);                                     /* @0x800E5540 */
 
 /* ---- big-file header helpers (next obj) ---- */
 extern "C" int typeofbigfile(void *buf);                /* @0x800E5F1C */

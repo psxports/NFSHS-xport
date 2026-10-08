@@ -4,7 +4,7 @@
     #define FECARS_EXTERNS_H
 
 /* global manager/state instances */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tTournamentManager tournamentManager;
 extern tTrackManager trackManager;
 extern tCarManager carManager; /* the global car-manager singleton (gCarManager alias) */
@@ -18,7 +18,7 @@ extern "C"
 {
     int FECheat_IsCheatEnabled(tCheatCode);
 }
-extern "C" extern "C" char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 
 /* class vtables (FECars.obj-defined iterator subclasses) */
 extern __vtbl_ptr_type tListIteratorCar_vtable[], tListIteratorCarColor_vtable[];

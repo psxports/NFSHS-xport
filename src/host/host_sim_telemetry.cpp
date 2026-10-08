@@ -13,7 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(__EMSCRIPTEN__)
+extern "C" long random(void);
+#else
 extern "C" int random(void);
+#endif
 
 static unsigned long host_environment_get(const char *name, char *buffer, size_t capacity)
 {
@@ -34,7 +38,7 @@ static unsigned long host_environment_get(const char *name, char *buffer, size_t
 #define GetEnvironmentVariableA host_environment_get
 #define ExitProcess(code) exit((int)(code))
 
-extern "C" void NFSHS_HostLog(const char *, ...);
+extern "C" void NFSHS_HostLog(const char *fmt);
 extern "C" void NFSHS_HostRaceStart(Car_tObj *playerCar);
 extern "C" unsigned int NFSHS_HostPSXRandSeed(void);
 
@@ -44,8 +48,8 @@ extern Car_tObj *Cars_gTrafficCarList[9];
 extern int Cars_gNumTrafficCars;
 extern u_int fastRandom;
 extern u_int randSeed;
-extern "C" extern GameSetup_tData GameSetup_gData;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" GameSetup_tData GameSetup_gData;
+extern "C" tfrontEnd frontEnd;
 extern "C" Sim_tSimGlobalVar simGlobal;
 extern "C" tPadModuleState gPadinfo;
 extern int Input_gHandler[184];
@@ -82,7 +86,7 @@ extern "C" void NFSHS_HostEacAudioReplay(unsigned *state)
             unsigned header[4];
             if(fd<0 || _read(fd,header,16)!=16 || header[0]!=0x31434145U ||
                _read(fd,initial,24)!=24) {
-                NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("EAC_REPLAY invalid fixture"));
+                NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "EAC_REPLAY invalid fixture"); NFSHS_HostLog(nfshsLogLine); }()));
                 ExitProcess(93);
             }
             initialTick=header[1]; remaining=header[2]; endTick=header[3];
@@ -96,18 +100,18 @@ extern "C" void NFSHS_HostEacAudioReplay(unsigned *state)
     unsigned record[8];
     if(!remaining || _read(fd,record,sizeof(record))!=sizeof(record) ||
        record[0]!=(unsigned)simGlobal.gameTicks) {
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("EAC_REPLAY call mismatch tick=%d remaining=%u",simGlobal.gameTicks,remaining));
+        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "EAC_REPLAY call mismatch tick=%d remaining=%u",simGlobal.gameTicks,remaining); NFSHS_HostLog(nfshsLogLine); }()));
         ExitProcess(93);
     }
     active=1;
     for(unsigned i=0;i<record[1];i++) random();
     active=0;
     if(memcmp(state,record+2,24)) {
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("EAC_REPLAY state mismatch tick=%d remaining=%u",simGlobal.gameTicks,remaining));
+        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "EAC_REPLAY state mismatch tick=%d remaining=%u",simGlobal.gameTicks,remaining); NFSHS_HostLog(nfshsLogLine); }()));
         ExitProcess(93);
     }
     --remaining;
-    if(!remaining) NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("EAC_REPLAY all non-audio calls verified"));
+    if(!remaining) NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "EAC_REPLAY all non-audio calls verified"); NFSHS_HostLog(nfshsLogLine); }()));
 }
 
 #ifdef AP_WIN
@@ -188,7 +192,7 @@ extern "C" void NFSHS_HostReplayCameraButton(void)
     }
     if(next<count && simGlobal.gameTicks==ticks[next]) {
         Camera_NextMode(0);++next;
-        NFSHS_HostLog("CAMERA_BUTTON tick=%d event=%d/%d",simGlobal.gameTicks,next,count);
+        ([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "CAMERA_BUTTON tick=%d event=%d/%d",simGlobal.gameTicks,next,count); NFSHS_HostLog(nfshsLogLine); }());
     }
 }
 
@@ -216,8 +220,8 @@ static void host_trace_state_tick(void)
                 HOST_STATE_TRACE_VERSION,sizeof(Car_tObj),HOST_STATE_TRACE_TRAFFIC_SLOTS,
                 (unsigned int)(4*4+(1+HOST_STATE_TRACE_TRAFFIC_SLOTS)*(4+sizeof(Car_tObj)))};
             host_write_all(hostStateTraceFd,&header,sizeof(header));
-            NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("STATE_TRACE opened path=%s carSize=%u recordSize=%u",
-                          path,header.carSize,header.recordSize));
+            NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "STATE_TRACE opened path=%s carSize=%u recordSize=%u",
+                          path,header.carSize,header.recordSize); NFSHS_HostLog(nfshsLogLine); }()));
         }
     }
     if(hostStateTraceFd<0) return;
@@ -253,16 +257,16 @@ extern "C" void NFSHS_HostRaceBoundaryStart(void)
         hostStartY=hostCar->N.position.y;
         hostStartZ=hostCar->N.position.z;
     }
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_RACE_LOOP car=%p list0=%p human0=%p index=%d start=(%d,%d,%d)",
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_RACE_LOOP car=%p list0=%p human0=%p index=%d start=(%d,%d,%d)",
                   hostCar,Cars_gList[0],Cars_gHumanRaceCarList[0],
-                  hostCar?hostCar->carIndex:-1,hostStartX,hostStartY,hostStartZ));
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_INPUT_SETUP config=(%d,%d) pad=(id=%u,nopad=%u) handlers=%08x,%08x,%08x,%08x,%08x,%08x",
+                  hostCar?hostCar->carIndex:-1,hostStartX,hostStartY,hostStartZ); NFSHS_HostLog(nfshsLogLine); }()));
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_INPUT_SETUP config=(%d,%d) pad=(id=%u,nopad=%u) handlers=%08x,%08x,%08x,%08x,%08x,%08x",
                   GameSetup_gData.controllerData.controllerConfig[0],
                   GameSetup_gData.controllerData.controllerConfig[1],
                   (unsigned)gPadinfo.buf[0].ID,(unsigned)gPadinfo.buf[0].nopad,
                   Input_gHandler[0],Input_gHandler[1],Input_gHandler[2],
-                  Input_gHandler[3],Input_gHandler[4],Input_gHandler[5]));
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_SETUP race=%d laps=%d track=%d traffic=%d seed=%d scene=%d/%d/%d loaded=%d customSlice=%d playerLap=%d crtSeed=%08x fe=(track=%u laps=%u traffic=%u list=%u opp=%u)",
+                  Input_gHandler[3],Input_gHandler[4],Input_gHandler[5]); NFSHS_HostLog(nfshsLogLine); }()));
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_SETUP race=%d laps=%d track=%d traffic=%d seed=%d scene=%d/%d/%d loaded=%d customSlice=%d playerLap=%d crtSeed=%08x fe=(track=%u laps=%u traffic=%u list=%u opp=%u)",
                   GameSetup_gData.raceType,GameSetup_gData.numLaps,
                   GameSetup_gData.track,GameSetup_gData.trafficDensity,
                   GameSetup_gData.randSeed,GameSetup_gData.SceneNumber,
@@ -273,7 +277,7 @@ extern "C" void NFSHS_HostRaceBoundaryStart(void)
                   (unsigned char)frontEnd.track[0],(unsigned char)frontEnd.laps,
                   (unsigned char)frontEnd.traffic[0],
                   (unsigned char)frontEnd.carListType,
-                  (unsigned char)frontEnd.oppNumber));
+                  (unsigned char)frontEnd.oppNumber); NFSHS_HostLog(nfshsLogLine); }()));
 }
 
 extern "C" void NFSHS_HostRaceBoundaryTick(void)
@@ -291,8 +295,8 @@ extern "C" void NFSHS_HostRaceBoundaryTick(void)
         hostDy>0x10000 || hostDy<-0x10000 ||
         hostDz>0x10000 || hostDz<-0x10000)) {
         hostMoved=1;
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_MOVED tick=%d delta=(%d,%d,%d) speed=%d",
-                      simGlobal.gameTicks,hostDx,hostDy,hostDz,hostCar->speed));
+        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_MOVED tick=%d delta=(%d,%d,%d) speed=%d",
+                      simGlobal.gameTicks,hostDx,hostDy,hostDz,hostCar->speed); NFSHS_HostLog(nfshsLogLine); }()));
     }
     if(!hostCollided &&
        (hostCar->N.collision.collided!=0 ||
@@ -300,16 +304,16 @@ extern "C" void NFSHS_HostRaceBoundaryTick(void)
         (hostCar->N.collision.lastTime>0 &&
          (unsigned int)(simGlobal.gameTicks-hostCar->N.collision.lastTime)<2U))) {
         hostCollided=1;
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_COLLISION tick=%d collided=%d impulse=%d lastImpulse=%d other=%p",
+        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_COLLISION tick=%d collided=%d impulse=%d lastImpulse=%d other=%p",
                       simGlobal.gameTicks,hostCar->N.collision.collided,
                       hostCar->N.collision.impulse,hostCar->N.collision.lastImpulse,
-                      hostCar->N.collision.otherObj));
+                      hostCar->N.collision.otherObj); NFSHS_HostLog(nfshsLogLine); }()));
     }
     if(hostTelemetryTick>=0 &&
        (unsigned int)(simGlobal.gameTicks-hostTelemetryTick)<64U) return;
     hostTelemetryTick=simGlobal.gameTicks;
 
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ORIENT_STATE tick=%d orient=(%d,%d,%d;%d,%d,%d;%d,%d,%d) road=(%d,%d,%d;%d,%d,%d;%d,%d,%d) angvel=(%d,%d,%d) angacc=(%d,%d,%d)",
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "ORIENT_STATE tick=%d orient=(%d,%d,%d;%d,%d,%d;%d,%d,%d) road=(%d,%d,%d;%d,%d,%d;%d,%d,%d) angvel=(%d,%d,%d) angacc=(%d,%d,%d)",
                   simGlobal.gameTicks,
                   hostCar->N.orientMat.m[0],hostCar->N.orientMat.m[1],hostCar->N.orientMat.m[2],
                   hostCar->N.orientMat.m[3],hostCar->N.orientMat.m[4],hostCar->N.orientMat.m[5],
@@ -318,25 +322,25 @@ extern "C" void NFSHS_HostRaceBoundaryTick(void)
                   hostCar->N.roadMatrix.m[3],hostCar->N.roadMatrix.m[4],hostCar->N.roadMatrix.m[5],
                   hostCar->N.roadMatrix.m[6],hostCar->N.roadMatrix.m[7],hostCar->N.roadMatrix.m[8],
                   hostCar->N.angularVel.x,hostCar->N.angularVel.y,hostCar->N.angularVel.z,
-                  hostCar->angularAcc.x,hostCar->angularAcc.y,hostCar->angularAcc.z));
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("ROAD_QUADS tick=%d flags=(slice=%d quad=%d simrot=%d triangle=%d) q=(%d,%d,%d)(%d,%d,%d)(%d,%d,%d)(%d,%d,%d)",
+                  hostCar->angularAcc.x,hostCar->angularAcc.y,hostCar->angularAcc.z); NFSHS_HostLog(nfshsLogLine); }()));
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "ROAD_QUADS tick=%d flags=(slice=%d quad=%d simrot=%d triangle=%d) q=(%d,%d,%d)(%d,%d,%d)(%d,%d,%d)(%d,%d,%d)",
                   simGlobal.gameTicks,(int)hostCar->N.simRoadInfo.slice,
                   (int)hostCar->N.simRoadInfo.quad,(int)hostCar->N.simRoadInfo.simRotFlag,
                   (int)hostCar->N.simRoadInfo.triangleFlag,
                   hostCar->N.simRoadInfo.quadPts[0].x,hostCar->N.simRoadInfo.quadPts[0].y,hostCar->N.simRoadInfo.quadPts[0].z,
                   hostCar->N.simRoadInfo.quadPts[1].x,hostCar->N.simRoadInfo.quadPts[1].y,hostCar->N.simRoadInfo.quadPts[1].z,
                   hostCar->N.simRoadInfo.quadPts[2].x,hostCar->N.simRoadInfo.quadPts[2].y,hostCar->N.simRoadInfo.quadPts[2].z,
-                  hostCar->N.simRoadInfo.quadPts[3].x,hostCar->N.simRoadInfo.quadPts[3].y,hostCar->N.simRoadInfo.quadPts[3].z));
+                  hostCar->N.simRoadInfo.quadPts[3].x,hostCar->N.simRoadInfo.quadPts[3].y,hostCar->N.simRoadInfo.quadPts[3].z); NFSHS_HostLog(nfshsLogLine); }()));
     for(int wheelIndex=0;wheelIndex<4;++wheelIndex) {
         Car_tWheel *wheel=&hostCar->wheel[wheelIndex];
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("WHEEL_STATE tick=%d wheel=%d pos=(%d,%d,%d) normal=(%d,%d,%d) actual=%d acc=%d air=%d rebound=%d impact=%d surface=%d",
+        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "WHEEL_STATE tick=%d wheel=%d pos=(%d,%d,%d) normal=(%d,%d,%d) actual=%d acc=%d air=%d rebound=%d impact=%d surface=%d",
                       simGlobal.gameTicks,wheelIndex,
                       wheel->currentPos.x,wheel->currentPos.y,wheel->currentPos.z,
                       wheel->roadNormal.x,wheel->roadNormal.y,wheel->roadNormal.z,
                       wheel->actualHeight,wheel->wheelAcc,wheel->wheelInAir,
-                      wheel->rebound,wheel->impactCompression,wheel->roadSurfaceType));
+                      wheel->rebound,wheel->impactCompression,wheel->roadSurfaceType); NFSHS_HostLog(nfshsLogLine); }()));
     }
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_STATE tick=%d started=%d finish=%d crash=%d gear=%d/%d rs=%d rpm=%d air=%d%d%d%d pos=(%d,%d,%d) vel=(%d,%d,%d) accCh=(%d,%d,%d) accWorld=(%d,%d,%d) shadowZ=(%d,%d,%d) speed=%d ground=(alt=%d,elev=%d,orient=%d,center=%d,q0=%d,slice=%d) input=(%d,%d,%d,%d) desired=(%d,%d) actual=(%d,%d) collision=%d impulse=%d",
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_STATE tick=%d started=%d finish=%d crash=%d gear=%d/%d rs=%d rpm=%d air=%d%d%d%d pos=(%d,%d,%d) vel=(%d,%d,%d) accCh=(%d,%d,%d) accWorld=(%d,%d,%d) shadowZ=(%d,%d,%d) speed=%d ground=(alt=%d,elev=%d,orient=%d,center=%d,q0=%d,slice=%d) input=(%d,%d,%d,%d) desired=(%d,%d) actual=(%d,%d) collision=%d impulse=%d",
                   simGlobal.gameTicks,simGlobal.gameStarted,(int)hostCar->stats.finishType,
                   (int)hostCar->crash,(int)hostCar->control.gear,
                   (int)hostCar->control.desiredGear,(int)hostCar->RSControl,
@@ -355,12 +359,12 @@ extern "C" void NFSHS_HostRaceBoundaryTick(void)
                   (int)Input_gResults[0].brake,(int)Input_gSim.gas,
                   (int)hostCar->control.desiredGasLevel,(int)hostCar->control.desiredBrakeLevel,
                   (int)hostCar->control.gasLevel,(int)hostCar->control.brakeLevel,
-                  hostCar->N.collision.collided,hostCar->N.collision.impulse));
+                  hostCar->N.collision.collided,hostCar->N.collision.impulse); NFSHS_HostLog(nfshsLogLine); }()));
 
     int slice=(int)hostCar->N.simRoadInfo.slice;
     if(BWorldSm_slices && slice>=0 && slice<gNumSlices) {
         int next=slice+1<gNumSlices?slice+1:0;
-        NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_ROAD slice=%d right=(%d,%d,%d) normal=(%d,%d,%d) forward=(%d,%d,%d) centerDelta=(%d,%d,%d) orientZ=(%d,%d,%d)",
+        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_ROAD slice=%d right=(%d,%d,%d) normal=(%d,%d,%d) forward=(%d,%d,%d) centerDelta=(%d,%d,%d) orientZ=(%d,%d,%d)",
                       slice,
                       (int)BWorldSm_slices[slice].right[0],(int)BWorldSm_slices[slice].right[1],(int)BWorldSm_slices[slice].right[2],
                       (int)BWorldSm_slices[slice].normal[0],(int)BWorldSm_slices[slice].normal[1],(int)BWorldSm_slices[slice].normal[2],
@@ -368,15 +372,15 @@ extern "C" void NFSHS_HostRaceBoundaryTick(void)
                       nfs4_mips_subu_s32(BWorldSm_slices[next].center[0],BWorldSm_slices[slice].center[0]),
                       nfs4_mips_subu_s32(BWorldSm_slices[next].center[1],BWorldSm_slices[slice].center[1]),
                       nfs4_mips_subu_s32(BWorldSm_slices[next].center[2],BWorldSm_slices[slice].center[2]),
-                      hostCar->N.orientMat.m[6],hostCar->N.orientMat.m[7],hostCar->N.orientMat.m[8]));
+                      hostCar->N.orientMat.m[6],hostCar->N.orientMat.m[7],hostCar->N.orientMat.m[8]); NFSHS_HostLog(nfshsLogLine); }()));
     }
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("AUTOTEST_MATS orient=(%d,%d,%d;%d,%d,%d;%d,%d,%d) shadow=(%d,%d,%d;%d,%d,%d;%d,%d,%d)",
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "AUTOTEST_MATS orient=(%d,%d,%d;%d,%d,%d;%d,%d,%d) shadow=(%d,%d,%d;%d,%d,%d;%d,%d,%d)",
                   hostCar->N.orientMat.m[0],hostCar->N.orientMat.m[1],hostCar->N.orientMat.m[2],
                   hostCar->N.orientMat.m[3],hostCar->N.orientMat.m[4],hostCar->N.orientMat.m[5],
                   hostCar->N.orientMat.m[6],hostCar->N.orientMat.m[7],hostCar->N.orientMat.m[8],
                   hostCar->N.shadowMat.m[0],hostCar->N.shadowMat.m[1],hostCar->N.shadowMat.m[2],
                   hostCar->N.shadowMat.m[3],hostCar->N.shadowMat.m[4],hostCar->N.shadowMat.m[5],
-                  hostCar->N.shadowMat.m[6],hostCar->N.shadowMat.m[7],hostCar->N.shadowMat.m[8]));
+                  hostCar->N.shadowMat.m[6],hostCar->N.shadowMat.m[7],hostCar->N.shadowMat.m[8]); NFSHS_HostLog(nfshsLogLine); }()));
 }
 
 

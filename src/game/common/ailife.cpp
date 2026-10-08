@@ -26,7 +26,7 @@ Car_tObj * AILife_IsCarInAnyVisibleArea(Car_tObj *carObj);
 Car_tObj * AILife_IsSliceInAnyVisibleArea(int slice);
 Car_tObj * AILife_IsSliceCloseToAnyCopCar(int slice);
 Car_tObj * AILife_IsPositionInAnyVisibleArea(coorddef *pos);
-void AILife_Debug(char *format);
+void AILife_Debug(const char *format);
 
 
 /* ---- AILife_EvaluateLife__FP8Car_tObj  [@0x80067650] ---- */
@@ -240,7 +240,7 @@ void AILife_PlaceCarAtLocation(Car_tObj *carObj,int rotation1024)
   int speed;
   coorddef zero;
   matrixtdef rotMatrix;
-  u_long uVar1;
+  uint32 uVar1;
   matrixtdef *pmVar2;
   int iVar3;
   int iVar4;
@@ -625,7 +625,7 @@ int AILife_IsCoordInThisVisibleArea(coorddef *tPos,Car_tObj *racer)
   else {
     iVar1 = iVar2 + (iVar1 >> 2);
   }
-  return 0xac0000 < iVar1 ^ 1;
+  return (0xac0000 < iVar1) ^ 1;
 }
 
 /* ---- AILife_IsCarInAnyVisibleArea__FP8Car_tObj  [@0x800687ec] ---- */
@@ -713,7 +713,7 @@ Car_tObj * AILife_IsPositionInAnyVisibleArea(coorddef *pos)
 }
 
 /* ---- AILife_Debug__FPce  [@0x800689d0] ---- */
-void AILife_Debug(char *format)
+void AILife_Debug(const char *format)
 {
   int sliceDist;
   int dist;

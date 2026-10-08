@@ -7,7 +7,7 @@
 
 extern "C"
 {
-    char *Platform_GetDCTBuffer(...);
+    char *Platform_GetDCTBuffer(int size, const char *string);
     void Platform_ResetDCTBuffer();
 }
 extern "C" Group *gPersistObjInst;                      /* track.obj */

@@ -275,9 +275,10 @@ void AIHigh_BTC_Cop::StartArrest(AIHigh_BTC_Perp *arrestMe)
 
       pSVar1 = (Speaker *)Speech_Mobile(carObj);
 
-      (**(int (**)(...))(pSVar1->_vf[2] + 0xe))
-
-                ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[2] + 10),1);
+      {
+        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[9];
+        ((void (*)(MobileSpeaker *, int))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta), 1);
+      }
 
     }
 
@@ -312,9 +313,9 @@ void AIHigh_BTC_Cop::FinishArrest(AIHigh_BTC_Perp *arrestMe)
 
     this->freezeMode_ = 4;
 
-    (**(int (**)(...))(pa_Var1[9] + 1))
-
-              ((int)&(this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_ + (int)*(short *)pa_Var1[8]);
+    const __vtbl_ptr_type &entry = ((__vtbl_ptr_type *)pa_Var1)[3];
+    ((void (NFS4_THISCALL *)(void *))entry.pfn)
+        ((char *)&this->_base_AIHigh_BasicCop._base_AIHigh_Base + entry.delta);
 
     this->HudOff();
 
@@ -1155,9 +1156,10 @@ void AIHigh_BTC_HumanCop::UpdateAndCheckTimeLeft()
 
       pSVar2 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-      (**(int (**)(...))(pSVar2->_vf[1] + 0x1d))
-
-                ((int)&(pSVar2->fPosition).flags + (int)*(short *)(pSVar2->_vf[1] + 0x19));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar2->_vf)[7];
+        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+      }
 
       AIH_BTCCop_freezeToggle_8013c564 = 0;
 
@@ -1310,9 +1312,10 @@ void AIHigh_BTC_HumanCop::RequestWingman()
 
     pSVar1 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-    (**(int (**)(...))(pSVar1->_vf[3] + 7))
-
-              ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[3] + 3));
+    {
+      const __vtbl_ptr_type &entry = (*pSVar1->_vf)[12];
+      ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta));
+    }
 
     if ((((this->chaseStartTime_ == 0) || (iVar2 == 0)) ||
 
@@ -1320,9 +1323,10 @@ void AIHigh_BTC_HumanCop::RequestWingman()
 
       pSVar1 = (Speaker *)Speech_Dispatch();
 
-      (**(int (**)(...))(*pSVar1->_vf + 0x1c))
-
-                ((int)&(pSVar1->fPosition).flags + (int)*(short *)(*pSVar1->_vf + 0x18));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[3];
+        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta));
+      }
 
     }
 
@@ -1368,9 +1372,10 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
 
       pSVar1 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-      (**(int (**)(...))(pSVar1->_vf[2] + 0x16))
-
-                ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[2] + 0x12));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[10];
+        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta));
+      }
 
       iVar3 = GameSetup_gData.perpInfo[this->currentStage_].BlockadeCopTime;
 
@@ -1382,9 +1387,10 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
 
       pSVar1 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-      (**(int (**)(...))(pSVar1->_vf[2] + 0x1e))
-
-                ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[2] + 0x1a));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[11];
+        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta));
+      }
 
       iVar3 = GameSetup_gData.perpInfo[this->currentStage_].SpikeBeltTime;
 
@@ -1400,9 +1406,10 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
 
       pSVar1 = (Speaker *)Speech_Dispatch();
 
-      (**(int (**)(...))(*pSVar1->_vf + 0x1c))
-
-                ((int)&(pSVar1->fPosition).flags + (int)*(short *)(*pSVar1->_vf + 0x18));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[3];
+        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta));
+      }
 
     }
 
@@ -1410,9 +1417,10 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
 
       pSVar1 = (Speaker *)Speech_Dispatch();
 
-      (**(int (**)(...))(pSVar1->_vf[1] + 5))
-
-                ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[1] + 1));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[4];
+        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta));
+      }
 
       if (spikeBeltRequest == 0) {
 
@@ -2031,9 +2039,10 @@ void AIHigh_BTC_Wingman::HighExecute()
 
         pSVar2 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-        (**(int (**)(...))(pSVar2->_vf[4] + 8))
-
-                  ((int)&(pSVar2->fPosition).flags + (int)*(short *)(pSVar2->_vf[4] + 4));
+        {
+          const __vtbl_ptr_type &entry = (*pSVar2->_vf)[16];
+          ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+        }
 
         this->currentRole_ = this->newRole_;
 
@@ -2383,9 +2392,10 @@ LAB_8005ea9c:
 
       pSVar2 = (Speaker *)Speech_Mobile(pCVar9);
 
-      (**(int (**)(...))(pSVar2->_vf[1] + 0x1d))
-
-                ((int)&(pSVar2->fPosition).flags + (int)*(short *)(pSVar2->_vf[1] + 0x19));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar2->_vf)[7];
+        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+      }
 
     }
 
@@ -2737,11 +2747,10 @@ void AIHigh_BTC_Wingman::SetupWingman(AIHigh_BTC_HumanCop *humanCop)
 
   pSVar1 = (Speaker *)Speech_Dispatch();
 
-  (**(int (**)(...))(pSVar1->_vf[1] + 0xd))
-
-            ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[1] + 9),
-
-             (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
+  {
+    const __vtbl_ptr_type &entry = (*pSVar1->_vf)[5];
+    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta), (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
+  }
 
   return;
 
@@ -2781,7 +2790,7 @@ void AIHigh_BTC_Wingman::SetupBlockader(AIHigh_BTC_HumanCop *humanCop,int spikeB
 
   int iVar3;
 
-  u_long uVar4;
+  uint32 uVar4;
 
   Speaker *pSVar5;
 
@@ -3089,11 +3098,10 @@ LAB_8005f268:
 
   pSVar5 = (Speaker *)Speech_Dispatch();
 
-  (**(int (**)(...))(pSVar5->_vf[1] + 0xd))
-
-            ((int)&(pSVar5->fPosition).flags + (int)*(short *)(pSVar5->_vf[1] + 9),
-
-             (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
+  {
+    const __vtbl_ptr_type &entry = (*pSVar5->_vf)[5];
+    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar5 + entry.delta), (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
+  }
 
   return;
 

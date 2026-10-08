@@ -94,9 +94,6 @@ void CopSpeak_RadioStaticActive(int noise)
   char *pcVar5;
   int iVar6;
   u_int uVar7;
-  u_int local_38;
-  u_char local_34;
-  u_char local_30;
   
   uVar7 = 3;
   if (0x60 < noise) {
@@ -121,11 +118,11 @@ CopSpkRadioStatic_returnLoop:
     if (*piVar4 == -1) {
       iVar3 = AudioCmn_GetAsyncSfx(2,*pcVar5 + 0x2f,false);
       if (-1 < iVar3) {
-        SNDplaysetdef(&local_38);
-        local_34 = (u_char)iVar3;
-        local_38 = 0;
-        local_30 = (u_char)(gMasterFENarrationLevel * noise * 0x81 >> 0xe);
-        iVar3 = SNDplay(&local_38);
+        SNDplaysetdef(&playopts);
+        playopts.bhandle = (u_char)iVar3;
+        playopts.patnum = 0;
+        playopts.vol = (u_char)(gMasterFENarrationLevel * noise * 0x81 >> 0xe);
+        iVar3 = SNDplay(&playopts);
         *piVar4 = iVar3;
         *pcVar5 = -1;
         if (*piVar4 < 0) {
@@ -489,6 +486,10 @@ extern "C" void CopSpeak_GenericBankRequest(int patch,Car_tObj *car)
 void CopSpeak_StartUp(void)
 
 {
+  char rainBankName[] = "rain.bnk";
+  char loadEngineName[] = "lden";
+  char loadExhaustName[] = "ldex";
+  char oneShotsName[] = "oneshots.txt";
   long offset;
   long size;
   int filename;
@@ -508,15 +509,16 @@ void CopSpeak_StartUp(void)
   int iVar3;
   void *pvVar4;
   char *addr;
-  int *out_size_ptr;
+  int entryOffset;
+  int entrySize;
   char *pcVar5;
+  const char *languageName;
   char **ppcVar6;
-  int iVar7;
   char *tag;
   char acStack_b8 [104];
   char acStack_50 [16];
   char *local_40 [3];
-  void *local_34;
+  int local_34;
   int local_30 [2];
   
   CopSpeak_InitVars();
@@ -534,10 +536,11 @@ void CopSpeak_StartUp(void)
     Copspeak_gBank[1].Count = Copspeak_gBank[1].Count * 2 + 1;
     Copspeak_gBank[1].Index =
          (CopSpeak_tFileIndex *)reservememadr("ocar index",Copspeak_gBank[1].Count * 8,0);
-    local_40[2] = "rain.bnk";
+    local_40[2] = rainBankName;
     do {
-      pvVar4 = locatebigentryz(pvVar2,*ppcVar6,0,&Copspeak_gBank[1].Index[iVar3].offset,
-                          (int)&Copspeak_gBank[1].Index[iVar3].size);
+      pvVar4 = locatebigentryz(pvVar2,*ppcVar6,0,&entryOffset,&entrySize);
+      Copspeak_gBank[1].Index[iVar3].offset = entryOffset;
+      Copspeak_gBank[1].Index[iVar3].size = entrySize;
       if (pvVar4 == (void *)0x0) {
         Copspeak_gBank[1].Index[iVar3].offset = 0;
         Copspeak_gBank[1].Index[iVar3].size = 0;
@@ -545,18 +548,17 @@ void CopSpeak_StartUp(void)
       iVar3 = iVar3 + 1;
       ppcVar6 = ppcVar6 + 1;
     } while (iVar3 < 1);
-    iVar7 = 8;
     for (iVar3 = 0; iVar3 < Copspeak_gBank[1].Count + -1; iVar3 = iVar3 + 1) {
-      local_40[0] = "lden";
-      local_40[1] = "ldex";
-      sprintf(acStack_50,"%.4s%.4s.bnk",GameSetup_gCarNames + iVar3 / 2,local_40[iVar3 % 2]);
-      out_size_ptr = (int *)((int)&(Copspeak_gBank[1].Index)->offset + iVar7);
-      pvVar4 = locatebigentryz(pvVar2,acStack_50,0,out_size_ptr,(int)(out_size_ptr + 1));
+      local_40[0] = loadEngineName;
+      local_40[1] = loadExhaustName;
+      sprintf(acStack_50,"%.4s%.4s.bnk",GameSetup_gCarNames[iVar3 / 2],local_40[iVar3 % 2]);
+      pvVar4 = locatebigentryz(pvVar2,acStack_50,0,&entryOffset,&entrySize);
+      Copspeak_gBank[1].Index[iVar3 + 1].offset = entryOffset;
+      Copspeak_gBank[1].Index[iVar3 + 1].size = entrySize;
       if (pvVar4 == (void *)0x0) {
         Copspeak_gBank[1].Index[iVar3 + 1].offset = 0;
         Copspeak_gBank[1].Index[iVar3 + 1].size = 0;
       }
-      iVar7 = iVar7 + 8;
     }
     purgememadr(pvVar2);
     Copspeak_gBank[1].FileOpen =
@@ -564,7 +566,7 @@ void CopSpeak_StartUp(void)
   }
   CopSpeak_gNumTrackSfx = 0;
   sprintf(acStack_b8,"%szzzw%s.viv",Paths_Paths[0x1c],
-             GameSetup_gTrackNames + GameSetup_gData.track);
+             GameSetup_gTrackNames[GameSetup_gData.track]);
   pvVar2 = (void *)loadbigfileheader(acStack_b8,0x10);
   if (pvVar2 == (void *)0x0) {
     sprintf(acStack_b8,"%szzzwcst.viv",Paths_Paths[0x1c]);
@@ -578,8 +580,11 @@ void CopSpeak_StartUp(void)
   iVar3 = 0;
   if (0 < Copspeak_gBank[0].Count) {
     do {
-      locatebigentry(pvVar2,(char *)0x0,iVar3,&Copspeak_gBank[0].Index[iVar3].offset,
-                 (int)&Copspeak_gBank[0].Index[iVar3].size);
+      int entryOffset;
+      int entrySize;
+      locatebigentry(pvVar2,(char *)0x0,iVar3,&entryOffset,&entrySize);
+      Copspeak_gBank[0].Index[iVar3].offset = entryOffset;
+      Copspeak_gBank[0].Index[iVar3].size = entrySize;
       iVar3 = iVar3 + 1;
     } while (iVar3 < Copspeak_gBank[0].Count);
   }
@@ -588,23 +593,23 @@ void CopSpeak_StartUp(void)
        FILE_opensync(acStack_b8,1,100,&Copspeak_gBank[0].FileHandle);
 CopSpeakStart_langSwitch:
   if (GameSetup_gData.userSetting.language == 1) {
-    pcVar5 = "ger";
+    languageName = "ger";
   }
   else if (GameSetup_gData.userSetting.language == 2) {
-    pcVar5 = "fre";
+    languageName = "fre";
   }
   else {
-    pcVar5 = "eng";
+    languageName = "eng";
   }
-  sprintf(acStack_b8,"%szzzx%s.viv",Paths_Paths[0x1d],pcVar5);
+  sprintf(acStack_b8,"%szzzx%s.viv",Paths_Paths[0x1d],languageName);
   pvVar2 = (void *)loadbigfileheader(acStack_b8,0x10);
   if (pvVar2 != (void *)0x0) {
-    pvVar4 = locatebigentryz(pvVar2,"oneshots.txt",0,(int *)&local_34,(int)local_30);
+    pvVar4 = locatebigentryz(pvVar2,oneShotsName,0,&local_34,local_30);
     if ((pvVar4 != (void *)0x0) && (local_30[0] != 0)) {
       addr = (char *)reservememadr("copspeak temp",local_30[0],0x10);
       Copspeak_gBank[2].FileOpen =
             FILE_opensync(acStack_b8,1,100,&Copspeak_gBank[2].FileHandle);
-      FILE_readsync(Copspeak_gBank[2].FileHandle,(unsigned int)(intptr)local_34,(intptr)addr,local_30[0],100);   /* oracle 0x8a160: +size(local_30[0]) +prio(0x64) */
+      FILE_readsync(Copspeak_gBank[2].FileHandle,(unsigned int)local_34,(intptr)addr,local_30[0],100);
       bVar1 = false;
       Copspeak_gBank[2].Count = 0;
       for (pcVar5 = addr; pcVar5 < addr + local_30[0]; pcVar5 = pcVar5 + 1) {
@@ -626,8 +631,9 @@ CopSpeakStart_langSwitch:
           if (*pcVar5 == '\"') {
             if (bVar1) {
               *pcVar5 = '\0';
-              pvVar4 = locatebigentryz(pvVar2,tag,0,&Copspeak_gBank[2].Index[iVar3].offset,
-                                  (int)&Copspeak_gBank[2].Index[iVar3].size);
+              pvVar4 = locatebigentryz(pvVar2,tag,0,&entryOffset,&entrySize);
+              Copspeak_gBank[2].Index[iVar3].offset = entryOffset;
+              Copspeak_gBank[2].Index[iVar3].size = entrySize;
               if (pvVar4 == (void *)0x0) {
                 Copspeak_gBank[2].Index[iVar3].size = 0;
               }
@@ -673,22 +679,15 @@ int CopSpeak_Play(CopSpeak_tRequest *r,int handle)
   int noise;
   int iVar1;
   int iVar2;
-  int local_28;
-  u_char local_24;
-  u_char local_21;
-  u_char local_20;
-  u_char local_1f;
-  u_char local_1d;
-  u_short local_18;
   
-  SNDplaysetdef(&local_28);
+  SNDplaysetdef(&playopts);
   if (r->bank == '\x03') {
-    local_24 = (u_char)gSndBnk[3].bnkID;
-    local_28 = ((int *)r)[6];
+    playopts.bhandle = (u_char)gSndBnk[3].bnkID;
+    playopts.patnum = ((int *)r)[6];
   }
   else {
-    local_28 = 0;
-    local_24 = handle;
+    playopts.patnum = 0;
+    playopts.bhandle = handle;
   }
   iVar2 = 0x30;
   if (*(int *)r != 0) {
@@ -708,22 +707,21 @@ int CopSpeak_Play(CopSpeak_tRequest *r,int handle)
   else {
     iVar2 = gMasterFENarrationLevel * (0x80 - (iVar2 >> 2)) * 0x81 >> 0xe;
   }
-  local_1f = 0x40;
-  local_20 = (u_char)iVar2;
-  local_1d = Audio_direct3davail != 0;
+  playopts.bend = 0x40;
+  playopts.vol = (u_char)iVar2;
+  playopts.use3dpos = Audio_direct3davail != 0;
   if (Audio_direct3davail == 0) {
     if (gStereoMode == 0) {
-      local_21 = 0x40;
+      playopts.pan = 0x40;
     }
     else {
-      local_21 = 0x40;
+      playopts.pan = 0x40;
     }
   }
   else {
-    local_18 = 0;
+    playopts.azimuth = 0;
   }
-  SNDplay(&local_28);
-  return 0;
+  return SNDplay(&playopts);
 }
 
 /* ---- CopSpeak_Skip__Fv  [COPSPEAK.CPP:1028-1042] SLD-VERIFIED ---- */

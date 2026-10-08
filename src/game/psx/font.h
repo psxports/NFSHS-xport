@@ -8,7 +8,7 @@ void Font_TextTint__Fi(int rgb);                                                
 void Font_SetABR__Fi(int abr);                                                                    /* :96 */
 void Font_Blit__FiiPviiP12charactertbli(int x, int y, void *src, int u, int v, charactertbl *ch); /* :128 */
 void Font_ComputeColors__Fiiic(int colour, int forecolour, int backcolour, char in_game);         /* :168 */
-void *Font_textbsearch__FiPcUlUl(int key, char *base, u_long nmemb, u_long size);                 /* :262 */
+void *Font_textbsearch__FiPcUlUl(int key, char *base, uint32 nmemb, uint32 size);                 /* :262 */
 void *Font_Getcharacter__Fi(int targetindex);                                                     /* :286 */
 void Font_SetBlitter__FPFiiPviiP12charactertbli_v(void *blitter);                                 /* :305 */
 void Font_ReSetBlitter__Fv(void);                                                                 /* :311 */

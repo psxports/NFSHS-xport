@@ -45,7 +45,7 @@ extern "C" int allocmutex(void); /* callback.obj @0x800FE424 */
 extern "C" void freemutex(int mutex);
 extern "C" int iscurrentthread(int t); /* threads.obj */
 extern "C" void yieldthread(void);
-extern "C" void systemtask(int x);                   /* systask.obj */
+extern "C" unsigned int systemtask(int x);           /* systask.obj */
 extern "C" int strcmp(const char *a, const char *b); /* syslib C23 */
 extern "C" char *strcpy(char *d, const char *s);     /* syslib C25 */
 #ifndef _MSC_VER

@@ -12,11 +12,11 @@ extern "C" SndStreamState *iSNDstreamgetstreamptr(int idx);                     
 extern "C" int iSNDstreamnumcreated(void);                                                                                      /* @0x800E96F8 */
 extern "C" int iSNDstreamqueue(unsigned int s, int name, char *filename, int off, int mode);                                    /* @0x800E9970 */
 extern "C" void iSNDstreamservice(void);                                                                                        /* @0x800E9590 (serve hook) */
-extern "C" void SNDPKTPLAY_destroy(int pktplay);                                                                                /* spktplay */
-extern "C" void SNDPKTPLAY_stop(int pktplay);
+extern "C" int SNDPKTPLAY_destroy(int pktplay);                                                                                 /* spktplay */
+extern "C" int SNDPKTPLAY_stop(int pktplay);
 extern "C" void STREAM_destroy(intptr strm); /* stream.obj */
 extern "C" void STREAM_kill(intptr strm);
-extern "C" void iSNDserverremoveclient(void *cb); /* ssysserv */
+extern "C" int iSNDserverremoveclient(int cb); /* ssysserv */
 #ifndef _MSC_VER
 extern "C" void *memset(void *d, int c, int n);
 #endif
@@ -24,7 +24,7 @@ extern "C" void *memset(void *d, int c, int n);
 extern "C" intptr (&sndss)[1];
 extern "C" int sndgs[]; /* (char)sndgs[0xf] = init flag, sndgs[0x22] = destroyall hook */
 
-extern "C" void SNDSTRM_purge(int s); /* @0x800E9C58 (fwd: destroy calls it) */
+extern "C" int SNDSTRM_purge(int s); /* @0x800E9C58 (fwd: destroy calls it) */
 
 /* SNDSTRM_create @0x800E9B44 : create a streaming voice with its OWN ring (extHandle/extFlag forced 0).
  *   Returns the stream slot or a negative error. */
@@ -47,7 +47,7 @@ extern "C" int SNDSTRM_destroy(int s)
     SNDSTRM_purge(s);
     if (iSNDstreamnumcreated() == 1)
     { /* this is the last live stream */
-        iSNDserverremoveclient((void *)iSNDstreamservice);
+        iSNDserverremoveclient((int)(intptr)iSNDstreamservice);
         sndgs[0x22] = 0;
     }
     SNDPKTPLAY_destroy(S->packetPlayer);
@@ -65,10 +65,14 @@ extern "C" int SNDSTRM_queuefile(int s, int name, char *filename, long off)
 
 /* SNDSTRM_purge @0x800E9C58 : stop playback, flush the ring, and reset the voice to an empty idle state
  *   (counters, parse index, and both format slots cleared) -- ready to be re-queued. */
-extern "C" void SNDSTRM_purge(int s)
+extern "C" int SNDSTRM_purge(int s)
 {
     SndStreamState *S;
-    if ((char)sndgs[0xf] != 0 && (S = iSNDstreamgetstreamptr(s)) != 0)
+    if ((char)sndgs[0xf] == 0)
+        return -10;
+    S = iSNDstreamgetstreamptr(s);
+    if (S == 0)
+        return -8;
     {
         if (-1 < S->playResult)
             SNDPKTPLAY_stop(S->packetPlayer);
@@ -83,4 +87,5 @@ extern "C" void SNDSTRM_purge(int s)
         memset(S->lockedHeader, 0, sizeof(S->lockedHeader));
         memset(S->currentHeader, 0, sizeof(S->currentHeader));
     }
+    return 0;
 }

@@ -174,7 +174,7 @@ void * tScreen::IsShapeFileLoaded(tShapeInformation &shapes)
     iVar1 = getasyncreadstatus(shapes.async_handle);
     if (iVar1 < 1) {
       if (iVar1 == -1) {
-        pvVar3 = getasyncreadadr(shapes.async_handle,buf);
+        pvVar3 = getasyncreadadr(shapes.async_handle);
         if (pvVar3 != (void *)0x0) {
           purgememadr(pvVar3);
         }
@@ -192,7 +192,7 @@ void * tScreen::IsShapeFileLoaded(tShapeInformation &shapes)
     else {
       pcVar2 = shapes.fDestFile;
       if (pcVar2 == (char *)0x0) {
-        pcVar2 = getasyncreadadr(shapes.async_handle,buf);
+        pcVar2 = getasyncreadadr(shapes.async_handle);
       }
       shapes.fFile = pcVar2;
       shapes.async_handle = 0;
@@ -338,7 +338,7 @@ void tScreen::Draw(bool drawBackground)
 
 {
   short delta;
-  int (*pfn)(...);
+  nfs4_vtbl_pfn pfn;
   
   if (drawBackground == 0) {
     delta = (*this->_vf)[3].delta;
@@ -380,11 +380,11 @@ void tScreen::AsyncLoadShapeFile(char *name,tShapeInformation &data)
     if (data.fLoadCancelled == 0) {
       data.fLoadCancelled = 0;
       if (data.fDestFile == (char *)0x0) {
-        uVar1 = asyncloadfile(buffer,(void *)0x10);
+        uVar1 = asyncloadfile(buffer,0x10);
         data.async_handle = uVar1;
       }
       else {
-        uVar1 = asyncloadfileat(buffer,data.fDestFile);
+        uVar1 = asyncloadfileat(buffer,(intptr)data.fDestFile);
         data.async_handle = uVar1;
       }
     }
@@ -411,7 +411,7 @@ void tScreen::CancelAsyncLoad(tShapeInformation &data)
     }
     else {
       if (data.fDestFile == (char *)0x0) {
-        pcVar2 = getasyncreadadr(data.async_handle,buf);
+        pcVar2 = getasyncreadadr(data.async_handle);
         data.fFile = pcVar2;
       }
       if (data.fFile != (char *)0x0) {
@@ -510,7 +510,7 @@ void tScreen::FreeShapes(tShapeInformation &data)
     }
     else {
       if (data.fDestFile == (char *)0x0) {
-        pcVar3 = getasyncreadadr(data.async_handle,buf);
+        pcVar3 = getasyncreadadr(data.async_handle);
         data.fFile = pcVar3;
       }
       else {

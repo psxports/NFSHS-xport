@@ -10,29 +10,29 @@ Track_MipMap *gTempMipMapInfo; Track_MultiPalette *gTempMultiPalInfo;
 
 /* track.obj car-dashboard shape/tach name-prefix tables @0x80055A54 (contiguous; 58 char*,
  *   't'=day shapes / 'n'=night, decoded byte-exact from nfs4-f.exe via IDA NFS4.EXE.i64).
- *   HudPmx_InitTextures copies these into stack buffers, using &Track_gShapeNamePtrs_end and
- *   gShapeNamePtrs_subList+3 as loop bounds -- so declaration order MUST stay contiguous. */
-char *Track_gShapeNamePtrs[28] = {                 /* @0x80055A54 : [0..27] */
+ *   HudPmx_InitTextures copies the two 29-entry lists with explicit bounds
+ *   Host declaration order does not imply contiguous storage */
+const char *Track_gShapeNamePtrs[28] = {           /* @0x80055A54 : [0..27] */
     "tslk","tbz3","thsv","tfor","tz28","ttra","tdb7","txkr","ttm5","tvet",
     "t550","t911","tf50","tdsv","tclk","tmcf","t911","thsv","tvet","tbon",
     "tbon","tbon","tcap","thsv","ttm5","tvet","t911","tdsv" };
-char *Track_gShapeNamePtrs_end[1] = { "tbon" };    /* @0x80055AC4 : [28] (loop-bound marker) */
+const char *Track_gShapeNamePtrs_end[1] = { "tbon" }; /* @0x80055AC4 : [28] (loop-bound marker) */
 /* decompiler also references the value form _Track_gShapeNamePtrs_end -> same [28] datum.
  * gcc2.7.2/ccpsx has no __attribute__((alias)); keep the alias for the modern pre-gate, and
  * resolve the underscore-symbol bridge (hudpmx.cpp) in the deferred linkage/hygiene pass. */
 #ifndef NFS4_PSYQ_HEADERS
 /* _Track_gShapeNamePtrs_end removed: hudpmx.cpp now uses Track_gShapeNamePtrs_end directly. */
 #endif
-char *Track_gTachNamePtrs[25] = {                  /* @0x80055AC8 : [29..53] */
+const char *Track_gTachNamePtrs[25] = {            /* @0x80055AC8 : [29..53] */
     "nslk","nbz3","nhsv","nfor","nz28","ntra","ndb7","nxkr","nnm5","nvet",
     "n550","n911","nf50","tdsv","tclk","nmcf","n911","nhsv","nvet","nbon",
     "nbon","nbon","ncap","nhsv","nnm5" };
-char *gShapeNamePtrs_subList[4] = { "nvet","n911","tdsv","nbon" };  /* @0x80055B2C : [54..57] */
+const char *gShapeNamePtrs_subList[4] = { "nvet","n911","tdsv","nbon" }; /* @0x80055B2C : [54..57] */
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 void Track_SetTrackNumber(int tracknum);
-char * Track_MakeTrackPathName(char *ext);
-char * Track_MakeTrackDataPathName(char *ext);
+char * Track_MakeTrackPathName(const char *ext);
+char * Track_MakeTrackDataPathName(const char *ext);
 void AllocArtResource(Track_tArtresource *artRes,int numPmx);
 void InitArtResources(void);
 void DeInitArtResources(void);
@@ -68,7 +68,7 @@ void Track_SetTrackNumber(int tracknum)
 }
 
 /* ---- Track_MakeTrackPathName__FPc  [TRACK.CPP:103-110] SLD-VERIFIED ---- */
-char * Track_MakeTrackPathName(char *ext)
+char * Track_MakeTrackPathName(const char *ext)
 
 {
   static char strspc[64];   /* @0x8013e300 STAT (.bss) */
@@ -77,7 +77,7 @@ char * Track_MakeTrackPathName(char *ext)
 }
 
 /* ---- Track_MakeTrackDataPathName__FPc  [TRACK.CPP:114-121] SLD-VERIFIED ---- */
-char * Track_MakeTrackDataPathName(char *ext)
+char * Track_MakeTrackDataPathName(const char *ext)
 
 {
   static char strspc[64];   /* @0x8013e340 STAT (.bss) */
@@ -271,7 +271,7 @@ void TexturesLoadInitial(void)
   char *shape_path;
   Draw_tPixMap *pDVar3;
   char *pcVar4;
-  char *track_path;
+  const char *track_path;
   int reg_t0;
   u_int uVar5;
   int reg_t1;
@@ -307,7 +307,7 @@ void TexturesLoadInitial(void)
   }
   shape_path = Track_MakeTrackPathName(track_path);
   gInitialArt.shapeFile =
-       (char *)loadshapeadr(shape_path,(void *)0x0);
+       (char *)loadshapeadr(shape_path,0x0);
   if (gInitialArt.shapeFile != (char *)0x0) {
     Texture_ResetPaletteSharing();
     gInitialArt.shapeCount = (int)shapecount(gInitialArt.shapeFile);
@@ -320,7 +320,7 @@ void TexturesLoadInitial(void)
     purgememadr(gInitialArt.shapeFile);
     Hrz_GetHorizonPixMap(gInitialArt.pPmx);
     pcVar4 = Track_MakeTrackPathName("r.psh");
-    pcVar4 = (char *)loadshapeadr(pcVar4,(void *)0x0);
+    pcVar4 = (char *)loadshapeadr(pcVar4,0x0);
     if (pcVar4 != (char *)0x0) {
       Texture_ResetPaletteSharing();
       LoadShapesAndMakePmx_EnvMap(pcVar4,Track_gReflectionMaps,0x3e0,0);
@@ -792,12 +792,18 @@ void CalcObjectBoundingSphere(Group *defGroup,Group *boundingSphereGroup)
     while( true ) {
       uVar11 = uVar11 - 1;
       if (uVar11 == 0xffffffff) break;
-      iVar6 = cp.x / (int)uVar10 - (int)pTVar13->id >> 6;
+      iVar6 = nfs4_mips_sra_s32(
+          nfs4_mips_subu_s32(cp.x / (int)uVar10, (int)pTVar13->id), 6);
       ((u_char *)&(sVar2))[0] = pTVar9[1].vertexCount;
       ((u_char *)&(sVar2))[1] = pTVar9[1].quadCount;
-      iVar7 = cp.y / (int)uVar4 - (int)sVar2 >> 6;
-      iVar8 = cp.z / (int)uVar5 - (int)pTVar9[2].id >> 6;
-      iVar6 = iVar6 * iVar6 + iVar7 * iVar7 + iVar8 * iVar8;
+      iVar7 = nfs4_mips_sra_s32(
+          nfs4_mips_subu_s32(cp.y / (int)uVar4, (int)sVar2), 6);
+      iVar8 = nfs4_mips_sra_s32(
+          nfs4_mips_subu_s32(cp.z / (int)uVar5, (int)pTVar9[2].id), 6);
+      iVar6 = nfs4_mips_addu_s32(
+          nfs4_mips_addu_s32(nfs4_mips_mult_s32(iVar6, iVar6),
+                             nfs4_mips_mult_s32(iVar7, iVar7)),
+          nfs4_mips_mult_s32(iVar8, iVar8));
       if (iVar14 < iVar6) {
         iVar14 = iVar6;
       }

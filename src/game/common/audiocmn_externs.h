@@ -7,18 +7,18 @@
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern camera_info Camera_gInfo[2];     /* camera.obj */
 extern char *Audio_gLangAssignmentTable[];
 extern char *gAudioBasePath;
 extern "C" char GameSetup_gCarNames[51][5];
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int Stats_GetNumOpponents(void);      /* stats.obj */
 extern int Stats_GetPosition(Car_tObj *car); /* stats.obj */
 extern "C" int gMasterFENarrationLevel, gStereoMode, Audio_direct3davail;

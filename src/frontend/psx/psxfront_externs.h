@@ -138,29 +138,29 @@ extern "C"
         void Texture_KillMenuTexture(void);
     }
     int elapsedticks(void);
-    int play_movie(char movie);
+    extern "C++" int play_movie(char movie);
     void trap(int code);
     /* eaclib timer proc (from pad.c) */
 
     /* --- external game globals (Ghidra-typed) --- */
     extern "C" u_char CF_DVLC[49096];
-    extern "C" extern int ComingIntoTheFrontEndTheVeryFirstTime;
+    extern "C" int ComingIntoTheFrontEndTheVeryFirstTime;
     extern "C" int DrawC_gMenuColor[2];
     extern "C" int DrawC_gMenuLights;
     extern "C" int DrawC_gMenuLightsDirection;
     extern "C" int Draw_gDoVSync;
     extern "C" int Draw_gPlayer1View;
-    extern "C" extern int Draw_gRearView;
+    extern "C" int Draw_gRearView;
     extern "C" char GameSetup_gCarNames[51][5];
-    extern "C" extern "C" GameSetup_tData GameSetup_gData;
-    extern "C" extern "C" char *Paths_Paths[50];
-    extern "C" extern int R3DCar_InMenu;
+    extern "C" GameSetup_tData GameSetup_gData;
+    extern "C" char *Paths_Paths[50];
+    extern "C" int R3DCar_InMenu;
     extern "C" u_char *&Render_gPacketPtr;  /* GPU packet build cursor (byte-arith) */
     extern "C" u_char *&Render_gPalettePtr; /* GPU packet build cursor (byte-arith) */
-    extern "C" u_long font_tint;
-    extern "C" extern tfrontEnd frontEnd;
-    extern "C" extern DRender_tView gCView;
-    extern "C" extern tTexture_ShapeInfo *gCurrentShapes;
+    extern "C" uint32 font_tint;
+    extern "C" tfrontEnd frontEnd;
+    extern "C" DRender_tView gCView;
+    extern "C" tTexture_ShapeInfo *gCurrentShapes;
     extern "C" dflip gEnviro[2];
     extern "C" int gFlip;
     extern "C" u_short gFontClut;

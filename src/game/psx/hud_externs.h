@@ -32,7 +32,7 @@ extern "C" u_short gFontClut;
 extern "C" int gFlip; /* 0x8013d7b4 */
 // [owned->defined in hud.cpp] extern int            gMapOffX, gMapOffY, gMapRotate, gMapScaleX, gMapScaleY;
 // [owned->defined in hud.cpp] extern int gMapOffX, gMapOffY, gMapRotate, gMapScaleX, gMapScaleY;
-extern "C" extern DRender_tView gCView; /* 0x80116f7c */
+extern "C" DRender_tView gCView; /* 0x80116f7c */
 
 /* ---- GPU packet cursors (scratchpad linked-list) ---- */
 extern "C" u_char *&Render_gPacketPtr;
@@ -75,13 +75,13 @@ extern Car_tObj *Cars_gHumanRaceCarList[]; /* 0x8010fa48 */
 extern Car_tObj *Cars_gCopCarList[];
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gSortedList[];
-extern int Cars_gNumRaceCars;                 /* 0x8013c7f8 */
-extern "C" extern int Cars_gNumHumanRaceCars; /* 0x8013c800 */
+extern int Cars_gNumRaceCars;          /* 0x8013c7f8 */
+extern "C" int Cars_gNumHumanRaceCars; /* 0x8013c800 */
 extern int Cars_gNumCars;
 extern int Cars_gNumCopCars;
-extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar simGlobal;                /* 0x8011e0ac */
-extern camera_info Camera_gInfo[2];                    /* 0x8010f2ac */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* 0x8011e0ac */
+extern camera_info Camera_gInfo[2];         /* 0x8010f2ac */
 extern dashhud_info DashHUD_gInfo;
 extern int Input_gLookBehind[2];
 extern "C" tPadModuleState gPadinfo;        /* 0x8013e89c */
@@ -96,7 +96,7 @@ extern "C" tBTCPerpInfo BTCPerpInfo[2][10]; /* 0x80120bc0 */
 /* ---- font / textsys ---- */
 extern "C"
 {
-    extern int Font_GetUVWH(char c, int *u, int *v, int *w, int *h, int *yo);
+    extern void Font_GetUVWH(char c, int *u, int *v, int *w, int *h, int *yo);
 }
 extern "C"
 {
@@ -127,11 +127,11 @@ extern int Stats_GetPosition(Car_tObj *car);
 extern int Input_WingCommandMode(int player);
 extern "C"
 {
-    extern int DashHUD_CheckWrongWay(int player);
+    extern void DashHUD_CheckWrongWay(int player);
 }
 extern "C"
 {
-    extern int DashHUD_HUDCalc(int player);
+    extern void DashHUD_HUDCalc(int player);
 }
 extern void CopSpeak_Debug(void);
 extern int AudioMus_Buffered(void);

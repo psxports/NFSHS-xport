@@ -4,10 +4,10 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" extern tfrontEnd frontEnd;
-extern "C" extern char *Paths_Paths[50];
+extern "C" tfrontEnd frontEnd;
+extern "C" char *Paths_Paths[50];
 extern "C" tRecordBuffer Stats_gTrackRecords[187];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" char GameSetup_gPersonalityNames[15][8];
 
 /* game C++ helpers + PsyQ/eaclib (cfront-mangled / C; normal C++ linkage) */

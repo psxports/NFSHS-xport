@@ -22,6 +22,8 @@ void tMissionManager::Initialize()
 void tMissionManager::LoadDescription(bool LoadHotPursuit)
 
 {
+  static char hotPursuit2File[] = "zHPurs2.mis";
+  static char hotPursuitFile[] = "zHPurs.mis";
   byte bVar1;
   tAcademyDefinition *ptVar2;
   char *data;
@@ -31,10 +33,10 @@ void tMissionManager::LoadDescription(bool LoadHotPursuit)
   char filename [80];
   
   if (frontEnd.gameMode == '\x01') {
-    data = "zHPurs2.mis";
+    data = hotPursuit2File;
   }
   else {
-    data = "zHPurs.mis";
+    data = hotPursuitFile;
   }
   sprintf(filename,"%s%s",Paths_Paths[0x25],data);
   data = (char *)loadfileadr(filename,0x10);

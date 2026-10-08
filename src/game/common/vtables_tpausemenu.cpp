@@ -1,8 +1,8 @@
 /* vtables_tpausemenu.cpp -- #75 data-materialization: tPauseMenu-family vtables (16), faithful member-cast.
- * Real nfs4-f.exe bytes + REAL method addresses: (int(*)(...))&Class::method; overloaded methods
+ * Real nfs4-f.exe bytes and real method addresses; overloaded methods
  * use a typed member-pointer cast (ret from header, params from mangle). @0xVA breadcrumbs. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 
 static int NFS4_VT_THUNK _vtdtor_tInsideBoxControllerLeftRightSlider(tInsideBoxControllerLeftRightSlider *p){ p->~tInsideBoxControllerLeftRightSlider(); return 0; }
 static int NFS4_VT_THUNK _vtdtor_tInsideBoxLeftRightSlider(tInsideBoxLeftRightSlider *p){ p->~tInsideBoxLeftRightSlider(); return 0; }

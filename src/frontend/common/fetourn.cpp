@@ -1055,7 +1055,7 @@ tListIteratorTournament::~tListIteratorTournament()
 
 {
   (this->_base_tListIterator)._vf = (__vtbl_ptr_type (*)[6])tListIteratorTournament_vtable;
-  tListIterator_dtor(&this->_base_tListIterator);
+  tListIterator_dtor(&this->_base_tListIterator,2);
   return;
 }
 

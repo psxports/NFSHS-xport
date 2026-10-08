@@ -14,8 +14,8 @@ extern void Object_ClearCustomObjects(void);
 extern void Object_AddCustomObject(SceneElem *elem, int setupSimDataFlag);
 
 /* ---- paths + setup ---- */
-extern "C" extern "C" char *Paths_Paths[]; /* 0x80116468 */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" char *Paths_Paths[]; /* 0x80116468 */
+extern "C" GameSetup_tData GameSetup_gData;
 
 /* ---- eaclib EACPSXZ: memstd / syncfile / nsync / fixed-point ---- */
 

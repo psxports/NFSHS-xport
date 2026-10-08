@@ -17,14 +17,12 @@ extern "C" void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect)
   short y1;
   short y2;
   short tpage;
-  int linkAddr;
   short x2;
   short x1;
   short i;
   DR_MODE *dr_mode;
   short top;
   u_char  *prevDrm;
-  u_char  *prevPrim;
   u_char  *prim;
   
   i = 0;
@@ -35,20 +33,16 @@ extern "C" void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect)
   x2 = (uint)(u_short)rect.x + ((int)((uint)(u_short)rect.w << 0x10) >> 0x13);
   do {
     prim = Render_gPacketPtr;
-    prevPrim = Render_gPalettePtr;
-    *(uint *)Render_gPacketPtr =
-         *(uint *)Render_gPacketPtr & 0xff000000 | *(uint *)Render_gPalettePtr & 0xffffff;
-    linkAddr = (uint)Render_gPacketPtr & 0xffffff;
+    nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x24;
-    *(uint *)prevPrim = *(uint *)prevPrim & 0xff000000 | linkAddr;
-    *(u_long *)(prim + 4) = 0x808080;
+    *(uint32 *)(prim + 4) = 0x808080;
     prim[7] = 0x3a;
     prim[3] = 8;
     *(short *)(prim + 10) = top + 3;
     i = i + 1;
-    *(u_long *)(prim + 0x14) = 0x808080;
-    *(u_long *)(prim + 0x1c) = 0;
-    *(u_long *)(prim + 0xc) = 0;
+    *(uint32 *)(prim + 0x14) = 0x808080;
+    *(uint32 *)(prim + 0x1c) = 0;
+    *(uint32 *)(prim + 0xc) = 0;
     *(short *)(prim + 8) = (short)x1;
     *(short *)(prim + 0x10) = (short)x2;
     *(short *)(prim + 0x12) = y1;
@@ -61,11 +55,8 @@ extern "C" void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect)
     x1 = (uint)(u_short)rect.x + (uint)(u_short)rect.w + -2;
     x2 = x1 - ((int)((uint)(u_short)rect.w << 0x10) >> 0x13);
   } while (i * 0x10000 >> 0x10 < 2);
-  *(uint *)Render_gPacketPtr =
-       *(uint *)Render_gPacketPtr & 0xff000000 | *(uint *)Render_gPalettePtr & 0xffffff;
-  linkAddr = (uint)Render_gPacketPtr & 0xffffff;
+  nfs4_add_prim(prevDrm,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
-  *(uint *)prevDrm = *(uint *)prevDrm & 0xff000000 | linkAddr;
   tpage = GetTPage(2,2,0,0x100);
   SetDrawMode(dr_mode,0,0,(uint)(u_short)tpage,(PSX_RECT *)0x0);
   return;

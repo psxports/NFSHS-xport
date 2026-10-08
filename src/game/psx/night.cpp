@@ -455,11 +455,11 @@ extern "C" void Night_InitNightDriving(void)
   sprintf(name,"%snight.psh",Paths_Paths[0x19]);
   sz = filesize(name);
   nightfile = (char *)reservememadr("night.psh",sz,0);
-  shp = (void *)loadshapeadr(name,(void *)0x0);
+  shp = (void *)loadshapeadr(name,0x0);
   sz = filesize(name);
   blockmove(shp,nightfile,sz);
   purgememadr(shp);
-  mem = (char *)locateshape(nightfile,"nght",sz);
+  mem = (char *)locateshape(nightfile,"nght");
   Night_gNightTbl = mem + 0x10;
   Night_InitPlayerHeadLightColor(0);
   if (GameSetup_gData.cops != 0) {

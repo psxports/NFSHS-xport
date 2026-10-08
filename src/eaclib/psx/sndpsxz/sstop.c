@@ -8,7 +8,7 @@ extern "C" void iSNDenteraudio(void); /* sserver  */
 extern "C" void iSNDleaveaudio(void);
 extern "C" int iSNDgetchan(unsigned int tag);       /* salloc   */
 extern "C" int iSNDpatchkey(int chan, int *outvar); /* spatkey  */
-extern "C" void iSNDstop(unsigned int voice);       /* sdriver  */
+extern "C" int iSNDstop(unsigned int voice);        /* sdriver  */
 
 /* SNDstop @0x800E7E80 : stop every voice patched under `tag`.  Resolves the tag to a channel, then walks
  *   its patch keys, issuing the low-level stop on each.  Returns the channel (or a negative error). */

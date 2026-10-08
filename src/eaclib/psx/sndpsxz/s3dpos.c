@@ -5,8 +5,8 @@
 
 extern "C" int sndgs[];
 extern "C" unsigned char &DAT_80147a08, &DAT_80147a0c, &DAT_80147a0e, &DAT_80147a14, &DAT_80147a15;
-extern "C" void iSNDatolrv(unsigned int pan, int level, int *outL, int *outR);                  /* saetolrv */
-extern "C" void iSNDatodlrv(unsigned int pan, int level, int *outL, int *outR, int pL, int pR); /* saetodv  */
+extern "C" int iSNDatolrv(int pan, int level, int *outL, int *outR);                            /* saetolrv */
+extern "C" int iSNDatodlrv(int angle, int level, int *out_l, int *out_r, int prevL, int prevR); /* saetodv  */
 extern "C" unsigned int iSNDsetvol(int chan, int left, int right);                              /* spatkey  */
 
 extern "C" int iSNDplatform3dpos(int chan, int x); /* @0x800FEE30 */

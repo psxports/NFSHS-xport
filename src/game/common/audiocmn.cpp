@@ -318,7 +318,7 @@ extern "C" void AudioCmn_LoadAsyncSfx(int bank,int patch,void *pbank,int size)
           ;
           pAVar2->header = (char *)pThis;
           if (pThis != 0x0) {
-            SNDbankheadercopy(pThis,(u_char *)pAVar2->handle);
+            SNDbankheadercopy((unsigned char *)pThis,pAVar2->handle);
             pAVar2->patch = patch;
             pAVar2->ticks = simGlobal.gameTicks;
             return;
@@ -996,12 +996,12 @@ void AudioCmn_SFX(int sndPlayer,s_type surface1,s_type surface2,int tweakedForce
 /* ---- freeVoiceChannel__Fi  [@0x800780d0] ---- */
 void freeVoiceChannel(int sndPlayer)
 {
-  void *pThis;
+  int soundHandle;
   
   if (sndPlayer != -1) {
-    pThis = (void *)(intptr)gaChannel[sndPlayer].Partial;
-    if (pThis != (void *)0xffffffff) {   /* @0x80078108: Partial == -1 sentinel (disasm-v3) */
-      SNDautovol(pThis,5,-1);
+    soundHandle = gaChannel[sndPlayer].Partial;
+    if (soundHandle != -1) {   /* @0x80078108: Partial == -1 sentinel */
+      SNDautovol(soundHandle,5,-1);
       gaChannel[sndPlayer].Partial = -1;
       gaChannel[sndPlayer].SFXnum = -1;
       NumSFXOn = NumSFXOn + -1;
@@ -1550,7 +1550,7 @@ void AudioCmn_TrafficSFX(int iChan,int iSFXnum,int freq,int doppler,int dst,int 
   
   uVar1 = 0;
   if (GameSetup_gData.commMode == 1) {
-    uVar1 = iChan < 8 ^ 1;
+    uVar1 = (iChan < 8) ^ 1;
   }
   iVar2 = 0x8000000;
   if (Camera_gInfo[uVar1].mode == 0xc) {
@@ -1696,7 +1696,7 @@ void AudioCmn_PlayFESFXVol(int SFXnum,int vol)
   playopts.bhandle = (char)gSndBnk[0].bnkID;
   playopts.vol = (char)(gMasterSFXLevel * vol * 0x78 >> 0xe);
   playopts.patnum = SFXnum;
-  SNDplay((int *)&playopts);
+  SNDplay(&playopts);
   NumSFXOn = NumSFXOn + 1;
   return;
 }

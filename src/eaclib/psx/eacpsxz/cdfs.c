@@ -32,7 +32,7 @@ extern "C" void *&CD_dirEntryArray; /* +0x38 the sorted directory-entry array (0
 /* ---- helpers ---- */
 extern "C" int toupper(int c); /* @0x8010907C (libc C37)      */
 #ifndef _MSC_VER
-extern "C" void *bsearch(const void *key, const void *base, int n, int size, int (*cmp)(const void *, const void *));
+extern "C" void *bsearch(const void *key, const void *base, size_t n, size_t size, int (*cmp)(const void *, const void *));
 #endif                                                   /* @0x801091DC (libc)          */
 extern "C" int dircompare(const void *a, const void *b); /* @0x800FA344 (cdfs, below)   */
 #ifndef _MSC_VER
@@ -54,10 +54,10 @@ extern "C" int &CD_cachedSector;                /* @0x80146CD0 sector currently 
 extern "C" unsigned char (&CD_sectorCache)[0x800];
 extern "C" void CD_timerfunc(void); /* @0x800F9C44 (cdfs read watchdog/poll, below)             */
 
-extern "C" void addtimer(void *fn, void *arg);          /* @0x800EAFE8 (eaclib)                        */
-extern "C" void deltimer(void *fn);                     /* @0x800EB048 (eaclib)                        */
+extern "C" void addtimer(void (*fn)(void));             /* @0x800EAFE8 (eaclib) */
+extern "C" void deltimer(void (*fn)(void));             /* @0x800EB048 (eaclib) */
 extern "C" void blockmove(void *src, void *dst, int n); /* @0x800E62DC                          */
-extern "C" int savegp(void *ctx);                       /* save $gp around a cross-module callback     */
+extern "C" void savegp(void *ctx);                      /* save $gp around a cross-module callback     */
 extern "C" void restoregp(int saved);
 
 /* ---- additional CD context globals + the CD machinery ---- */
@@ -88,25 +88,25 @@ extern "C"
 #endif
 
 /* ---- syslib / PsyQ libcd backend (toolchain-provided; declared, not reconstructed) ---- */
-extern "C" int CdInit(void);                         /* @0x800F908C */
-extern "C" void CdReset(int mode);                   /* @0x800F77AC */
-extern "C" void CdSetDebug(int level);               /* @0x800F7838 */
-extern "C" int CdGetToc(CdlLOC *toc);                /* @0x800F929C */
-extern "C" int CdSync(int mode, unsigned char *r);   /* @0x800F784C */
-extern "C" int CdFlush(void);                        /* @0x800F7818 */
-extern "C" void CdIntToPos(int i, unsigned char *p); /* @0x800F7CF4 */
-extern "C" int CdPosToInt(CdlLOC *p);                /* syslib SYS  */
-extern "C" int CdGetSector(void *madr, int size);    /* syslib SYS  */
-extern "C" int CdDataSync(int mode);                 /* syslib SYS  */
-extern "C" int CdDiskReady(int mode);                /* syslib TYPE */
-extern "C" int CdGetDiskType(void);                  /* syslib TYPE */
+extern "C" int CdInit(void);                       /* @0x800F908C */
+extern "C" int CdReset(int mode);                  /* @0x800F77AC */
+extern "C" int CdSetDebug(int level);              /* @0x800F7838 */
+extern "C" int CdGetToc(CdlLOC *toc);              /* @0x800F929C */
+extern "C" int CdSync(int mode, unsigned char *r); /* @0x800F784C */
+extern "C" int CdFlush(void);                      /* @0x800F7818 */
+extern "C" CdlLOC *CdIntToPos(int i, CdlLOC *p);   /* @0x800F7CF4 */
+extern "C" int CdPosToInt(CdlLOC *p);              /* syslib SYS  */
+extern "C" int CdGetSector(void *madr, int size);  /* syslib SYS  */
+extern "C" int CdDataSync(int mode);               /* syslib SYS  */
+extern "C" int CdDiskReady(int mode);              /* syslib TYPE */
+extern "C" int CdGetDiskType(void);                /* syslib TYPE */
 #ifndef AP_WIN
 extern "C" void VSync(int mode); /* @0x800F231C */
 #endif
 
 extern "C" int addsystemtask(intptr fn, int period, int delay); /* @ systask */
 extern "C" intptr delsystemtask(intptr fn);                     /* @ systask */
-extern "C" void addexit(void *fn);                              /* @0x800F1CF8 (exit) */
+extern "C" void addexit(void (*fn)(void));                      /* @0x800F1CF8 (exit) */
 extern "C" void blockclear(void *dst, int n);                   /* @0x800F17A0 (blkfill) */
 #ifndef _MSC_VER
 extern "C" int strncmp(const char *a, const char *b, int n); /* @0x800EB1D0 (syslib C24) */
@@ -115,7 +115,7 @@ extern "C" int strncmp(const char *a, const char *b, int n); /* @0x800EB1D0 (sys
 extern "C" void *memcpy(void *d, const void *s, int n); /* @0x800EAAC4 (syslib C42) */
 #endif
 #ifndef _MSC_VER
-extern "C" void qsort(void *base, int n, int sz, int (*cmp)(const void *, const void *)); /* @0x800E5D8C */
+extern "C" void qsort(void *base, size_t n, size_t sz, int (*cmp)(const void *, const void *)); /* @0x800E5D8C */
 #endif
 
 /* ---- cdfs internal forward decls (mutually recursive CD machinery) ---- */
@@ -229,7 +229,7 @@ extern "C" int CD_Read(int dev, int dest, int offset, int len)
     Cdinfo |= 2;                                       /* read in progress */
     CD_timeout = timerhz * 6;
     CD_curDst = (void *)dest;
-    addtimer((void *)CD_timerfunc, (void *)dest);
+    addtimer(CD_timerfunc);
 
     if (CD_cachedSector == CD_curSector && (Cdinfo & 0x10) && g_currentthread == 2)
     {
@@ -239,7 +239,7 @@ extern "C" int CD_Read(int dev, int dest, int offset, int len)
             int gpctx[2];
             CD_timeout = 0;
             Cdinfo &= ~2;
-            deltimer((void *)CD_timerfunc);
+            deltimer(CD_timerfunc);
             if (CD_completionCallback != 0)
             {
                 savegp(gpctx);
@@ -379,7 +379,7 @@ extern "C" int CD_Init(int maxOpen, int numEntries, void *buffer, void (*callbac
 
     qsort(CD_dirEntryArray, CD_dirEntryCount, 0x14, dircompare);
     CD_completionCallback = callback; /* ctx+0x30 */
-    addexit((void *)CD_Restore);
+    addexit(CD_Restore);
     return CD_dirEntryCount;
 }
 
@@ -404,7 +404,7 @@ extern "C" int CD_Restart(int startSector)
     CD_cachedSector = startSector; /* ctx+0x0C read-head */
     CD_curSector = startSector;    /* ctx+0x14 target  */
     CdReadyCallback(CdReadyHandler);
-    CdIntToPos(CD_curSector, pos);
+    CdIntToPos(CD_curSector, (CdlLOC *)pos);
     return CdControl(0x1B, pos, 0); /* CdlReadN */
 }
 
@@ -449,14 +449,14 @@ extern "C" void CD_systaskfunc(void)
         VSync(3);
         CdFlush();
         CdSync(0, 0);
-        CdIntToPos(CD_cachedSector, pos);
+        CdIntToPos(CD_cachedSector, (CdlLOC *)pos);
         CdControl(0x1B, pos, result);
         CdReadyCallback(CdReadyHandler);
         if (CD_remLen > 0)
         { /* a transfer was in progress -> resume it */
             CD_ringIdx = 0;
             CD_timeout = timerhz * 6;
-            addtimer((void *)CD_timerfunc, pos);
+            addtimer(CD_timerfunc);
         }
     }
 }
@@ -472,7 +472,7 @@ extern "C" void CD_timerfunc(void)
         {
             addsystemtask((intptr)CD_systaskfunc, 0, 0);
             CD_timeout = 0;
-            deltimer((void *)CD_timerfunc);
+            deltimer(CD_timerfunc);
         }
     }
 }
@@ -498,7 +498,7 @@ extern "C" void CdReadyHandler(unsigned char intr, unsigned char *result)
 
     if ((*result & 0x10) != 0)
     { /* shell open / hard error -> hand off to the recovery task */
-        deltimer((void *)CD_timerfunc);
+        deltimer(CD_timerfunc);
         addsystemtask((intptr)CD_systaskfunc, 0, 0);
         return;
     }
@@ -587,7 +587,7 @@ extern "C" void CdReadyHandler(unsigned char intr, unsigned char *result)
             Cdinfo &= ~1;
             CD_timeout = 0;
             CD_lastSector = CD_cachedSector;
-            deltimer((void *)CD_timerfunc);
+            deltimer(CD_timerfunc);
             if (CD_completionCallback != 0)
             {
                 g_currentthread = 2;
@@ -627,7 +627,7 @@ advance:
             CdFlush();
             CdSync(0, 0);
             CD_cachedSector = CD_curSector;
-            CdIntToPos(CD_curSector, pos);
+            CdIntToPos(CD_curSector, (CdlLOC *)pos);
             CdControl(0x1B, pos, result);
         }
     }
@@ -638,7 +638,7 @@ advance:
     }
     /* prefetched too far past the last delivered sector -> rewind the read head */
     CD_cachedSector = CD_lastSector;
-    CdIntToPos(CD_lastSector, pos);
+    CdIntToPos(CD_lastSector, (CdlLOC *)pos);
     com = 0x1B; /* CdlReadN */
     param = pos;
 issue:

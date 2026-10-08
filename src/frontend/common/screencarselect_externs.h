@@ -3,36 +3,35 @@
 #define _FE_SCREENS_SCREENCARSELECT_EXTERNS_H_
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
-typedef int code(...);      /* Ghidra fn-ptr type for vtable dispatch */
 extern int _i, _reflection; /* DrawCar Ghidra phantom locals */
 
 /* ===== globals ===== */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tTournamentManager tournamentManager;
 extern tTrackManager trackManager;
 extern tGlobalMenuDefs *menuDefs;
 extern tFEApplication *FEApp;
 extern "C" int ticks;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern int kRGBVals[28];
 extern "C" char textDefinitions[14][6];
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 extern "C" tPadModuleState gPadinfo;
 extern "C" int screenheight, showRoomFlag, gFlip, gShowroomLights, gStopCommentaryNow;
 extern "C" int gMenuRotate[2];
-extern u_long gCameraRotation;
-extern "C" extern DRender_tView gCView;
+extern uint32 gCameraRotation;
+extern "C" DRender_tView gCView;
 extern "C" Car_tObj *gCarObj[2];
 extern "C"
 {
-    char *PlayerName(...);
+    char *PlayerName(int player);
 }
 extern "C" char CURRENTLYUSINGMEMCARD;
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern tCarManager carManager;
 extern "C"
 {
-    void DrawC_MenuColorData(...);
+    void DrawC_MenuColorData(int color, Car_tObj *carObj, int player);
 }
 extern "C" int DrawC_gMenuLights, DrawC_gMenuLightsDirection;
 
@@ -71,7 +70,7 @@ extern "C"
 extern "C"
 {
     void tScreenCarSelect_ctor(tScreenCarSelect *);
-    void tScreenCarSelect_dtor(tScreenCarSelect *);
+    void tScreenCarSelect_dtor(tScreenCarSelect *, int mode);
 }
 void tScreenCarSelectTwoPlayer_ctor(tScreenCarSelectTwoPlayer *);
 void tScreenCarSelectTwoPlayer_dtor(tScreenCarSelectTwoPlayer *);
@@ -86,7 +85,7 @@ extern "C"
 }
 extern "C"
 {
-    void UploadShapes(...);
+    void UploadShapes(tScreen *a0, tShapeInformation *a1, short a2, short a3, int a4, int a5);
 }
 void FreeShapes(tScreen *, tShapeInformation *);
 void InitializeShapes(tScreen *, tShapeInformation *, int);
@@ -124,35 +123,35 @@ extern "C"
 }
 extern "C"
 {
-    void DrawMoney(...);
+    void DrawMoney(int x, int y, int numplaces, long number, int colfore, int colback);
 }
 extern "C"
 {
-    void DrawShapeExtended(...);
+    void DrawShapeExtended(int index, int flags, int x, int y, int fade, int abr, tDrawShapeExtended *extra);
 }
 extern "C"
 {
-    void DrawShape_NFS4Rectangle(...);
+    void DrawShape_NFS4Rectangle(PSX_RECT &position);
     void DrawShape_NFS4RoundRectangle(int, PSX_RECT *, short);
 }
 extern "C"
 {
-    void DrawSlider(...);
+    void DrawSlider(short value, short min, short max, short fX, short fY, short fWidth, short fHeight, short rectwidth, short rectspace, bool reverse, bool shadow, short fSelFade, short fFadeVal);
 }
 void PSXDrawSquare(int, int, int, int, int);
 extern "C"
 {
-    void FETextRender_FullTextRGB(...);
+    void FETextRender_FullTextRGB(char *sMenuText, short x, short y, int col, char size, short justify);
 }
 void FETextRender_MenuTextPositionedJustify(short, short, short, short, tMenuTextState, tMenuTextType);
 void FETextRender_WordWrap(short, PSX_RECT &, tMenuTextState, tMenuTextType);
 extern "C"
 {
-    void FeAudio_AsyncPlaySpeech(...);
+    short FeAudio_AsyncPlaySpeech(int type, int index);
 }
 extern "C"
 {
-    void *FECheat_IsCheatEnabled(...);
+    void *FECheat_IsCheatEnabled(tCheatCode cheat);
 }
 short GetNumPinkSlipsCars(tCarManager *, short);
 void GetStockCar(tCarManager *, unsigned short, tCarInfo *);
@@ -165,11 +164,11 @@ extern "C"
 short LoadGame(short player, bool PinkSlips, bool WithDialogs);
 extern "C"
 {
-    void MCRD_handlecardevents(...);
+    int MCRD_handlecardevents(int card);
 }
 extern "C"
 {
-    char *Platform_GetDCTBuffer(...);
+    char *Platform_GetDCTBuffer(int size, const char *string);
     void Platform_ResetDCTBuffer();
 }
 #include "../../game/psx/fe3dmenu.h"
@@ -186,18 +185,18 @@ extern "C"
 /* re-added (varargs; one per line to avoid shared-line breakage) */
 extern "C"
 {
-    void AudioMus_StopSong(...);
-    void CleanupSpinningCarsMenu(...);
-    void DeInit_Memcard(...);
+    void AudioMus_StopSong(int fadeticks);
+    void CleanupSpinningCarsMenu(void);
+    void DeInit_Memcard(void);
 }
 extern "C"
 {
-    void DrawShape_NFS4TransRectangle(...);
-    void FETextRender_MenuTextPositioned(...);
-    void Init_Memcard(...);
+    void DrawShape_NFS4TransRectangle(PSX_RECT &r, short opacity);
+    void FETextRender_MenuTextPositioned(short index, short x, short y, tMenuTextState textState, tMenuTextType textType);
+    void Init_Memcard(bool redraw, bool pinkslips);
 }
 extern "C" void SetLicensePlate(void);
-void TransformVector(...);
+void TransformVector(int (*vect)[4], int (*transform)[4][4], int (*result)[4]);
 extern "C" void UploadSwapShapes(tScreen *, int);
 long CalcUsedPrice(tCarManager *, short);
 long CheapestCarStockPrice(tCarManager *);
@@ -205,11 +204,11 @@ short GetNumOwnedCars(tCarManager *, short);
 short GetNumTourneyCars(tCarManager *, short);
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern "C" DRAWENV *Draw_GetDRAWENV(int, int);
 void GetGarageCar(tCarManager *, unsigned short, tCarInfo *, int);
-void *GetPinkSlipsCar(...);
+void GetPinkSlipsCar(tCarManager *manager, short garageNumber, tCarInfo *carInfo, short playerNum);
 
 void PreLoad(tScreen *);
 #endif

@@ -36,8 +36,8 @@ extern "C" void FILE_callbackop(unsigned int id, void (*cb)(int, int));         
 extern "C" void FILE_cancelop(unsigned int id);                                                                          /* @0x800EC008 */
 extern "C" int FILE_opensync(char *name, int mode, int prio, int *outHandle);                                            /* @0x800EA8A8 */
 extern "C" int FILE_closesync(int handle, int prio);                                                                     /* @0x800EA950 */
-extern "C" void *reservememadr(char *name, int size, int classid);                                                       /* @0x800E533C */
-extern "C" void purgememadr(void *p);                                                                                    /* @0x800E5540 */
+extern "C" void *reservememadr(const char *name, int size, int classid);                                                 /* @0x800E533C */
+extern "C" int purgememadr(void *p);                                                                                     /* @0x800E5540 */
 extern "C" int addsystemtask(intptr fn, int period, int delay);                                                          /* @0x800E6AF4 */
 extern "C" void *allocmutex(void);                                                                                       /* @0x800FE424 */
 
@@ -351,9 +351,9 @@ extern "C" int asyncloadfilecallback(int name, int memclass, int cb)
 }
 
 /* asyncloadfile @0x800F1368 : as above, no completion callback (poll-only). */
-extern "C" int asyncloadfile(int name, int memclass)
+extern "C" int asyncloadfile(char *name, int memclass)
 {
-    return asyncloadfilecallback(name, memclass, 0);
+    return asyncloadfilecallback((int)(intptr)name, memclass, 0);
 }
 
 /* asyncloadfileatcallback @0x800F1388 : async load into a caller-provided destination (no allocation). */
@@ -379,13 +379,13 @@ extern "C" int asyncloadfileatcallback(int name, int dest, int cb)
 }
 
 /* asyncloadfileat @0x800F143C : as above, poll-only. */
-extern "C" int asyncloadfileat(int name, int dest)
+extern "C" int asyncloadfileat(const char *name, intptr dest)
 {
-    return asyncloadfileatcallback(name, dest, 0);
+    return asyncloadfileatcallback((int)(intptr)name, (int)dest, 0);
 }
 
 /* setasyncfile @0x800F145C : (re)open the persistent file used by segment loads; 0 closes it. */
-extern "C" void setasyncfile(int name)
+extern "C" void setasyncfile(char *name)
 {
     if (asyncfilehandle != 0)
         FILE_closesync(asyncfilehandle, 0x64);
@@ -394,7 +394,7 @@ extern "C" void setasyncfile(int name)
         asyncfilehandle = 0;
         return;
     }
-    FILE_opensync((char *)(size_t)(unsigned int)name, 1, 0x64, &asyncfilehandle);
+    FILE_opensync(name, 1, 0x64, &asyncfilehandle);
     asyncfileoffset = 0;
 }
 
@@ -430,9 +430,9 @@ extern "C" int asyncloadsegmentcallback(int offset, int dest, int size, int cb)
 }
 
 /* asyncloadsegment @0x800F15B0 : as above, poll-only. */
-extern "C" int asyncloadsegment(int offset, int dest, int size)
+extern "C" int asyncloadsegment(int offset, void *dest, int size)
 {
-    return asyncloadsegmentcallback(offset, dest, size, 0);
+    return asyncloadsegmentcallback(offset, (int)(intptr)dest, size, 0);
 }
 
 /* cancelasyncload @0x800F15D0 : request cancellation of a load; cancels the FILE op and, if nothing is
@@ -456,7 +456,7 @@ extern "C" int cancelasyncload(int id)
 
 /* getasyncreadadr @0x800F1640 : the loaded buffer address, or 0 if not ready.  For a poll-only request
  *   (no callback) this also recycles the slot, so call it once the load is done. */
-extern "C" int getasyncreadadr(int id)
+extern "C" char *getasyncreadadr(int id)
 {
     AsyncReq *req = locaterequest(id);
     int adr;
@@ -472,10 +472,10 @@ extern "C" int getasyncreadadr(int id)
     if (req->buffer == 0)
         return 0;           /* nothing allocated */
     if (req->callback != 0) /* a callback owns the lifecycle */
-        return adr;
+        return (char *)(intptr)adr;
     queueadd(&freequeue, req); /* poll-only -> recycle the slot now */
     req->id = (unsigned char)req->id;
-    return adr;
+    return (char *)(intptr)adr;
 }
 
 /* getasyncreadstatus @0x800F16D8 : -2 for an invalid/cancelled request, 0 while a FILE operation is

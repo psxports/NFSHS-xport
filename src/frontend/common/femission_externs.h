@@ -4,7 +4,7 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" extern tfrontEnd frontEnd;
-extern "C" extern char *Paths_Paths[];
+extern "C" tfrontEnd frontEnd;
+extern "C" char *Paths_Paths[];
 
 #endif

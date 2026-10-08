@@ -1006,7 +1006,7 @@ void Flare_Halo2(DRender_tView *Vi,int scale,int type,coorddef *fpt,coorddef *fp
   }
   if ((halfHeight & 0x10U) == 0) {
     if ((halfHeight & 0x20U) == 0) goto FlareHalo2_rtpsEmit;
-    pkt_addr24 = simGlobal.gameTicks + 0x1b >> 5;
+    pkt_addr24 = nfs4_mips_sra_s32(nfs4_mips_addu_s32(simGlobal.gameTicks, 0x1b), 5);
   }
   else {
     pkt_addr24 = simGlobal.gameTicks >> 6;
@@ -1489,14 +1489,14 @@ void Flare_QuadRing(long *pt,CVECTOR *color,int otz)
 void Flare_TextureQuad(long *pt,CVECTOR *color,char type,int otz)
 
 {
-  u_long l3;
+  uint32 l3;
   int shape_p;
   int pkt_addr24_b;
-  u_long l0;
+  uint32 l0;
   int color_word;
-  u_long l1;
+  uint32 l1;
   u_int uVar1;
-  u_long l2;
+  uint32 l2;
   u_int uVar2;
   u_int *puVar3;
   int pkt_addr24;

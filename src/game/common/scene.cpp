@@ -86,12 +86,12 @@ void Scene_LoadSceneFile(int sceneFileIndex)
   Object_ClearCustomObjects();
   bigFile = 0;
   sprintf(fname,"%sscene.viv",Paths_Paths[6]);
-  FILE_addbigsync(fname,(void *)0x10,100,&bigFile);
+  FILE_addbigsync(fname,0x10,100,&bigFile);
   priority = GameSetup_gData.track;
   sprintf(fname,"tr%02d%02d.scn",priority,sceneFileIndex);
   gGameSceneList = (CSceneList *)0x0;
   gGameSceneList = (CSceneList *)loadfileadr(fname,0);
-  FILE_delbigsync((char *)bigFile,(void *)0x64,priority,(int *)sceneFileIndex);
+  FILE_delbigsync(bigFile,0x64);
   return;
 }
 

@@ -5,6 +5,10 @@
 #include "screencarselect.h"
 #include "../../mips_semantics.h"
 
+static char carSelectShapes[] = "zcars";
+static char duelShapes[] = "zDuel";
+static char twoPlayerCarShapes[] = "zcarsb";
+static char pinkSlipsDialogText[128];
 
 /* ---- (static)::TransformVector  [SCREENCARSELECT.CPP:51-59] ---- */
 /* File-static 4x4 fixed-point matrix * 4-vector (ScreenCarSelect.obj 1st fn @0x8003a8f0). Mangled R =
@@ -30,19 +34,19 @@ static void TransformVector(int (*vect)[4],int (*transform)[4][4],int (*result)[
 
 /* ---- (free)::DrawCar  [SCREENCARSELECT.CPP:180-212] ---- */
 
-/* Decoded Phase 84: DrawCar(tCarInfo&, short, short, float, float, char, bool, u_long, tPlayer) -
+/* Decoded Phase 84: DrawCar(tCarInfo&, short, short, float, float, char, bool, uint32, tPlayer) -
    render car in 3D (428 B, 7 callers - hot). When tcarinfo->fCarID >= 0: applies fColor /
    carType=fSimNumber / Country=fCountry to (*ppCVar3)->carInfo. Used in showroom + dealer screens.
    
    [ghidra-meta] section: front.text */
 
 void DrawCar(tCarInfo *carInfo,short x,short y,float camerax,float cameray,char brightness,
-               bool reflection,u_long rotate,tPlayer player)
+               bool reflection,uint32 rotate,tPlayer player)
 
 {
   byte bVar1;
   int iVar2;
-  u_long ticks;
+  uint32 ticks;
   char *carBytes = (char*)carInfo;
   int the_simcarcolor;
   Car_tObj **ppCVar3;
@@ -126,7 +130,7 @@ tScreenCarSelect::~tScreenCarSelect()
 
 {
   (this->_base_tScreen)._vf = (__vtbl_ptr_type (*)[10])tScreenCarSelect_vtable;
-  (((tScreen*)(&this->_base_tScreen))->~tScreen(), (tScreen*)(&this->_base_tScreen));
+  ((tScreen*)(&this->_base_tScreen))->~tScreen();
   return;
 }
 
@@ -262,7 +266,7 @@ DrawOvl_transitionPos:
                0x232323);
     FETextRender_MenuTextPositionedJustify(0x7b,(short)(((uint)(ushort)temp.x + ((int)((uint)(ushort)temp.w << 0x10) >> 0x11)) *
                             0x10000 >> 0x10),temp.y + 0xd,1,textState_Selected,textType_FramedInfo);
-    DrawShape_NFS4Rectangle(&temp);
+    DrawShape_NFS4Rectangle(temp);
     PSXDrawSquare(0,(int)pos.x,(int)pos.y,(int)pos.w,10);
     break;
   case 4:
@@ -321,7 +325,7 @@ DrawOvl_wordWrapEmit:
       temp.h = pos.h + -0x19;
       temp.x = pos.x + 0xf;
       temp.y = pos.y + 0x14;
-      DrawShape_NFS4Rectangle(&temp);
+      DrawShape_NFS4Rectangle(temp);
     }
     break;
   case 6:
@@ -335,7 +339,7 @@ DrawOvl_wordWrapEmit:
     this->DrawSliders(carInfo,pos.x + 0xd,pos.y + 4);
   }
   if (overlay->ID != 0) {
-    DrawShape_NFS4TransRectangle(&pos,1);
+    DrawShape_NFS4TransRectangle(pos,1);
   }
   return;
 }
@@ -441,7 +445,7 @@ void tScreenCarSelect::SetState(int state)
 
 
 /* ---- tScreenCarSelect::CalcSplinePosition  [SCREENCARSELECT.CPP:583-625] ---- */
-void tScreenCarSelect::CalcSplinePosition(int knot1,int knot2,int knot3,int knot4,u_long elapsed,
+void tScreenCarSelect::CalcSplinePosition(int knot1,int knot2,int knot3,int knot4,uint32 elapsed,
                int &camY,int &camZ,int &screenX,int &screenY,int &camRot)
 
 {
@@ -472,7 +476,8 @@ void tScreenCarSelect::CalcSplinePosition(int knot1,int knot2,int knot3,int knot
   camZ = Result2[1] >> 1;
   _i = Result2[2] >> 0x11;
   if (Result2[2] >> 1 < 0) {
-    _i = (Result2[2] >> 1) + 0xffff >> 0x10;
+    _i = nfs4_mips_sra_s32(
+        nfs4_mips_addu_s32(nfs4_mips_sra_s32(Result2[2],1),0xffff),0x10);
   }
   screenX = _i;
   _i = Result2[3] >> 1;
@@ -507,7 +512,7 @@ void tScreenCarSelect::GetShapeInfo(short &numPermShapes,short &numSwapShapes,ch
   
   numPermShapes = 0x8e;
   numSwapShapes = 0xb;
-  *permFileName = "zcars";
+  *permFileName = carSelectShapes;
   vtbl = (this->_base_tScreen)._vf;
   valid = NFS4_VCALL1(vtbl[1][3].pfn,
                     (this->_base_tScreen).fPermShapes.fFilename + vtbl[1][3].delta + -0x14,&carInfo);
@@ -989,7 +994,7 @@ void tScreenCarSelect::DrawForeground()
   short i;
   tMenuItem *item;
   int iVar14;
-  u_long textTicks;
+  uint32 textTicks;
   uint uVar15;
   int textColor;
   int textID;
@@ -1194,7 +1199,7 @@ DrawFG_overlayFetch:
           gRotateOffset[3] = gRotateOffset[2] + 0x4000000;
         }
         this->CalcSplinePosition((int)(short)uVar15,(int)(short)iVar7,(int)(short)iVar14,(int)sVar12,
-                           (u_long)elapsedticks,cameraY,cameraZ,screenX,screenY,camRot);
+                           (uint32)elapsedticks,cameraY,cameraZ,screenX,screenY,camRot);
         camerax = (float)cameraY * 0.0000152587890625f;
         showRoomFlag = 1;
         cameray = (float)cameraZ * 0.0000152587890625f;
@@ -1446,7 +1451,7 @@ void tScreenCarSelectDuel::GetShapeInfo(short &numPermShapes,short &numSwapShape
   (this->_base_tScreenCarSelect).fPreviousCarID = (short)carInfo.fCarID;
   this->fPreviousOpponent = -1;
   (this->_base_tScreenCarSelect).fPreviousCountry = (ushort)carInfo.fCountry;
-  *permFileName = "zDuel";
+  *permFileName = duelShapes;
   *swapFileName = (char *)0x0;
   return;
 }
@@ -1822,7 +1827,7 @@ void tScreenCarSelectTwoPlayer::GetShapeInfo(short &numPermShapes,short &numSwap
   (this->_base_tScreenCarSelect).fPreviousCarID = -1;
   (this->_base_tScreenCarSelect).fPreviousCountry = (short)-1;
   carManager.GetStockCar(0,carInfo);
-  *permFileName = "zcarsb";
+  *permFileName = twoPlayerCarShapes;
   sprintf(gSwapFileName[0],"%s",carInfo.fSmallName);
   *swapFileName = gSwapFileName[0];
   return;
@@ -2453,8 +2458,9 @@ switchD_8003f3b4_caseD_7:
     }
     str2 = TextSys_Word(0x2a8);
     str = PlayerName(1 - p);
-    sprintf("",str2,str);
-    (this->_base_tScreenCarSelectTwoPlayer).CarDialog._base_tDialogMessageString.string = "";
+    sprintf(pinkSlipsDialogText,str2,str);
+    (this->_base_tScreenCarSelectTwoPlayer).CarDialog._base_tDialogMessageString.string =
+        pinkSlipsDialogText;
     goto SetDlg_displayAndReset;
   case WhoCaresWeBeExiting:
     goto switchD_8003f3b4_caseD_7;
@@ -2526,7 +2532,7 @@ void tScreenPinkSlipsCarSelect::GetShapeInfo(short &numPermShapes,short &numSwap
   (this->_base_tScreenCarSelectTwoPlayer._base_tScreenCarSelect).fPreviousCarID = -1;
   (this->_base_tScreenCarSelectTwoPlayer._base_tScreenCarSelect).fPreviousCountry = (short)-1;
   carManager.GetStockCar(0,carInfo);
-  *permFileName = "zcarsb";
+  *permFileName = twoPlayerCarShapes;
   sprintf(gSwapFileName[0],"%s",carInfo.fSmallName);
   *swapFileName = gSwapFileName[0];
   return;
@@ -2539,8 +2545,8 @@ tScreenPinkSlipsCarSelect::~tScreenPinkSlipsCarSelect()
 
 {
   
-  (((tScreen*)((tScreen *)&(this->_base_tScreenCarSelectTwoPlayer).CarDialog))->~tScreen(), (tScreen*)((tScreen *)&(this->_base_tScreenCarSelectTwoPlayer).CarDialog));
-  tScreenCarSelect_dtor((tScreenCarSelect *)this);
+  ((tScreen*)((tScreen *)&(this->_base_tScreenCarSelectTwoPlayer).CarDialog))->~tScreen();
+  tScreenCarSelect_dtor((tScreenCarSelect *)this,2);
   return;
 }
 
@@ -2551,8 +2557,8 @@ tScreenCarSelectTwoPlayer::~tScreenCarSelectTwoPlayer()
 
 {
   
-  (((tScreen*)((tScreen *)&this->CarDialog))->~tScreen(), (tScreen*)((tScreen *)&this->CarDialog));
-  tScreenCarSelect_dtor(&this->_base_tScreenCarSelect);
+  ((tScreen*)((tScreen *)&this->CarDialog))->~tScreen();
+  tScreenCarSelect_dtor(&this->_base_tScreenCarSelect,2);
   return;
 }
 
@@ -2576,7 +2582,7 @@ tScreenCarSelectDuel::~tScreenCarSelectDuel()
   int T [4];
   char buffer [32];
   
-  tScreenCarSelect_dtor(&this->_base_tScreenCarSelect);
+  tScreenCarSelect_dtor(&this->_base_tScreenCarSelect,2);
   return;
 }
 

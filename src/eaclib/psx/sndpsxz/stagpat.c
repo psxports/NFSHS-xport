@@ -41,7 +41,7 @@ extern "C" int iSNDresolvetaggedpatch(unsigned char *bank, intptr patchBase, int
 extern "C" int iSNDremovetaggedpatch(unsigned char *bank, int *patch_idx);                                                                                 /* @0x801025C0 */
 extern "C" int iSNDplaytaggedtimbre(intptr timbre, const unsigned char *tag, SndTimbre *vol, SndTimbre *header, int baseNote, int velScale, int pitchOff); /* @0x80101C8C */
 extern "C" int iSNDplaytaggedpatch(unsigned char *patch, int *tag);                                                                                        /* @0x8010218C */
-extern "C" int SNDstop(int tag);                                                                                                                           /* sstop  */
+extern "C" int SNDstop(unsigned int tag);                                                                                                                  /* sstop  */
 extern "C" int iSNDgetchan(int tag);                                                                                                                       /* salloc */
 extern "C" void iSNDenteraudio(void);                                                                                                                      /* sserver */
 extern "C" void iSNDleaveaudio(void);

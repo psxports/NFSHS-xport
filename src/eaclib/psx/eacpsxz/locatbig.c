@@ -22,9 +22,9 @@ extern "C" unsigned strlen(const char *s);                                   /* 
 /* intra-obj forward decls (C-linkage) */
 extern "C" int typeofbigfile(void *buf);
 extern "C" int sizeofbigfileheader(void *buf);
-extern "C" char *locatebigentryz(void *buf, char *name, int index, int *offset, int *size);
-extern "C" char *locatebigentry(void *buf, char *name, int index, int *offset, int *size);
-extern "C" int locatebigoffset(void *buf, char *name);
+extern "C" char *locatebigentryz(void *buf, const char *name, int index, int *offset, int *size);
+extern "C" char *locatebigentry(void *buf, const char *name, int index, int *offset, int *size);
+extern "C" int locatebigoffset(void *buf, const char *name);
 
 /* write-only sink for the discarded "size" out-param of locatebigoffset (@0x8013DE64, obj-local) */
 static int gLocatebigSizeSink;
@@ -79,7 +79,7 @@ extern "C" int bigcount(void *buf)
  *  size through `offset`/`size` (when non-NULL) and return a pointer to  *
  *  the entry's name; on a miss zero them and return NULL.                *
  * ===================================================================== */
-extern "C" char *locatebigentryz(void *buf, char *name, int index, int *offset, int *size)
+extern "C" char *locatebigentryz(void *buf, const char *name, int index, int *offset, int *size)
 {
     char *end = (char *)buf + sizeofbigfileheader(buf); /* delay slot before typeofbigfile */
     int type = typeofbigfile(buf);
@@ -131,7 +131,7 @@ extern "C" char *locatebigentryz(void *buf, char *name, int index, int *offset, 
 /* ===================================================================== *
  *  locatebigentry @0x800E61B8 : forwarder to locatebigentryz.           *
  * ===================================================================== */
-extern "C" char *locatebigentry(void *buf, char *name, int index, int *offset, int *size)
+extern "C" char *locatebigentry(void *buf, const char *name, int index, int *offset, int *size)
 {
     return locatebigentryz(buf, name, index, offset, size);
 }
@@ -139,7 +139,7 @@ extern "C" char *locatebigentry(void *buf, char *name, int index, int *offset, i
 /* ===================================================================== *
  *  locatebigoffset @0x800E61DC : data offset of `name`, or 0.            *
  * ===================================================================== */
-extern "C" int locatebigoffset(void *buf, char *name)
+extern "C" int locatebigoffset(void *buf, const char *name)
 {
     int offset = 0;
     if (name != 0)
@@ -150,7 +150,7 @@ extern "C" int locatebigoffset(void *buf, char *name)
 /* ===================================================================== *
  *  locatebig @0x800E6218 : pointer to the entry's data, or NULL.        *
  * ===================================================================== */
-extern "C" char *locatebig(void *buf, char *name)
+extern "C" char *locatebig(void *buf, const char *name)
 {
     int off = locatebigoffset(buf, name);
     return off ? (char *)buf + off : 0;

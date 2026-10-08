@@ -6,6 +6,17 @@
 #ifndef _NFS4_TYPES_H_
 #define _NFS4_TYPES_H_
 
+#include <initializer_list>
+
+/* Materialize writable storage for legacy PsyQ APIs declared with char pointers */
+#define NFS4_WRITABLE_LITERAL(text) \
+    ( \
+        []() -> char * \
+        { \
+            static char storage[] = text; \
+            return storage; \
+        }())
+
 #if defined(AP_WIN)
     #include "psx.h"
     #define NFS4_PSYQ_HEADERS 1
@@ -64,9 +75,6 @@ struct SPCHChosenSentence
 
 /* PsyQ scalar aliases */
 #ifndef NFS4_PSYQ_HEADERS
-typedef uint32 u_long;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
 typedef uint16 u_short;
 #endif
 #ifndef NFS4_PSYQ_HEADERS
@@ -87,10 +95,10 @@ static inline void nfs4_add_prim(void *ot, void *prim)
 #else
 static inline void nfs4_add_prim(void *ot, void *prim)
 {
-    u_long *tag = (u_long *)prim;
-    u_long *slot = (u_long *)ot;
+    uint32 *tag = (uint32 *)prim;
+    uint32 *slot = (uint32 *)ot;
     *tag = (*tag & 0xff000000UL) | (*slot & 0x00ffffffUL);
-    *slot = (*slot & 0xff000000UL) | ((u_long)prim & 0x00ffffffUL);
+    *slot = (*slot & 0xff000000UL) | ((uint32)prim & 0x00ffffffUL);
 }
 #endif
 
@@ -122,18 +130,18 @@ static inline u_short PsyQ_readRam16(intptr address)
     return *(volatile u_short *)address;
 }
 
-static inline u_long PsyQ_readRam32(intptr address)
+static inline uint32 PsyQ_readRam32(intptr address)
 {
     if ((intptr)address < 0xfffdU)
     {
         intptr offset = (intptr)address;
-        return (u_long)DRAM[offset] | (u_long)DRAM[offset + 1] << 8 | (u_long)DRAM[offset + 2] << 16 | (u_long)DRAM[offset + 3] << 24;
+        return (uint32)DRAM[offset] | (uint32)DRAM[offset + 1] << 8 | (uint32)DRAM[offset + 2] << 16 | (uint32)DRAM[offset + 3] << 24;
     }
-    return *(volatile u_long *)address;
+    return *(volatile uint32 *)address;
 }
 #else
     #if !defined(getScratchAddr)
-        #define getScratchAddr(offset) ((u_long *)(0x1f800000 + (offset) * 4))
+        #define getScratchAddr(offset) ((uint32 *)(0x1f800000 + (offset) * 4))
     #endif
 static inline u_char PsyQ_readRam8(intptr address)
 {
@@ -145,9 +153,9 @@ static inline u_short PsyQ_readRam16(intptr address)
     return *(volatile u_short *)address;
 }
 
-static inline u_long PsyQ_readRam32(intptr address)
+static inline uint32 PsyQ_readRam32(intptr address)
 {
-    return *(volatile u_long *)address;
+    return *(volatile uint32 *)address;
 }
 #endif
 /* NFS4 boolean: cfront emitted these as 'type NULL' = implicit int. 4-byte storage,
@@ -773,28 +781,32 @@ typedef union tPadStdAnalog_u tPadStdAnalog_u;
    it is the compiler's own builtin there, NOT something we invented. GCC 2.7.2's old-ABI layout is the
    8-byte {short delta; short index; void(*pfn)()} (delta/index = the multiple-inheritance this-adjust).
    BINARY-CONFIRMED via _vt.15tScreenCongrats @ 0x80012448 -> pfns = GetShapeInfo / DrawBackground /
-   Initialize / Cleanup / ProcessInput / ... ; delta/index = 0 (single inheritance, no thunk).
+   Initialize / Cleanup / ProcessInput and later entries; delta/index = 0 (single inheritance, no thunk).
    The native MSVC build uses this explicit definition because its C++ ABI has no compatible builtin type.
    Since that typedef is already parsed, we cannot re-`struct` the name -> we define the real 8-byte
    entry under a private tag and macro-restore the canonical name to it. So `__vtbl_ptr_type` means
-   exactly what GCC 2.7.2 / the SYM mean by it: the 8-byte entry. (pfn is int(*)(...) not void(*)() only
-   so Ghidra's `iVarN = (*pfn)(...)` virtual-dispatch bodies type-check; size/layout are unaffected.)
+   exactly what GCC 2.7.2 / the SYM mean by it: the 8-byte entry. Native code stores an opaque
+   function address and restores a fixed-arity signature at each dispatch; size/layout are unaffected.
    _vf fields are always POINTERS to arrays of these, so this size never changes any struct's size. */
 #ifdef AP_WIN
-    #ifdef _MSC_VER
+    #if defined(_MSC_VER) && defined(_M_IX86)
         #define NFS4_VT_THUNK __fastcall
         #define NFS4_THISCALL __thiscall
         #define NFS4_VT_PFN_CALL __cdecl
-    #else
+    #elif defined(__i386__)
         #define NFS4_VT_THUNK __attribute__((thiscall))
         #define NFS4_THISCALL __attribute__((thiscall))
         #define NFS4_VT_PFN_CALL __attribute__((thiscall))
+    #else
+        #define NFS4_VT_THUNK
+        #define NFS4_THISCALL
+        #define NFS4_VT_PFN_CALL
     #endif
     /* The reconstructed call sites pass the adjusted object as their first
    argument. The 32-bit MSVC member implementations use the native thiscall
    ABI, so fixed-arity dispatch places that object in ECX. */
-    #if defined(_MSC_VER)
-typedef int(__cdecl *nfs4_vtbl_pfn)(...);
+    #if defined(_MSC_VER) || defined(__EMSCRIPTEN__)
+typedef void(__cdecl *nfs4_vtbl_pfn)(void);
 
 template <typename T>
 static inline nfs4_vtbl_pfn nfs4_vtable_entry(T value)
@@ -822,88 +834,108 @@ typedef struct __nfs4_vtbl_ptr_t
     nfs4_vtbl_pfn pfn;
 } __nfs4_vtbl_ptr_t;
     #else
-        #define NFS4_VTABLE_ENTRY(value) ((int (*)(...))(value))
+typedef void(NFS4_VT_PFN_CALL *nfs4_vtbl_pfn)(void);
+
+        #define NFS4_VTABLE_ENTRY(value) ((nfs4_vtbl_pfn)(value))
 
 typedef struct __nfs4_vtbl_ptr_t
 {
     short delta;
     short index;
-    int(NFS4_VT_PFN_CALL *pfn)(...);
+    nfs4_vtbl_pfn pfn;
 } __nfs4_vtbl_ptr_t;
     #endif
 #else
     #define NFS4_VT_THUNK
-    #define NFS4_VTABLE_ENTRY(value) ((int (*)(...))(value))
+    #define NFS4_THISCALL
+typedef void (*nfs4_vtbl_pfn)(void);
+    #define NFS4_VTABLE_ENTRY(value) ((nfs4_vtbl_pfn)(value))
 
 typedef struct __nfs4_vtbl_ptr_t
 {
     short delta;
     short index;
-    int (*pfn)(...);
+    nfs4_vtbl_pfn pfn;
 } __nfs4_vtbl_ptr_t;
 #endif
 #define __vtbl_ptr_type __nfs4_vtbl_ptr_t
 
-#ifdef AP_WIN
-/* Explicit dispatch helpers for reconstructed GCC 2.7 vtables.  Their pfn
-   field is intentionally variadic for source compatibility, which makes GCC
-   fall back to cdecl even when annotated thiscall.  Cast at the call site to
-   a fixed-arity signature so the adjusted object is reliably passed in ECX. */
-template <typename Obj, typename... Args>
-static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj, Args... args)
+/* Vtable entries store opaque function addresses
+   Dispatch must restore the target signature and calling convention */
+template <typename Obj>
+static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj)
 {
-    typedef intptr(__thiscall * call_type)(void *, Args...);
-    return ((call_type)fn)((void *)(intptr)obj, args...);
+    typedef intptr(NFS4_THISCALL * call_type)(void *);
+    return ((call_type)fn)((void *)(intptr)obj);
 }
 
-    #define NFS4_VCALL_AUTO(fn, ...) nfs4_vcall_auto((fn), __VA_ARGS__)
+template <typename Obj, typename A0>
+static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj, A0 a0)
+{
+    typedef intptr(NFS4_THISCALL * call_type)(void *, A0);
+    return ((call_type)fn)((void *)(intptr)obj, a0);
+}
+
+template <typename Obj, typename A0, typename A1>
+static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj, A0 a0, A1 a1)
+{
+    typedef intptr(NFS4_THISCALL * call_type)(void *, A0, A1);
+    return ((call_type)fn)((void *)(intptr)obj, a0, a1);
+}
+
+template <typename Obj, typename A0, typename A1, typename A2>
+static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj, A0 a0, A1 a1, A2 a2)
+{
+    typedef intptr(NFS4_THISCALL * call_type)(void *, A0, A1, A2);
+    return ((call_type)fn)((void *)(intptr)obj, a0, a1, a2);
+}
+
+template <typename Obj, typename A0, typename A1, typename A2, typename A3>
+static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj, A0 a0, A1 a1, A2 a2, A3 a3)
+{
+    typedef intptr(NFS4_THISCALL * call_type)(void *, A0, A1, A2, A3);
+    return ((call_type)fn)((void *)(intptr)obj, a0, a1, a2, a3);
+}
+
+template <typename Obj, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
+static inline intptr nfs4_vcall_auto(nfs4_vtbl_pfn fn, Obj obj, A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
+{
+    typedef intptr(NFS4_THISCALL * call_type)(void *, A0, A1, A2, A3, A4, A5);
+    return ((call_type)fn)((void *)(intptr)obj, a0, a1, a2, a3, a4, a5);
+}
+
+#define NFS4_VCALL_AUTO nfs4_vcall_auto
 
 static inline intptr nfs4_vcall_dtor(nfs4_vtbl_pfn fn, void *obj, int mode)
 {
-    typedef intptr(__fastcall * call_type)(void *, int);
+    typedef intptr(NFS4_VT_THUNK * call_type)(void *, int);
     return ((call_type)fn)(obj, mode);
 }
 
-    #define NFS4_VCALL0(fn, obj) (((int(NFS4_THISCALL *)(void *))(fn))((void *)(obj)))
-    #define NFS4_VCALL1(fn, obj, a1) (((int(NFS4_THISCALL *)(void *, int))(fn))((void *)(obj), (int)(a1)))
-    #define NFS4_VCALL2(fn, obj, a1, a2) (((int(NFS4_THISCALL *)(void *, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2)))
-    #define NFS4_VCALL3(fn, obj, a1, a2, a3) (((int(NFS4_THISCALL *)(void *, int, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2), (int)(a3)))
-    #define NFS4_VCALL4(fn, obj, a1, a2, a3, a4) (((int(NFS4_THISCALL *)(void *, int, int, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2), (int)(a3), (int)(a4)))
-    /* ObjectAnim::Draw thunks are free functions using NFS4_VT_THUNK
+#define NFS4_VCALL0(fn, obj) (((int(NFS4_THISCALL *)(void *))(fn))((void *)(obj)))
+#define NFS4_VCALL1(fn, obj, a1) (((int(NFS4_THISCALL *)(void *, int))(fn))((void *)(obj), (int)(a1)))
+#define NFS4_VCALL2(fn, obj, a1, a2) (((int(NFS4_THISCALL *)(void *, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2)))
+#define NFS4_VCALL3(fn, obj, a1, a2, a3) (((int(NFS4_THISCALL *)(void *, int, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2), (int)(a3)))
+#define NFS4_VCALL4(fn, obj, a1, a2, a3, a4) (((int(NFS4_THISCALL *)(void *, int, int, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2), (int)(a3), (int)(a4)))
+/* ObjectAnim::Draw thunks are free functions using NFS4_VT_THUNK
    Match that ABI so MSVC passes Vi in EDX and the callee pops only sd/offset. */
-    #define NFS4_VCALL_PTR_PTR_INT(fn, obj, p1, p2, i3) (((int(NFS4_VT_THUNK *)(void *, void *, void *, int))(fn))((void *)(obj), (void *)(p1), (void *)(p2), (int)(i3)))
-    /* Frontend ProcessInput entries take a player enum followed by key/command
+#define NFS4_VCALL_PTR_PTR_INT(fn, obj, p1, p2, i3) (((int(NFS4_VT_THUNK *)(void *, void *, void *, int))(fn))((void *)(obj), (void *)(p1), (void *)(p2), (int)(i3)))
+/* Frontend ProcessInput entries take a player enum followed by key/command
    pointers.  Do not route those pointers through the generic integer helper. */
-    #define NFS4_VCALL_INT_PTR_PTR(fn, obj, i1, p2, p3) (((int(NFS4_THISCALL *)(void *, int, void *, void *))(fn))((void *)(obj), (int)(i1), (void *)(p2), (void *)(p3)))
-    /* Pointer-returning zero-argument virtuals (for example Speech::CallSign).
+#define NFS4_VCALL_INT_PTR_PTR(fn, obj, i1, p2, p3) (((int(NFS4_THISCALL *)(void *, int, void *, void *))(fn))((void *)(obj), (int)(i1), (void *)(p2), (void *)(p3)))
+/* Pointer-returning zero-argument virtuals (for example Speech::CallSign).
    A recovered PSX vtable stores every pfn in one generic integer-return slot,
    but the native ABI must not narrow the actual pointer result. */
-    #define NFS4_VCALL_PTR0(fn, obj) (((void *(NFS4_THISCALL *)(void *))(fn))((void *)(obj)))
-    /* One pointer argument after the adjusted object (for example
+#define NFS4_VCALL_PTR0(fn, obj) (((void *(NFS4_THISCALL *)(void *))(fn))((void *)(obj)))
+/* One pointer argument after the adjusted object (for example
    Speech::Speaker::Engage(Car_tObj*)). */
-    #define NFS4_VCALL_P1(fn, obj, p1) (((int(NFS4_THISCALL *)(void *, void *))(fn))((void *)(obj), (void *)(p1)))
-    /* Two pointer arguments after the adjusted object (menu ProcessInput-style). */
-    #define NFS4_VCALL_P2(fn, obj, p1, p2) (((int(NFS4_THISCALL *)(void *, void *, void *))(fn))((void *)(obj), (void *)(p1), (void *)(p2)))
-    /* Pointer-returning virtual with one pointer argument (KnownPerp-style). */
-    #define NFS4_VCALL_PTR_P1(fn, obj, p1) (((void *(NFS4_THISCALL *)(void *, void *))(fn))((void *)(obj), (void *)(p1)))
-    #define NFS4_AISTATE_DTOR(state) nfs4_vcall_dtor((*(state)->_vf)[2].pfn, (char *)(state) + (*(state)->_vf)[2].delta, 3)
-    #define NFS4_AISTATE_TEST(state) NFS4_VCALL0((*(state)->_vf)[3].pfn, (char *)(state) + (*(state)->_vf)[3].delta)
-#else
-    #define NFS4_VCALL_AUTO(fn, ...) ((fn)(__VA_ARGS__))
-    #define NFS4_VCALL0(fn, obj) ((fn)((obj)))
-    #define NFS4_VCALL1(fn, obj, a1) ((fn)((obj), (a1)))
-    #define NFS4_VCALL2(fn, obj, a1, a2) ((fn)((obj), (a1), (a2)))
-    #define NFS4_VCALL3(fn, obj, a1, a2, a3) ((fn)((obj), (a1), (a2), (a3)))
-    #define NFS4_VCALL4(fn, obj, a1, a2, a3, a4) ((fn)((obj), (a1), (a2), (a3), (a4)))
-    #define NFS4_VCALL_PTR_PTR_INT(fn, obj, p1, p2, i3) ((fn)((obj), (p1), (p2), (i3)))
-    #define NFS4_VCALL_INT_PTR_PTR(fn, obj, i1, p2, p3) (((int (*)(...))(fn))((obj), (i1), (p2), (p3)))
-    #define NFS4_VCALL_PTR0(fn, obj) (((void *(*)(...))(fn))((obj)))
-    #define NFS4_VCALL_P1(fn, obj, p1) (((int (*)(...))(fn))((obj), (p1)))
-    #define NFS4_VCALL_P2(fn, obj, p1, p2) (((int (*)(...))(fn))((obj), (p1), (p2)))
-    #define NFS4_VCALL_PTR_P1(fn, obj, p1) (((void *(*)(...))(fn))((obj), (p1)))
-    #define NFS4_AISTATE_DTOR(state) (*(int (*)(...))(state)->_vf[5])((int)&(state)->carObj_ + (int)*(short *)(state)->_vf[4], 3)
-    #define NFS4_AISTATE_TEST(state) (*(int (*)(...))(state)->_vf[7])((int)&(state)->carObj_ + (int)*(short *)(state)->_vf[6])
-#endif
+#define NFS4_VCALL_P1(fn, obj, p1) (((int(NFS4_THISCALL *)(void *, void *))(fn))((void *)(obj), (void *)(p1)))
+/* Two pointer arguments after the adjusted object (menu ProcessInput-style). */
+#define NFS4_VCALL_P2(fn, obj, p1, p2) (((int(NFS4_THISCALL *)(void *, void *, void *))(fn))((void *)(obj), (void *)(p1), (void *)(p2)))
+/* Pointer-returning virtual with one pointer argument (KnownPerp-style). */
+#define NFS4_VCALL_PTR_P1(fn, obj, p1) (((void *(NFS4_THISCALL *)(void *, void *))(fn))((void *)(obj), (void *)(p1)))
+#define NFS4_AISTATE_DTOR(state) nfs4_vcall_dtor((*(state)->_vf)[2].pfn, (char *)(state) + (*(state)->_vf)[2].delta, 3)
+#define NFS4_AISTATE_TEST(state) NFS4_VCALL0((*(state)->_vf)[3].pfn, (char *)(state) + (*(state)->_vf)[3].delta)
 
 /* ============ ENUMS ============ */
 
@@ -1710,7 +1742,7 @@ struct RVECTOR
     u_short pad;  /* +0xA */
     CVECTOR c;    /* +0xC */
     DVECTOR sxy;  /* +0x10 */
-    u_long sz;    /* +0x14 */
+    uint32 sz;    /* +0x14 */
 };
 #endif
 
@@ -1719,7 +1751,7 @@ struct CRVECTOR3
 {                          /* 88 bytes (PsyQ libgte) */
     RVECTOR r01, r12, r20; /* +0x0 */
     RVECTOR *r0, *r1, *r2; /* +0x48 */
-    u_long *rtn;           /* +0x54 */
+    uint32 *rtn;           /* +0x54 */
 };
 #endif
 
@@ -1728,7 +1760,7 @@ struct CRVECTOR4
 {                                   /* 140 bytes (PsyQ libgte) */
     RVECTOR r01, r02, r31, r32, rc; /* +0x0 */
     RVECTOR *r0, *r1, *r2, *r3;     /* +0x78 */
-    u_long *rtn;                    /* +0x88 */
+    uint32 *rtn;                    /* +0x88 */
 };
 #endif
 
@@ -1742,8 +1774,8 @@ struct PSX_RECT
 #ifndef NFS4_PSYQ_HEADERS
 struct DR_ENV
 {                    /* 64 bytes (PsyQ libgpu) */
-    u_long tag;      /* +0x0 */
-    u_long code[15]; /* +0x4 */
+    uint32 tag;      /* +0x0 */
+    uint32 code[15]; /* +0x4 */
 };
 #endif
 
@@ -1770,16 +1802,16 @@ struct DISPENV
 #ifndef NFS4_PSYQ_HEADERS
 struct DR_MODE
 {                   /* 12 bytes (PsyQ libgpu) */
-    u_long tag;     /* +0x0 */
-    u_long code[2]; /* +0x4 */
+    uint32 tag;     /* +0x0 */
+    uint32 code[2]; /* +0x4 */
 };
 #endif
 
 #ifndef NFS4_PSYQ_HEADERS
 typedef struct DR_TPAGE
 {                   /* 8 bytes (PsyQ libgpu draw-tpage prim) */
-    u_long tag;     /* +0x0 */
-    u_long code[1]; /* +0x4 */
+    uint32 tag;     /* +0x0 */
+    uint32 code[1]; /* +0x4 */
 } DR_TPAGE;
 #endif
 
@@ -1881,7 +1913,7 @@ struct Draw_SVertex
 
 struct Draw_PrimStruct
 {                             /* 12 bytes */
-    u_long *LastPrim;         /* +0x0 */
+    uint32 *LastPrim;         /* +0x0 */
     char *PrimPtr, *MPrimPtr; /* +0x4 */
 };
 
@@ -2158,7 +2190,7 @@ struct Cars_tRenderInfo
     short colorIndex;                                                                                                                  /* +0x0 */
     char currentCountry, newCountry;                                                                                                   /* +0x2 */
     int textureStartIndex, bodyPitch, bodyRoll, currentPitch, currentRoll, currentHeight, pitchFactor, rollFactor, world_otz, sub_otz; /* +0x4 */
-    u_long *sub_ot;                                                                                                                    /* +0x2C */
+    uint32 *sub_ot;                                                                                                                    /* +0x2C */
     int sub_otSize, sub_otOffset;                                                                                                      /* +0x30 */
     void *sort_carObj;                                                                                                                 /* +0x38 */
     short sort_flag, damageParts;                                                                                                      /* +0x3C */
@@ -2674,62 +2706,62 @@ struct AIHigh_Cop
 
 struct SPCHNFSType_POSITION
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_DISTANCE
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_COLOUR
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_ACCIDENT
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_AMBULANCE
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_PURS_UPDT
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_ARREST
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_vs_RDBLK_SSTRP
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_PERP_NAME
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_CONFIRM
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_SPIKE_BELT_SIDE
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_REVINTRO
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct CarBank
@@ -2800,7 +2832,7 @@ struct FLARE_PIECE_DEF
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_GT4
 {                            /* 52 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char u0, v0;           /* +0xC */
@@ -2924,13 +2956,13 @@ struct AIHigh_Traffic
 struct TCB
 {                      /* 192 bytes (PsyQ kernel) */
     long status, mode; /* +0x0 */
-    u_long reg[40];    /* +0x8 */
+    uint32 reg[40];    /* +0x8 */
     long system[6];    /* +0xA8 */
 };
 
 struct EXEC
 {                                                                                                           /* 60 bytes (PsyQ kernel) */
-    u_long pc0, gp0, t_addr, t_size, d_addr, d_size, b_addr, b_size, s_addr, s_size, sp, fp, gp, ret, base; /* +0x0 */
+    uint32 pc0, gp0, t_addr, t_size, d_addr, d_size, b_addr, b_size, s_addr, s_size, sp, fp, gp, ret, base; /* +0x0 */
 };
 
 struct DIRENTRY
@@ -3326,7 +3358,7 @@ struct tTexture_ShapeInfo
     shapetbl *shpptr;                                      /* +0x0 */
     long clutID;                                           /* +0x4 */
     char depth;                                            /* +0x8 */
-    u_long type : 8;                                       /* +0x9 bit 0 */
+    uint32 type : 8;                                       /* +0x9 bit 0 */
     long next : 24;                                        /* +0xC bit 0 */
     short width, height, centerx, centery, shapex, shapey; /* +0x10 */
     u_short tpage, clut;                                   /* +0x1C */
@@ -3350,7 +3382,7 @@ struct tMenu
     {
     }
 
-    void tMenuConstructor(tMenuItem *firstItem, void *ap);
+    void tMenuConstructor(tMenuItem *firstItem, std::initializer_list<tMenuItem *> rest);
     tMenu(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title);
     ~tMenu();
     void Initialize();
@@ -3448,9 +3480,9 @@ struct tCarInfo
     char fShapeName[8], fSmallName[8], fQTVRName[8];                                                  /* +0x8 */
     long fPrices[4];                                                                                  /* +0x20 */
     u_char fStats[4][5];                                                                              /* +0x30 */
-    u_long fColorList[16];                                                                            /* +0x44 */
+    uint32 fColorList[16];                                                                            /* +0x44 */
     u_char fSpeechColors[16];                                                                         /* +0x84 */
-    u_long fHudColor[2];                                                                              /* +0x94 */
+    uint32 fHudColor[2];                                                                              /* +0x94 */
     char fDayTachFile[8], fNightTachFile[8];                                                          /* +0x9C */
     char fNumLightColors, fNumDarkColors;                                                             /* +0xAC */
     u_char fCountries;                                                                                /* +0xAE */
@@ -3469,7 +3501,7 @@ struct tOwnedCarInfo
 
 struct tCarManager
 {                                                                         /* 908 bytes */
-    u_long fNumCars;                                                      /* +0x0 */
+    uint32 fNumCars;                                                      /* +0x0 */
     tCarInfo *fCars;                                                      /* +0x4 */
     tOwnedCarInfo fCarGarage[2][32], fPinkSlipsCars[2][32];               /* +0x8 */
     u_char fAvailableCars[48], fViewableCars[48];                         /* +0x208 */
@@ -3548,7 +3580,7 @@ struct tfrontEnd
     char headstart, numBTracksActivated, checkPointType;                                                                                                  /* +0x394 */
     char checkPointDisplay[2], defaultedPlayerName[2];                                                                                                    /* +0x397 */
     BOOL FEPlayList[40];                                                                                                                                  /* +0x39C */
-    u_long gPinkSlipsNoCheat[2];                                                                                                                          /* +0x43C */
+    uint32 gPinkSlipsNoCheat[2];                                                                                                                          /* +0x43C */
     BOOL GotAPlayList;                                                                                                                                    /* +0x444 */
     BOOL AnalogOn[2];                                                                                                                                     /* +0x448 */
 };
@@ -3822,7 +3854,7 @@ struct tNormalCacheEntry
     u_char triangleFlag;      /* +0x2 */
     char quadInd;             /* +0x3 */
     coorddef normal, forward; /* +0x4 */
-    u_long accessTime;        /* +0x1C */
+    uint32 accessTime;        /* +0x1C */
 };
 
 struct camera_info
@@ -3834,18 +3866,18 @@ struct camera_info
     int twist;                            /* +0x54 */
     coorddef wallLeft, wallRight;         /* +0x58 */
     short mode, camNum;                   /* +0x70 */
-    char modechange : 1;                  /* +0x74 bit 0 */
-    char pitch : 1;                       /* +0x74 bit 1 */
-    char jostling : 1;                    /* +0x74 bit 2 */
-    char tracking : 1;                    /* +0x74 bit 3 */
-    char checkwalls : 1;                  /* +0x74 bit 4 */
-    char noLookBack : 1;                  /* +0x74 bit 5 */
-    char checkcollisions : 1;             /* +0x74 bit 6 */
-    char splitscreen : 1;                 /* +0x74 bit 7 */
+    unsigned char modechange : 1;         /* +0x74 bit 0 */
+    unsigned char pitch : 1;              /* +0x74 bit 1 */
+    unsigned char jostling : 1;           /* +0x74 bit 2 */
+    unsigned char tracking : 1;           /* +0x74 bit 3 */
+    unsigned char checkwalls : 1;         /* +0x74 bit 4 */
+    unsigned char noLookBack : 1;         /* +0x74 bit 5 */
+    unsigned char checkcollisions : 1;    /* +0x74 bit 6 */
+    unsigned char splitscreen : 1;        /* +0x74 bit 7 */
     char intransition, tumbling;          /* +0x75 */
-    char direction : 1;                   /* +0x77 bit 0 */
-    char zooming : 2;                     /* +0x77 bit 1 */
-    char inCar : 1;                       /* +0x77 bit 3 */
+    unsigned char direction : 1;          /* +0x77 bit 0 */
+    unsigned char zooming : 2;            /* +0x77 bit 1 */
+    unsigned char inCar : 1;              /* +0x77 bit 3 */
     short circleCounter, circleAngle;     /* +0x78 */
     char animNum, animHandle, splineMode; /* +0x7C */
     int forceFocus;                       /* +0x80 */
@@ -3855,27 +3887,27 @@ struct camera_info
 };
 
 struct camera_flags
-{                            /* 16 bytes */
-    coorddef arm;            /* +0x0 */
-    int pitch : 1;           /* +0xC bit 0 */
-    int jostling : 1;        /* +0xC bit 1 */
-    int tracking : 1;        /* +0xC bit 2 */
-    int checkwalls : 1;      /* +0xC bit 3 */
-    int noLookBack : 1;      /* +0xC bit 4 */
-    int checkcollisions : 1; /* +0xC bit 5 */
+{                                     /* 16 bytes */
+    coorddef arm;                     /* +0x0 */
+    unsigned int pitch : 1;           /* +0xC bit 0 */
+    unsigned int jostling : 1;        /* +0xC bit 1 */
+    unsigned int tracking : 1;        /* +0xC bit 2 */
+    unsigned int checkwalls : 1;      /* +0xC bit 3 */
+    unsigned int noLookBack : 1;      /* +0xC bit 4 */
+    unsigned int checkcollisions : 1; /* +0xC bit 5 */
 };
 
 struct Camera_tCamSlot
-{                             /* 32 bytes */
-    char mode;                /* +0x0 */
-    char track : 1;           /* +0x1 bit 0 */
-    char zoom : 2;            /* +0x1 bit 1 */
-    char splineMode : 3;      /* +0x1 bit 3 */
-    short fov;                /* +0x2 */
-    coorddef pos;             /* +0x4 */
-    int height, splineOffset; /* +0x10 */
-    COORD16 euler;            /* +0x18 */
-    short slice;              /* +0x1E */
+{                                 /* 32 bytes */
+    char mode;                    /* +0x0 */
+    unsigned char track : 1;      /* +0x1 bit 0 */
+    unsigned char zoom : 2;       /* +0x1 bit 1 */
+    unsigned char splineMode : 3; /* +0x1 bit 3 */
+    short fov;                    /* +0x2 */
+    coorddef pos;                 /* +0x4 */
+    int height, splineOffset;     /* +0x10 */
+    COORD16 euler;                /* +0x18 */
+    short slice;                  /* +0x1E */
 };
 
 struct SimpleMem
@@ -3921,12 +3953,12 @@ struct HudPmx_tUV
 
 struct SPCHNFSType_vs_KMH_MPH
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct SPCHNFSType_VOICE
 {                 /* 4 bytes */
-    u_long flags; /* +0x0 */
+    uint32 flags; /* +0x0 */
 };
 
 struct CarBankName
@@ -4064,8 +4096,8 @@ struct tPMenu
     {
     }
 
-    void tPMenuConstructor(tPMenuItem *firstItem, void *ap);
-    tPMenu(tPMenuItem *firstItem, ...);
+    void tPMenuConstructor(tPMenuItem *firstItem, std::initializer_list<tPMenuItem *> rest);
+    tPMenu(tPMenuItem *firstItem, std::initializer_list<tPMenuItem *> rest);
     ~tPMenu();
     void Initialize();
     void *Debounce();
@@ -4181,7 +4213,7 @@ struct tPMenuItemGoToMenuButton
 {                                                      /* 20 bytes */
     tPMenuItemInteractive _base_tPMenuItemInteractive; /* +0x0 */
     tPMenu *fNewMenu;                                  /* +0xC */
-    void *fOnButtonPress;                              /* +0x10 */
+    void (*fOnButtonPress)(tPMenuCommand &);           /* +0x10 */
     /* reconstructed PauseMenu member fns (non-virtual decls; manual _vf vtable -> ABI-neutral) */
     tPMenuItemGoToMenuButton(unsigned int textDescription, tPMenu *newMenu, void (*OnButtonPress)(tPMenuCommand &));
     ~tPMenuItemGoToMenuButton();
@@ -4318,7 +4350,7 @@ struct tTrackInformation
 
 struct tTrackManager
 {                                                   /* 136 bytes */
-    u_long fNumTracks;                              /* +0x0 */
+    uint32 fNumTracks;                              /* +0x0 */
     tTrackInformation *fTracks;                     /* +0x4 */
     BOOL fAvailableTracks[16], fViewableTracks[16]; /* +0x8 */
     /* reconstructed member fns (FECheats.obj cross-refs; ABI-neutral) */
@@ -4359,7 +4391,7 @@ struct tTrackInfo
     char fTrackNumber;                                                              /* +0x0 */
     u_char fDirection, fMirrored, fTimeOfDay, fWeather, fRandom, fSituations, fPad; /* +0x1 */
     long fPrize[6];                                                                 /* +0x8 */
-    u_long fDifficulty;                                                             /* +0x20 */
+    uint32 fDifficulty;                                                             /* +0x20 */
     u_char fReserved[4];                                                            /* +0x24 */
 };
 
@@ -4464,7 +4496,7 @@ struct tStageInfo
     short fTimeLimit, fWingman, fSpikeBelt, fBlockadeCop; /* +0x4 */
     u_char fPlacement, fStyle;                            /* +0xC */
     u_short fDistance;                                    /* +0xE */
-    u_long fSpeed, fWeight, fGlue;                        /* +0x10 */
+    uint32 fSpeed, fWeight, fGlue;                        /* +0x10 */
     u_char fSpeechColor;                                  /* +0x1C */
     u_char fReserved[15];                                 /* +0x1D */
 };
@@ -4631,7 +4663,7 @@ struct Draw_CarCache
     Draw_tCacheHeader head;                   /* +0x0 */
     MATRIX matB;                              /* +0x14 */
     int pad;                                  /* +0x34 */
-    u_long *sub_ot;                           /* +0x38 */
+    uint32 *sub_ot;                           /* +0x38 */
     int otz, sub_otz, bfct;                   /* +0x3C */
     DR_MODE drawModeOn, drawModeOff;          /* +0x48 */
     Draw_tPixMap *pmxStart;                   /* +0x60 */
@@ -4675,7 +4707,7 @@ struct R3DCar_tEnvMapInfo
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_F4
 {                                         /* 24 bytes (PsyQ libgpu) */
-    u_long tag;                           /* +0x0 */
+    uint32 tag;                           /* +0x0 */
     u_char r0, g0, b0, code;              /* +0x4 */
     short x0, y0, x1, y1, x2, y2, x3, y3; /* +0x8 */
 };
@@ -4684,7 +4716,7 @@ struct POLY_F4
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_FT4
 {                            /* 40 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char u0, v0;           /* +0xC */
@@ -4704,8 +4736,8 @@ struct POLY_FT4
 #ifndef NFS4_PSYQ_HEADERS
 struct DR_STP
 {                   /* 12 bytes (PsyQ libgpu) */
-    u_long tag;     /* +0x0 */
-    u_long code[2]; /* +0x4 */
+    uint32 tag;     /* +0x0 */
+    uint32 code[2]; /* +0x4 */
 };
 #endif
 
@@ -4853,19 +4885,20 @@ struct SpuStVoiceAttr
 {                                  /* 16 bytes (PsyQ libspu) */
     char status, pad1, pad2, pad3; /* +0x0 */
     long last_size;                /* +0x4 */
-    u_long buf_addr, data_addr;    /* +0x8 */
+    uint32 buf_addr, data_addr;    /* +0x8 */
 };
 
 struct CarIO_textureInfo
-{                    /* 12 bytes */
-    char *tex, *pal; /* +0x0 */
-    int palShare;    /* +0x8 */
+{                          /* 12 bytes */
+    const char *tex, *pal; /* +0x0 */
+    int palShare;          /* +0x8 */
 };
 
 struct Input_tDeviceList
-{                                   /* 12 bytes */
-    char *devicename;               /* +0x0 */
-    void *devicefunc, *startupfunc; /* +0x4 */
+{                               /* 12 bytes */
+    char *devicename;           /* +0x0 */
+    int (*devicefunc)(uint32);  /* +0x4 */
+    int (*startupfunc)(uint32); /* +0x8 */
 };
 
 struct dflip
@@ -4878,13 +4911,13 @@ struct Draw_tView
 {                          /* 200 bytes */
     int otsize, membudget; /* +0x0 */
     DRAWENV drawenv[2];    /* +0x8 */
-    u_long *ot[2];         /* +0xC0 */
+    uint32 *ot[2];         /* +0xC0 */
 };
 
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_FT3
 {                            /* 32 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char u0, v0;           /* +0xC */
@@ -4901,7 +4934,7 @@ struct POLY_FT3
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_G3
 {                            /* 28 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char r1, g1, b1, pad1; /* +0xC */
@@ -4919,7 +4952,7 @@ struct DrawC_tEnvMap
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_GT3
 {                            /* 40 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char u0, v0;           /* +0xC */
@@ -4938,8 +4971,8 @@ struct POLY_GT3
 #ifndef NFS4_PSYQ_HEADERS
 struct DR_TWIN
 {                   /* 12 bytes (PsyQ libgpu) */
-    u_long tag;     /* +0x0 */
-    u_long code[2]; /* +0x4 */
+    uint32 tag;     /* +0x0 */
+    uint32 code[2]; /* +0x4 */
 };
 #endif
 
@@ -5008,7 +5041,7 @@ struct charactertbl
 #ifndef NFS4_PSYQ_HEADERS
 struct SPRT
 {                            /* 20 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char u0, v0;           /* +0xC */
@@ -5028,7 +5061,7 @@ struct cluttbl
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_G4
 {                            /* 36 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char r1, g1, b1, pad1; /* +0xC */
@@ -5043,7 +5076,7 @@ struct POLY_G4
 #ifndef NFS4_PSYQ_HEADERS
 struct LINE_G2
 {                            /* 20 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
     u_char r1, g1, b1, p1;   /* +0xC */
@@ -5067,14 +5100,14 @@ struct FLARE_DEF
 
 struct Flare_tInfo
 {                        /* 16 bytes */
-    u_long chalo, cbeam; /* +0x0 */
+    uint32 chalo, cbeam; /* +0x0 */
     int scale, flags;    /* +0x8 */
 };
 
 #ifndef NFS4_PSYQ_HEADERS
 struct TILE_1
 {                            /* 12 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0;            /* +0x8 */
 };
@@ -5110,7 +5143,7 @@ struct tHrz_Lightning
 #ifndef NFS4_PSYQ_HEADERS
 struct POLY_F3
 {                                 /* 20 bytes (PsyQ libgpu) */
-    u_long tag;                   /* +0x0 */
+    uint32 tag;                   /* +0x0 */
     u_char r0, g0, b0, code;      /* +0x4 */
     short x0, y0, x1, y1, x2, y2; /* +0x8 */
 };
@@ -5221,8 +5254,8 @@ struct Weather_tSplatInfo
 #ifndef NFS4_PSYQ_HEADERS
 struct DR_AREA
 {                   /* 12 bytes (PsyQ libgpu) */
-    u_long tag;     /* +0x0 */
-    u_long code[2]; /* +0x4 */
+    uint32 tag;     /* +0x0 */
+    uint32 code[2]; /* +0x4 */
 };
 #endif
 
@@ -5448,7 +5481,7 @@ struct tMenuNFS4
     short fTransitionVal;                            /* +0x74 */
     char fTransitionDirection, fLastItem, fNumItems; /* +0x76 */
     /* FEMenuExtended methods */
-    tMenuNFS4(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, tMenuItem *firstItem, ...);
+    tMenuNFS4(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, tMenuItem *firstItem, std::initializer_list<tMenuItem *> rest);
     tMenuNFS4(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title);
     ~tMenuNFS4();
     void Initialize();
@@ -5470,7 +5503,7 @@ struct tMenuNFS4TwoPlayer
 
     tMenuNFS4 _base_tMenuNFS4; /* +0x0 */
     /* FEMenuExtended methods */
-    tMenuNFS4TwoPlayer(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, tMenuItem *firstItem, ...);
+    tMenuNFS4TwoPlayer(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, tMenuItem *firstItem, std::initializer_list<tMenuItem *> rest);
     ~tMenuNFS4TwoPlayer();
     void DrawItem(int item);
 };
@@ -5484,7 +5517,7 @@ struct tMenuNFS4Bottom
 
     tMenuNFS4 _base_tMenuNFS4; /* +0x0 */
     /* FEMenuExtended methods */
-    tMenuNFS4Bottom(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, tMenuItem *firstItem, ...);
+    tMenuNFS4Bottom(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, tMenuItem *firstItem, std::initializer_list<tMenuItem *> rest);
     ~tMenuNFS4Bottom();
     void Draw();
 };
@@ -5518,10 +5551,10 @@ struct tMenuOptions
     } /* default ctor: embedded+body-init by tGlobalMenuDefs (FEMenuDefs) */
 
     tMenuNFS4 _base_tMenuNFS4; /* +0x0 */
-    u_long fMenuEnterTicks;    /* +0x7C */
+    uint32 fMenuEnterTicks;    /* +0x7C */
     short fPlayer;             /* +0x80 */
     /* FEMenuExtended methods */
-    tMenuOptions(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, short player, tMenuItem *firstItem, ...);
+    tMenuOptions(unsigned int flags, tScreen *screenHandler, tMenu *nextMenu, tMenu *optionsMenu, void (*OnButtonPress)(tMenuCommand &), short title, short player, tMenuItem *firstItem, std::initializer_list<tMenuItem *> rest);
     ~tMenuOptions();
     void Draw();
     void TransitionOff();
@@ -5566,7 +5599,7 @@ struct tOptionsMenu
     int fScreenFade, fFirstFrame, fNumFrames; /* +0x74 */
 
     /* reconstructed member fns -- FeMenuOptions.obj (ABI-neutral) */
-    tOptionsMenu(unsigned int, tScreen *, tMenu *, tMenu *, void (*)(tMenuCommand &), short, int, int, tMenuItem *, ...);
+    tOptionsMenu(unsigned int, tScreen *, tMenu *, tMenu *, void (*)(tMenuCommand &), short, int, int, tMenuItem *, std::initializer_list<tMenuItem *> rest);
     ~tOptionsMenu();
     long DebounceKeys();
     void TransitionOff();
@@ -5587,10 +5620,10 @@ struct tInsideBoxMenu
     {
     }
 
-    tInsideBoxMenu(unsigned int, tScreen *, tMenu *, tMenu *, void (*)(tMenuCommand &), short, tMenuItem *, ...);
+    tInsideBoxMenu(unsigned int, tScreen *, tMenu *, tMenu *, void (*)(tMenuCommand &), short, tMenuItem *, std::initializer_list<tMenuItem *> rest);
     ~tInsideBoxMenu();
     void ProcessInput(tPlayer, tInputKeyType &, tMenuCommand &);
-    int Draw(short, short, short, short, short);
+    void Draw(short, short, short, short, short);
 };
 
 struct tMenuItemSlidingMenu
@@ -5628,7 +5661,7 @@ struct tMenuItemSlidingActivated
     BOOL fActive;                                    /* +0x44 */
 
     /* reconstructed member fns -- FeMenuOptions.obj (ABI-neutral) */
-    int UpdatefOpenHeight(bool);
+    void UpdatefOpenHeight(bool);
     void TransitionOff();
     void TransitionOn();
     void *TransitionIsFinished();
@@ -5689,7 +5722,7 @@ struct tInsideBoxSongMenu
     short fOnOffFade[5], fSelFade[5];    /* +0x74 */
 
     /* reconstructed member fns -- FeMenuOptions.obj (ABI-neutral) */
-    tInsideBoxSongMenu(unsigned int, tScreen *, tMenu *, tMenu *, void (*)(tMenuCommand &), short, tMenuItem *, ...);
+    tInsideBoxSongMenu(unsigned int, tScreen *, tMenu *, tMenu *, void (*)(tMenuCommand &), short, tMenuItem *, std::initializer_list<tMenuItem *> rest);
     ~tInsideBoxSongMenu();
     void Draw(short, short, short, short, short);
     void DrawOneSong(short, short, short, short, short, short);
@@ -5993,7 +6026,7 @@ struct tScreenTournamentStandings3item
 
 struct LUMPYHEAD
 {                                /* 16 bytes */
-    u_long type, len, num, hlen; /* +0x0 */
+    uint32 type, len, num, hlen; /* +0x0 */
 };
 
 struct FILEINFO
@@ -6175,7 +6208,7 @@ struct tScreenMain
     tScreen _base_tScreen;                                            /* +0x0 */
     intptr hVideo;                                                    /* +0x64; VIDEOSTRUCT pointer carrier */
     int fFrame;                                                       /* +0x68 */
-    u_long fStartTicks, fAnimTicks;                                   /* +0x6C */
+    uint32 fStartTicks, fAnimTicks;                                   /* +0x6C */
     short fAnimLocation;                                              /* +0x74 */
     int fState;                                                       /* +0x78 */
     tTVConfig tvConfigs[16];                                          /* +0x7C */
@@ -6186,7 +6219,7 @@ struct tScreenMain
     BOOL fAnimationUploaded;                                          /* +0x544 */
     short fPreviousAnim, fWarningFade, fPreviousMovie, fCurrentMovie; /* +0x548 */
     BOOL bVideoAborted;                                               /* +0x550 */
-    u_long fMovieTicks;                                               /* +0x554 */
+    uint32 fMovieTicks;                                               /* +0x554 */
     tShapeInformation fVideoShapes[2];                                /* +0x558 */
     int fCurrentSlot;                                                 /* +0x5A8 */
     int fCurrentBG[2];                                                /* +0x5AC */
@@ -6223,7 +6256,7 @@ struct tVideoWall
     short fFirstTVShape, fNumTVs;                                                                                                                /* +0x4 */
     tTexture_ShapeInfo *fTVShapes;                                                                                                               /* +0x8 */
     short *tvOrder;                                                                                                                              /* +0xC */
-    u_long fTVTicks;                                                                                                                             /* +0x10 */
+    uint32 fTVTicks;                                                                                                                             /* +0x10 */
     short fTransitionDirection, fFlipAxis, fOffsetX, fOffsetY, fAvailableTextID, fAvailable, fAvailableBright, fValid, fAvailableX, fAvailableY; /* +0x14 */
     tTexture_ShapeInfo *fIconShapes;                                                                                                             /* +0x28 */
     short fIcon, fIconFrames, fIconX, fIconY;                                                                                                    /* +0x2C */
@@ -6260,17 +6293,17 @@ struct tScreenCarSelect
     short fBrightness[2], fDestBrightness[2];                     /* +0x374 */
     long fFadeTicks[2];                                           /* +0x37C */
     BOOL fTVsInitialized, fInShowroom;                            /* +0x384 */
-    u_long fShowroomTicks, fSpeechTicks;                          /* +0x38C */
+    uint32 fShowroomTicks, fSpeechTicks;                          /* +0x38C */
     BOOL fSpeechPlayed;                                           /* +0x394 */
     int fSplineInterval;                                          /* +0x398 */
-    u_long fCameraRotation;                                       /* +0x39C */
+    uint32 fCameraRotation;                                       /* +0x39C */
     /* --- reconstructed member fns (ScreenCarSelect.obj; non-virtual, ABI-neutral) --- */
     tScreenCarSelect();
     ~tScreenCarSelect();
     void Cleanup();
     void DrawOverlay(tOverlay *overlay);
     void SetState(int state);
-    void CalcSplinePosition(int a, int b, int c, int d, u_long e, int &x, int &y, int &z, int &w, int &v);
+    void CalcSplinePosition(int a, int b, int c, int d, uint32 e, int &x, int &y, int &z, int &w, int &v);
     void GetShapeInfo(short &numPermShapes, short &numSwapShapes, char **permFileName, char **swapFileName);
     void UpdateVideoWall(tCarInfo &car);
     void AllocateAsyncBuffer();
@@ -6358,7 +6391,7 @@ struct tScreenTournSelect
     tTVConfig tvConfigs[8];               /* +0x6C */
     tTVConfig trophyTV[4];                /* +0x1EC */
     short fPreviousMovie, fCurrentMovie;  /* +0x2AC */
-    u_long fStartTicks, fTVTicks;         /* +0x2B0 */
+    uint32 fStartTicks, fTVTicks;         /* +0x2B0 */
     short fTransitionDirection;           /* +0x2B8 */
     char fPreviousTrophy;                 /* +0x2BA */
     BOOL fTVsInitialized;                 /* +0x2BC */
@@ -6394,7 +6427,7 @@ struct tScreenTrophyRoom
     char fPreviousTrophy, fDoUpdate; /* +0x9C */
     BOOL fClearScreen;               /* +0xA0 */
     char fBrightness;                /* +0xA4 */
-    u_long fStartTicks;              /* +0xA8 */
+    uint32 fStartTicks;              /* +0xA8 */
     short fTextInfo[16];             /* +0xAC */
     char thisisuseless;              /* +0xCC */
     int tier;                        /* +0xD0 */
@@ -6582,12 +6615,12 @@ struct tScreenTrackSelect
     intptr hVideo;                                                                     /* +0x64; VIDEOSTRUCT pointer carrier */
     int fFrame;                                                                        /* +0x68 */
     short fPreviousTrack, fMovieTrack, fBrightness, fDestBrightness, fStartBrightness; /* +0x6C */
-    u_long fStartTicks;                                                                /* +0x78 */
+    uint32 fStartTicks;                                                                /* +0x78 */
     BOOL fTicksSet;                                                                    /* +0x7C */
     tTVConfig tvConfigs[10];                                                           /* +0x80 */
     tVideoWall fVideoWall;                                                             /* +0x260 */
     BOOL fTVsInitialized;                                                              /* +0x298 */
-    u_long fVideoTicks;                                                                /* +0x29C */
+    uint32 fVideoTicks;                                                                /* +0x29C */
     /* --- reconstructed member fns (ScreenTracks.obj; non-virtual, ABI-neutral) --- */
     void DrawBackground();
     void GetShapeInfo(short &numPermShapes, short &numSwapShapes, char **permFileName, char **swapFileName);
@@ -6622,7 +6655,7 @@ struct tScreenPinkSlips
     intptr hVideo;                                                        /* +0x68; VIDEOSTRUCT pointer carrier */
     int fFrame;                                                           /* +0x6C */
     short fPreviousTrack, fBrightness, fDestBrightness, fStartBrightness; /* +0x70 */
-    u_long fStartTicks, fTVTicks;                                         /* +0x78 */
+    uint32 fStartTicks, fTVTicks;                                         /* +0x78 */
     char fTransitionDirection;                                            /* +0x80 */
     tTVConfig fTrackTVs[8];                                               /* +0x84 */
     tTVConfig fImageTVs[4];                                               /* +0x204 */
@@ -6865,13 +6898,13 @@ struct tGlobalMenuDefs
 
 struct tMemCardData
 {                                                                                              /* 5292 bytes */
-    u_long fSize, bonus;                                                                       /* +0x0 */
+    uint32 fSize, bonus;                                                                       /* +0x0 */
     tfrontEnd frontEnd;                                                                        /* +0x8 */
     tSaveCarInfo carInfo;                                                                      /* +0x458 */
     tSaveTrackInfo trackInfo;                                                                  /* +0x538 */
     tSaveTournament tournament;                                                                /* +0x548 */
     tRecordBuffer records[187];                                                                /* +0x5F8 */
-    u_long pinkSlipsNoCheat, frontEndCRC, carInfoCRC, trackInfoCRC, tournamentCRC, recordsCRC; /* +0x1494 */
+    uint32 pinkSlipsNoCheat, frontEndCRC, carInfoCRC, trackInfoCRC, tournamentCRC, recordsCRC; /* +0x1494 */
 };
 
 struct MCRDOPTS_def
@@ -6897,7 +6930,7 @@ struct tVertex
 #ifndef NFS4_PSYQ_HEADERS
 struct LINE_F2
 {                            /* 16 bytes (PsyQ libgpu) */
-    u_long tag;              /* +0x0 */
+    uint32 tag;              /* +0x0 */
     u_char r0, g0, b0, code; /* +0x4 */
     short x0, y0, x1, y1;    /* +0x8 */
 };
@@ -6906,13 +6939,13 @@ struct LINE_F2
 struct CdlFILE
 {                  /* 24 bytes (PsyQ libcd) */
     CdlLOC pos;    /* +0x0 */
-    u_long size;   /* +0x4 */
+    uint32 size;   /* +0x4 */
     char name[16]; /* +0x8 */
 };
 
 struct DECENV
 {                      /* 48 bytes */
-    u_long *vlcbuf[2]; /* +0x0 */
+    uint32 *vlcbuf[2]; /* +0x0 */
     int vlcid;         /* +0x8 */
     u_short *imgbuf;   /* +0xC */
     PSX_RECT rect[2];  /* +0x10 */
@@ -6924,16 +6957,16 @@ struct DECENV
 struct CDSECTOR
 {                                         /* 28 bytes */
     u_short id, type, secCount, nSectors; /* +0x0 */
-    u_long frameCount, frameSize;         /* +0x8 */
+    uint32 frameCount, frameSize;         /* +0x8 */
     u_short width, height;                /* +0x10 */
-    u_long headm, headv;                  /* +0x14 */
+    uint32 headm, headv;                  /* +0x14 */
 };
 
 #ifndef NFS4_PSYQ_HEADERS
 struct DR_OFFSET
 {                   /* 12 bytes (PsyQ libgpu) */
-    u_long tag;     /* +0x0 */
-    u_long code[2]; /* +0x4 */
+    uint32 tag;     /* +0x0 */
+    uint32 code[2]; /* +0x4 */
 };
 #endif
 
@@ -6958,7 +6991,7 @@ struct MDECSTRUCT
     int id, width, height, bpp;    /* +0x0 */
     PSX_RECT framerect, striprect; /* +0x10 */
     int striprectsize;             /* +0x20 */
-    u_long *stripbuf, *vlcbuf;     /* +0x24 */
+    uint32 *stripbuf, *vlcbuf;     /* +0x24 */
 };
 
 struct tMdecHandle
@@ -7042,18 +7075,20 @@ typedef unsigned int u_int;
 #ifndef NFS4_PSYQ_HEADERS
 typedef void *physadr;
 #endif
+#if !defined(__EMSCRIPTEN__)
 typedef long daddr_t;
 typedef char *caddr_t;
 typedef long *qaddr_t;
-typedef u_long ino_t;
+typedef uint32 ino_t;
 typedef long swblk_t;
-#ifndef AP_WIN
+    #ifndef AP_WIN
 typedef long time_t;
-#endif
+    #endif
 typedef short dev_t;
 typedef long off_t;
 typedef u_short uid_t;
 typedef u_short gid_t;
+#endif
 typedef u_char nfs4_wchar_t;
 typedef void (*VOIDFN)();
 typedef int FILEOP;

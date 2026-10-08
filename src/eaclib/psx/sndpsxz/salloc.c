@@ -12,10 +12,10 @@
 #include "../../../lib/snd.h"
 #include "../../../mips_semantics.h"
 
-extern "C" unsigned char sndchanreserved[]; /* scratch list of chosen channel indices */
-extern "C" int DAT_80136dec;                /* rolling allocation id counter (+=0x20)  */
-extern "C" int SNDstop(int tag);            /* sstop  */
-extern "C" int SNDover(unsigned int tag);   /* sover  */
+extern "C" unsigned char sndchanreserved[];        /* scratch list of chosen channel indices */
+extern "C" int DAT_80136dec;                       /* rolling allocation id counter (+=0x20)  */
+extern "C" int SNDstop(unsigned int tag);          /* sstop  */
+extern "C" unsigned int SNDover(unsigned int tag); /* sover  */
 
 extern "C" int iSNDischanreserved(int chan, int count); /* @0x800FE724 */
 

@@ -9,23 +9,23 @@ typedef void fn_void(void); /* SYM PTR FCN VOID -> fn_void* = void(*)(void) */
 typedef long long longlong; /* Ghidra 64-bit helper types */
 typedef unsigned long long ulonglong;
 
-extern "C" extern int gMasterMusicLevel; /* game audio global */
+extern "C" int gMasterMusicLevel; /* game audio global */
 
 extern "C"
 {
     extern int StCdIntrFlag; /* PsyQ libcd interrupt flag */
     int CD_Restart(int startSector);
-    void *CdDataCallback(void *func);
-    int CdRead2(int mode);
+    CdlCB CdDataCallback(CdlCB func);
+    sint32 CdRead2(sint32 mode);
     void *CdSearchFile(void *fp, char *name);
-    void DecDCTReset(long mode);
-    void DecDCTin(u_long *runlevel, long mode);
-    long DecDCTinSync(long mode);
-    void DecDCTout(u_long *cell, long size);
-    long DecDCToutCallback(void *func);
-    int DecDCTvlc(u_long *bs, u_long *buf);
+    void DecDCTReset(int mode);
+    void DecDCTin(uint32 *runlevel, int mode);
+    int DecDCTinSync(int mode);
+    void DecDCTout(uint32 *cell, int size);
+    int DecDCToutCallback(void (*func)(void));
+    int DecDCTvlc(uint32 *bs, uint32 *buf);
     int DecDCTvlcSize(int size);
-    u_long *FntFlush(int id); /* match real PsyQ libgpu.h proto (int, not long) */
+    uint32 *FntFlush(int id); /* match real PsyQ libgpu.h proto (int, not long) */
     extern "C"
     {
         void Platform_ResetDCTBuffer(void);
@@ -33,10 +33,10 @@ extern "C"
     int SNDcdvol(int vol);
     void StCdInterrupt(void);
     void StClearRing(void);
-    u_long StFreeRing(u_long *base);
-    u_long StGetNext(u_long *addr, u_long *header);
-    void StSetRing(u_long *ring_addr, u_long ring_size);
-    void StSetStream(u_long mode, u_long start_frame, u_long end_frame, void *func1, void *func2);
+    uint32 StFreeRing(uint32 *base);
+    uint32 StGetNext(uint32 **addr, uint32 **header);
+    void StSetRing(uint32 *ring_addr, uint32 ring_size);
+    void StSetStream(uint32 mode, uint32 start_frame, uint32 end_frame, void (*func1)(void), void (*func2)(void));
     void StUnSetRing(void);
     int Triangle(); /* sig unknown */
     void trap(int code);

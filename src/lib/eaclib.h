@@ -86,7 +86,7 @@ void FILE_overhead(int arg0);                                                   
 void FILE_callbackop(int arg0);                                                                         /* nfile */
 void FILE_priorityop(int arg0);                                                                         /* nfile */
 void FILE_cancelop(int arg0);                                                                           /* nfile */
-void FILE_waitop(int arg0);                                                                             /* nfile */
+int FILE_waitop(unsigned int id);                                                                       /* nfile */
                                                                                                         /* nfile */
 void FILE_open(char *arg0);                                                                             /* nfile */
 void FILE_close(void *arg0);                                                                            /* nfile */
@@ -148,7 +148,7 @@ void asyncloadsegmentcallback(int arg0);                                        
                                                                                                         /* sinfunc */
                                                                                                         /* resize */
                                                                                                         /* loadshp */
-void addexit(void *arg0);                                                                               /* exit */
+void addexit(void (*arg0)(void));                                                                       /* exit */
                                                                                                         /* textset */
                                                                                                         /* getm */
                                                                                                         /* getm */
@@ -157,7 +157,7 @@ void puti(void *arg0);                                                          
                                                                                                         /* isqrt */
                                                                                                         /* fsincos */
                                                                                                         /* joystkn */
-void initfileio(void *arg0);                                                                            /* fileroot */
+int initfileio(void);                                                                                   /* fileroot */
                                                                                                         /* fileroot */
 void openfile(char *arg0);                                                                              /* fileroot */
 void closefile(int arg0);                                                                               /* fileroot */
@@ -165,7 +165,7 @@ void readfile(int arg0);                                                        
 void readfile_systask();                                                                                /* fileroot */
 void writefile(int arg0);                                                                               /* fileroot */
 void getfilesize(int arg0);                                                                             /* fileroot */
-void stopreadfile(int arg0);                                                                            /* fileroot */
+int stopreadfile(int arg0);                                                                             /* fileroot */
 void MEM_defaultevent(int arg0);                                                                        /* meminit */
                                                                                                         /* inittmr */
                                                                                                         /* inittmr */
@@ -175,7 +175,7 @@ void tmrint(int arg0);                                                          
 charactertbl *textbsearch(unsigned int key, charactertbl *base, int count, int stride);                 /* textfor */
                                                                                                         /* textfor */
                                                                                                         /* unhuff */
-void memcpyl(void *arg0);                                                                               /* unhuff */
+char *memcpyl(char *dst, char *src, int len);                                                           /* unhuff */
 void memcpyb(void *arg0);                                                                               /* unhuff */
 void refcpy(void *arg0);                                                                                /* unhuff */
                                                                                                         /* unref */
@@ -250,189 +250,189 @@ void remapshiftjiscode(int arg0);                       /* isqrttbl */
 int decodeshiftjis(unsigned char **cursor);             /* isqrttbl */
 void psxdevelopmentsystem();                            /* devsys */
 /* -- SNDPSXZ -- */
-void iSNDremovepatches(int arg0);                                                                                                                 /* sbremove */
-                                                                                                                                                  /* sbremove */
-void cSNDbankremove(int arg0);                                                                                                                    /* sbremove */
-                                                                                                                                                  /* splysdef */
-                                                                                                                                                  /* span */
-void iSNDunsafevol(int arg0);                                                                                                                     /* svol */
-                                                                                                                                                  /* svol */
-                                                                                                                                                  /* sstsetpr */
-                                                                                                                                                  /* seffect */
-                                                                                                                                                  /* seffect */
-void iSNDunsafebend(int arg0);                                                                                                                    /* sbend */
-                                                                                                                                                  /* sbend */
-                                                                                                                                                  /* splay */
-void cSNDplay(void *arg0);                                                                                                                        /* splay */
-                                                                                                                                                  /* sover */
-                                                                                                                                                  /* sbhdrsze */
-                                                                                                                                                  /* sbhdrcpy */
-                                                                                                                                                  /* sdmemlu */
-                                                                                                                                                  /* sbadd */
-                                                                                                                                                  /* sstop */
-                                                                                                                                                  /* spitch */
-                                                                                                                                                  /* smasterv */
-                                                                                                                                                  /* s3dlow */
-void SNDstopall();                                                                                                                                /* sstopall */
-                                                                                                                                                  /* sautovol */
-                                                                                                                                                  /* sstgetv */
-                                                                                                                                                  /* sststat */
-                                                                                                                                                  /* sstrstat */
-void strrstr(char *arg0);                                                                                                                         /* sstrstat */
-void iSNDstreamdestroyall();                                                                                                                      /* sst */
-SndStreamState *iSNDstreamgetstreamptr(int index);                                                                                                /* sst */
-int iSNDstreamremoverequest(unsigned int requestId);                                                                                              /* sst */
-void iSNDstreamreleasecallback(intptr sample);                                                                                                    /* sst */
-void iSNDstreamnotifycallback(int player, unsigned int bytes);                                                                                    /* sst */
-int iSNDstreamparseheader(SndStreamState *stream, intptr data);                                                                                   /* sst */
-int iSNDstreamparsenumchunks(SndStreamState *stream, intptr data);                                                                                /* sst */
-void iSNDstreamparsedata(SndStreamState *stream, intptr chunk);                                                                                   /* sst */
-int iSNDstreamparseend(SndStreamState *stream, intptr chunk);                                                                                     /* sst */
-int iSNDstreamparsechunk(SndStreamState *stream, intptr chunk);                                                                                   /* sst */
-int iSNDstreamisheld(SndStreamState *stream);                                                                                                     /* sst */
-void iSNDstreamhotroddatachunks();                                                                                                                /* sst */
-void iSNDstreamservice();                                                                                                                         /* sst */
-void iSNDstreamnumcreated();                                                                                                                      /* sst */
-int iSNDstreamcreate(int *priority, int numRequests, int packetArg, intptr objectBuffer, int memorySize, int externalHandle, int externalFlag);   /* sst */
-int iSNDstreamqueue(unsigned int stream, int name, char *filename, int offset, int mode);                                                         /* sst */
-                                                                                                                                                  /* spvoices */
-                                                                                                                                                  /* spvoices */
-                                                                                                                                                  /* spvoices */
-                                                                                                                                                  /* spvoices */
-                                                                                                                                                  /* sstsetgl */
-                                                                                                                                                  /* sstsetgs */
-                                                                                                                                                  /* sstautov */
-                                                                                                                                                  /* slimits */
-                                                                                                                                                  /* slimits */
-void SNDSTRM_overheadtap(int arg0);                                                                                                               /* sstovrhd */
-                                                                                                                                                  /* sstovrhd */
-                                                                                                                                                  /* sstvol */
-void iSNDserver();                                                                                                                                /* sserver */
-void iSND100hzserver();                                                                                                                           /* sserver */
-void iSNDenteraudio();                                                                                                                            /* sserver */
-void iSNDleaveaudio();                                                                                                                            /* sserver */
-                                                                                                                                                  /* sserver */
-                                                                                                                                                  /* sserver */
-                                                                                                                                                  /* stimerem */
-                                                                                                                                                  /* ssysinit */
-                                                                                                                                                  /* ssysinit */
-                                                                                                                                                  /* ssysinit */
-                                                                                                                                                  /* ssysinit */
-void iSNDsystemtaskreal();                                                                                                                        /* ssysreal */
-                                                                                                                                                  /* ssysreal */
-void SNDcdvol(int arg0);                                                                                                                          /* scdvol */
-void iSNDplatformfree(void *arg0);                                                                                                                /* sdata */
-void iSNDsync_func(int arg0);                                                                                                                     /* sbirmpat */
-void iSNDvalidbank(int arg0);                                                                                                                     /* sbvalid */
-void iSNDischanreserved(int arg0);                                                                                                                /* salloc */
-void iSNDallocchan(int arg0);                                                                                                                     /* salloc */
-intptr iSNDfreechan(int chan);                                                                                                                    /* salloc: mixed status/address result */
-void iSNDgetchan(int arg0);                                                                                                                       /* salloc */
-void iSNDplatform3dpos(int arg0);                                                                                                                 /* s3dpos */
-int iSNDpatchkey(int chan, int *iter);                                                                                                            /* spatkey */
-void iSNDcalcvol(int arg0);                                                                                                                       /* spatkey */
-void iSNDpsxkeyon(int arg0);                                                                                                                      /* spatkey */
-void iSNDpsxkeyoff(int arg0);                                                                                                                     /* spatkey */
-void iSNDpsxeffecton(int arg0);                                                                                                                   /* spatkey */
-void iSNDpsxeffectoff(int arg0);                                                                                                                  /* spatkey */
-void iSNDpsxeffectvol(int arg0);                                                                                                                  /* spatkey */
-void iSNDsetvol(int arg0);                                                                                                                        /* spatkey */
-void iSNDsetslot(int arg0);                                                                                                                       /* spatkey */
-void iSNDstartvoice(int arg0);                                                                                                                    /* spatkey */
-void iSNDplatformoutputcaps(void *arg0);                                                                                                          /* slib */
-void iSNDplatformoutputset(void *arg0);                                                                                                           /* slib */
-void iSNDinit(void *arg0);                                                                                                                        /* slib */
-void iSNDrestore();                                                                                                                               /* slib */
-void iSNDserve();                                                                                                                                 /* slib */
-void iSNDstop(int arg0);                                                                                                                          /* sdriver */
-void iSNDplatformpitch(int arg0);                                                                                                                 /* sdriver */
-void iSNDplatformfxlevel(int arg0);                                                                                                               /* sdriver */
-void iSNDvol(void *arg0);                                                                                                                         /* sdriver */
-void SNDI_mutexalloc();                                                                                                                           /* sdfx */
-void SNDI_mutexfree();                                                                                                                            /* sdfx */
-void SNDI_mutexlock();                                                                                                                            /* sdfx */
-void SNDI_mutexunlock();                                                                                                                          /* sdfx */
-void iSNDpsxfxinit(int arg0);                                                                                                                     /* sdfx */
-void iSNDplatformfxinit(int arg0);                                                                                                                /* sdfx */
-void iSNDplatformfxmasterlevel(int arg0);                                                                                                         /* sfxlevel */
-void SNDfxlevel(int arg0);                                                                                                                        /* sfxlevel */
-void iSNDdetunetolinear(int arg0);                                                                                                                /* sclcptch */
-void iSNDcalcpitch(int arg0);                                                                                                                     /* sclcptch */
-void iSNDresetpatch(SndTimbre *patch);                                                                                                            /* stagpat */
-unsigned char *iSNDresettimbre(SndTimbre *timbre, SndTimbre *buffer);                                                                             /* stagpat */
-intptr iSNDresolveheader(SndTimbre *timbre, const SndTimbre *header);                                                                             /* stagpat */
-void iSNDfindfreekey(void);                                                                                                                       /* stagpat */
-int iSNDplaytaggedtimbre(intptr stream, const unsigned char *tag, SndTimbre *timbre, SndTimbre *header, int note, int velocity, int pitchOffset); /* stagpat */
-int iSNDplaytaggedpatch(unsigned char *patch, int *info);                                                                                         /* stagpat */
-int iSNDresolvetaggedpatch(unsigned char *bank, intptr patchBase, int *scratch);                                                                  /* stagpat */
-int iSNDremovetaggedpatch(unsigned char *bank, int *patch);                                                                                       /* stagpat */
-int iSNDdownloadbank(intptr bankData, intptr patchData);                                                                                          /* sbdload */
-void iSNDbankalloc();                                                                                                                             /* sballoc */
-void SNDgetvol(int arg0);                                                                                                                         /* sgetvol */
-void iSNDpacketplayoverhead(int arg0);                                                                                                            /* spktplay */
-void SNDPKTPLAY_overhead(int arg0);                                                                                                               /* spktplay */
-int SNDPKTPLAY_create(intptr memory, int memorySize, SndPacketReleaseCallback release, SndPacketNotifyCallback notify);                           /* spktplay */
-int SNDPKTPLAY_start(int player, intptr rate, intptr header, int *params);                                                                        /* spktplay */
-int SNDPKTPLAY_submit(int player, intptr *frame);                                                                                                 /* spktplay */
-void SNDPKTPLAY_submitspace(int arg0);                                                                                                            /* spktplay */
-void SNDPKTPLAY_unsafeframesoutstanding(int arg0);                                                                                                /* spktplay */
-void SNDPKTPLAY_framesoutstanding(int arg0);                                                                                                      /* spktplay */
-void SNDPKTPLAY_purge(int arg0);                                                                                                                  /* spktplay */
-void SNDPKTPLAY_stop(int arg0);                                                                                                                   /* spktplay */
-void SNDPKTPLAY_destroy(int arg0);                                                                                                                /* spktplay */
-intptr iSNDpacketget(int player, int channel, int *frameSize);                                                                                    /* spktplay */
-unsigned int iSNDpacketfreeframes(int player, int channel, int bytes);                                                                            /* spktplay */
-void iSNDmulu64(void *arg0);                                                                                                                      /* smath64 */
-void iSNDdivu64(int arg0);                                                                                                                        /* smath64 */
-SndStreamRequest *iSNDstreamgetrequestptr(unsigned int requestId);                                                                                /* sstgetrp */
-void SNDattributessetdef(void *arg0);                                                                                                             /* spat2hdr */
-void iSNDpatchtohdr(void *arg0);                                                                                                                  /* spat2hdr */
-void iSNDpacketgetirq();                                                                                                                          /* sdpacket */
-void iSNDpacketsetirq();                                                                                                                          /* sdpacket */
-void iSNDpacketirqcallback();                                                                                                                     /* sdpacket */
-void iSNDpsxzerospu(void *arg0);                                                                                                                  /* sdpacket */
-void iSNDpacketpurgeframes(int arg0);                                                                                                             /* sdpacket */
-int iSNDfillspuwithpackets(int player, int chunk);                                                                                                /* sdpacket */
-void iSNDpacketserve();                                                                                                                           /* sdpacket */
-void iSNDplatformpacketoverhead();                                                                                                                /* sdpacket */
-void iSNDplatformcalcdatarate(void *arg0);                                                                                                        /* sdpacket */
-int iSNDplatformpacketplaycreate(int player, int *memory);                                                                                        /* sdpacket */
-void iSNDplatformpacketplaydestroy(int arg0);                                                                                                     /* sdpacket */
-void iSNDplatformpacketplay(char arg0);                                                                                                           /* sdpacket */
-void iSNDpsxpacketstop(void *arg0);                                                                                                               /* sdpacket */
-void iSNDserveraddclient(void *arg0);                                                                                                             /* ssysserv */
-void iSNDserverremoveclient(void *arg0);                                                                                                          /* ssysserv */
-void SNDSYS_service();                                                                                                                            /* ssysserv */
-void iSNDtimeremaining(int arg0);                                                                                                                 /* sdtimrem */
-void iSNDmemconstrain(int *arg0);                                                                                                                 /* smemman */
-void iSNDmeminit(void *arg0);                                                                                                                     /* smemman */
-void iSNDmemrestore();                                                                                                                            /* smemman */
-void iSNDmalloc(int arg0);                                                                                                                        /* smemman */
-void iSNDplatformcdpanvol(int arg0);                                                                                                              /* sdcdvol */
-void iSNDpsxmemconstrain(int *arg0);                                                                                                              /* sdmemman */
-void iSNDpsxmalloc(int arg0);                                                                                                                     /* sdmemman */
-void iSNDpsxfree(int arg0);                                                                                                                       /* sdmemman */
-void iSNDdmtransfer();                                                                                                                            /* sdma */
-void iSNDdmcallback();                                                                                                                            /* sdma */
-void iSNDdmservice(void *arg0);                                                                                                                   /* sdma */
-int iSNDdmqueue(intptr srcRam, int dstSpu, int len, unsigned char priority, unsigned char flag);                                                  /* sdma */
-int iSNDdmqueuesplit(intptr srcRam, int dstSpu, int len, unsigned char priority);                                                                 /* sdma */
-void iSNDdmcomplete(int arg0);                                                                                                                    /* sdma */
-void iSNDabs(int arg0);                                                                                                                           /* saetodv */
-void iSNDatodlrv(int arg0);                                                                                                                       /* saetodv */
-void iSNDatolrv(int arg0);                                                                                                                        /* saetolrv */
-int iSNDplatformresolve(intptr cursor, intptr bank, int *patch);                                                                                  /* sdresolv */
-int iSNDplatformremove(intptr cursor, int *patch);                                                                                                /* sdresolv */
-int iSNDplatformplay(intptr stream, int voice, int level, int pitch, int sampleArg, int fx, int volAngle, int volDelta);                          /* sdplapat */
-void randrange(int arg0);                                                                                                                         /* srrange */
-int iSNDgettag(intptr *cursor, unsigned int *id, int *value, intptr *data);                                                                       /* sgettag */
-void iSNDrandom();                                                                                                                                /* srandom */
-void iSNDpsxenablespuirq();                                                                                                                       /* sdspuirq */
-void iSNDpsxdisablespuirq();                                                                                                                      /* sdspuirq */
-void iSNDpvtolrv(int arg0);                                                                                                                       /* spvtolrv */
-void iSNDlibatodlrv(int arg0);                                                                                                                    /* saelib */
-void iSNDgetdata(void *arg0);                                                                                                                     /* sgetdata */
-void iSNDsin(int arg0);                                                                                                                           /* ssine */
+void iSNDremovepatches(int arg0);                                                                                                                              /* sbremove */
+                                                                                                                                                               /* sbremove */
+void cSNDbankremove(int arg0);                                                                                                                                 /* sbremove */
+                                                                                                                                                               /* splysdef */
+                                                                                                                                                               /* span */
+void iSNDunsafevol(int arg0);                                                                                                                                  /* svol */
+                                                                                                                                                               /* svol */
+                                                                                                                                                               /* sstsetpr */
+                                                                                                                                                               /* seffect */
+                                                                                                                                                               /* seffect */
+void iSNDunsafebend(int arg0);                                                                                                                                 /* sbend */
+                                                                                                                                                               /* sbend */
+                                                                                                                                                               /* splay */
+int cSNDplay(SNDPLAYOPTS *info);                                                                                                                               /* splay */
+                                                                                                                                                               /* sover */
+                                                                                                                                                               /* sbhdrsze */
+                                                                                                                                                               /* sbhdrcpy */
+                                                                                                                                                               /* sdmemlu */
+                                                                                                                                                               /* sbadd */
+                                                                                                                                                               /* sstop */
+                                                                                                                                                               /* spitch */
+                                                                                                                                                               /* smasterv */
+                                                                                                                                                               /* s3dlow */
+int SNDstopall(void);                                                                                                                                          /* sstopall */
+                                                                                                                                                               /* sautovol */
+                                                                                                                                                               /* sstgetv */
+                                                                                                                                                               /* sststat */
+                                                                                                                                                               /* sstrstat */
+void strrstr(char *arg0);                                                                                                                                      /* sstrstat */
+void iSNDstreamdestroyall();                                                                                                                                   /* sst */
+SndStreamState *iSNDstreamgetstreamptr(int index);                                                                                                             /* sst */
+int iSNDstreamremoverequest(unsigned int requestId);                                                                                                           /* sst */
+void iSNDstreamreleasecallback(intptr sample);                                                                                                                 /* sst */
+void iSNDstreamnotifycallback(int player, unsigned int bytes);                                                                                                 /* sst */
+int iSNDstreamparseheader(SndStreamState *stream, intptr data);                                                                                                /* sst */
+int iSNDstreamparsenumchunks(SndStreamState *stream, intptr data);                                                                                             /* sst */
+void iSNDstreamparsedata(SndStreamState *stream, intptr chunk);                                                                                                /* sst */
+int iSNDstreamparseend(SndStreamState *stream, intptr chunk);                                                                                                  /* sst */
+int iSNDstreamparsechunk(SndStreamState *stream, intptr chunk);                                                                                                /* sst */
+int iSNDstreamisheld(SndStreamState *stream);                                                                                                                  /* sst */
+void iSNDstreamhotroddatachunks();                                                                                                                             /* sst */
+void iSNDstreamservice();                                                                                                                                      /* sst */
+void iSNDstreamnumcreated();                                                                                                                                   /* sst */
+int iSNDstreamcreate(int *priority, int numRequests, int packetArg, intptr objectBuffer, int memorySize, int externalHandle, int externalFlag);                /* sst */
+int iSNDstreamqueue(unsigned int stream, int name, char *filename, int offset, int mode);                                                                      /* sst */
+                                                                                                                                                               /* spvoices */
+                                                                                                                                                               /* spvoices */
+                                                                                                                                                               /* spvoices */
+                                                                                                                                                               /* spvoices */
+                                                                                                                                                               /* sstsetgl */
+                                                                                                                                                               /* sstsetgs */
+                                                                                                                                                               /* sstautov */
+                                                                                                                                                               /* slimits */
+                                                                                                                                                               /* slimits */
+void SNDSTRM_overheadtap(int arg0);                                                                                                                            /* sstovrhd */
+                                                                                                                                                               /* sstovrhd */
+                                                                                                                                                               /* sstvol */
+void iSNDserver();                                                                                                                                             /* sserver */
+void iSND100hzserver();                                                                                                                                        /* sserver */
+void iSNDenteraudio();                                                                                                                                         /* sserver */
+void iSNDleaveaudio();                                                                                                                                         /* sserver */
+                                                                                                                                                               /* sserver */
+                                                                                                                                                               /* sserver */
+                                                                                                                                                               /* stimerem */
+                                                                                                                                                               /* ssysinit */
+                                                                                                                                                               /* ssysinit */
+                                                                                                                                                               /* ssysinit */
+                                                                                                                                                               /* ssysinit */
+void iSNDsystemtaskreal();                                                                                                                                     /* ssysreal */
+                                                                                                                                                               /* ssysreal */
+int SNDcdvol(int vol);                                                                                                                                         /* scdvol */
+void iSNDplatformfree(void *arg0);                                                                                                                             /* sdata */
+void iSNDsync_func(int arg0);                                                                                                                                  /* sbirmpat */
+void iSNDvalidbank(int arg0);                                                                                                                                  /* sbvalid */
+void iSNDischanreserved(int arg0);                                                                                                                             /* salloc */
+void iSNDallocchan(int arg0);                                                                                                                                  /* salloc */
+intptr iSNDfreechan(int chan);                                                                                                                                 /* salloc: mixed status/address result */
+void iSNDgetchan(int arg0);                                                                                                                                    /* salloc */
+int iSNDplatform3dpos(int chan, int pan);                                                                                                                      /* s3dpos */
+int iSNDpatchkey(int chan, int *iter);                                                                                                                         /* spatkey */
+void iSNDcalcvol(int arg0);                                                                                                                                    /* spatkey */
+void iSNDpsxkeyon(int arg0);                                                                                                                                   /* spatkey */
+void iSNDpsxkeyoff(int arg0);                                                                                                                                  /* spatkey */
+void iSNDpsxeffecton(int arg0);                                                                                                                                /* spatkey */
+void iSNDpsxeffectoff(int arg0);                                                                                                                               /* spatkey */
+void iSNDpsxeffectvol(int arg0);                                                                                                                               /* spatkey */
+void iSNDsetvol(int arg0);                                                                                                                                     /* spatkey */
+void iSNDsetslot(int arg0);                                                                                                                                    /* spatkey */
+void iSNDstartvoice(int arg0);                                                                                                                                 /* spatkey */
+void iSNDplatformoutputcaps(void *arg0);                                                                                                                       /* slib */
+void iSNDplatformoutputset(void *arg0);                                                                                                                        /* slib */
+void iSNDinit(void *arg0);                                                                                                                                     /* slib */
+void iSNDrestore();                                                                                                                                            /* slib */
+void iSNDserve();                                                                                                                                              /* slib */
+int iSNDstop(unsigned int chan);                                                                                                                               /* sdriver */
+void iSNDplatformpitch(int arg0);                                                                                                                              /* sdriver */
+int iSNDplatformfxlevel(unsigned int chan, int bus, int fxon);                                                                                                 /* sdriver */
+int iSNDvol(int chan, int level);                                                                                                                              /* sdriver */
+void SNDI_mutexalloc();                                                                                                                                        /* sdfx */
+void SNDI_mutexfree();                                                                                                                                         /* sdfx */
+void SNDI_mutexlock();                                                                                                                                         /* sdfx */
+void SNDI_mutexunlock();                                                                                                                                       /* sdfx */
+void iSNDpsxfxinit(int arg0);                                                                                                                                  /* sdfx */
+void iSNDplatformfxinit(int arg0);                                                                                                                             /* sdfx */
+void iSNDplatformfxmasterlevel(int arg0);                                                                                                                      /* sfxlevel */
+void SNDfxlevel(int arg0);                                                                                                                                     /* sfxlevel */
+void iSNDdetunetolinear(int arg0);                                                                                                                             /* sclcptch */
+int iSNDcalcpitch(int note);                                                                                                                                   /* sclcptch */
+void iSNDresetpatch(SndTimbre *patch);                                                                                                                         /* stagpat */
+unsigned char *iSNDresettimbre(SndTimbre *timbre, SndTimbre *buffer);                                                                                          /* stagpat */
+intptr iSNDresolveheader(SndTimbre *timbre, const SndTimbre *header);                                                                                          /* stagpat */
+void iSNDfindfreekey(void);                                                                                                                                    /* stagpat */
+int iSNDplaytaggedtimbre(intptr stream, const unsigned char *tag, SndTimbre *timbre, SndTimbre *header, int note, int velocity, int pitchOffset);              /* stagpat */
+int iSNDplaytaggedpatch(unsigned char *patch, int *info);                                                                                                      /* stagpat */
+int iSNDresolvetaggedpatch(unsigned char *bank, intptr patchBase, int *scratch);                                                                               /* stagpat */
+int iSNDremovetaggedpatch(unsigned char *bank, int *patch);                                                                                                    /* stagpat */
+int iSNDdownloadbank(intptr bankData, intptr patchData);                                                                                                       /* sbdload */
+void iSNDbankalloc();                                                                                                                                          /* sballoc */
+void SNDgetvol(int arg0);                                                                                                                                      /* sgetvol */
+void iSNDpacketplayoverhead(int arg0);                                                                                                                         /* spktplay */
+void SNDPKTPLAY_overhead(int arg0);                                                                                                                            /* spktplay */
+int SNDPKTPLAY_create(intptr memory, int memorySize, SndPacketReleaseCallback release, SndPacketNotifyCallback notify);                                        /* spktplay */
+int SNDPKTPLAY_start(int player, intptr rate, intptr header, int *params);                                                                                     /* spktplay */
+int SNDPKTPLAY_submit(int player, intptr *frame);                                                                                                              /* spktplay */
+void SNDPKTPLAY_submitspace(int arg0);                                                                                                                         /* spktplay */
+void SNDPKTPLAY_unsafeframesoutstanding(int arg0);                                                                                                             /* spktplay */
+void SNDPKTPLAY_framesoutstanding(int arg0);                                                                                                                   /* spktplay */
+void SNDPKTPLAY_purge(int arg0);                                                                                                                               /* spktplay */
+int SNDPKTPLAY_stop(int arg0);                                                                                                                                 /* spktplay */
+int SNDPKTPLAY_destroy(int arg0);                                                                                                                              /* spktplay */
+intptr iSNDpacketget(int player, int channel, int *frameSize);                                                                                                 /* spktplay */
+unsigned int iSNDpacketfreeframes(int player, int channel, int bytes);                                                                                         /* spktplay */
+int *iSNDmulu64(int *out, unsigned int a, unsigned int b);                                                                                                     /* smath64 */
+int iSNDdivu64(unsigned int low, unsigned int high, unsigned int div);                                                                                         /* smath64 */
+SndStreamRequest *iSNDstreamgetrequestptr(unsigned int requestId);                                                                                             /* sstgetrp */
+void SNDattributessetdef(void *arg0);                                                                                                                          /* spat2hdr */
+void iSNDpatchtohdr(short *src, int *rateDst, int *fmtDst, int *outSize);                                                                                      /* spat2hdr */
+void iSNDpacketgetirq();                                                                                                                                       /* sdpacket */
+void iSNDpacketsetirq();                                                                                                                                       /* sdpacket */
+void iSNDpacketirqcallback();                                                                                                                                  /* sdpacket */
+void iSNDpsxzerospu(void *arg0);                                                                                                                               /* sdpacket */
+void iSNDpacketpurgeframes(int arg0);                                                                                                                          /* sdpacket */
+int iSNDfillspuwithpackets(int player, int chunk);                                                                                                             /* sdpacket */
+void iSNDpacketserve();                                                                                                                                        /* sdpacket */
+void iSNDplatformpacketoverhead();                                                                                                                             /* sdpacket */
+void iSNDplatformcalcdatarate(void *arg0);                                                                                                                     /* sdpacket */
+int iSNDplatformpacketplaycreate(int player, int *memory);                                                                                                     /* sdpacket */
+void iSNDplatformpacketplaydestroy(int arg0);                                                                                                                  /* sdpacket */
+int iSNDplatformpacketplay(int player, int note, unsigned short angle, unsigned char level, int pitch, int arg6, unsigned char fxlevel, unsigned short *rate); /* sdpacket */
+void iSNDpsxpacketstop(void *arg0);                                                                                                                            /* sdpacket */
+short *iSNDserveraddclient(int cb);                                                                                                                            /* ssysserv */
+int iSNDserverremoveclient(int cb);                                                                                                                            /* ssysserv */
+void SNDSYS_service();                                                                                                                                         /* ssysserv */
+void iSNDtimeremaining(int arg0);                                                                                                                              /* sdtimrem */
+void iSNDmemconstrain(int *arg0);                                                                                                                              /* smemman */
+int *iSNDmeminit(int membase, int memsize);                                                                                                                    /* smemman */
+unsigned int iSNDmemrestore(void);                                                                                                                             /* smemman */
+void iSNDmalloc(int arg0);                                                                                                                                     /* smemman */
+void iSNDplatformcdpanvol(int arg0);                                                                                                                           /* sdcdvol */
+void iSNDpsxmemconstrain(int *arg0);                                                                                                                           /* sdmemman */
+void iSNDpsxmalloc(int arg0);                                                                                                                                  /* sdmemman */
+void iSNDpsxfree(int arg0);                                                                                                                                    /* sdmemman */
+void iSNDdmtransfer();                                                                                                                                         /* sdma */
+void iSNDdmcallback();                                                                                                                                         /* sdma */
+void iSNDdmservice(void *arg0);                                                                                                                                /* sdma */
+int iSNDdmqueue(intptr srcRam, int dstSpu, int len, unsigned char priority, unsigned char flag);                                                               /* sdma */
+int iSNDdmqueuesplit(intptr srcRam, int dstSpu, int len, unsigned char priority);                                                                              /* sdma */
+void iSNDdmcomplete(int arg0);                                                                                                                                 /* sdma */
+void iSNDabs(int arg0);                                                                                                                                        /* saetodv */
+int iSNDatodlrv(int angle, int level, int *out_l, int *out_r, int prevL, int prevR);                                                                           /* saetodv */
+int iSNDatolrv(int angle, int level, int *out_l, int *out_r);                                                                                                  /* saetolrv */
+int iSNDplatformresolve(intptr cursor, intptr bank, int *patch);                                                                                               /* sdresolv */
+int iSNDplatformremove(intptr cursor, int *patch);                                                                                                             /* sdresolv */
+int iSNDplatformplay(intptr stream, int voice, int level, int pitch, int sampleArg, int fx, int volAngle, int volDelta);                                       /* sdplapat */
+void randrange(int arg0);                                                                                                                                      /* srrange */
+int iSNDgettag(intptr *cursor, unsigned int *id, int *value, intptr *data);                                                                                    /* sgettag */
+void iSNDrandom();                                                                                                                                             /* srandom */
+int iSNDpsxenablespuirq(void);                                                                                                                                 /* sdspuirq */
+int iSNDpsxdisablespuirq(void);                                                                                                                                /* sdspuirq */
+void iSNDpvtolrv(int arg0);                                                                                                                                    /* spvtolrv */
+int iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r);                                                                                              /* saelib */
+void iSNDgetdata(void *arg0);                                                                                                                                  /* sgetdata */
+void iSNDsin(int arg0);                                                                                                                                        /* ssine */
 /* -- SPCHPSXZ -- */
 int VoxEvent_GetFilterLengthFlag(intptr event);                             /* spchevnt */
 unsigned int VoxEvent_GetKeepTillExpiresFlag(intptr event);                 /* spchevnt */
@@ -447,7 +447,7 @@ int SPCH_AddEvent(unsigned int *table);                                     /* s
 int iSPCH_ChooseEvent();                                                    /* spchevnt */
 void SPCH_ClearEventQueue();                                                /* spchevnt */
 void iSPCH_ClearOldEvents(int arg0);                                        /* spchevnt */
-void SPCH_PlaySpeech();                                                     /* spchevnt */
+void SPCH_PlaySpeech(void);                                                 /* spchevnt */
 void SPCH_ChooseSpeech();                                                   /* spchevnt */
 void iSPCH_InitBanks();                                                     /* spchbank */
 void iSPCH_DisposeBanks();                                                  /* spchbank */
@@ -459,7 +459,7 @@ void iSPCH_SetCycleBits(intptr bank);                                       /* s
 int SPCH_AddBank(intptr bank);                                              /* spchbank */
 intptr iSPCH_MemAlloc(int numBytes, char *message);                         /* spchinit */
 void iSPCH_MemFree(void *arg0);                                             /* spchinit */
-void SPCH_Deinit();                                                         /* spchinit */
+void SPCH_Deinit(void);                                                     /* spchinit */
 void iSPCH_InitInGame();                                                    /* spchinit */
 void SPCH_GetSampleDataRate(int arg0);                                      /* spchinit */
 intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks); /* spchinit */
@@ -468,7 +468,7 @@ int iSPCH_EACrandom();                                                      /* s
 int *iSPCH_EACseedrandom(unsigned int seed);                                /* spchrand */
 int iSPCH_Rand(int n);                                                      /* spchrand */
 int iSPCH_BindData(unsigned short *dat);                                    /* spchrand */
-void SPCH_ResolveData(void *arg0);                                          /* spchrslv */
+int SPCH_ResolveData(unsigned short *dat);                                  /* spchrslv */
 int iSPCH_GetMatchValue(intptr base, int index);                            /* spchdata */
 int VoxSentence_GetShortRule(intptr sentence);                              /* spchdata */
 int VoxSentence_GetNumPhrases(intptr sentence);                             /* spchdata */
@@ -500,7 +500,7 @@ void iSPCH_ClearChosen();                                                       
 int iSPCH_SaveChosenSentence(intptr event, intptr sentence, int ruleCtx, int *eventArgs);                                         /* spchpick */
 void iSPCH_OneChosen();                                                                                                           /* spchpick */
 void iSPCH_PlayChosen(void *arg0);                                                                                                /* spchpick */
-void iSPCH_ChooseSentence(void *arg0);                                                                                            /* spchpick */
+int iSPCH_ChooseSentence(void *arg0);                                                                                             /* spchpick */
 void SPCH_SetPreLoadTicks(int arg0);                                                                                              /* spchpick */
 // dup: void VoxSentence_GetNumPhrases(void * arg0);   /* spchrule */
 // dup: void iSPCH_GetOffset8(void * arg0);   /* spchrule */

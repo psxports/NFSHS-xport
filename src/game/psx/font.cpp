@@ -77,30 +77,24 @@ void Font_Blit(int x,int y,void *src,int u,int v,charactertbl *ch,int arg6)
   int dv;
   int iVar2;
   int height;
-  int pkt_addr24;
   int width;
   int loc_8;
   u_char uv_x;
   u_char uv_y;
-  u_long tu3;
-  u_char *prev_pkt;
+  uint32 tu3;
   u_char *sprt;
   shapetbl *fontShape;
   
   sprt = (u_char *)Render_gPacketPtr;
-  prev_pkt = (u_char *)Render_gPalettePtr;
   fontShape = (shapetbl *)src;
   uv_x = ch->width;
   uv_y = ch->height;
-  *(u_int *)Render_gPacketPtr =
-       *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-  pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
+  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x14;
-  *(u_int *)prev_pkt = *(u_int *)prev_pkt & 0xff000000 | pkt_addr24;
   sprt[3] = 4;
   tu3 = font_tint;
   *(int *)(sprt + 8) = (u_int)y << 0x10 | (u_int)x;
-  *(u_long *)(sprt + 4) = tu3;
+  *(uint32 *)(sprt + 4) = tu3;
   fontClut = (int)gFontClut;
   *(u_int *)(sprt + 0x10) = (u_int)uv_y << 0x10 | (u_int)uv_x;
   uVar1 = fontClut << 0x10 | (fontShape->shapey + v & 0xffU) << 8 | u;
@@ -197,7 +191,7 @@ FontColors_defaultColor:
 
 /* ---- Font_textbsearch__FiPcUlUl  [FONT.CPP:262-280] SLD-VERIFIED ---- */
 charactertbl *
-Font_textbsearch(int key,char *base,u_long nmemb,u_long size)
+Font_textbsearch(int key,char *base,uint32 nmemb,uint32 size)
 
 {
   int cmp;
@@ -363,7 +357,6 @@ void Font_TextXY(char *string,int x,int y)
   charactertbl *ch_entry_p;
   int char_w;
   int char_h;
-  int tpage_packed;
   DR_MODE *dr_mode;
   int tpage;
   int u;
@@ -371,11 +364,10 @@ void Font_TextXY(char *string,int x,int y)
   int code;
   int ch_byte;
   char *str;
-  u_char *tp1;
   u_char *p;
   
   ch_byte = -1;
-  while (p = (u_char *)Render_gPacketPtr, tp1 = (u_char *)Render_gPalettePtr, ch_byte != 0) {
+  while (p = (u_char *)Render_gPacketPtr, ch_byte != 0) {
     ch_byte = (int)(u_char)*string;
     string = string + 1;
     if ((u_int)ch_byte < 0x21) {
@@ -394,11 +386,8 @@ void Font_TextXY(char *string,int x,int y)
     }
   }
   tpage = (int)font_currentTPage;
-  *(u_int *)Render_gPacketPtr =
-       *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-  tpage_packed = (u_int)Render_gPacketPtr & 0xffffff;
+  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
-  *(u_int *)tp1 = *(u_int *)tp1 & 0xff000000 | tpage_packed;
   SetDrawMode((DR_MODE *)p,0,0,tpage,(PSX_RECT *)0x0);
   return;
 }

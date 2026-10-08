@@ -7,7 +7,7 @@
 #include "../../lib/libfns.h"
 
 /* --- globals --- */
-extern "C" extern "C" char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern "C" int CF_DVLC;
 extern int screenbpp;
 extern "C" int timerhz;

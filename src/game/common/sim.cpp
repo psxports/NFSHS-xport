@@ -278,7 +278,7 @@ extern "C" void Sim_MainGameLoop(void)
   int iVar2;
   int iVar3;
   int diffReal;
-  u_long uVar4;
+  uint32 uVar4;
   int realTick;
   int i;
   int lastRealTick;

@@ -48,7 +48,7 @@ void TrgSfx_AddCarWheelSfx(int car,int wheel,coorddef *skidpt,int type,coorddef 
 int TrgSfx_AddCarExtraCheck(int car,int wheel)
 
 {
-  return (simGlobal.gameTicks - gTAddCarExtraSfx[car & 7][wheel] < 8 ^ 1);
+  return ((simGlobal.gameTicks - gTAddCarExtraSfx[car & 7][wheel] < 8) ^ 1);
 }
 
 /* ---- TrgSfx_AddCarExtraSfx__FiiP8coorddefiT2iii  [TRGSFX.CPP:101-111] SLD-VERIFIED ---- */

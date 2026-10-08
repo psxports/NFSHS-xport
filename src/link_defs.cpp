@@ -52,7 +52,7 @@ int sndgs[47];   /* @80147860 : sized to full SndState 0xBC=188B (47*4); SND cas
 /* CF_DVLC @0x80123838-region NAME COLLISION NOTE: the game-side CF_DVLC is a 49096-byte BSS
  *   load/overlay buffer (asyncloadfileat target; speech-bank-pool overlay), NOT the MDEC table.
  *   psxfront/video/nfs3/draww take its address; zero-init BSS is faithful. */
-unsigned char CF_DVLC[];                            /* @BSS : 49096B load buffer */
+extern unsigned char CF_DVLC[];                     /* Owned by initialized link data */
 #ifdef AP_WIN
 unsigned char NFSHS_sndmm_storage[588];                    /* backing for @80148780 */
 unsigned char NFSHS_sndpd_storage[1836];                   /* backing for @80147918 */

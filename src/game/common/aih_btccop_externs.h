@@ -11,7 +11,7 @@ extern __vtbl_ptr_type AIHigh_BTC_Cop_vtable[], AIHigh_BTC_HumanCop_vtable[], AI
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 int Speech_Dispatch(void);              /* speech.obj flat (was Dispatch__6Speech; cast result to Speaker*) */
 intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; cast result to Speaker* */
@@ -24,13 +24,13 @@ extern Car_tObj *Cars_gTrafficCarList[];
 extern Car_tObj *Cars_gRaceCarList[]; /* 0x8010fa00 */
 extern Car_tObj *AILife_IsCarInAnyVisibleArea(Car_tObj *carObj);
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern "C" Sim_tSimSystemVar simVar;
 extern Trk_NewSlice *BWorldSm_slices;
 extern __vtbl_ptr_type AIHigh_Human_vtable[], AIHigh_BasicPerp_vtable[], AIState_Idle_vtable[];
 extern int Cars_gNumTrafficCars;
-extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern "C" int generic128HzClock, stackSpeedUpEnbabledFlag;
 extern int AIInit_forceHumanHandBrake;
 extern int AITune_driveSide;
 extern int Cars_gNumRaceCars;

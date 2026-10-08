@@ -1337,7 +1337,9 @@ void Physics_CalculateRoadGripModifiers(Car_tObj *carObj)
   leftMult = iVar6 >> 1;
   rightMult = iVar7 >> 1;
   iVar2 = (carObj->linearVel_ch).z;
-  roadMult = (frontMult + rearMult >> 1) + (carObj->N).roadGravityModifier;
+  roadMult = nfs4_mips_addu_s32(
+      nfs4_mips_sra_s32(nfs4_mips_addu_s32(frontMult,rearMult),1),
+      (carObj->N).roadGravityModifier);
   if (0x50000 < iVar2) {
     iVar2 = fixedmult(iVar2,carObj->specs->frontAeroDownForce);
     frontMult = frontMult + iVar2;
@@ -1788,7 +1790,8 @@ void Physics_CalcWheelLockAcc(Car_tObj *carObj,Physics_tWheelAccStruct *wheel)
     trap(0x1800);
   }
   if (iVar1 < totalAcc) {
-    wheel->skid = wheel->skid * 3 + (totalAcc - iVar1) >> 2;
+    wheel->skid = nfs4_mips_sra_s32(nfs4_mips_addu_s32(
+        nfs4_mips_mult_s32(wheel->skid,3),nfs4_mips_subu_s32(totalAcc,iVar1)),2);
   }
   else {
     wheel->skid = 0;
@@ -2541,7 +2544,9 @@ PhyReal_calcAccel:
     if (iVar11 < 0) {
       iVar11 = (iVar5 >> 9) + 0xc0ff;
     }
-    carObj->gTransferFront = (iVar10 + 0xff >> 8) * (iVar11 >> 8);
+    carObj->gTransferFront = nfs4_mips_mult_s32(
+        nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar10,0xff),8),
+        nfs4_mips_sra_s32(iVar11,8));
   }
   else if (0 < iVar10) {
     iVar10 = iVar10 * 3;
@@ -2823,9 +2828,9 @@ PhyReal_calcAccel:
     dirVector.y = pTVar9->center[1];
     dirVector.z = pTVar9->center[2];
     iVar3 = Physics_CalculateRSControlDesiredPosition(carObj,iVar4,iVar5);
-    iVar5 = fixedmult((int)BWorldSm_slices[iVar4].right[0] << 9,iVar3);
-    iVar10 = fixedmult((int)BWorldSm_slices[iVar4].right[1] << 9,iVar3);
-    iVar3 = fixedmult((int)BWorldSm_slices[iVar4].right[2] << 9,iVar3);
+    iVar5 = fixedmult(nfs4_mips_sll_s32(BWorldSm_slices[iVar4].right[0],9),iVar3);
+    iVar10 = fixedmult(nfs4_mips_sll_s32(BWorldSm_slices[iVar4].right[1],9),iVar3);
+    iVar3 = fixedmult(nfs4_mips_sll_s32(BWorldSm_slices[iVar4].right[2],9),iVar3);
     dirVector.x = (dirVector.x + iVar5) - iVar11;
     dirVector.y = (dirVector.y + iVar10) - iVar6;
     dirVector.z = (dirVector.z + iVar3) - iVar7;

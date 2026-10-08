@@ -24,7 +24,7 @@ extern "C" unsigned char snd_reverb_table[660] = {0x02, 0x00, 0x00, 0x00, 0x00, 
 extern "C" unsigned int iSNDpsxeffectoff(int mask);                                                     /* spatkey */
 extern "C" int iSNDpsxeffectvol(int left, int right);                                                   /* spatkey */
 extern "C" void blockmove(int *src, int *dst, int n);                                                   /* blkmov  */
-extern "C" int blockclear(int buf, int len);                                                            /* blkfill (2-arg per IDA; Ghidra dropped both) */
+extern "C" void blockclear(void *buf, int len);                                                         /* blkfill (2-arg per IDA; Ghidra dropped both) */
 extern "C" int iSNDdmqueue(intptr srcRam, int dstSpu, int len, unsigned char prio, unsigned char flag); /* sdma */
 extern "C" int iSNDdmcomplete(int handle);                                                              /* sdma */
 
@@ -111,8 +111,8 @@ extern "C" unsigned int iSNDpsxfxinit(int mode)
     work = 0x10000 - (unsigned short)rv[0];
 #endif
 
-    blockclear((int)scratch, 0x100); /* zero the 256-byte DMA scratch */
-    i = 0;                           /* DMA-clear SPU reverb RAM in 0x20-word runs */
+    blockclear(scratch, 0x100); /* zero the 256-byte DMA scratch */
+    i = 0;                      /* DMA-clear SPU reverb RAM in 0x20-word runs */
     while (i < 0x10000)
     {
         int chunk = 0x10000 - i;

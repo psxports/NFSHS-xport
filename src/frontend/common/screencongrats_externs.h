@@ -5,7 +5,7 @@
 #include "../../lib/libfns.h"
 #include "../psx/psxfront.h" /* DrawShapeExtended/CleanupSpinningCarsMenu */
 
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tCarManager carManager;
 extern tTournamentManager tournamentManager;
 
@@ -16,7 +16,7 @@ extern "C" char textDefinitions[14][6];
 /* (gFE_congratsCarRot is NOT extern: SYM marks it STAT carRotate = DrawBackground-local static) */
 extern int R3DCar_aSyncLoading;
 extern "C" int showRoomFlag;
-extern "C" extern SPEECHINFO ginfo;
+extern "C" SPEECHINFO ginfo;
 
 /* external methods declared free-form (mgr/mgr2 = the implicit this) */
 tCarInfo *GetCarFromID(tCarManager *mgr, short carID);
@@ -45,7 +45,7 @@ extern "C"
 {
     void CarIO_CreateLicense(char *text, int carType, int player);
 }
-void DrawCar(tCarInfo *carInfo, short x, short y, float camerax, float cameray, char brightness, bool reflection, u_long rotate, tPlayer player);
+void DrawCar(tCarInfo *carInfo, short x, short y, float camerax, float cameray, char brightness, bool reflection, uint32 rotate, tPlayer player);
 extern "C"
 {
     void DrawMoney(int x, int y, int numplaces, long number, int colfore, int colback);

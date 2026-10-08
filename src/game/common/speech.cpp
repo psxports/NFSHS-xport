@@ -343,8 +343,11 @@ void Speaker_SetCar(Speaker *pThis,Car_tObj *car)
       (pThis->fColour).flags = uVar3;
     }
     iVar2 = Speech_Dispatch();
-    iVar2 = (**(int (**)(...))(*(int *)(iVar2 + 0x4c) + 0x94))
-                      (iVar2 + *(short *)(*(int *)(iVar2 + 0x4c) + 0x90),car);
+    iVar2 = ([&]() -> int {
+      DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr_t)iVar2;
+      const __vtbl_ptr_type &entry = (*dispatch->_base_Speaker._vf)[18];
+      return ((void * (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)dispatch + entry.delta), car) != nullptr;
+    }());
     if (iVar2 == 0) {
       piVar1 = (int *)NFS4_VCALL_AUTO((*pThis->_vf)[0x1c].pfn, (int)&(pThis->fPosition).flags + (int)(*pThis->_vf)[0x1c].delta,
                                  car->carIndex);
@@ -702,8 +705,8 @@ static u_int Speech_ReadBE32(const u_char *bytes)
 int Speech_CalculateBankSize(Speech *pThis,char *header,CarBankName *bn,long *hoffset,long *hsize)
 
 {
-  long eventOffset;
-  long eventSize;
+  int eventOffset;
+  int eventSize;
   int bankCount = 0;
   int totalSize = 0;
   u_char *entry = (u_char *)header + 0x10;
@@ -740,8 +743,8 @@ int Speech_CalculateBankSize(Speech *pThis,char *header,CarBankName *bn,long *ho
 void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoffset,long hsize)
 
 {
-  long eventOffset;
-  long eventSize;
+  int eventOffset;
+  int eventSize;
   int headerBank = 0;
   int nextDataBank = 0;
   u_char *eventData = (u_char *)(pThis->fBankOffset + pThis->fBankCount);
@@ -750,7 +753,7 @@ void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoff
 
   locatebigentry(header,"j:eventdat\\event.dat",0,&eventOffset,&eventSize);
   FILE_readsync(pThis->fFileHandle,eventOffset,(intptr)eventData,eventSize,100);
-  SPCH_ResolveData((int)(intptr)eventData);
+  SPCH_ResolveData((unsigned short *)eventData);
   u_char *bankData = eventData + eventSize;
   u_char *headerData = (u_char *)reservememadr("spch temp",hsize,0x10);
   FILE_readsync(pThis->fFileHandle,hoffset,(intptr)headerData,hsize,100);
@@ -951,7 +954,7 @@ void Speech_Reset(void)
     Speech_fgSpeech->fCopCount = ((uVar3 & 0xffff00) >> 8) % 9;
     Speech_fgSpeech->fSuperCount = ((uVar4 & 0xffff00) >> 8) % 6;
     DispatchSpeaker_Activate(Speech_fgSpeech->fDispatch,
-               uVar7 + (uVar7 / 7 + (uVar7 - uVar7 / 7 >> 1) >> 2) * -7);
+               uVar7 + ((uVar7 / 7 + ((uVar7 - uVar7 / 7) >> 1)) >> 2) * -7);
   }
   return;
 }
@@ -1897,7 +1900,7 @@ void MobileSpeaker_Activate(MobileSpeaker *pThis,Car_tObj *carObj)
   Speech_tMobileVoiceAttr * a;
   int reg_v0;
   int Voice;
-  u_long uVar1;
+  uint32 uVar1;
   __vtbl_ptr_type (*pa_Var2) [31];
   int iVar3;
   int unit;
@@ -2071,49 +2074,49 @@ int MobileSpeaker_DistToPerp(MobileSpeaker *pThis)
   int iVar3;
   int iVar4;
   int z;
-  int (*pcVar5)(...);
+  nfs4_vtbl_pfn pcVar5;
   int x;
   int iVar6;
   
   pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x19].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x19].delta);
+  iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
   pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar4 = NFS4_VCALL_AUTO((*pa_Var2)[0x1b].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x1b].delta);
+  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
   if (*(int *)(iVar3 + 0xa0) - *(int *)(iVar4 + 0xa0) < 1) {
     pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x1b].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x1b].delta);
+    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
     pa_Var2 = (pThis->_base_Speaker)._vf;
     sVar1 = (*pa_Var2)[0x19].delta;
     pcVar5 = (*pa_Var2)[0x19].pfn;
   }
   else {
     pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x19].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x19].delta);
+    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
     pa_Var2 = (pThis->_base_Speaker)._vf;
     sVar1 = (*pa_Var2)[0x1b].delta;
     pcVar5 = (*pa_Var2)[0x1b].pfn;
   }
-  iVar4 = (*pcVar5)((int)&(pThis->_base_Speaker).fPosition.flags + (int)sVar1);
+  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))pcVar5)((MobileSpeaker *)((char *)pThis + sVar1));
   iVar6 = *(int *)(iVar3 + 0xa0) - *(int *)(iVar4 + 0xa0);
   pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x19].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x19].delta);
+  iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
   pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar4 = NFS4_VCALL_AUTO((*pa_Var2)[0x1b].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x1b].delta);
+  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
   if (*(int *)(iVar3 + 0xa8) - *(int *)(iVar4 + 0xa8) < 1) {
     pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x1b].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x1b].delta);
+    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
     pa_Var2 = (pThis->_base_Speaker)._vf;
     sVar1 = (*pa_Var2)[0x19].delta;
     pcVar5 = (*pa_Var2)[0x19].pfn;
   }
   else {
     pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x19].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x19].delta);
+    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
     pa_Var2 = (pThis->_base_Speaker)._vf;
     sVar1 = (*pa_Var2)[0x1b].delta;
     pcVar5 = (*pa_Var2)[0x1b].pfn;
   }
-  iVar4 = (*pcVar5)((int)&(pThis->_base_Speaker).fPosition.flags + (int)sVar1);
+  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))pcVar5)((MobileSpeaker *)((char *)pThis + sVar1));
   iVar3 = *(int *)(iVar3 + 0xa8) - *(int *)(iVar4 + 0xa8);
   if (iVar3 < iVar6) {
     iVar6 = iVar6 + (iVar3 >> 2);
@@ -2467,7 +2470,7 @@ void MobileSpeaker_Catch(MobileSpeaker *pThis,int ticket)
   __vtbl_ptr_type *entry;
   CallSignBank *callSign;
   Car_tObj *perp;
-  u_long ambulanceFlags;
+  uint32 ambulanceFlags;
 
   entry = &(*base->_vf)[27];
   perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
@@ -2677,14 +2680,11 @@ void MobileSpeaker_Bullhorn(MobileSpeaker *pThis)
 {
   Car_tObj *carObj;
   SPCHNFSType_VOICE *VOICE;
-  int reg_a1;
-  int reg_a2;
-  int reg_a3;
   
   VOICE = &pThis->fVoice;
   *(Car_tObj **)(((int)Speech_fgSpeech) + 0x38c) = pThis->fCarObj;
   SPCHNFS_C_P_BULLHORN_SPEECH(VOICE);
-  SPCH_PlaySpeech((int)(intptr)VOICE,reg_a1,reg_a2,reg_a3);
+  SPCH_PlaySpeech();
   return;
 }
 
@@ -2708,12 +2708,18 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
     pThis->fCarObj = (Car_tObj *)0x0;
     iVar3 = Speech_Dispatch();
     pMVar4 = (MobileSpeaker *)
-             (**(int (**)(...))(*(int *)(iVar3 + 0x4c) + 0xb4))
-                       (iVar3 + *(short *)(*(int *)(iVar3 + 0x4c) + 0xb0));
+             ([&]() -> Speaker * {
+      DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr_t)iVar3;
+      const __vtbl_ptr_type &entry = (*dispatch->_base_Speaker._vf)[22];
+      return ((Speaker * (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)dispatch + entry.delta));
+    }());
     if (pMVar4 == pThis) {
       iVar3 = Speech_Dispatch();
-      (**(int (**)(...))(*(int *)(iVar3 + 0x4c) + 0xbc))
-                (iVar3 + *(short *)(*(int *)(iVar3 + 0x4c) + 0xb8));
+      ([&]() -> void {
+      DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr_t)iVar3;
+      const __vtbl_ptr_type &entry = (*dispatch->_base_Speaker._vf)[23];
+      return ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)dispatch + entry.delta));
+    }());
     }
     pMVar4 = (MobileSpeaker *)Speech_Dispatch();
     do {
@@ -3016,103 +3022,103 @@ CallSignBank * Speaker_CallSign(Speaker *pThis)   /* @0x80099364  CallSign__Q26S
 
 /* ---- #75 data-materialization: 3 Speech vtables (nested Speech::<Leaf>, flat <Leaf>_<Method> pfns). ---- */
 __vtbl_ptr_type Speaker_vtable[31] = {   /* @0x80055dc4  Speech::Speaker vtable (#75 data-mat; faithful nfs4-f.exe bytes) */
-  {0, 0, (int (*)(...))0},                           /* @0x80055dc4  null */
-  {0, 0, (int (*)(...))&Speaker_Report},             /* @0x80055dcc  Report__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_Status},             /* @0x80055dd4  Status__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Deny},               /* @0x80055ddc  Deny__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Grant},              /* @0x80055de4  Grant__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Ready},              /* @0x80055dec  Ready__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_Engage},             /* @0x80055df4  Engage__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_Lose},               /* @0x80055dfc  Lose__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Accident},           /* @0x80055e04  Accident__Q26Speech7Speakeri */
-  {0, 0, (int (*)(...))&Speaker_Catch},              /* @0x80055e0c  Catch__Q26Speech7Speakeri */
-  {0, 0, (int (*)(...))&Speaker_RoadBlock},          /* @0x80055e14  RoadBlock__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_SpikeBelt},          /* @0x80055e1c  SpikeBelt__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Backup},             /* @0x80055e24  Backup__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_ReportBlockade},     /* @0x80055e2c  ReportBlockade__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Roger},              /* @0x80055e34  Roger__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Bullhorn},           /* @0x80055e3c  Bullhorn__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Purge},              /* @0x80055e44  Purge__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Unit},               /* @0x80055e4c  Unit__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_KnownPerp},          /* @0x80055e54  KnownPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_ClearPerp},          /* @0x80055e5c  ClearPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_IsSuper},            /* @0x80055e64  IsSuper__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_StatusCount},        /* @0x80055e6c  StatusCount__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_StatusSub},          /* @0x80055e74  StatusSub__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_PurgeStatusSub},     /* @0x80055e7c  PurgeStatusSub__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_DistToPerp},         /* @0x80055e84  DistToPerp__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_CarObj},             /* @0x80055e8c  CarObj__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_ReActivate},         /* @0x80055e94  ReActivate__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Perp},               /* @0x80055e9c  Perp__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_GetCarBank},         /* @0x80055ea4  GetCarBank__Q26Speech7Speakeri */
-  {0, 0, (int (*)(...))&Speaker_FindClosestLocationTo}, /* @0x80055eac  FindClosestLocationTo__Q26Speech7Speakeri */
-  {0, 0, (int (*)(...))&Speaker_CallSign},           /* @0x80055eb4  CallSign__Q26Speech7Speaker */
+  {0, 0, nullptr},                           /* @0x80055dc4  null */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Report)},             /* @0x80055dcc  Report__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Status)},             /* @0x80055dd4  Status__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Deny)},               /* @0x80055ddc  Deny__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Grant)},              /* @0x80055de4  Grant__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Ready)},              /* @0x80055dec  Ready__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Engage)},             /* @0x80055df4  Engage__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Lose)},               /* @0x80055dfc  Lose__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Accident)},           /* @0x80055e04  Accident__Q26Speech7Speakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Catch)},              /* @0x80055e0c  Catch__Q26Speech7Speakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_RoadBlock)},          /* @0x80055e14  RoadBlock__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_SpikeBelt)},          /* @0x80055e1c  SpikeBelt__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Backup)},             /* @0x80055e24  Backup__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReportBlockade)},     /* @0x80055e2c  ReportBlockade__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Roger)},              /* @0x80055e34  Roger__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Bullhorn)},           /* @0x80055e3c  Bullhorn__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Purge)},              /* @0x80055e44  Purge__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Unit)},               /* @0x80055e4c  Unit__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_KnownPerp)},          /* @0x80055e54  KnownPerp__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ClearPerp)},          /* @0x80055e5c  ClearPerp__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_IsSuper)},            /* @0x80055e64  IsSuper__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusCount)},        /* @0x80055e6c  StatusCount__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusSub)},          /* @0x80055e74  StatusSub__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_PurgeStatusSub)},     /* @0x80055e7c  PurgeStatusSub__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_DistToPerp)},         /* @0x80055e84  DistToPerp__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_CarObj)},             /* @0x80055e8c  CarObj__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReActivate)},         /* @0x80055e94  ReActivate__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Perp)},               /* @0x80055e9c  Perp__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_GetCarBank)},         /* @0x80055ea4  GetCarBank__Q26Speech7Speakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_FindClosestLocationTo)}, /* @0x80055eac  FindClosestLocationTo__Q26Speech7Speakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_CallSign)},           /* @0x80055eb4  CallSign__Q26Speech7Speaker */
 };
 __vtbl_ptr_type MobileSpeaker_vtable[31] = {   /* @0x80055bd4  Speech::MobileSpeaker vtable (#75 data-mat; faithful nfs4-f.exe bytes) */
-  {0, 0, (int (*)(...))0},                           /* @0x80055bd4  null */
-  {0, 0, (int (*)(...))&MobileSpeaker_Report},       /* @0x80055bdc  Report__Q26Speech13MobileSpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&MobileSpeaker_Status},       /* @0x80055be4  Status__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&Speaker_Deny},               /* @0x80055bec  Deny__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Grant},              /* @0x80055bf4  Grant__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Ready},              /* @0x80055bfc  Ready__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&MobileSpeaker_Engage},       /* @0x80055c04  Engage__Q26Speech13MobileSpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&MobileSpeaker_Lose},         /* @0x80055c0c  Lose__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Accident},     /* @0x80055c14  Accident__Q26Speech13MobileSpeakeri */
-  {0, 0, (int (*)(...))&MobileSpeaker_Catch},        /* @0x80055c1c  Catch__Q26Speech13MobileSpeakeri */
-  {0, 0, (int (*)(...))&MobileSpeaker_RoadBlock},    /* @0x80055c24  RoadBlock__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_SpikeBelt},    /* @0x80055c2c  SpikeBelt__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Backup},       /* @0x80055c34  Backup__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_ReportBlockade}, /* @0x80055c3c  ReportBlockade__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Roger},        /* @0x80055c44  Roger__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Bullhorn},     /* @0x80055c4c  Bullhorn__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Purge},        /* @0x80055c54  Purge__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Unit},         /* @0x80055c5c  Unit__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&Speaker_KnownPerp},          /* @0x80055c64  KnownPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_ClearPerp},          /* @0x80055c6c  ClearPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&MobileSpeaker_IsSuper},      /* @0x80055c74  IsSuper__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&Speaker_StatusCount},        /* @0x80055c7c  StatusCount__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_StatusSub},          /* @0x80055c84  StatusSub__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_PurgeStatusSub},     /* @0x80055c8c  PurgeStatusSub__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_DistToPerp},   /* @0x80055c94  DistToPerp__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_CarObj},       /* @0x80055c9c  CarObj__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_ReActivate},   /* @0x80055ca4  ReActivate__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_Perp},         /* @0x80055cac  Perp__Q26Speech13MobileSpeaker */
-  {0, 0, (int (*)(...))&MobileSpeaker_GetCarBank},   /* @0x80055cb4  GetCarBank__Q26Speech13MobileSpeakeri */
-  {0, 0, (int (*)(...))&MobileSpeaker_FindClosestLocationTo}, /* @0x80055cbc  FindClosestLocationTo__Q26Speech13MobileSpeakeri */
-  {0, 0, (int (*)(...))&MobileSpeaker_CallSign},     /* @0x80055cc4  CallSign__Q26Speech13MobileSpeaker */
+  {0, 0, nullptr},                           /* @0x80055bd4  null */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Report)},       /* @0x80055bdc  Report__Q26Speech13MobileSpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Status)},       /* @0x80055be4  Status__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Deny)},               /* @0x80055bec  Deny__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Grant)},              /* @0x80055bf4  Grant__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Ready)},              /* @0x80055bfc  Ready__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Engage)},       /* @0x80055c04  Engage__Q26Speech13MobileSpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Lose)},         /* @0x80055c0c  Lose__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Accident)},     /* @0x80055c14  Accident__Q26Speech13MobileSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Catch)},        /* @0x80055c1c  Catch__Q26Speech13MobileSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_RoadBlock)},    /* @0x80055c24  RoadBlock__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_SpikeBelt)},    /* @0x80055c2c  SpikeBelt__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Backup)},       /* @0x80055c34  Backup__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_ReportBlockade)}, /* @0x80055c3c  ReportBlockade__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Roger)},        /* @0x80055c44  Roger__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Bullhorn)},     /* @0x80055c4c  Bullhorn__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Purge)},        /* @0x80055c54  Purge__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Unit)},         /* @0x80055c5c  Unit__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_KnownPerp)},          /* @0x80055c64  KnownPerp__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ClearPerp)},          /* @0x80055c6c  ClearPerp__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_IsSuper)},      /* @0x80055c74  IsSuper__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusCount)},        /* @0x80055c7c  StatusCount__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusSub)},          /* @0x80055c84  StatusSub__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_PurgeStatusSub)},     /* @0x80055c8c  PurgeStatusSub__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_DistToPerp)},   /* @0x80055c94  DistToPerp__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_CarObj)},       /* @0x80055c9c  CarObj__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_ReActivate)},   /* @0x80055ca4  ReActivate__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Perp)},         /* @0x80055cac  Perp__Q26Speech13MobileSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_GetCarBank)},   /* @0x80055cb4  GetCarBank__Q26Speech13MobileSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_FindClosestLocationTo)}, /* @0x80055cbc  FindClosestLocationTo__Q26Speech13MobileSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_CallSign)},     /* @0x80055cc4  CallSign__Q26Speech13MobileSpeaker */
 };
 __vtbl_ptr_type DispatchSpeaker_vtable[31] = {   /* @0x80055ccc  Speech::DispatchSpeaker vtable (#75 data-mat; faithful nfs4-f.exe bytes) */
-  {0, 0, (int (*)(...))0},                           /* @0x80055ccc  null */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Report},     /* @0x80055cd4  Report__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Status},     /* @0x80055cdc  Status__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Deny},       /* @0x80055ce4  Deny__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Grant},      /* @0x80055cec  Grant__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Ready},      /* @0x80055cf4  Ready__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_Engage},             /* @0x80055cfc  Engage__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_Lose},               /* @0x80055d04  Lose__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Accident},   /* @0x80055d0c  Accident__Q26Speech15DispatchSpeakeri */
-  {0, 0, (int (*)(...))&Speaker_Catch},              /* @0x80055d14  Catch__Q26Speech7Speakeri */
-  {0, 0, (int (*)(...))&Speaker_RoadBlock},          /* @0x80055d1c  RoadBlock__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_SpikeBelt},          /* @0x80055d24  SpikeBelt__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Backup},             /* @0x80055d2c  Backup__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_ReportBlockade},     /* @0x80055d34  ReportBlockade__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_Roger},      /* @0x80055d3c  Roger__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&Speaker_Bullhorn},           /* @0x80055d44  Bullhorn__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Purge},              /* @0x80055d4c  Purge__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Unit},               /* @0x80055d54  Unit__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_KnownPerp},  /* @0x80055d5c  KnownPerp__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&DispatchSpeaker_ClearPerp},  /* @0x80055d64  ClearPerp__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, (int (*)(...))&Speaker_IsSuper},            /* @0x80055d6c  IsSuper__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_StatusCount}, /* @0x80055d74  StatusCount__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_StatusSub},  /* @0x80055d7c  StatusSub__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_PurgeStatusSub}, /* @0x80055d84  PurgeStatusSub__Q26Speech15DispatchSpeaker */
-  {0, 0, (int (*)(...))&Speaker_DistToPerp},         /* @0x80055d8c  DistToPerp__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_CarObj},             /* @0x80055d94  CarObj__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_ReActivate},         /* @0x80055d9c  ReActivate__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&Speaker_Perp},               /* @0x80055da4  Perp__Q26Speech7Speaker */
-  {0, 0, (int (*)(...))&DispatchSpeaker_GetCarBank}, /* @0x80055dac  GetCarBank__Q26Speech15DispatchSpeakeri */
-  {0, 0, (int (*)(...))&DispatchSpeaker_FindClosestLocationTo}, /* @0x80055db4  FindClosestLocationTo__Q26Speech15DispatchSpeakeri */
-  {0, 0, (int (*)(...))&DispatchSpeaker_CallSign},   /* @0x80055dbc  CallSign__Q26Speech15DispatchSpeaker */
+  {0, 0, nullptr},                           /* @0x80055ccc  null */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Report)},     /* @0x80055cd4  Report__Q26Speech15DispatchSpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Status)},     /* @0x80055cdc  Status__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Deny)},       /* @0x80055ce4  Deny__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Grant)},      /* @0x80055cec  Grant__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Ready)},      /* @0x80055cf4  Ready__Q26Speech15DispatchSpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Engage)},             /* @0x80055cfc  Engage__Q26Speech7SpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Lose)},               /* @0x80055d04  Lose__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Accident)},   /* @0x80055d0c  Accident__Q26Speech15DispatchSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Catch)},              /* @0x80055d14  Catch__Q26Speech7Speakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_RoadBlock)},          /* @0x80055d1c  RoadBlock__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_SpikeBelt)},          /* @0x80055d24  SpikeBelt__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Backup)},             /* @0x80055d2c  Backup__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReportBlockade)},     /* @0x80055d34  ReportBlockade__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Roger)},      /* @0x80055d3c  Roger__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Bullhorn)},           /* @0x80055d44  Bullhorn__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Purge)},              /* @0x80055d4c  Purge__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Unit)},               /* @0x80055d54  Unit__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_KnownPerp)},  /* @0x80055d5c  KnownPerp__Q26Speech15DispatchSpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_ClearPerp)},  /* @0x80055d64  ClearPerp__Q26Speech15DispatchSpeakerP8Car_tObj */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_IsSuper)},            /* @0x80055d6c  IsSuper__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_StatusCount)}, /* @0x80055d74  StatusCount__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_StatusSub)},  /* @0x80055d7c  StatusSub__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_PurgeStatusSub)}, /* @0x80055d84  PurgeStatusSub__Q26Speech15DispatchSpeaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_DistToPerp)},         /* @0x80055d8c  DistToPerp__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_CarObj)},             /* @0x80055d94  CarObj__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReActivate)},         /* @0x80055d9c  ReActivate__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Perp)},               /* @0x80055da4  Perp__Q26Speech7Speaker */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_GetCarBank)}, /* @0x80055dac  GetCarBank__Q26Speech15DispatchSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_FindClosestLocationTo)}, /* @0x80055db4  FindClosestLocationTo__Q26Speech15DispatchSpeakeri */
+  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_CallSign)},   /* @0x80055dbc  CallSign__Q26Speech15DispatchSpeaker */
 };
 
 /* end of speech.cpp */

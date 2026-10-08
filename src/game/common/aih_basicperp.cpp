@@ -567,9 +567,10 @@ void AIHigh_BasicPerp::RemoveCloseCops()
 
         pSVar2 = (Speaker *)Speech_Mobile(pAVar3->carObj_);
 
-        (**(int (**)(...))(pSVar2->_vf[4] + 8))
-
-                  ((int)&(pSVar2->fPosition).flags + (int)*(short *)(pSVar2->_vf[4] + 4));
+        {
+          const __vtbl_ptr_type &entry = (*pSVar2->_vf)[16];
+          ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+        }
 
       }
 

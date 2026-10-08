@@ -13,10 +13,10 @@
  */
 #include "../../../mips_semantics.h"
 
-extern "C" void *reservememadr(char *name, int size, int classid); /* eacpsxz @0x800E533C (memstd) */
-extern "C" int purgememadr(void *p);                               /* eacpsxz @0x800E5540 (memstd) */
-extern "C" void ClearOTagR(unsigned long *ot, int n);              /* PsyQ libgpu */
-extern "C" int DrawSync(int mode);                                 /* PsyQ libgpu */
+extern "C" void *reservememadr(const char *name, int size, int classid); /* eacpsxz @0x800E533C (memstd) */
+extern "C" int purgememadr(void *p);                                     /* eacpsxz @0x800E5540 (memstd) */
+extern "C" unsigned long *ClearOTagR(unsigned long *ot, int n);          /* PsyQ libgpu */
+extern "C" int DrawSync(int mode);                                       /* PsyQ libgpu */
 
 /* ---- shared GPU draw-list globals (data-materialization pass owns the definitions) ---- */
 extern "C" int maxot;        /* ordering-table length (set to 16 here)        */

@@ -4,8 +4,14 @@
  *   Sfx_BuildSouffleFacet (per-type render dispatch), Sfx_Add (per-type init).
  */
 #include "../../nfs4_types.h"
+#include "../../mips_semantics.h"
 #include "sfx_externs.h"
 
+static int Sfx_OffsetCoordinate(int point,int offset,int center,unsigned int shift)
+{
+  return nfs4_mips_sra_s32(
+      nfs4_mips_subu_s32(nfs4_mips_addu_s32(point,offset),center),shift);
+}
 
 /* ---- Sfx_Transform__FP8coorddefP7SVECTORT0  [SFX.CPP:40-75] SLD-VERIFIED ---- */
 void Sfx_Transform(coorddef *worldpt,SVECTOR *campt,coorddef *t)
@@ -75,20 +81,20 @@ void Sfx_ThickenXZ(SVECTOR *d,coorddef *pt1,coorddef *pt2,coorddef *cp)
   int pzp;
 
   angle = intatan(pt2->x - pt1->x,pt2->z - pt1->z);
-  pxp = fixedmult(0xe666,-fastintcos(angle)) >> 1;
-  pzp = fixedmult(0xe666,fastintsin(angle)) >> 1;
-  d[1].vx = (short)((pt1->x + pxp) - cp->x >> 10);
-  d[1].vy = (short)(pt1->y - cp->y >> 10);
-  d[1].vz = (short)((pt1->z + pzp) - cp->z >> 10);
-  d[2].vx = (short)((pt1->x - pxp) - cp->x >> 10);
-  d[2].vy = (short)(pt1->y - cp->y >> 10);
-  d[2].vz = (short)((pt1->z - pzp) - cp->z >> 10);
-  d->vx = (short)((pt2->x + pxp) - cp->x >> 10);
-  d->vy = (short)(pt2->y - cp->y >> 10);
-  d->vz = (short)((pt2->z + pzp) - cp->z >> 10);
-  d[3].vx = (short)((pt2->x - pxp) - cp->x >> 10);
-  d[3].vy = (short)(pt2->y - cp->y >> 10);
-  d[3].vz = (short)((pt2->z - pzp) - cp->z >> 10);
+  pxp = nfs4_mips_sra_s32(fixedmult(0xe666,-fastintcos(angle)),1);
+  pzp = nfs4_mips_sra_s32(fixedmult(0xe666,fastintsin(angle)),1);
+  d[1].vx = (short)Sfx_OffsetCoordinate(pt1->x,pxp,cp->x,10);
+  d[1].vy = (short)Sfx_OffsetCoordinate(pt1->y,0,cp->y,10);
+  d[1].vz = (short)Sfx_OffsetCoordinate(pt1->z,pzp,cp->z,10);
+  d[2].vx = (short)Sfx_OffsetCoordinate(pt1->x,nfs4_mips_negu_s32(pxp),cp->x,10);
+  d[2].vy = (short)Sfx_OffsetCoordinate(pt1->y,0,cp->y,10);
+  d[2].vz = (short)Sfx_OffsetCoordinate(pt1->z,nfs4_mips_negu_s32(pzp),cp->z,10);
+  d->vx = (short)Sfx_OffsetCoordinate(pt2->x,pxp,cp->x,10);
+  d->vy = (short)Sfx_OffsetCoordinate(pt2->y,0,cp->y,10);
+  d->vz = (short)Sfx_OffsetCoordinate(pt2->z,pzp,cp->z,10);
+  d[3].vx = (short)Sfx_OffsetCoordinate(pt2->x,nfs4_mips_negu_s32(pxp),cp->x,10);
+  d[3].vy = (short)Sfx_OffsetCoordinate(pt2->y,0,cp->y,10);
+  d[3].vz = (short)Sfx_OffsetCoordinate(pt2->z,nfs4_mips_negu_s32(pzp),cp->z,10);
   return;
 }
 
@@ -112,10 +118,9 @@ void Sfx_AdditivePrim(Draw_tPixMap *pmx,SVECTOR *pt,int mode,int offset,Sfx_tCac
 
 {
   POLY_FT4 *prim;
-  u_long l0;
-  u_long l1;
-  u_long l2;
-  u_long l3;
+  uint32 l1;
+  uint32 l2;
+  uint32 l3;
   u_short tpage;
 
   if (sd->head.cprim.PrimPtr < sd->head.cprim.MPrimPtr) {
@@ -151,12 +156,8 @@ void Sfx_AdditivePrim(Draw_tPixMap *pmx,SVECTOR *pt,int mode,int offset,Sfx_tCac
       tpage = pmx->tpage;
       ChangeTPage(&tpage,(mode & 1U) == 0 ? 1 : 2);
       prim->tpage = tpage;
-      prim->tag = prim->tag & 0xff000000 |
-                  *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xffffff;
-      l0 = (u_int)Render_gPacketPtr & 0xffffff;
+      nfs4_add_prim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x28;
-      *(u_int *)(Render_gPalettePtr + sd->otz * 4) =
-           *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xff000000 | l0;
     }
   }
   return;
@@ -302,11 +303,8 @@ SfxSouffle_billboard:
           tpage = pmx->tpage;
           ChangeTPage(&tpage,(is->type == 8) ? 2 : 1);
           prim->tpage = tpage;
-          prim->tag = prim->tag & 0xff000000 | *(u_int *)(sd->head.cprim.LastPrim + sd->otz) & 0xffffff;
-          colorcode = (int)sd->head.cprim.PrimPtr & 0xffffff;
+          nfs4_add_prim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
           sd->head.cprim.PrimPtr = (char *)((char *)sd->head.cprim.PrimPtr + 0x28);
-          ((u_int *)sd->head.cprim.LastPrim)[sd->otz] =
-               ((u_int *)sd->head.cprim.LastPrim)[sd->otz] & 0xff000000 | colorcode;
         }
       }
     }
@@ -338,11 +336,8 @@ SfxSouffle_billboard:
         *(u_int *)&prim->u1 = *(u_int *)&gLeafPixmap->u1;
         *(u_int *)&prim->u2 = *(u_int *)&gLeafPixmap->u2;
         *(u_int *)&prim->u3 = *(u_int *)&gLeafPixmap->u3;
-        prim->tag = prim->tag & 0xff000000 | *(u_int *)(sd->head.cprim.LastPrim + sd->otz) & 0xffffff;
-        colorcode = (int)sd->head.cprim.PrimPtr & 0xffffff;
+        nfs4_add_prim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
         sd->head.cprim.PrimPtr = (char *)((char *)sd->head.cprim.PrimPtr + 0x28);
-        ((u_int *)sd->head.cprim.LastPrim)[sd->otz] =
-             ((u_int *)sd->head.cprim.LastPrim)[sd->otz] & 0xff000000 | colorcode;
       }
     }
     break;

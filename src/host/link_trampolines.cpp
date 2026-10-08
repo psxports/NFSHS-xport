@@ -1,7 +1,8 @@
 /* link_trampolines.cpp -- AUTO-GENERATED flat->member bridges (LINK phase). */
 #include "../nfs4_types.h"
+#include "../game/common/new.h"
 #include <stddef.h>
-#include <stdarg.h>
+#include <stdlib.h>
 
 extern "C" tAllScreens* tAllScreens_ctor(tAllScreens* p) {
   return new((void*)p) tAllScreens();
@@ -25,21 +26,11 @@ extern "C" void tGlobalMenuDefs_dtor(tGlobalMenuDefs* p, int mode) {
 extern "C" tMenuNFS4* tMenuNFS4_ctor(tMenuNFS4* p, u_int flags, tScreen* screen,
                            tMenu* next, tMenu* options,
                            void (*onPress)(tMenuCommand&), short title,
-                           tMenuItem* first, ...) {
+                           tMenuItem* first, std::initializer_list<tMenuItem*> items) {
   new((void*)p) tMenuNFS4(flags, screen, next, options, onPress, title);
-  tMenuItem* rest[64];
-  int count = 0;
-  va_list args;
-  va_start(args, first);
-  if (first) {
-    do {
-      rest[count] = va_arg(args, tMenuItem*);
-    } while (rest[count++] && count < 64);
-  } else {
-    rest[0] = 0;
-  }
-  va_end(args);
-  p->_base_tMenu.tMenuConstructor(first, rest);
+  if (items.size() == 0 || items.size() > 15 || *(items.end() - 1) != nullptr)
+    abort();
+  p->_base_tMenu.tMenuConstructor(first, first ? items : std::initializer_list<tMenuItem*>{nullptr});
   return p;
 }
 
@@ -172,7 +163,7 @@ extern "C" void UploadShapes(tScreen* a0, tShapeInformation* a1, short a2, short
 void InitializeShapes(tScreen* a0, tShapeInformation* a1, unsigned a2) {
   a0->InitializeShapes(*a1, a2);
 }
-void Init(tCreditManager* a0, u_long a1) {
+void Init(tCreditManager* a0, uint32 a1) {
   a0->Init(a1);
 }
 void DeInit(tCreditManager* a0) {
@@ -220,8 +211,10 @@ void tScreen_dtor(tScreen* a0, int a1) {
 void tDialogYesNo_ctor(tDialogYesNo* a0) {
   new((void*)a0) tDialogYesNo();
 }
-extern "C" void tListIterator_dtor(tListIterator* a0) {
+extern "C" void tListIterator_dtor(tListIterator* a0, int mode) {
   ((tListIterator*)a0)->~tListIterator();
+  if (mode & 1)
+    __builtin_delete(a0);
 }
 void tScreen_dtor(tScreen* a0) {
   ((tScreen*)a0)->~tScreen();
@@ -229,8 +222,10 @@ void tScreen_dtor(tScreen* a0) {
 extern "C" void tScreenCarSelect_ctor(tScreenCarSelect* a0) {
   new((void*)a0) tScreenCarSelect();
 }
-extern "C" void tScreenCarSelect_dtor(tScreenCarSelect* a0) {
+extern "C" void tScreenCarSelect_dtor(tScreenCarSelect* a0, int mode) {
   ((tScreenCarSelect*)a0)->~tScreenCarSelect();
+  if (mode & 1)
+    __builtin_delete(a0);
 }
 void tScreenCarSelectTwoPlayer_dtor(tScreenCarSelectTwoPlayer* a0) {
   ((tScreenCarSelectTwoPlayer*)a0)->~tScreenCarSelectTwoPlayer();

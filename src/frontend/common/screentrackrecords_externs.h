@@ -4,11 +4,11 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" int ticks;
 extern int kRGBVals[28];
 extern "C" char textDefinitions[14][6];
-extern "C" extern tTexture_ShapeInfo *gCurrentShapes;
+extern "C" tTexture_ShapeInfo *gCurrentShapes;
 extern int NewRecords[8];
 extern int NewBestLap;
 void trap(int code);

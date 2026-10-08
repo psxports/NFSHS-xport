@@ -4,7 +4,7 @@ extern "C" int iSNDgetchan(unsigned int tag);    /* salloc  */
 extern "C" int iSNDpatchkey(int chan, int *tag); /* spatkey */
 extern "C" void iSNDenteraudio(void);            /* sserver */
 extern "C" void iSNDleaveaudio(void);
-extern "C" int iSNDplatform3dpos(int chan, unsigned int pos);       /* s3dpos */
+extern "C" int iSNDplatform3dpos(int chan, int pos);                /* s3dpos */
 extern "C" int SND3dpos(unsigned int tag, unsigned int pos, int y); /* @0x800E80E4 */
 
 /* SND3dpos : set the 3D pan position on every voice of `tag`. */

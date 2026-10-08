@@ -4,10 +4,10 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 extern "C" int ticks;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tFEApplication *FEApp;
 extern tGlobalMenuDefs *menuDefs;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern tCarManager carManager;
 extern tTournamentManager tournamentManager;
 extern tTrackManager trackManager;
@@ -18,56 +18,56 @@ void AddCarToIngameList(tCarManager *, tCarModels *, char *);
 short AdvanceToNextTrack(tTournamentManager *);
 extern "C"
 {
-    int AudioMus_GetSongList(...);
+    AudioMus_tSongList *AudioMus_GetSongList(char *pattern, int memtype);
 }
 extern "C"
 {
-    int AudioMus_SysCleanUp(...);
+    void AudioMus_SysCleanUp(void);
 }
 extern "C"
 {
-    int AudioMus_SysStartUp(...);
+    void AudioMus_SysStartUp(int buffersize, int spusize, const char *songs);
 }
 extern "C"
 {
-    int AudioMus_Volume(...);
+    void AudioMus_Volume(int volume);
 }
 extern "C"
 {
-    int Audio_FECleanUp(...);
+    void Audio_FECleanUp(void);
 }
 extern "C"
 {
-    int CarIO_CleanUpLicense(...);
+    void CarIO_CleanUpLicense(int player);
 }
 extern "C"
 {
-    int CarIO_CreateLicense(...);
+    void CarIO_CreateLicense(char *text, int carType, int player);
 }
 long CheapestCarStockPrice(tCarManager *);
 extern "C"
 {
-    int Controller_SetRamp(...);
+    void Controller_SetRamp(void);
 }
 extern "C"
 {
-    int DeInit_Memcard(...);
+    void DeInit_Memcard(void);
 }
 extern "C"
 {
-    int FECheat_IsCheatEnabled(...);
+    void *FECheat_IsCheatEnabled(tCheatCode cheat);
 }
 extern "C"
 {
-    int FeAudio_DeInitCommentary(...);
+    void FeAudio_DeInitCommentary(void);
 }
 extern "C"
 {
-    int FeAudio_InitCommentary(...);
+    void FeAudio_InitCommentary(int language, int arg1);
 }
 extern "C"
 {
-    int FeTools_deinit(...);
+    void FeTools_deinit(void);
 }
 int FindSimilarCar(tCarManager *, tCarModels *, char *, short, tCarModels *);
 tCarInfo *GetCarFromID(tCarManager *, short);
@@ -79,45 +79,45 @@ void GetMissionToRace(tMissionManager *, tMissionInfo **);
 short GetNumOwnedCars(tCarManager *, short);
 extern "C"
 {
-    int GetPinkSlipsCar(...);
+    void GetPinkSlipsCar(tCarManager *a0, short a1, tCarInfo *a2, short a3);
 }
 void GetStockCar(tCarManager *, unsigned short, tCarInfo *);
 void GetTrack(tTrackManager *, unsigned short, tTrackInformation *);
 extern "C"
 {
-    int GetTrackByID(...);
+    tTrackInformation *GetTrackByID(tTrackManager *a0, short a1);
 }
 extern "C"
 {
-    int GetTrackToRace(...);
+    void GetTrackToRace(tTournamentManager *a0, tTrackInfo *a1);
 }
 extern "C"
 {
-    int Init_Memcard(...);
+    void Init_Memcard(bool redraw, bool pinkslips);
 }
 extern "C"
 {
-    int Init_PSX_FrontEnd(...);
+    void Init_PSX_FrontEnd(void);
 }
 void InitializeIngameCarList(tCarManager *);
 extern "C"
 {
-    int InitializeSpinningCars(...);
+    void InitializeSpinningCars(void);
 }
 void *IsCarAnAddedModel(tCarManager *, tCarModels *, char *);
 void LoadDescription(tMissionManager *, bool);
 short LoadGame(short player, bool PinkSlips, bool WithDialogs);
 extern "C"
 {
-    int MenuExtended_TransitionFromPostGameToMainMenu(...);
+    void MenuExtended_TransitionFromPostGameToMainMenu(tMenuCommand *command);
 }
 extern "C"
 {
-    int PSXExitFrontend(...);
+    void PSXExitFrontend(void);
 }
 extern "C"
 {
-    int Platform_ResetDCTBuffer(...);
+    void Platform_ResetDCTBuffer(void);
 }
 extern "C"
 {
@@ -125,85 +125,75 @@ extern "C"
 }
 tAppCommand RunFrontEnd(tFEApplication *);
 tAppCommand RunPostGame(tFEApplication *);
-int Setup(...);
 extern "C"
 {
-    int StatTool_UpperCaseItKeepingInMindThoseBloodySpecialCharacters(...);
+    void StatTool_UpperCaseItKeepingInMindThoseBloodySpecialCharacters(char *string);
 }
 extern "C"
 {
-    int Stattool_GetAllDefaultRecords(...);
+    void Stattool_GetAllDefaultRecords(tRecordBuffer *TrackRecords, bool cheatones);
 }
 extern "C"
 {
-    int Stattool_ReturnRecordLapTime(...);
+    int Stattool_ReturnRecordLapTime(short nTrack);
 }
 extern "C"
 {
-    int TextSys_UnloadWords(...);
+    void TextSys_UnloadWords(void);
 }
 extern "C"
 {
-    int TextSys_Word(...);
+    char *TextSys_Word(int wordnum);
 }
 void UpdateAwardInformation(tTournamentManager *);
 void UpdateCarLineup(tTournamentManager *);
 void *__builtin_new(unsigned int size);
 extern "C"
 {
-    int s_lower(...);
+    void s_lower(char *string);
 }
 extern "C"
 {
-    tAllScreens *tAllScreens_ctor(...);
+    tAllScreens *tAllScreens_ctor(tAllScreens *p);
 }
 extern "C"
 {
-    tAllScreens *tAllScreens_dtor(...);
+    void tAllScreens_dtor(tAllScreens *p, int);
 }
 extern "C"
 {
-    tFEApplication *tFEApplication_ctor(...);
+    tFEApplication *tFEApplication_ctor(tFEApplication *p);
 }
 extern "C"
 {
-    tFEApplication *tFEApplication_dtor(...);
+    void tFEApplication_dtor(tFEApplication *p, int);
 }
 extern "C"
 {
-    tGlobalMenuDefs *tGlobalMenuDefs_ctor(...);
+    tGlobalMenuDefs *tGlobalMenuDefs_ctor(tGlobalMenuDefs *p);
 }
 extern "C"
 {
-    tGlobalMenuDefs *tGlobalMenuDefs_dtor(...);
-}
-tScreenAudio *tScreenAudio_ctor(...);
-extern "C"
-{
-    tScreenCarSelect *tScreenCarSelect_ctor(...);
+    void tGlobalMenuDefs_dtor(tGlobalMenuDefs *p, int mode);
 }
 extern "C"
 {
-    tScreenCarSelect *tScreenCarSelect_dtor(...);
+    void tScreenCarSelect_ctor(tScreenCarSelect *a0);
 }
-tScreenControllerConfig *tScreenControllerConfig_ctor(...);
-tScreenMemcard *tScreenMemcard_ctor(...);
-tScreenTournSelect *tScreenTournSelect_ctor(...);
-tScreenTournSelect *tScreenTournSelect_dtor(...);
-tScreenTournamentStandings *tScreenTournamentStandings_ctor(...);
-tScreenTrophyRoom *tScreenTrophyRoom_ctor(...);
-tScreenTrophyRoom *tScreenTrophyRoom_dtor(...);
 extern "C"
 {
-    tScreen *tScreen_ctor(...);
+    void tScreenCarSelect_dtor(tScreenCarSelect *a0, int mode);
 }
-tScreen *tScreen_dtor(...);
-extern "C" Car_tStats *Cars_gNewCarStatsList;
+extern "C"
+{
+    void tScreen_ctor(tScreen *a0);
+}
+extern "C" Car_tStats Cars_gNewCarStatsList[9];
 /* FETracks.obj/SYM: ARY SHORT at 0x80051610.  OutputDisplaySettings MIPS
    0x80027E00..0x80027E10 indexes by two and loads it with `lh`. */
 extern short CountryMeasurement[8];
 extern tCreditManager CreditManager;
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" int MEMCARDFRONTENDISINITTED;
 extern "C" tRecordBuffer Stats_gTrackRecords[187];
 extern int _7tScreen_fSuppressLoadingText;
@@ -213,10 +203,10 @@ extern int colourChosen[8];
 extern "C" int gCalculateVictory;
 extern int gFEBigHandle;
 extern "C" int gLargestUnused;
-extern "C" extern int gMasterAmbientLevel;
+extern "C" int gMasterAmbientLevel;
 extern "C" int gMasterEngineLevel;
 extern "C" int gMasterFENarrationLevel;
-extern "C" extern int gMasterMusicLevel;
+extern "C" int gMasterMusicLevel;
 extern "C" int gMasterSFXLevel;
 extern int gPSXMemCardFull;
 extern "C" tPadModuleState gPadinfo;

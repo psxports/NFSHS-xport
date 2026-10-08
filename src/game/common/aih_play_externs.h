@@ -18,7 +18,7 @@ extern Car_tObj *AILife_IsSliceCloseToAnyCopCar(int slice);
 extern Car_tObj *AILife_IsSliceInAnyVisibleArea(int slice);
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gCopCarList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern "C" Sim_tSimSystemVar simVar;
 extern Trk_NewSlice *BWorldSm_slices;
@@ -27,7 +27,7 @@ extern dashhud_info DashHUD_gInfo; /* dashHUD.obj */
 extern int Cars_gNumCopCars;
 extern int Cars_gNumRaceCars;
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int Cars_gNumAIRaceCars;
 extern int AICop_gRoadBlockState;
 extern int AICop_numArrestedHumans;

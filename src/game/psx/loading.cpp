@@ -19,9 +19,9 @@ extern "C" void Loading_DrawLoadingScreen(void)
 
   language = GameSetup_gData.userSetting.language;
   sprintf(name,"%sLoad%d%c.qps",Paths_Paths[0x19],GameSetup_gData.track,GameSetup_gData.mirrorTrack + 0x61);
-  f = (char *)loadshapeadr(name,(void *)0x0);
+  f = (char *)loadshapeadr(name,0x0);
   sprintf(name,"%sLoada.psh",Paths_Paths[0x19]);
-  g = (char *)loadshapeadr(name,(void *)0x0);
+  g = (char *)loadshapeadr(name,0x0);
   Draw_SetEnvironment(0x200,0xf0,1,0,1,0,0,0);
   s = (shapetbl *)shapepointer(f,0);
   Draw_DrawDirectScreen(s,0,0);
@@ -44,7 +44,7 @@ extern "C" void Loading_UpdateLoadingScreen(int checkpoint)
 
   if ((checkpoint == 1) && (smallShapeFile == (char *)0x0)) {
     sprintf(name,"%sLoadb.psh",Paths_Paths[0x19]);
-    smallShapeFile = (char *)loadshapeadr(name,(void *)0x10);
+    smallShapeFile = (char *)loadshapeadr(name,0x10);
   }
   max = 0x17;
   i = 0;

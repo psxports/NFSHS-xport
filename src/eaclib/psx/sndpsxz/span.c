@@ -37,7 +37,7 @@ extern "C" int SNDpan(int handle, int pan) /* @0x800E6884 */
                 p = 0;
             if (v->pancurve != 0)
                 p = ((signed char *)v->pancurve)[p]; /* pan curve remap */
-            iSNDplatform3dpos(iter, ((p - 0x40) << 8) & 0xFF00, 0);
+            iSNDplatform3dpos(iter, ((p - 0x40) << 8) & 0xFF00);
         }
     }
     iSNDleaveaudio();

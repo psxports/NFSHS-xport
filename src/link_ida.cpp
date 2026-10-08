@@ -3,10 +3,10 @@
  * defined. Zero image -> zero-init typed; nonzero primitive -> byte-exact. */
 #include "nfs4_types.h"
 
-int Device_Null(u_long param);
-int Device_Analog(u_long param);
-int Device_PSXPad(u_long param);
-int Device_PSXPadMulti(u_long param);
+int Device_Null(uint32 param);
+int Device_Analog(uint32 param);
+int Device_PSXPad(uint32 param);
+int Device_PSXPadMulti(uint32 param);
 
 extern "C" {
 
@@ -42,10 +42,10 @@ unsigned char CD_context[0x83c];                                                
 int Cdinfo[0x83c / sizeof(int)];                                                 /* @80146cc4 */
 #endif
 Input_tDeviceList Device_gDeviceList[5] = {
-    {Device_nameNull,   (void *)Device_Null,        0},
-    {Device_nameAnalog, (void *)Device_Analog,      0},
-    {Device_namePad,    (void *)Device_PSXPad,      0},
-    {Device_nameMulti,  (void *)Device_PSXPadMulti, 0},
+    {Device_nameNull,   Device_Null,        0},
+    {Device_nameAnalog, Device_Analog,      0},
+    {Device_namePad,    Device_PSXPad,      0},
+    {Device_nameMulti,  Device_PSXPadMulti, 0},
     {0,                 0,                          0}
 }; /* @8011ec18 60B */
 PAD_COMMON Padglobal[2];                                                         /* @8013e8f0 16B */
@@ -69,7 +69,7 @@ AnimDef gAnimDefs[14] = {                                                    /* 
     {0,  1, -1, 2, 0},
     {0,  1, -1, 2, 0},
 };
-u_long hilight_colors[5] = {0x700a00,0x400a00,0x300300,0x180300,0x180300};       /* @8011f4b4 20B */
+uint32 hilight_colors[5] = {0x700a00,0x400a00,0x300300,0x180300,0x180300};       /* @8011f4b4 20B */
 int hoff[6] = {0x4d,0x1,0x0,0x0,0x0,0x0};                                        /* @8013dac0 24B */
 sim_queue inputQueue;                                                            /* @8013e0f4 524B */
 static char loading_languageNameStorage[6][8] = {

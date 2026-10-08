@@ -63,7 +63,7 @@ void tScreenTrackSelect::DrawBackground()
     DrawSync(0);
     movieRetCode = ticks;
     this->fBrightness = 0;
-    this->fStartTicks = (u_long)nfs4_mips_addu_s32(movieRetCode,-0x14);
+    this->fStartTicks = (uint32)nfs4_mips_addu_s32(movieRetCode,-0x14);
   }
   else if (videoState == 3) {
     frameAdvanced = VIDEO_updateframexy
@@ -166,7 +166,7 @@ void tScreenTrackSelect::GetShapeInfo(short &numPermShapes,short &numSwapShapes,
   GetTrack(&trackManager,(ushort)(byte)frontEnd.track[0],&trackInfo);
   numPermShapes = 0x44;
   numSwapShapes = 10;
-  *permFileName = "ztrack";
+  *permFileName = NFS4_WRITABLE_LITERAL("ztrack");
   sprintf(gSwapFileName,"%s",trackInfo.fShapeName);
   *swapFileName = gSwapFileName;
   this->fPreviousTrack = (short)trackInfo.fTrackID;

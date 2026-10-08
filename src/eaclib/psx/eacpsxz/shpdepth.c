@@ -2,10 +2,11 @@
  *   obj nfs4\eaclib\psx\shpdepth.obj ; EACPSXZ.LIB.  1 fn @0x800F43E4.  shapedepth -- bit depth from a
  *   shape's type byte (&0x77).  Ghidra nfs4-f.exe.c (shpdepth) + IDA sig.
  */
-extern "C" int shapedepth(unsigned char *shape); /* @0x800F43E4 */
+extern "C" int shapedepth(const void *shapeData); /* @0x800F43E4 */
 
-extern "C" int shapedepth(unsigned char *shape)
+extern "C" int shapedepth(const void *shapeData)
 {
+    const unsigned char *shape = (const unsigned char *)shapeData;
     unsigned char t = *shape & 0x77;
     if (t == 0x41)
         return 8;

@@ -54,8 +54,8 @@ extern "C" int Draw_gViewOtSize;
 extern "C" int Draw_gPlayer1View, Draw_gPlayer2View;
 
 /* ---- track / setup ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" CTrackSpec TrackSpec_gSpec;      /* 0x8012327c */
 // [owned->defined in hrzsku.cpp] extern CHorizonSpec  *Hrz_gTrackSpec;            /* horizon spec (angle/height/frontColor/ringPMX) */
 // [owned->defined in hrzsku.cpp] extern CSkySpec      *Sky_gTrackSpec;            /* sky spec (numStars/frontcolors/...) */
 extern void trap(int c);

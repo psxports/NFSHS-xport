@@ -86,16 +86,16 @@ extern "C" void Draw_InitViews(void)
 extern "C" void Draw_InitViewOT(void)
 
 {
-  u_long *puVar1;
+  uint32 *puVar1;
   Draw_tView *pDVar2;
   int i;
   int iVar3;
   
   pDVar2 = Draw_gView;
   for (iVar3 = 0; iVar3 < Draw_gNumView; iVar3 = iVar3 + 1) {
-    puVar1 = (u_long *)reservememadr("ot0",pDVar2->otsize << 2,0x10);
+    puVar1 = (uint32 *)reservememadr("ot0",pDVar2->otsize << 2,0x10);
     pDVar2->ot[0] = puVar1;
-    puVar1 = (u_long *)reservememadr("ot1",pDVar2->otsize << 2,0x10);
+    puVar1 = (uint32 *)reservememadr("ot1",pDVar2->otsize << 2,0x10);
     pDVar2->ot[1] = puVar1;
     pDVar2 = pDVar2 + 1;
   }
@@ -106,16 +106,16 @@ extern "C" void Draw_InitViewOT(void)
 void Draw_InitViewOTInGame(void)
 
 {
-  u_long *puVar1;
+  uint32 *puVar1;
   Draw_tView *pDVar2;
   int i;
   int iVar3;
   
   pDVar2 = Draw_gView;
   for (iVar3 = 0; iVar3 < Draw_gNumView; iVar3 = iVar3 + 1) {
-    puVar1 = (u_long *)Platform_ReserveMemory(pDVar2->otsize << 2,"ot0");
+    puVar1 = (uint32 *)Platform_ReserveMemory(pDVar2->otsize << 2,"ot0");
     pDVar2->ot[0] = puVar1;
-    puVar1 = (u_long *)Platform_ReserveMemory(pDVar2->otsize << 2,"ot1");
+    puVar1 = (uint32 *)Platform_ReserveMemory(pDVar2->otsize << 2,"ot1");
     pDVar2->ot[1] = puVar1;
     pDVar2 = pDVar2 + 1;
   }
@@ -132,14 +132,14 @@ void Draw_DeInitViews(void)
   
   pDVar1 = Draw_gView;
   for (iVar2 = 0; iVar2 < Draw_gNumView; iVar2 = iVar2 + 1) {
-    if (pDVar1->ot[0] != (u_long *)0x0) {
+    if (pDVar1->ot[0] != (uint32 *)0x0) {
       purgememadr(pDVar1->ot[0]);
     }
-    if (pDVar1->ot[1] != (u_long *)0x0) {
+    if (pDVar1->ot[1] != (uint32 *)0x0) {
       purgememadr(pDVar1->ot[1]);
     }
-    pDVar1->ot[0] = (u_long *)0x0;
-    pDVar1->ot[1] = (u_long *)0x0;
+    pDVar1->ot[0] = (uint32 *)0x0;
+    pDVar1->ot[1] = (uint32 *)0x0;
     pDVar1 = pDVar1 + 1;
   }
   return;
@@ -159,8 +159,8 @@ void Draw_DeInitViewsInGame(void)
   iVar4 = 0;
   pDVar3 = Draw_gView;
   while (bVar1 = iVar4 < iVar2, iVar4 = iVar4 + 1, bVar1) {
-    pDVar3->ot[0] = (u_long *)0x0;
-    pDVar3->ot[1] = (u_long *)0x0;
+    pDVar3->ot[0] = (uint32 *)0x0;
+    pDVar3->ot[1] = (uint32 *)0x0;
     pDVar3 = pDVar3 + 1;
   }
   return;
@@ -303,7 +303,7 @@ void Draw_StopRenderingView(int viewid)
 
 {
   Draw_tView *view;
-  u_long *otLast;
+  uint32 *otLast;
   DRAWENV LEnv;
   u_char *cur_pkt;
   
@@ -311,15 +311,7 @@ void Draw_StopRenderingView(int viewid)
   view = Draw_gView + viewid;
   nfs4_mips_copy_bytes(&LEnv,&view->drawenv[gFlip],sizeof(LEnv));
   otLast = view->ot[gFlip] + view->otsize - 1;
-#ifdef AP_WIN
   AddPrim(otLast,cur_pkt);
-#else
-  *(u_int *)Render_gPacketPtr =
-       *(u_int *)Render_gPacketPtr & 0xff000000 |
-       *otLast & 0xffffff;
-  *otLast = *otLast & 0xff000000 |
-       (u_int)(intptr)Render_gPacketPtr & 0xffffff;
-#endif
   Render_gPacketPtr = Render_gPacketPtr + 0x40;
   SetDrawEnv((DR_ENV *)cur_pkt,&LEnv);
   return;
@@ -344,7 +336,7 @@ void Draw_StartFrameRender(void)
 {
   bool bVar1;
   int *piVar2;
-  u_long **ppuVar3;
+  uint32 **ppuVar3;
   Draw_tView *pDVar4;
   int i;
   int iVar5;

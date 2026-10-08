@@ -33,20 +33,20 @@ extern "C" void NFSHS_HostTraceFlareHaloRTPS(const void *, const void *, int, in
     /* flare_Halo2 performs the MIPS >>2 explicitly in flare.cpp after this raw
    register store; keeping it here as well would shift SZ3 twice. */
     #define gte_stsz(p) gte_swc2(19, (p))
-    #define gte_rtir(...) nfs4_gte_rtir()
+    #define gte_rtir() nfs4_gte_rtir()
     #define gte_ldtr(x, y, z) nfs4_gte_set_trans_xyz((x), (y), (z))
-    #define gte_rtps_b(...) gte_rtps()
+    #define gte_rtps_b() gte_rtps()
 #else
     #define gte_SetRotMatrix(mp) ((void)(mp))   /* ctc2 R -> cop2 ctrl 0..4  (5 ctc2)     */
     #define gte_SetTransMatrix(mp) ((void)(mp)) /* ctc2 TR -> cop2 ctrl 5..7 (3 ctc2)     */
     #define gte_SetTransVector(vp) ((void)(vp))
-    #define gte_ldsv(p) ((void)(p))   /* mtc2 short-vector -> IR1..3 (3 mtc2)   */
-    #define gte_stsv(p) ((void)(p))   /* mfc2 IR1..3 -> short-vector (3 mfc2)   */
-    #define gte_stsxy(p) ((void)(p))  /* mfc2 SXY2 -> DVECTOR (screen xy)       */
-    #define gte_stsz(p) ((void)(p))   /* mfc2 SZ3  -> short   (projected depth) */
-    #define gte_rtir(...) ((void)0)   /* RotIR / mvmva (transform IR vector)     */
-    #define gte_ldtr(...) ((void)0)   /* load translation vector to cop2         */
-    #define gte_rtps_b(...) ((void)0) /* RTPS variant (buffered)                 */
+    #define gte_ldsv(p) ((void)(p))              /* mtc2 short-vector -> IR1..3 (3 mtc2)   */
+    #define gte_stsv(p) ((void)(p))              /* mfc2 IR1..3 -> short-vector (3 mfc2)   */
+    #define gte_stsxy(p) ((void)(p))             /* mfc2 SXY2 -> DVECTOR (screen xy)       */
+    #define gte_stsz(p) ((void)(p))              /* mfc2 SZ3  -> short   (projected depth) */
+    #define gte_rtir() ((void)0)                 /* RotIR / mvmva (transform IR vector)     */
+    #define gte_ldtr(arg0, arg1, arg2) ((void)0) /* load translation vector to cop2         */
+    #define gte_rtps_b() ((void)0)               /* RTPS variant (buffered)                 */
 #endif
 /* PsyQ libgte RotMatrixZ */
 typedef void(code)(void);
@@ -77,13 +77,13 @@ extern matrixtdef gWorldMat; /* 0x8010ee40 (36 B = 9 ints, game matrix) */
 /* ---- camera / view / draw ---- */
 extern "C" int Draw_gViewOtSize;       /* 0x8013d7b0 */
 extern "C" short DrawC_gReflectOffset; /* 0x8013d814 */
-extern "C" extern int R3DCar_InMenu;   /* 0x8013d324 */
+extern "C" int R3DCar_InMenu;          /* 0x8013d324 */
 extern long Camera_gGeomScreen[2];     /* 0x8013c7dc; empty format word at +4 */
 
 /* ---- track / setup / sim ---- */
-extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
-extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar simGlobal;                /* 0x8011e0ac */
+extern "C" CTrackSpec TrackSpec_gSpec;      /* 0x8012327c */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* 0x8011e0ac */
 
 /* ---- flare geometry + colour tables ---- */
 // [owned->defined in flare.cpp] extern Flare_tInfo      Flare_gType[34];          /* 0x8011ff68 (544 B) flare-type defs (chalo/cbeam/flags/scale) */

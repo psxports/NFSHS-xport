@@ -3,6 +3,7 @@
  *   Bodies from Ghidra; namespaces stripped, phantom stack-args resolved vs disasm.
  */
 #include "screentournselect.h"
+#include "../../mips_semantics.h"
 
 /* M13: DrawVideoWall (below) now indexes the real trophyTVOrder[4]={1,2,0,3} @0x80052058 (already
  * materialized in screentournselect_externs.h, EXE bytes 01 02 00 03) instead of an inlined truncated
@@ -26,7 +27,7 @@ tScreenTournSelect::~tScreenTournSelect()
 
 {
   (this->_base_tScreen)._vf = (__vtbl_ptr_type (*)[10])tScreenTournSelect_vtable;
-  (((tScreen*)(&this->_base_tScreen))->~tScreen(), (tScreen*)(&this->_base_tScreen));
+  ((tScreen*)(&this->_base_tScreen))->~tScreen();
   return;
 }
 
@@ -49,7 +50,7 @@ void tScreenTournSelect::GetShapeInfo(short &numPermShapes,short &numSwapShapes,
   tournOffset = (tournamentManager.fDefinition)->fTiers[(byte)frontEnd.tier].fTournOffset;
   numPermShapes = 0x40;
   numSwapShapes = 0x20;
-  *permFileName = "ztourn";
+  *permFileName = NFS4_WRITABLE_LITERAL("ztourn");
   GetTrophyName(&tournamentManager,def->fTournaments + (uint)useSpecial + (uint)tournOffset,ts_Medium,gSwapFileName,-1);
   *swapFileName = gSwapFileName;
   return;
@@ -179,7 +180,7 @@ void tScreenTournSelect::DrawVideoWall()
     i = i + 0x30;
   } while (i < 0x89);
   FeDraw_SetABRMode(2);
-  transCount = ticks - this->fTVTicks >> 2;
+  transCount = nfs4_mips_sra_s32(nfs4_mips_subu_s32(ticks,this->fTVTicks),2);
   if (this->fTransitionDirection < 1) {
     i = 0;
     if (transCount != 0) {
@@ -249,7 +250,7 @@ void tScreenTournSelect::DrawBackground()
   char buffer [64];
   PSX_RECT r;
   char moviename [80];
-  u_long movieRGB;
+  uint32 movieRGB;
   
   tb1 = frontEnd.tournament;
   if (frontEnd.tier != '\0') {

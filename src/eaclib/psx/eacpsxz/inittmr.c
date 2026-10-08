@@ -18,23 +18,23 @@ extern "C" int g_currentthread;
 extern "C" int creatememclass(int id, char *name, char *membuf, int bufsize, int granularity, int alignment, int infosize, int lowguard, int reserved9, int highguard, int usemutex, int field3c);
 extern "C" unsigned int MEM_defaultevent(void); /* @0x800F4178 */
 extern "C" void blockclear(int dst, int len);   /* blkfill */
-extern "C" int addexit(int fn);                 /* exit */
+extern "C" void addexit(void (*fn)(void));      /* exit */
 extern "C" void initgp(void);                   /* savegp */
 extern "C" void savegp(void *buf);              /* savegp */
 extern "C" void restoregp(int gp);              /* savegp */
 extern "C" void resettick(void);                /* timer */
 extern "C" void trap(unsigned int code);
 /* --- syslib (PsyQ libapi/libetc) --- */
-extern "C" void EnterCriticalSection(void);
+extern "C" int EnterCriticalSection(void);
 extern "C" void ExitCriticalSection(void);
-extern "C" int OpenEvent(unsigned int cls, int spec, int mode, int *fn);
-extern "C" void EnableEvent(int ev);
-extern "C" void DisableEvent(int ev);
-extern "C" void SetRCnt(int spec, unsigned short target, int mode);
-extern "C" void StartRCnt(int spec);
+extern "C" long OpenEvent(unsigned long cls, long spec, long mode, long (*fn)());
+extern "C" long EnableEvent(long ev);
+extern "C" long DisableEvent(long ev);
+extern "C" long SetRCnt(unsigned long spec, unsigned short target, long mode);
+extern "C" long StartRCnt(unsigned long spec);
 
 extern "C" int initmemadr(int base, int size); /* @0x800F4180 */
-extern "C" int inittimer(int hz);              /* @0x800F41F0 */
+extern "C" void inittimer(int hz);             /* @0x800F41F0 */
 extern "C" void restoretimer(void);            /* @0x800F4304 */
 extern "C" unsigned int tmrint(void);          /* @0x800F4328 */
 
@@ -47,7 +47,7 @@ extern "C" int initmemadr(int base, int size)
 }
 
 /* inittimer @0x800F41F0 : install (once) the RCnt event + restore hook, then arm the counter for `hz` Hz. */
-extern "C" int inittimer(int hz)
+extern "C" void inittimer(int hz)
 {
     if (hz == 0)
         hz = 100;
@@ -55,10 +55,10 @@ extern "C" int inittimer(int hz)
     if (timerflag == 0)
     {
         blockclear((int)&tmrsub, 0x20);
-        timerevent = OpenEvent(0xf2000002, 2, 0x1000, (int *)tmrint);
+        timerevent = OpenEvent(0xf2000002, 2, 0x1000, (long (*)())tmrint);
         EnableEvent(timerevent);
         timerflag = 1;
-        addexit((int)restoretimer);
+        addexit(restoretimer);
     }
     initgp();
     if (hz == 0)
@@ -69,7 +69,7 @@ extern "C" int inittimer(int hz)
     StartRCnt(0xf2000002);
     ExitCriticalSection();
     resettick();
-    return addexit((int)restoretimer);
+    addexit(restoretimer);
 }
 
 /* restoretimer @0x800F4304 : disable the RCnt event (exit hook). */

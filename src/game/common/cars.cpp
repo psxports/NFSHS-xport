@@ -261,7 +261,7 @@ void Cars_InitializeCarTablesFlagsAndCounters(Car_tObj *carObj)
     strcpy(carObj->carNameLocalized,pcVar1);
   }
   else {
-    sprintf(carObj->carNameLocalized,(char *)&Camera_gGeomScreen[1]);
+    strcpy(carObj->carNameLocalized,(char *)&Camera_gGeomScreen[1]);
   }
   if ((uVar7 & 1) == 0) goto LAB_80086300;
   pvVar2 = PlayerNameExist(Cars_gNumHumanRaceCars);
@@ -271,12 +271,12 @@ void Cars_InitializeCarTablesFlagsAndCounters(Car_tObj *carObj)
       goto LAB_80086234;
     }
     pcVar1 = TextSys_Word(0x2f);
-    sprintf(carObj->carInfo->driver,pcVar1);
+    strcpy(carObj->carInfo->driver,pcVar1);
   }
   else {
     pcVar1 = PlayerNameMixedCase(Cars_gNumHumanRaceCars);
 LAB_80086234:
-    sprintf(carObj->carInfo->driver,pcVar1);
+    strcpy(carObj->carInfo->driver,pcVar1);
   }
   strcpy(carObj->carInfo->license,frontEnd.licensePlate[Cars_gNumHumanRaceCars]);
   ppCVar3 = Cars_gHumanRaceCarList + Cars_gNumHumanRaceCars;
@@ -2057,14 +2057,14 @@ void Car_DoPostCollisionStuff(Car_tObj *carObj)
     if (((carObj->carFlags & 4U) == 0) || ((carObj->N).flightTime != 0)) {
       iVar1 = (carObj->linearAcc_ch).x;
       (carObj->render).currentPitch =
-           (carObj->render).currentPitch * 0xf + (carObj->linearAcc_ch).z >> 4;
-      iVar1 = (carObj->render).currentRoll * 0xf + iVar1 >> 4;
+           ((carObj->render).currentPitch * 0xf + (carObj->linearAcc_ch).z) >> 4;
+      iVar1 = ((carObj->render).currentRoll * 0xf + iVar1) >> 4;
     }
     else {
       iVar1 = (carObj->linearAcc_ch).x;
       (carObj->render).currentPitch =
-           (carObj->render).currentPitch * 7 + (carObj->linearAcc_ch).z >> 3;
-      iVar1 = (carObj->render).currentRoll * 7 + iVar1 >> 3;
+           ((carObj->render).currentPitch * 7 + (carObj->linearAcc_ch).z) >> 3;
+      iVar1 = ((carObj->render).currentRoll * 7 + iVar1) >> 3;
     }
     (carObj->render).currentRoll = iVar1;
     iVar1 = -(carObj->N).groundVel;
@@ -2400,7 +2400,7 @@ void Cars_InitCar(Car_tObj *carObj,int index)
     else {
       sprintf(acStack_108,"%s%s.qda",Paths_Paths[4],(char *)carObj + 0x240);
     }
-    mem_00 = (char *)loadpackadr(acStack_108,(void *)0x10);
+    mem_00 = (char *)loadpackadr(acStack_108,0x10);
     handle_00 = Udff_Opena((char *)0x0,mem_00,1);
     if (carObj->carInfo->carType < 0x1d) {
       sprintf(acStack_38,"p%s.dat",GameSetup_gCarNames[0] + carObj->carInfo->carType * 5);
@@ -2410,7 +2410,7 @@ void Cars_InitCar(Car_tObj *carObj,int index)
     }
     sprintf(acStack_a0,"%sdusty.viv",Paths_Paths[3]);
     pThis = loadfileadrz(acStack_a0,0x10);
-    mem = (char *)locatebig(pThis, acStack_38, 0) /* @0x7Axxx: $a2 dropped by Ghidra; 0=locate-from-start, verify #148 */;
+    mem = (char *)locatebig(pThis, acStack_38);
     handle = Udff_Opena((char *)0x0,mem,0);
     if (index < GameSetup_gData.numCars) {
       AIInit_InitAICar(carObj,handle_00);
@@ -2672,7 +2672,7 @@ void Cars_CleanUp(void)
       Sched_DeleteFunction(simGlobal.schedule32Hz,(*ppCVar3)->funcDoPostCollisionStuff,*ppCVar3);
       iVar1 = Force_IsForceOn(*ppCVar3);
       if (iVar1 != 0) {
-        Sched_DeleteFunction(simGlobal.schedule32Hz,Force_Update,*ppCVar3);
+        Sched_DeleteFunction(simGlobal.schedule32Hz,(void *)Force_Update,*ppCVar3);
       }
       pCVar2 = *ppCVar3;
       schedule32Hz = simGlobal.schedule32Hz2;

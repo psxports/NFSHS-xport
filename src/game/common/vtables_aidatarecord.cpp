@@ -2,14 +2,39 @@
  * Real nfs4-f.exe bytes; __vtbl_ptr_type; size = null-delimited rodata segment. @0xVA breadcrumbs.
  * CarTracking_t has 4 slots (virtual Get); others 3. NOT original layout; self-contained + links. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern void __builtin_delete(void *);
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 
-static int NFS4_VT_THUNK _vtdtor_AIDataRecord_AccTable_t(AIDataRecord_AccTable_t *p){ p->~AIDataRecord_AccTable_t(); return 0; }
-static int NFS4_VT_THUNK _vtdtor_AIDataRecord_BestLine_t(AIDataRecord_BestLine_t *p){ p->~AIDataRecord_BestLine_t(); return 0; }
-static int NFS4_VT_THUNK _vtdtor_AIDataRecord_CarTracking_t(AIDataRecord_CarTracking_t *p){ p->~AIDataRecord_CarTracking_t(); return 0; }
-static int NFS4_VT_THUNK _vtdtor_AIDataRecord_CurveSpeedTable_t(AIDataRecord_CurveSpeedTable_t *p){ p->~AIDataRecord_CurveSpeedTable_t(); return 0; }
-static int NFS4_VT_THUNK _vtdtor_AIDataRecord_TrackCurve_t(AIDataRecord_TrackCurve_t *p){ p->~AIDataRecord_TrackCurve_t(); return 0; }
-static int NFS4_VT_THUNK _vtdtor_AIDataRecord_t(AIDataRecord_t *p){ p->~AIDataRecord_t(); return 0; }
+static void NFS4_VT_THUNK _vtdtor_AIDataRecord_AccTable_t(AIDataRecord_AccTable_t *p, int mode)
+{
+    p->~AIDataRecord_AccTable_t();
+    if (mode & 1) __builtin_delete(p);
+}
+static void NFS4_VT_THUNK _vtdtor_AIDataRecord_BestLine_t(AIDataRecord_BestLine_t *p, int mode)
+{
+    p->~AIDataRecord_BestLine_t();
+    if (mode & 1) __builtin_delete(p);
+}
+static void NFS4_VT_THUNK _vtdtor_AIDataRecord_CarTracking_t(AIDataRecord_CarTracking_t *p, int mode)
+{
+    p->~AIDataRecord_CarTracking_t();
+    if (mode & 1) __builtin_delete(p);
+}
+static void NFS4_VT_THUNK _vtdtor_AIDataRecord_CurveSpeedTable_t(AIDataRecord_CurveSpeedTable_t *p, int mode)
+{
+    p->~AIDataRecord_CurveSpeedTable_t();
+    if (mode & 1) __builtin_delete(p);
+}
+static void NFS4_VT_THUNK _vtdtor_AIDataRecord_TrackCurve_t(AIDataRecord_TrackCurve_t *p, int mode)
+{
+    p->~AIDataRecord_TrackCurve_t();
+    if (mode & 1) __builtin_delete(p);
+}
+static void NFS4_VT_THUNK _vtdtor_AIDataRecord_t(AIDataRecord_t *p, int mode)
+{
+    p->~AIDataRecord_t();
+    if (mode & 1) __builtin_delete(p);
+}
 
 __vtbl_ptr_type AIDataRecord_CarTracking_t_vtable[4] = {   /* @0x8005542c */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x8005542c  null */

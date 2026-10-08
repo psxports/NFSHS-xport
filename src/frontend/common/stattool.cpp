@@ -234,7 +234,7 @@ void Stattool_ReadDefaultRecords(tRecordBuffer *Records,bool cheatones)
 
 {
   int fsize;
-  char *fmt;
+  const char *fmt;
   char filename [80];
   
   if (cheatones == 0) {

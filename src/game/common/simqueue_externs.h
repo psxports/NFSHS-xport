@@ -3,7 +3,7 @@
 #define SIMQUEUE_EXTERNS_H
 
 /* ---- harvested + SYM ---- */
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 
 extern "C" sim_queue inputQueue;     /* Validity/Buffer/TailTime */
 extern "C" Input_tResults output[2]; /* per-player current input */

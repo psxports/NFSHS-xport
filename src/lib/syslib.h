@@ -77,7 +77,6 @@ void _swap();                                                                   
                                                                                    /* C30 */
 extern void *memchr(unsigned char *, unsigned char, int);                          /* C46 */
 extern void *memmove(unsigned char *, unsigned char *, int);                       /* MEMMOVE */
-extern int printf(char *fmt, ...);                                                 /* C63 */
 extern char *strrchr(char *, char);                                                /* C31 */
 extern char tolower(char);                                                         /* C38 */
 extern int memcmp(/* unsigned char *, unsigned char *, int */);                    /* MEMCMP */
@@ -113,7 +112,7 @@ void _memcpy_w();                /* C_011 */
 void _StSetDMA();                /* C_011 */
 void StClearRing();              /* C_002 */
 void StUnSetRing();              /* C_003 */
-void CdRead2();                  /* CDREAD2 */
+sint32 CdRead2(sint32 mode);     /* CDREAD2 */
 void _cdread2_ready_cb();        /* CDREAD2 */
 void StSetStream();              /* C_005 */
 void CdSearchFile();             /* ISO9660 */
@@ -139,36 +138,36 @@ void CdInitOnce();               /* EVENT */
 void CdCbsync();                 /* EVENT */
 void CdCbready();                /* EVENT */
 void CdCbread();                 /* EVENT */
-void CdGetToc();                 /* TOC */
+int CdGetToc(CdlLOC *loc);       /* TOC */
 void CdGetToc2();                /* TOC */
 /* -- libds -- */
 void DsReadyCallback(); /* DSCB */
 void DsDataCallback();  /* DSCB */
 /* -- libetc -- */
 /* VMODE */
-void GetVideoMode();       /* VMODE */
-                           /* VSYNC */
-void _VSync_wait();        /* VSYNC */
-                           /* INTR */
-void InterruptCallback();  /* INTR */
-void DMACallback();        /* INTR */
-                           /* INTR */
-void VSyncCallbacks();     /* INTR */
-void CheckCallback();      /* INTR */
-void SetIntrMask();        /* INTR */
-void _initIntr();          /* INTR */
-void _intrhand();          /* INTR */
-void _set_intr_callback(); /* INTR */
-void StopCallback();       /* INTR */
-void RestartCallback();    /* INTR */
-void _bzero_w();           /* INTR */
-void startIntrVSync();     /* INTR_VB */
-void trapIntrVSync();      /* INTR_VB */
+void GetVideoMode();                                    /* VMODE */
+                                                        /* VSYNC */
+void _VSync_wait();                                     /* VSYNC */
+                                                        /* INTR */
+void *InterruptCallback(int interrupt, void *callback); /* INTR */
+void *DMACallback(int dma, void *callback);             /* INTR */
+                                                        /* INTR */
+void VSyncCallbacks();                                  /* INTR */
+void CheckCallback();                                   /* INTR */
+void SetIntrMask();                                     /* INTR */
+void _initIntr();                                       /* INTR */
+void _intrhand();                                       /* INTR */
+void _set_intr_callback();                              /* INTR */
+void StopCallback();                                    /* INTR */
+void RestartCallback();                                 /* INTR */
+void _bzero_w();                                        /* INTR */
+void startIntrVSync();                                  /* INTR_VB */
+void trapIntrVSync();                                   /* INTR_VB */
 // dup: void VSyncCallback();   /* INTR_VB */
 // dup: void _bzero_w();   /* INTR_VB */
 void startIntrDMA(); /* INTR_DMA */
 void _dma_isr();     /* INTR_DMA */
-// dup: void DMACallback();   /* INTR_DMA */
+// dup: void DMACallback(); /* INTR_DMA */
 // dup: void _bzero_w();   /* INTR_DMA */
 /* -- libgpu -- */
 void Eac_vars();                 /* SYS */
@@ -212,7 +211,7 @@ void _sync();                    /* SYS */
 void _gpu_arm_timeout();         /* SYS */
 void _gpu_check_timeout();       /* SYS */
 void _gpu_init_videomode();      /* SYS */
-extern int DrawOTag2(u_long *p); /* SYS */
+extern int DrawOTag2(uint32 *p); /* SYS */
 void _install_drain_cb();        /* SYS */
 void _memset();                  /* SYS */
                                  /* P00 */
@@ -227,7 +226,7 @@ void _memset();                  /* SYS */
                                  /* P01 */
                                  /* P11 */
 // dup: extern void SetPolyF3(POLY_F3 *p) ;   /* P11 */
-extern u_long *FntFlush(int id);                                   /* FONT */
+extern uint32 *FntFlush(int id);                                   /* FONT */
 extern int FntPrint();                                             /* FONT */
 void CdStatus();                                                   /* SYS */
 void CdMode();                                                     /* SYS */
@@ -237,7 +236,7 @@ void CdFlush();                                                    /* SYS */
 void CdSetDebug();                                                 /* SYS */
 void CdSync();                                                     /* SYS */
 void CdReady();                                                    /* SYS */
-void CdGetSector();                                                /* SYS */
+int CdGetSector(void *madr, int size);                              /* SYS */
 void CdGetSector2();                                               /* SYS */
 void CdDataCallback();                                             /* SYS */
 void CdDataSync();                                                 /* SYS */
@@ -409,10 +408,10 @@ void _padIntRecvData();     /* PADIF */
 /* -- libpress -- */
 void Libp_table();                             /* TABLE */
 extern int DecDCTvlcSize(int size);            /* VLC */
-extern int DecDCTvlc(u_long *bs, u_long *buf); /* VLC */
+extern int DecDCTvlc(uint32 *bs, uint32 *buf); /* VLC */
 extern void DecDCTReset(int mode);             /* LIBPRESS */
-extern void DecDCTin(u_long *buf, int mode);   /* LIBPRESS */
-extern void DecDCTout(u_long *buf, int size);  /* LIBPRESS */
+extern void DecDCTin(uint32 *buf, int mode);   /* LIBPRESS */
+extern void DecDCTout(uint32 *buf, int size);  /* LIBPRESS */
 extern int DecDCTinSync(int mode);             /* LIBPRESS */
 extern int DecDCToutCallback(void (*func)());  /* LIBPRESS */
 void MDEC_rest();                              /* LIBPRESS */

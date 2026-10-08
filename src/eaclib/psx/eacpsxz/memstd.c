@@ -3,7 +3,7 @@
  *   13 fns @ [0x800E4D4C, 0x800E5608) -- EA "memstd" standard heap allocator.
  *   FULL reconstruction of the actual code (disasm-v3 MIPS); NOT stubs/thunks.
  *   No SYM debug info for these (LIB built without -g) -> param/field names reasoned from
- *   the MIPS + the EA memstd design; every field keeps a /* +0xNN *\/ byte-offset breadcrumb.
+ *   the MIPS + the EA memstd design; every field keeps a +0xNN byte-offset breadcrumb.
  *   C-linkage symbols (the .obj XDEFs these names); cross-obj callers resolve via lib/libfns.h.
  *
  *   HEAP MODEL (recovered byte-for-byte from the disasm):
@@ -54,21 +54,21 @@ extern "C" MemClass *gMemClassTable[16]; /* @0x8013E900 (BSS) */
 extern "C" int mb_default;               /* @0x8013DCC8       */
 
 /* ---- helpers defined in sibling eacpsxz / libc objs (called, not defined here) ---- */
-extern "C" int sprintf(char *, const char *, ...); /* libc SPRINTF     */
-extern "C" char *strcpy(char *, const char *);     /* eacpsxz strcpy   */
-extern "C" unsigned strlen(const char *);          /* eacpsxz strlen   */
-extern "C" void blockclear(void *, int);           /* eacpsxz blockclear */
-extern "C" void putm(void *, unsigned, int);       /* guard-band writer  */
-extern "C" void puti(void *, unsigned, int);       /* guard-band writer  */
-extern "C" void *allocmutex(void);                 /* mutex allocator    */
+#include <stdio.h>
+extern "C" char *strcpy(char *, const char *); /* eacpsxz strcpy   */
+extern "C" unsigned strlen(const char *);      /* eacpsxz strlen   */
+extern "C" void blockclear(void *, int);       /* eacpsxz blockclear */
+extern "C" void putm(void *, unsigned, int);   /* guard-band writer  */
+extern "C" void puti(void *, unsigned, int);   /* guard-band writer  */
+extern "C" void *allocmutex(void);             /* mutex allocator    */
 /* forward decls of intra-obj XDEFs (all C-linkage) */
 extern "C" MemBlock *FREE_find(MemClass *mb, int size, int reverse);
 extern "C" MemBlock *FREE_findlargest(MemClass *mb, int size, int reverse);
 extern "C" void FREE_add(MemClass *mb, MemBlock *node);
 extern "C" void FREE_remove(MemClass *mb, MemBlock *node);
-extern "C" int initmemblock(MemBlock *blk, char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext);
+extern "C" int initmemblock(MemBlock *blk, const char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext);
 extern "C" int MEM_infosize(int id);
-extern "C" int MEM_tailsize(char *name, int id);
+extern "C" int MEM_tailsize(const char *name, int id);
 
 /* ===================================================================== *
  *  FREE_find  @0x800E4D4C : first free block whose size >= `size`.       *
@@ -205,7 +205,7 @@ extern "C" void FREE_remove(MemClass *mb, MemBlock *node) /* @0x800E4F04 */
  *  write debug guard bands and copy a block name into the tail region.    *
  *  Returns the total span consumed (header+payload+name) in bytes.        *
  * ===================================================================== */
-extern "C" int initmemblock(MemBlock *blk, char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext) /* @0x800E4F2C */
+extern "C" int initmemblock(MemBlock *blk, const char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext) /* @0x800E4F2C */
 {
     char *end = (char *)blk + size + 0x10; /* s0 = blk + size + 16 */
 
@@ -244,7 +244,7 @@ extern "C" int MEM_infosize(int id) /* @0x800E5008 */
  *  MEM_tailsize @0x800E5030 : bytes reserved after the payload =         *
  *  infosize + (named class & name given ? strlen(name)+1 : 0).          *
  * ===================================================================== */
-extern "C" int MEM_tailsize(char *name, int id) /* @0x800E5030 */
+extern "C" int MEM_tailsize(const char *name, int id) /* @0x800E5030 */
 {
     MemClass *cls = gMemClassTable[id & 0xF];
     int extra = 0;
@@ -349,7 +349,7 @@ extern "C" char *getblockname(void *p) /* @0x800E52E0 */
  *  HIGH end, 0x20=pick the largest free block.  Returns the user pointer *
  *  (header+0x10) or NULL.                                                *
  * ===================================================================== */
-extern "C" void *reservememadr(char *name, int size, int classid) /* @0x800E533C */
+extern "C" void *reservememadr(const char *name, int size, int classid) /* @0x800E533C */
 {
     MemClass *cls = gMemClassTable[classid & 0xF]; /* s3 */
     int need;                                      /* s1 */

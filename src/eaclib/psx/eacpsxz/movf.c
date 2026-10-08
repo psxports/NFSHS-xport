@@ -16,9 +16,9 @@
 #include "../../../nfs4_types.h"
 #include "../../../mips_semantics.h"
 
-extern "C" int shapedepth(unsigned char *shape);                   /* shpdepth */
-extern "C" int shapetoclutid(unsigned int *shape);                 /* shpclut */
-extern "C" int vramimage(PSX_RECT *rect, u_long *data);            /* vramfxya */
+extern "C" int shapedepth(const void *shapeData);                  /* shpdepth */
+extern "C" int shapetoclutid(const void *shapeData);               /* shpclut */
+extern "C" int vramimage(PSX_RECT *rect, uint32 *data);            /* vramfxya */
 extern "C" intptr fastmovfxya(unsigned char *shape, int x, int y); /* fastmovf sibling */
 extern "C" char *primptr;                                          /* primate : primitive write cursor */
 extern "C" char *nextprim;                                         /* primate : OT link target (prev prim) */
@@ -26,11 +26,12 @@ extern "C" int semitrans;                                          /* primate : 
 extern "C" unsigned short DAT_801486e8;                            /* @0x801486E8 : draw-origin X */
 extern "C" unsigned short DAT_801486ec;                            /* @0x801486EC : draw-origin Y */
 
-extern "C" intptr movfxya(unsigned char *shape, int x, int y); /* @0x800F0738 */
+extern "C" intptr movfxya(void *shapeData, int x, int y); /* @0x800F0738 */
 
 /* movfxya @0x800F0738 : draw shape at (x,y). */
-extern "C" intptr movfxya(unsigned char *shape, int x, int y)
+extern "C" intptr movfxya(void *shapeData, int x, int y)
 {
+    unsigned char *shape = (unsigned char *)shapeData;
     int depth = shapedepth(shape);
     intptr ret = 0;
 
@@ -41,7 +42,7 @@ extern "C" intptr movfxya(unsigned char *shape, int x, int y)
         rect.y = DAT_801486ec + (short)y;
         rect.w = *(short *)(shape + 4);
         rect.h = *(short *)(shape + 6);
-        ret = vramimage(&rect, (u_long *)(shape + 0x10));
+        ret = vramimage(&rect, (uint32 *)(shape + 0x10));
     }
     else if (((*shape & 3) == 2) && ((semitrans & 2) == 0))
     { /* (b) */

@@ -2683,11 +2683,11 @@ void AIState_RovingTraffic::Execute()
 
   pCVar4 = (this->_base_AIState_Base).carObj_;
 
-  iVar9 = (pCVar4->targetPos).x - (pCVar4->N).position.x >> 0xc;
+  iVar9 = ((pCVar4->targetPos).x - (pCVar4->N).position.x) >> 0xc;
 
   pCVar4 = (this->_base_AIState_Base).carObj_;
 
-  iVar8 = (pCVar4->targetPos).z - (pCVar4->N).position.z >> 0xc;
+  iVar8 = ((pCVar4->targetPos).z - (pCVar4->N).position.z) >> 0xc;
 
   if (iVar9 * iVar9 + iVar8 * iVar8 < 10000) {
 
@@ -3447,7 +3447,7 @@ int AIState_RovingTraffic::TestForRelease()
 
 {
 
-  return this->pathIndex_ < this->numPathPoints_ ^ 1;
+  return (this->pathIndex_ < this->numPathPoints_) ^ 1;
 
 }
 

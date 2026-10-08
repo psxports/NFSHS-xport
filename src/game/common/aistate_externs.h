@@ -11,13 +11,13 @@ extern __vtbl_ptr_type AIState_Base_vtable[], AIState_Normal_vtable[], AIState_N
 
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gSortedList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern Trk_NewSlice *BWorldSm_slices;
 extern int Cars_gNumTrafficCars;
 extern int Cars_gNumCars;
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int AI_elapsedTime;
 extern int AITune_LifeTimer[];
 extern int AIWorld_CheckForBarrierBetweenLanes(int slice, int lane0, int lane1);
@@ -34,7 +34,7 @@ void AIScript_ProcessActionsAndReactions(AIScript_t *script, int flags);
 void AISpeeds_CalcDesiredSpeed(Car_tObj *carObj);
 extern "C"
 {
-    void AISpeeds_CalcTrafficTopSpeed(Car_tObj *carObj);
+    int AISpeeds_CalcTrafficTopSpeed(Car_tObj *carObj);
 }
 void AI_GenericBeginCycle(Car_tObj *carObj);
 void AI_GenericCycle(Car_tObj *carObj);

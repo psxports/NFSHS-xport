@@ -2,7 +2,7 @@
  * Real nfs4-f.exe bytes; __vtbl_ptr_type; size = null-delimited rodata segment. @0xVA breadcrumbs.
  * NOT original layout (each obj owned its vtable in rodata); self-contained + faithful + links. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 
 static int NFS4_VT_THUNK _vtdtor_tScreen(tScreen *p){ p->~tScreen(); return 0; }
 static int NFS4_VT_THUNK _vtdtor_tScreenBeTheCopCongrats(tScreenBeTheCopCongrats *p){ p->~tScreenBeTheCopCongrats(); return 0; }

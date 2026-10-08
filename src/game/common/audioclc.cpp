@@ -366,8 +366,8 @@ int AudioClc_CalcAzimuth(DRender_tCalcView *view,coorddef *object)
     iVar1 = -iVar1;
   }
   uVar5 = intatan(iVar1 >> 8,
-                     (iVar8 >> 8) * (iVar4 >> 8) + (iVar9 >> 8) * (iVar2 >> 8) +
-                     (iVar6 >> 8) * (iVar7 >> 8) >> 8);
+                     ((iVar8 >> 8) * (iVar4 >> 8) + (iVar9 >> 8) * (iVar2 >> 8) +
+                     (iVar6 >> 8) * (iVar7 >> 8)) >> 8);
   return (uVar5 & 0x3ff) << 6;
 }
 
@@ -464,8 +464,8 @@ int AudioClc_CalcTrackAzimuth(DRender_tCalcView *view,Car_tObj *car)
     iVar1 = -iVar1;
   }
   uVar5 = intatan(iVar1 >> 8,
-                     (iVar8 >> 8) * (iVar4 >> 8) + (iVar7 >> 8) * (iVar2 >> 8) +
-                     (iVar6 >> 8) * (iVar3 >> 8) >> 8);
+                     ((iVar8 >> 8) * (iVar4 >> 8) + (iVar7 >> 8) * (iVar2 >> 8) +
+                     (iVar6 >> 8) * (iVar3 >> 8)) >> 8);
   return (uVar5 & 0x3ff) << 6;
 }
 
@@ -1007,7 +1007,7 @@ void AudioClc_SoundSpeech(void)
 
 /* externs for cross-module symbols not already in audioclc.cpp scope */
 extern int HudBustedOverlay;
-extern "C" extern int gMasterAmbientLevel;
+extern "C" int gMasterAmbientLevel;
 void Camera_GetAudioViewInfo(int cviewP, DRender_tCalcView *cview, coorddef **cvel);
 void AudioCmn_UpdateThunder(void);
 

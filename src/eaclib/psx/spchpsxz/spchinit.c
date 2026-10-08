@@ -34,7 +34,7 @@ extern "C" void iSPCH_InitEventDat(void);                    /* spchevnt */
 extern "C" void iSPCH_InitEventQueue(void);                  /* spchevnt */
 extern "C" int *iSPCH_EACseedrandom(unsigned int seed);      /* spchrand: true typed state pointer */
 extern "C" void iSPCH_ClearChosen(void);                     /* spchpick */
-extern "C" int SPCH_SetPreLoadTicks(int ticks);              /* spchpick */
+extern "C" void SPCH_SetPreLoadTicks(int ticks);             /* spchpick */
 
 extern "C" intptr iSPCH_MemAlloc(int numBytes, char *message);                         /* @0x800EB5A4 */
 extern "C" void iSPCH_MemFree(void *mem);                                              /* @0x800EB5D4 */

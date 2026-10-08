@@ -280,24 +280,24 @@ extern "C"
         SndFxBus fxbus[2];                 /* +0x9C reverb/effect buses (stride 0x10)                        */
     } SndState;                            /* 0xBC                                                           */
 
-    int sndgs[]; /* @0x80147860 : the SndState block (was aliased as gSndState) */
+    extern int sndgs[]; /* @0x80147860 : the SndState block (was aliased as gSndState) */
 #define SND ((SndState *)sndgs)
 
     /* ---- SND runtime helpers shared across SNDPSXZ objs (permissive; real sigs in each .cpp) ---- */
     int iSNDvalidbank(int bank); /* nonzero == invalid */
     int iSNDbankremovepat(int bank, int idx, int *scratch);
     int iSNDremovetaggedpatch(unsigned char *bank, int *patch);
-    int SNDstop(int handle);
+    int SNDstop(unsigned int tag);
     void iSNDplatformfree(void *p);
-    int SNDbankremove(int bank);
+    void SNDbankremove(int bankId);
     /* critical section + voice iteration + SPU pokes */
-    void iSNDenteraudio(void);                         /* @0x800EA534 lock   */
-    void iSNDleaveaudio(void);                         /* @0x800EA56C unlock */
-    int iSNDgetchan(int handle);                       /* @0x800EE9D4 channel index from handle (<0 if none) */
-    int iSNDpatchkey(int chan, int *iter);             /* @0x800FEF4C iterate voices of a chan; 0 when done  */
-    void iSNDplatform3dpos(int voice, int pan, int z); /* @0x800EEE30 */
-    void iSNDcalcvol(int voice);                       /* @0x800EF050 */
-    void iSNDvol(int voice, int vol);                  /* @0x800F00F8 */
+    void iSNDenteraudio(void);                 /* @0x800EA534 lock   */
+    void iSNDleaveaudio(void);                 /* @0x800EA56C unlock */
+    int iSNDgetchan(int handle);               /* @0x800EE9D4 channel index from handle (<0 if none) */
+    int iSNDpatchkey(int chan, int *iter);     /* @0x800FEF4C iterate voices of a chan; 0 when done  */
+    int iSNDplatform3dpos(int voice, int pan); /* @0x800EEE30 */
+    void iSNDcalcvol(int voice);               /* @0x800EF050 */
+    int iSNDvol(int chan, int level);          /* @0x800F00F8 */
     /* fx/reverb bus */
     int iSNDplatformfxinit(int bus, int type, int depth, int delay); /* @0x800F0584 */
     int iSNDplatformfxmasterlevel(int bus, int level);               /* @0x800F05BC */

@@ -5,7 +5,7 @@
 #include "../../lib/libfns.h"
 
 /* ---- globals ---- */
-extern "C" extern "C" char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern char *font12;
 extern char *font18;
 extern char *fontTitle;
@@ -16,11 +16,11 @@ extern short currentSize; /* SYM short (was wrongly int); fetextrender_externs.h
 /* ---- engine / front-end helpers ---- */
 extern "C"
 {
-    int DrawShapeExtended(int shape, int a, int x, int y, int e, int f, tDrawShapeExtended *flags);
+    void DrawShapeExtended(int shape, int a, int x, int y, int e, int f, tDrawShapeExtended *flags);
 }
 extern "C"
 {
-    int Font_ExitFromGame(void);
+    void Font_ExitFromGame(void);
 }
 extern "C"
 {
@@ -28,7 +28,7 @@ extern "C"
 }
 extern "C"
 {
-    int Font_DeInit(void);
+    void Font_DeInit(void);
 }
 extern "C"
 {

@@ -5,12 +5,12 @@
 #include "../../lib/libfns.h"
 
 /* --- globals --- */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" int ticks;
 extern tTrackManager trackManager;
 extern tGlobalMenuDefs *menuDefs;
 extern tFEApplication *FEApp;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 
 /* --- storage owned by ScreenTracks.obj --- */

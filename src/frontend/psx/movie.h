@@ -19,7 +19,7 @@ void strSetDefDecEnv(DECENV *dec);
 void strInit(CdlLOC *loc, int frame_size, fn_void *callback, fn_void *endcallback);
 void strCallback(void);
 int strNextVlc(DECENV *dec);
-u_long *strNext(DECENV *dec);
+uint32 *strNext(DECENV *dec);
 void strSync(DECENV *dec, int arg1);
 void strKickCD(CdlLOC *loc);
 

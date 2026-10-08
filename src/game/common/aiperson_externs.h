@@ -7,12 +7,12 @@
 
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern Udff_tInfo *Udff_Opena(char *name, char *mem, int abortFlag);
 extern "C" char GameSetup_gPersonalityNames[15][8];
 extern int Cars_gNumCopCars;
 extern int Cars_gNumCars;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int Cars_gNumAIRaceCars;
 extern int Udff_GetInt(Udff_tInfo *handle);
 extern void AIScript_Assign(AIScript_t *aiscriptt, AIScript_tReactionDetails (*arg2)[7]);

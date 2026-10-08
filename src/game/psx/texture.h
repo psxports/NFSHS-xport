@@ -14,7 +14,7 @@ void Texture_MenuReleaseClutId__Fs(short id);                                   
 void Texture_ColorCarPalette__FPcT0i(char *from, char *to, int numentry);                                                       /* :327 */
 void Texture_CopyPalette__FPciii(char *data, int width, int x, int y);                                                          /* :339 */
 void Texture_ProcessPaletteCopy__FP15Texture_pal8bitii(Texture_pal8bit *palCopy, int palStart, int palNum);                     /* :356 */
-void Texture_LoadImage__FP4RECTPUl(PSX_RECT *imgrect, u_long *p);                                                               /* :393 */
+void Texture_LoadImage__FP4RECTPUl(PSX_RECT *imgrect, uint32 *p);                                                               /* :393 */
 void Texture_Vramf__FP8shapetbliiii(shapetbl *shp, int x, int y, int clutx, int cluty);                                         /* :406 */
 void Texture_Vramcf__FP8shapetbliiii(shapetbl *shp, int x, int y, int clutx, int cluty);                                        /* :468 */
 int Texture_GetTranslucencyMode__FP8shapetbl(shapetbl *shp);                                                                    /* :514 */

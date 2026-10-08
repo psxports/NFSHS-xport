@@ -19,7 +19,7 @@ int          textSysMemCardFail_Index[7] = { 0, 677, 685, 675, 811, 671, 669 }; 
 void ChecksumData(tMemCardData *memCardData)
 
 {
-  u_long uVar1;
+  uint32 uVar1;
   
   memCardData->fSize = 0x14ac;
   uVar1 = crc16(&memCardData->frontEnd,0x450);
@@ -42,7 +42,7 @@ void ChecksumData(tMemCardData *memCardData)
 void * VerifySuccessfulRead(tMemCardData *memCardData)
 
 {
-  u_long uVar1;
+  uint32 uVar1;
   byte result;
   void *pvVar2;
   
@@ -153,7 +153,7 @@ int Confirm(int Text,int yesText)
 Confirm_redrawAndCleanup:
   Redraw(FEApp);
   MakeWayForMemoryCard();
-  (((tScreen*)((tScreen *)&MyDialog))->~tScreen(), (tScreen*)((tScreen *)&MyDialog));
+  ((tScreen *)&MyDialog)->~tScreen();
   return ret;
 }
 
@@ -309,17 +309,18 @@ extern "C" void DeInit_Memcard(void)
 void Init_MemcardFile(MCRDFILE_def *memCardFile,short cardnum,bool notitle)
 
 {
+  static char fileName[] = "NFS4";
   void *pvVar1;
   char *pcVar2;
   char *pcVar3;
   
   blockclear(memCardFile,0x2c);
-  memCardFile->name = "NFS4";
+  memCardFile->name = fileName;
   if (notitle == 0) {
     pvVar1 = PlayerNameExist((uint)(cardnum == 5));
     if (pvVar1 == (void *)0x0) {
       pcVar2 = TextSys_Word(0x279);
-      sprintf(TITLE,pcVar2);
+      sprintf(TITLE,"%s",pcVar2);
     }
     else {
       pcVar2 = TextSys_Word(0x278);
@@ -430,7 +431,7 @@ extern "C" void * SaveGame(short player)
   memCardData.pinkSlipsNoCheat = rand();
   FECheat_SaveBonus(&memCardData.bonus);
   sprintf(shapeFileName,"%szMem.psh",Paths_Paths[0x20]);
-  bigfile = (void *)loadshapeadr(shapeFileName,(void *)0x0);
+  bigfile = (void *)loadshapeadr(shapeFileName,0x0);
   memCardFile.flags = 0x200;
   memCardFile.icon[0] = (shapetbl *)shapepointer(bigfile,0);
   memCardFile.icon[1] = (shapetbl *)0x0;
@@ -488,7 +489,7 @@ extern "C" void * SaveGame(short player)
   Hide((tDialogBase *)&WarningDialog);
   Redraw(FEApp);
   CURRENTLYUSINGMEMCARD = 0;
-  (((tScreen*)((tScreen *)&WarningDialog))->~tScreen(), (tScreen*)((tScreen *)&WarningDialog));
+  ((tScreen *)&WarningDialog)->~tScreen();
   return pvVar11;
 }
 
@@ -646,14 +647,14 @@ switchD_80035054_caseD_4:
           FECheat_LoadBonus(&memCardData.bonus);
         }
         else {
-          sprintf(frontEnd.playerNameList[iVar4],memCardData.frontEnd.playerNameList[0]);
+          sprintf(frontEnd.playerNameList[iVar4],"%s",memCardData.frontEnd.playerNameList[0]);
         }
         carManager.LoadCars(memCardData.carInfo,player);
       }
       else {
         frontEnd.gPinkSlipsNoCheat[iVar4] = memCardData.pinkSlipsNoCheat;
         carManager.LoadPinkSlipsCars(memCardData.carInfo,player);
-        sprintf(frontEnd.playerNameList[iVar4],memCardData.frontEnd.playerNameList[0]);
+        sprintf(frontEnd.playerNameList[iVar4],"%s",memCardData.frontEnd.playerNameList[0]);
         frontEnd.pinkSlipsCash[iVar4] = memCardData.tournament.fSaveMoney;
       }
       iVar12 = 0x28d;
@@ -716,7 +717,7 @@ LAB_80035238:
       FEApp->Redraw();
     }
     CURRENTLYUSINGMEMCARD = 0;
-    (((tScreen*)((tScreen *)warningDialog))->~tScreen(), (tScreen*)((tScreen *)warningDialog));
+    ((tScreen *)warningDialog)->~tScreen();
     return sVar13;
   }
   goto LoadGame_memcardInit;
@@ -760,7 +761,7 @@ PinkSlipsErrorCode SavePinkSlipsCars(short player,short withoutCarInGarageNumber
   CURRENTLYUSINGMEMCARD = 1;
   nomessage = 0;
   sprintf(shapeFileName,"%szMem.psh",Paths_Paths[0x20]);
-  addr = (void *)loadshapeadr(shapeFileName,(void *)0x0);
+  addr = (void *)loadshapeadr(shapeFileName,0x0);
   Init_MemcardFile(&memCardFile,(short)((uint)iVar4 >> 0x10),true);
   while (iVar5 = MCRD_handlecardevents(iVar4 >> 0x10), iVar5 == 0x15) {
     VSync(0);
@@ -960,7 +961,7 @@ SavePinkSlipsCarsWithErrorDialogs(short player,short WillLoseCar,short withoutCa
     if (PVar2 != PinkSlipsNoError) {
       Hide((tDialogBase *)&FEApp->NoInputMemCardDialog);
       pcVar3 = TextSys_Word(textSysMemCardFail_Index[PVar2] + player_00);
-      sprintf(string,pcVar3);
+      sprintf(string,"%s",pcVar3);
       if (WillLoseCar != 0) {
         iVar5 = 0x298;
         if (WillLoseCar == 2) {
@@ -978,10 +979,10 @@ SavePinkSlipsCarsWithErrorDialogs(short player,short WillLoseCar,short withoutCa
       sVar1 = Run(&RetryCancelDialog._base_tDialogInteractive);
       Hide((tDialogBase *)&WillLoseCarMessage);
     }
-    (((tScreen*)((tScreen *)&WarningDialog))->~tScreen(), (tScreen*)((tScreen *)&WarningDialog));
+    ((tScreen *)&WarningDialog)->~tScreen();
     if ((PVar2 == PinkSlipsNoError) || (sVar1 == 0)) {
-      (((tScreen*)((tScreen *)&WillLoseCarMessage))->~tScreen(), (tScreen*)((tScreen *)&WillLoseCarMessage));
-      (((tScreen*)((tScreen *)&RetryCancelDialog))->~tScreen(), (tScreen*)((tScreen *)&RetryCancelDialog));
+      ((tScreen *)&WillLoseCarMessage)->~tScreen();
+      ((tScreen *)&RetryCancelDialog)->~tScreen();
       return PVar2;
     }
   } while( true );

@@ -3,6 +3,7 @@
  *   GTE-free (plain fixed-point + fixedsqrt). Full SYM-locals applied.
  */
 #include "../../nfs4_types.h"
+#include "../../mips_semantics.h"
 #include "quatern_externs.h"
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
@@ -73,21 +74,30 @@ void Quatern_QuatToMat(tQuat *q,matrixtdef *matrix)
   
   iVar4 = (int)q->x;
   iVar7 = (int)q->w;
-  iVar1 = iVar7 * iVar4 * 2;
+  iVar1 = nfs4_mips_mult_s32(nfs4_mips_mult_s32(iVar7,iVar4),2);
   iVar5 = (int)q->y;
-  iVar8 = iVar5 * 2;
-  iVar6 = q->z * 2;
-  iVar2 = q->z * iVar6;
-  iVar3 = 0x10000000 - iVar4 * iVar4 * 2;
-  matrix->m[0] = (0x10000000 - iVar5 * iVar8) - iVar2 >> 0xc;
-  matrix->m[1] = iVar4 * iVar8 + iVar7 * iVar6 >> 0xc;
-  matrix->m[3] = iVar4 * iVar8 - iVar7 * iVar6 >> 0xc;
-  matrix->m[4] = iVar3 - iVar2 >> 0xc;
-  matrix->m[8] = iVar3 - iVar5 * iVar8 >> 0xc;
-  matrix->m[2] = iVar4 * iVar6 - iVar7 * iVar8 >> 0xc;
-  matrix->m[6] = iVar4 * iVar6 + iVar7 * iVar8 >> 0xc;
-  matrix->m[5] = iVar5 * iVar6 + iVar1 >> 0xc;
-  matrix->m[7] = iVar5 * iVar6 - iVar1 >> 0xc;
+  iVar8 = nfs4_mips_mult_s32(iVar5,2);
+  iVar6 = nfs4_mips_mult_s32(q->z,2);
+  iVar2 = nfs4_mips_mult_s32(q->z,iVar6);
+  iVar3 = nfs4_mips_subu_s32(0x10000000,
+      nfs4_mips_mult_s32(nfs4_mips_mult_s32(iVar4,iVar4),2));
+  matrix->m[0] = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+      nfs4_mips_subu_s32(0x10000000,nfs4_mips_mult_s32(iVar5,iVar8)),iVar2),0xc);
+  matrix->m[1] = nfs4_mips_sra_s32(nfs4_mips_addu_s32(
+      nfs4_mips_mult_s32(iVar4,iVar8),nfs4_mips_mult_s32(iVar7,iVar6)),0xc);
+  matrix->m[3] = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+      nfs4_mips_mult_s32(iVar4,iVar8),nfs4_mips_mult_s32(iVar7,iVar6)),0xc);
+  matrix->m[4] = nfs4_mips_sra_s32(nfs4_mips_subu_s32(iVar3,iVar2),0xc);
+  matrix->m[8] = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+      iVar3,nfs4_mips_mult_s32(iVar5,iVar8)),0xc);
+  matrix->m[2] = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+      nfs4_mips_mult_s32(iVar4,iVar6),nfs4_mips_mult_s32(iVar7,iVar8)),0xc);
+  matrix->m[6] = nfs4_mips_sra_s32(nfs4_mips_addu_s32(
+      nfs4_mips_mult_s32(iVar4,iVar6),nfs4_mips_mult_s32(iVar7,iVar8)),0xc);
+  matrix->m[5] = nfs4_mips_sra_s32(nfs4_mips_addu_s32(
+      nfs4_mips_mult_s32(iVar5,iVar6),iVar1),0xc);
+  matrix->m[7] = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+      nfs4_mips_mult_s32(iVar5,iVar6),iVar1),0xc);
   return;
 }
 
@@ -135,7 +145,8 @@ void Quatern_MatToQuat(matrixtdef *matrix,tQuat *q)
     }
     if (uVar2 == 1) {
       iVar3 = fixedsqrt((matrix->m[4] - (iVar3 + iVar1)) + 0x10000);
-      q->y = (short)(iVar3 - (iVar3 >> 0x1f) >> 3);
+      q->y = (short)nfs4_mips_sra_s32(
+          nfs4_mips_subu_s32(iVar3,nfs4_mips_sra_s32(iVar3,0x1f)),3);
       iVar1 = 0;
       if (iVar3 != 0) {
         iVar1 = fixeddiv(0x8000,iVar3);
@@ -153,7 +164,8 @@ void Quatern_MatToQuat(matrixtdef *matrix,tQuat *q)
         return;
       }
       iVar3 = fixedsqrt((iVar3 - (iVar1 + matrix->m[4])) + 0x10000);
-      q->z = (short)(iVar3 - (iVar3 >> 0x1f) >> 3);
+      q->z = (short)nfs4_mips_sra_s32(
+          nfs4_mips_subu_s32(iVar3,nfs4_mips_sra_s32(iVar3,0x1f)),3);
       iVar1 = 0;
       if (iVar3 != 0) {
         iVar1 = fixeddiv(0x8000,iVar3);
@@ -170,7 +182,8 @@ void Quatern_MatToQuat(matrixtdef *matrix,tQuat *q)
       return;
     }
     iVar3 = fixedsqrt((iVar1 - (matrix->m[4] + iVar3)) + 0x10000);
-    q->x = (short)(iVar3 - (iVar3 >> 0x1f) >> 3);
+    q->x = (short)nfs4_mips_sra_s32(
+        nfs4_mips_subu_s32(iVar3,nfs4_mips_sra_s32(iVar3,0x1f)),3);
     iVar1 = 0;
     if (iVar3 != 0) {
       iVar1 = fixeddiv(0x8000,iVar3);
@@ -183,7 +196,8 @@ void Quatern_MatToQuat(matrixtdef *matrix,tQuat *q)
   }
   else {
     iVar1 = fixedsqrt(iVar1 + 0x10000);
-    q->w = (short)(iVar1 - (iVar1 >> 0x1f) >> 3);
+    q->w = (short)nfs4_mips_sra_s32(
+        nfs4_mips_subu_s32(iVar1,nfs4_mips_sra_s32(iVar1,0x1f)),3);
     iVar1 = fixeddiv(0x8000,iVar1);
     iVar3 = fixedmult(matrix->m[7] - matrix->m[5],iVar1);
     q->x = (short)(iVar3 >> 2);

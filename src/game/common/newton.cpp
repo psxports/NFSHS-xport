@@ -433,19 +433,19 @@ void Newton_UpdateRoadGeometry(BO_tNewtonObj *n)
     if (bVar3) {
       cVar1 = BWorldSm_slices[iVar9].right[2];
       cVar2 = BWorldSm_slices[iVar9].right[1];
-      (n->roadMatrix).m[0] = (int)BWorldSm_slices[iVar9].right[0] << 9;
-      (n->roadMatrix).m[2] = (int)cVar1 << 9;
-      (n->roadMatrix).m[1] = (int)cVar2 << 9;
+      (n->roadMatrix).m[0] = nfs4_mips_sll_s32(BWorldSm_slices[iVar9].right[0],9);
+      (n->roadMatrix).m[2] = nfs4_mips_sll_s32(cVar1,9);
+      (n->roadMatrix).m[1] = nfs4_mips_sll_s32(cVar2,9);
       cVar1 = pTVar4[iVar9].normal[2];
       cVar2 = pTVar4[iVar9].normal[1];
-      (n->roadMatrix).m[3] = (int)pTVar4[iVar9].normal[0] << 9;
-      (n->roadMatrix).m[5] = (int)cVar1 << 9;
-      (n->roadMatrix).m[4] = (int)cVar2 << 9;
+      (n->roadMatrix).m[3] = nfs4_mips_sll_s32(pTVar4[iVar9].normal[0],9);
+      (n->roadMatrix).m[5] = nfs4_mips_sll_s32(cVar1,9);
+      (n->roadMatrix).m[4] = nfs4_mips_sll_s32(cVar2,9);
       cVar1 = pTVar4[iVar9].forward[1];
       cVar2 = pTVar4[iVar9].forward[2];
-      (n->roadMatrix).m[6] = (int)pTVar4[iVar9].forward[0] << 9;
-      (n->roadMatrix).m[7] = (int)cVar1 << 9;
-      (n->roadMatrix).m[8] = (int)cVar2 << 9;
+      (n->roadMatrix).m[6] = nfs4_mips_sll_s32(pTVar4[iVar9].forward[0],9);
+      (n->roadMatrix).m[7] = nfs4_mips_sll_s32(cVar1,9);
+      (n->roadMatrix).m[8] = nfs4_mips_sll_s32(cVar2,9);
     }
     else if ((n->simRoadInfo).quadChanged != '\0') {
       pcVar5 = (coorddef *)BWorldSm_UNormal(&n->simRoadInfo);
@@ -537,7 +537,7 @@ int Newton_FindGroundElevationGeneral(coorddef *point,coorddef *normal,coorddef 
       iVar2 = iVar2 + 0xff;
     }
     iVar5 = fixedmult(-((iVar3 >> 8) * (iVar2 >> 8)) - (iVar4 >> 8) * (iVar1 >> 8),
-                       divTable[0x10000 - iVar5 >> 9]);
+                       divTable[nfs4_mips_sra_s32(nfs4_mips_subu_s32(0x10000,iVar5),9)]);
   }
   return iVar5 + pointOnQuad->y;
 }
@@ -622,7 +622,8 @@ FindGERough_iterReduceA:
         iVar3 = fixeddiv(iVar3,iVar1);
       }
       else {
-        iVar3 = fixedmult(iVar3,divTable[0x10000 - iVar1 >> 9]);
+        iVar3 = fixedmult(iVar3,
+                          divTable[nfs4_mips_sra_s32(nfs4_mips_subu_s32(0x10000,iVar1),9)]);
       }
       return iVar3 + pointOnQuad->y + iVar6;
     }
@@ -966,19 +967,25 @@ Newton_FindGE_bounceFirst:
       elevation.x = elevation.x >> 2;
       elevation.z = elevation.z >> 2;
       elevation.y = elevation.y >> 2;
-      tempVecZ.x = (wheelHeight[0].x + wheelHeight[1].x) - (wheelHeight[2].x + wheelHeight[3].x) >>
-                   1;
-      tempVecZ.y = (wheelHeight[0].y + wheelHeight[1].y) - (wheelHeight[2].y + wheelHeight[3].y) >>
-                   1;
-      tempVecZ.z = (wheelHeight[0].z + wheelHeight[1].z) - (wheelHeight[2].z + wheelHeight[3].z) >>
-                   1;
+      tempVecZ.x = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+          nfs4_mips_addu_s32(wheelHeight[0].x,wheelHeight[1].x),
+          nfs4_mips_addu_s32(wheelHeight[2].x,wheelHeight[3].x)),1);
+      tempVecZ.y = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+          nfs4_mips_addu_s32(wheelHeight[0].y,wheelHeight[1].y),
+          nfs4_mips_addu_s32(wheelHeight[2].y,wheelHeight[3].y)),1);
+      tempVecZ.z = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+          nfs4_mips_addu_s32(wheelHeight[0].z,wheelHeight[1].z),
+          nfs4_mips_addu_s32(wheelHeight[2].z,wheelHeight[3].z)),1);
       Math_NormalizeShortVector(&tempVecZ);
-      tempVecX.x = (wheelHeight[1].x + wheelHeight[3].x) - (wheelHeight[0].x + wheelHeight[2].x) >>
-                   1;
-      tempVecX.y = (wheelHeight[1].y + wheelHeight[3].y) - (wheelHeight[0].y + wheelHeight[2].y) >>
-                   1;
-      tempVecX.z = (wheelHeight[1].z + wheelHeight[3].z) - (wheelHeight[0].z + wheelHeight[2].z) >>
-                   1;
+      tempVecX.x = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+          nfs4_mips_addu_s32(wheelHeight[1].x,wheelHeight[3].x),
+          nfs4_mips_addu_s32(wheelHeight[0].x,wheelHeight[2].x)),1);
+      tempVecX.y = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+          nfs4_mips_addu_s32(wheelHeight[1].y,wheelHeight[3].y),
+          nfs4_mips_addu_s32(wheelHeight[0].y,wheelHeight[2].y)),1);
+      tempVecX.z = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+          nfs4_mips_addu_s32(wheelHeight[1].z,wheelHeight[3].z),
+          nfs4_mips_addu_s32(wheelHeight[0].z,wheelHeight[2].z)),1);
       Math_NormalizeShortVector(&tempVecX);
       iVar20 = fixedmult(tempVecZ.y,tempVecX.z);
       iVar24 = fixedmult(tempVecZ.z,tempVecX.y);
@@ -1037,8 +1044,9 @@ Newton_FindGE_bounceFirst:
         iVar20 = fixedmult(ti4,iVar5);
         iVar24 = fixedmult((newtonObj->angularVel).y,(newtonObj->orientMat).m[7]);
         iVar3 = fixedmult((newtonObj->angularVel).z,(newtonObj->orientMat).m[8]);
-        ti4 = (carObj->wheel[2].wheelAcc + carObj->wheel[3].wheelAcc) -
-              (carObj->wheel[0].wheelAcc + carObj->wheel[1].wheelAcc) >> 2;
+        ti4 = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+            nfs4_mips_addu_s32(carObj->wheel[2].wheelAcc,carObj->wheel[3].wheelAcc),
+            nfs4_mips_addu_s32(carObj->wheel[0].wheelAcc,carObj->wheel[1].wheelAcc)),2);
         carObj->angularVel_ch.z = iVar20 + iVar24 + iVar3;
         if (ti4 < 1) {
           iVar20 = -carObj->specs->pitchAngularVelCap;
@@ -1052,8 +1060,9 @@ Newton_FindGE_bounceFirst:
             iVar20 = ti4;
           }
         }
-        iVar24 = (carObj->wheel[0].wheelAcc + carObj->wheel[2].wheelAcc) -
-                 (carObj->wheel[1].wheelAcc + carObj->wheel[3].wheelAcc) >> 2;
+        iVar24 = nfs4_mips_sra_s32(nfs4_mips_subu_s32(
+            nfs4_mips_addu_s32(carObj->wheel[0].wheelAcc,carObj->wheel[2].wheelAcc),
+            nfs4_mips_addu_s32(carObj->wheel[1].wheelAcc,carObj->wheel[3].wheelAcc)),2);
         if (iVar24 < 1) {
           iVar3 = -carObj->specs->rollAngularVelCap;
           if (iVar3 < iVar24) {
@@ -1600,15 +1609,15 @@ void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coo
   BWorldSm_SetSlice(slice,&n->simRoadInfo);
   pTVar15 = BWorldSm_slices;
   n->totalSlice = (u_short)slice;
-  (n->roadMatrix).m[0] = (int)pTVar15[slice].right[0] << 9;
-  (n->roadMatrix).m[1] = (int)pTVar15[slice].right[1] << 9;
-  (n->roadMatrix).m[2] = (int)pTVar15[slice].right[2] << 9;
-  (n->roadMatrix).m[3] = (int)pTVar15[slice].normal[0] << 9;
-  (n->roadMatrix).m[4] = (int)pTVar15[slice].normal[1] << 9;
-  (n->roadMatrix).m[5] = (int)pTVar15[slice].normal[2] << 9;
-  (n->roadMatrix).m[6] = (int)pTVar15[slice].forward[0] << 9;
-  (n->roadMatrix).m[7] = (int)pTVar15[slice].forward[1] << 9;
-  (n->roadMatrix).m[8] = (int)pTVar15[slice].forward[2] << 9;
+  (n->roadMatrix).m[0] = nfs4_mips_sll_s32(pTVar15[slice].right[0],9);
+  (n->roadMatrix).m[1] = nfs4_mips_sll_s32(pTVar15[slice].right[1],9);
+  (n->roadMatrix).m[2] = nfs4_mips_sll_s32(pTVar15[slice].right[2],9);
+  (n->roadMatrix).m[3] = nfs4_mips_sll_s32(pTVar15[slice].normal[0],9);
+  (n->roadMatrix).m[4] = nfs4_mips_sll_s32(pTVar15[slice].normal[1],9);
+  (n->roadMatrix).m[5] = nfs4_mips_sll_s32(pTVar15[slice].normal[2],9);
+  (n->roadMatrix).m[6] = nfs4_mips_sll_s32(pTVar15[slice].forward[0],9);
+  (n->roadMatrix).m[7] = nfs4_mips_sll_s32(pTVar15[slice].forward[1],9);
+  (n->roadMatrix).m[8] = nfs4_mips_sll_s32(pTVar15[slice].forward[2],9);
   Math_NormalizeShortVector((coorddef *)&n->roadMatrix);
   Math_NormalizeShortVector((coorddef *)((n->roadMatrix).m + 3));
   Math_NormalizeShortVector((coorddef *)((n->roadMatrix).m + 6));
@@ -1897,7 +1906,7 @@ void Newton_QDUpdateRot64Hz(BO_tNewtonObj *newtonObj)
       cVar1 = newtonObj->reOrthoCounter + -1;
       newtonObj->reOrthoCounter = cVar1;
       if ((cVar1 == '\0') || (aiStack_18[0] != 0)) {
-        reorthogonalize(m1);
+        reorthogonalize(m1->m);
         newtonObj->reOrthoCounter = 0x20;
         newtonObj->cumulatedRot = 0;
       }
@@ -1946,7 +1955,7 @@ void Newton_QDUpdateRot32Hz(BO_tNewtonObj *newtonObj)
         (cVar1 = newtonObj->reOrthoCounter + -1,
          newtonObj->reOrthoCounter = cVar1, cVar1 == '\0')))
        ) {
-      reorthogonalize(m1);
+      reorthogonalize(m1->m);
       newtonObj->reOrthoCounter = 0x40;
       newtonObj->cumulatedRot = 0;
     }

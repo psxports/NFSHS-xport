@@ -6,13 +6,13 @@
 
 /* ===== globals ===== */
 extern "C" int ticks;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern "C" int Draw_gPlayer1View;   /* @0x8013d3cc */
 extern "C" Draw_tView Draw_gView[]; /* @0x8011ec54 */
 extern "C" dflip gEnviro[2];        /* @0x8011f424 */
 extern "C" int screenheight;
-extern "C" extern tTexture_ShapeInfo *gCurrentShapes; /* @0x800517cc */
-extern __vtbl_ptr_type tScreen_vtable[];              /* _vt.7tScreen */
+extern "C" tTexture_ShapeInfo *gCurrentShapes; /* @0x800517cc */
+extern __vtbl_ptr_type tScreen_vtable[];       /* _vt.7tScreen */
 
 /* ===== statics owned by FEScreen.obj ===== */
 extern int _7tScreen_fSuppressLoadingText; /* def in host/link_runtime.cpp */ /* @0x800517C8 */

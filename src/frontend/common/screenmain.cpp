@@ -394,7 +394,7 @@ void tScreenMain::DrawBackground()
   int iVar7;
   tScreenMainState tVar8;
   uint uVar9;
-  u_long deltaTicks;
+  uint32 deltaTicks;
   byte bAllTVsOn;
   int drawAnimFade;
   int TextCol, shapeX, shapeY;

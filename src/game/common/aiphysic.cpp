@@ -129,7 +129,7 @@ void AIPhysic_RevEngine(Car_tObj *carObj)
   iVar1 = iVar1 + increase;                              /* 0x80069388 flywheelRpm += increase */
   carObj->flywheelRpm = iVar1;                           /* 0x8006938C */
   if (iVar2 >> 0x10 < iVar1) {
-    carObj->flywheelRpm = (iVar2 >> 0x10) - (iVar2 >> 0x1f) >> 1 | 1;
+    carObj->flywheelRpm = (((iVar2 >> 0x10) - (iVar2 >> 0x1f)) >> 1) | 1;
   }
   if (carObj->flywheelRpm < 0x1f5) {
     carObj->flywheelRpm = 500;
@@ -1122,7 +1122,7 @@ void AIPhysic_GetDesiredVector(Car_tObj *carObj)
       iVar5 = iVar3 * 0xca3d;
       iVar3 = iVar5 >> 0x10;
       if (iVar5 < 0) {
-        iVar3 = iVar5 + 0xffff >> 0x10;
+        iVar3 = (iVar5 + 0xffff) >> 0x10;
       }
     }
     if (iVar2 < 0xe667) {
@@ -1139,7 +1139,7 @@ void AIPhysic_GetDesiredVector(Car_tObj *carObj)
     }
     iVar3 = iVar2 >> 0x10;
     if (iVar2 < 0) {
-      iVar3 = iVar2 + 0xffff >> 0x10;
+      iVar3 = (iVar2 + 0xffff) >> 0x10;
     }
   }
 LAB_8006af18:
@@ -1246,7 +1246,7 @@ int AIPhysic_CheckIfOutOfControl(Car_tObj *carObj)
     if (iVar1 < 0) {
       iVar1 = -iVar1;
     }
-    return 0x2ffff < iVar1 ^ 1;
+    return (0x2ffff < iVar1) ^ 1;
   }
   iVar2 = carObj->aCarWRTDesired;
   if (iVar2 < 0) {
@@ -2038,7 +2038,7 @@ int AIPhysic_HitWallCheck(Car_tObj *carObj)
     carObj->timeOffRoad = 0;
   }
   if (carObj->timeOffRoad < 9) {
-    return 0xd999 < (carObj->N).roadMatrix.m[4] ^ 1;
+    return (0xd999 < (carObj->N).roadMatrix.m[4]) ^ 1;
   }
   return 1;
 }

@@ -130,7 +130,7 @@ void CleanupSpinningCars(void)
     rendering3DEnvironmentInitialized = '\0';
     Platform_ResetDCTBuffer();
     sprintf(fname,"%sDCT.BIN",Paths_Paths[0x20]);
-    i = asyncloadfileat(fname,CF_DVLC);
+    i = asyncloadfileat(fname,(intptr)CF_DVLC);
     while (status = getasyncreadstatus(i), status == 0) {
       systemtask(0);
     }
@@ -179,7 +179,7 @@ void DoTitleScreen(void)
   if (creditShapeFile == (char *)0x0) {
     sprintf(artfilename,"title.psh");
     sprintf(fileName,STR_FRMT,Paths_Paths[0x20],artfilename);
-    creditShapeFile = (char *)loadshapeadr(fileName,(void *)0x0);
+    creditShapeFile = (char *)loadshapeadr(fileName,0x0);
     systemtask(0);
     if (creditShapeFile == (char *)0x0) {
       return;
@@ -284,9 +284,9 @@ extern "C" void Init_PSX_FrontEnd(void)
     if (movieRes != 1) {
       play_movie('\0');
     }
-    initlinkmode(0,1);
+    initlinkmode(0,1,1);
     Init_RenderingEnvironment();
-    initlinkmode(0,0x14);
+    initlinkmode(0,0x14,0);
     DoLanguageScreen();
     TextSys_LoadWords((uint)(byte)frontEnd.language);
 #if !defined(AP_WIN)
@@ -294,7 +294,7 @@ extern "C" void Init_PSX_FrontEnd(void)
        loading/title bitmap; frontend initialization below remains unchanged. */
     DoTitleScreen();
 #endif
-    initlinkmode(0,1);
+    initlinkmode(0,1,1);
     Front_SecondaryMemCardCheck();
   }
   FeTools_init();
@@ -825,7 +825,7 @@ void LoadAllHelpShapes(void)
   char fullName [48];
   
   sprintf(fullName,"%szperm.psh",Paths_Paths[0x20]);
-  f = (char *)loadshapeadr(fullName,(void *)0x0);
+  f = (char *)loadshapeadr(fullName,0x0);
   index = 0;
   if (f != (char *)0x0) {
     do {
@@ -1000,7 +1000,7 @@ void PSXDrawTransSquare(int col,int x,int y,int w,int h,short opacity)
 
 /* ---- FontUpsideDownBlit  (psxfront.cpp:1434, code lines 1434-1466) ---- */
 /* GPU packet: builds POLY_FT4 (stride 0x28, code 0x2c); prim=u_char* build cursor, prevPrim=u_char* link word */
-extern "C" int FontUpsideDownBlit(int x,int y,void *src,int u,int v,charactertbl *ch,int arg6)
+extern "C" void FontUpsideDownBlit(int x,int y,void *src,int u,int v,charactertbl *ch,int arg6)
 
 {
   byte uv_y_top;
@@ -1025,7 +1025,7 @@ extern "C" int FontUpsideDownBlit(int x,int y,void *src,int u,int v,charactertbl
   byte char_h;
   byte uv_offset;
   short dstX;
-  u_long fontTint;
+  uint32 fontTint;
   byte char_x;
   short y_top;
   byte tc2;
@@ -1045,7 +1045,7 @@ extern "C" int FontUpsideDownBlit(int x,int y,void *src,int u,int v,charactertbl
   AddPrim(prevPrim,prim);
   Render_gPacketPtr = next_pkt;
   fontTint = font_tint;
-  *(u_long *)(prim + 4) = fontTint;
+  *(uint32 *)(prim + 4) = fontTint;
   prim[3] = 9;
   prim[7] = 0x2c;
   y_top = ((short)y + (char)uv_offset * -2 + 5) - (ushort)char_h;
@@ -1074,7 +1074,7 @@ extern "C" int FontUpsideDownBlit(int x,int y,void *src,int u,int v,charactertbl
   *(short *)(prim + 0x1a) = y_top;
   *(short *)(prim + 0x20) = x_plus_w;
   *(short *)(prim + 0x22) = y_top;
-  return tpageBit;
+  return;
 }
 
 /* end of psxfront.cpp */

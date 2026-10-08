@@ -1330,7 +1330,7 @@ int AI_CheckPreferredLateralPosition(Car_tObj *carObj)
     uVar6 = 1;
   }
   else {
-    uVar6 = (iVar2 < carObj->laneIndex ^ 1) << 1;
+    uVar6 = ((iVar2 < carObj->laneIndex) ^ 1) << 1;
   }
   local_20[2] = AI_Info.laneWeights[2];
   local_20[0] = AI_Info.laneWeights[0];
@@ -1350,7 +1350,7 @@ int AI_CheckPreferredLateralPosition(Car_tObj *carObj)
     uVar4 = 1;
   }
   else {
-    uVar4 = (iVar2 < carObj->laneIndex ^ 1) << 1;
+    uVar4 = ((iVar2 < carObj->laneIndex) ^ 1) << 1;
   }
   local_20[2] = AI_Info.laneWeights[2];
   local_20[0] = AI_Info.laneWeights[0];
@@ -1608,7 +1608,7 @@ int AI_IsMellowZone(Car_tObj *carObj,int delay)
       if (Cars_gNumAIRaceCars == 0) {
         iVar3 = 0;
       }
-      return iVar3 + delay < iVar2 + iVar4 * 0x540000 ^ 1;
+      return (iVar3 + delay < iVar2 + iVar4 * 0x540000) ^ 1;
     }
   }
   return 0;

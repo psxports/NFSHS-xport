@@ -253,7 +253,7 @@ void AIPerson_Startup(void)
   Udff_tInfo*handle;
   char filename[110];
   Udff_tInfo *pUVar1;
-  char *fmt;
+  const char *fmt;
   char acStack_80 [112];
   
   AIPerson_LoadGridAndSetPersonalityIndexes();

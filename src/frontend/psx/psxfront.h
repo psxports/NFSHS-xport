@@ -45,7 +45,7 @@ void PSXDrawTransGouraudSquare(int x, int y, int w, int h, int opacity, int c1, 
 void PSXDrawTransSquare(int col, int x, int y, int w, int h, short opacity);
 extern "C"
 {
-    int FontUpsideDownBlit(int x, int y, void *src, int u, int v, charactertbl *ch, int arg6);
+    void FontUpsideDownBlit(int x, int y, void *src, int u, int v, charactertbl *ch, int arg6);
 }
 
 /* ---- PSXFront.obj EXT data globals ---- */

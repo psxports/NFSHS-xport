@@ -45,19 +45,19 @@ extern "C" int SNDPKTPLAY_start(int pktplay, intptr rate, intptr fmt, int *param
 extern "C" int SNDPKTPLAY_submit(int pktplay, intptr *desc);
 extern "C" int SNDPKTPLAY_submitspace(int pktplay);
 extern "C" int SNDPKTPLAY_framesoutstanding(int pktplay);
-extern "C" void SNDPKTPLAY_stop(int pktplay);
+extern "C" int SNDPKTPLAY_stop(int pktplay);
 extern "C" int SNDPKTPLAY_overhead(int arg);
 extern "C" int SNDPKTPLAY_create(intptr buf, int size, void (*relcb)(intptr), void (*notifycb)(int, unsigned int));
 
 /* ---- other SND helpers ---- */
-extern "C" int iSNDpatchtohdr(short *src, int *rateDst, int *fmtDst, int *outSize); /* spat2hdr */
-extern "C" int iSNDplatformcalcdatarate(void *rate);                                /* sdpacket  */
-extern "C" void iSNDenteraudio(void);                                               /* sserver   */
+extern "C" void iSNDpatchtohdr(short *src, int *rateDst, int *fmtDst, int *outSize); /* spat2hdr */
+extern "C" int iSNDplatformcalcdatarate(void *rate);                                 /* sdpacket  */
+extern "C" void iSNDenteraudio(void);                                                /* sserver   */
 extern "C" void iSNDleaveaudio(void);
-extern "C" void iSNDserveraddclient(void *cb);             /* ssysserv  */
-extern "C" void SNDSTRM_setgreedylevel(int strm, int lvl); /* sstsetgl  */
-extern "C" int SNDSTRM_destroy(int s);                     /* spvoices  */
-extern "C" void SNDSTRM_purge(int s);
+extern "C" short *iSNDserveraddclient(int cb);            /* ssysserv  */
+extern "C" int SNDSTRM_setgreedylevel(int strm, int lvl); /* sstsetgl  */
+extern "C" int SNDSTRM_destroy(int s);                    /* spvoices  */
+extern "C" int SNDSTRM_purge(int s);
 #ifndef _MSC_VER
     #ifndef _MSC_VER
         #ifndef _MSC_VER
@@ -489,7 +489,7 @@ extern "C" int iSNDstreamcreate(int *priority, int numReq, int pktArg, intptr ob
     S->params[4] = priority[4];
     if (iSNDstreamnumcreated() == 0)
     { /* first stream -> register the service hook */
-        iSNDserveraddclient((void *)iSNDstreamservice);
+        iSNDserveraddclient((int)(intptr)iSNDstreamservice);
         sndgs[0x22] = (int)iSNDstreamdestroyall;
     }
     sndss[slot] = (intptr)S;

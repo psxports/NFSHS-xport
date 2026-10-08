@@ -1,3 +1,5 @@
+#include "../../../nfs4_types.h"
+
 /* eaclib/psx/sndpsxz/splysdef.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.
  *   Source obj : nfs4\eaclib\psx\splysdef.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col10)
  *   1 fn @0x800E6834 (80 bytes): SNDplaysetdef -- initialise an SND "play descriptor" to defaults.
@@ -10,7 +12,7 @@
  *     +0x0C/0E   s16 pitch = 0x1000 (== 1.0)  +0x10/12 s16 = 0
  */
 
-extern "C" void SNDplaysetdef(void *def) /* @0x800E6834 */
+extern "C" void SNDplaysetdef(SNDPLAYOPTS *def) /* @0x800E6834 */
 {
     char *d = (char *)def;
     *(int *)(d + 0x00) = -1;

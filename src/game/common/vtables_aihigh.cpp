@@ -2,7 +2,7 @@
  * Real nfs4-f.exe bytes; __vtbl_ptr_type (size=_vf[3]); pfn VAs symbolicated. @0xVA breadcrumbs.
  * NOT original layout (the obj owned each in its rodata); self-contained + faithful + links. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 
 static int NFS4_VT_THUNK _vtdtor_AIHigh_BTC_AIPerp(AIHigh_BTC_AIPerp *p){ p->~AIHigh_BTC_AIPerp(); return 0; }
 static int NFS4_VT_THUNK _vtdtor_AIHigh_BTC_Cop(AIHigh_BTC_Cop *p){ p->~AIHigh_BTC_Cop(); return 0; }
@@ -24,60 +24,70 @@ __vtbl_ptr_type AIHigh_Base_vtable[3] = {   /* @0x80054e04 */
   {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},             /* @0x80054e0c  __pure_virtual */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_Base)},        /* @0x80054e14  ~AIHigh_Base */
 };
-__vtbl_ptr_type AIHigh_BasicPerp_vtable[3] = {   /* @0x80054e6c */
+__vtbl_ptr_type AIHigh_BasicPerp_vtable[4] = {   /* @0x80054e6c */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054e6c  null */
   {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},             /* @0x80054e74  __pure_virtual */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BasicPerp)},   /* @0x80054e7c  ~AIHigh_BasicPerp */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
 __vtbl_ptr_type AIHigh_BasicCop_vtable[3] = {   /* @0x80054e9c */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054e9c  null */
   {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},             /* @0x80054ea4  __pure_virtual */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BasicCop)},    /* @0x80054eac  ~AIHigh_BasicCop */
 };
-__vtbl_ptr_type AIHigh_BTC_Wingman_vtable[3] = {   /* @0x80054ec4 */
+__vtbl_ptr_type AIHigh_BTC_Wingman_vtable[4] = {   /* @0x80054ec4 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054ec4  null */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_Wingman::HighExecute)}, /* @0x80054ecc  HighExecute__18AIHigh_BTC_Wingman */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_Wingman)}, /* @0x80054ed4  ~AIHigh_BTC_Wingman */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_Cop::FreezeAndEndChase)},
 };
-__vtbl_ptr_type AIHigh_BTC_HumanCop_vtable[3] = {   /* @0x80054ee4 */
+__vtbl_ptr_type AIHigh_BTC_HumanCop_vtable[4] = {   /* @0x80054ee4 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054ee4  null */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_HumanCop::HighExecute)}, /* @0x80054eec  HighExecute__19AIHigh_BTC_HumanCop */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_HumanCop)}, /* @0x80054ef4  ~AIHigh_BTC_HumanCop */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_HumanCop::FreezeAndEndChase)},
 };
-__vtbl_ptr_type AIHigh_BTC_Cop_vtable[3] = {   /* @0x80054f04 */
+__vtbl_ptr_type AIHigh_BTC_Cop_vtable[4] = {   /* @0x80054f04 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054f04  null */
   {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},             /* @0x80054f0c  __pure_virtual */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_Cop)},     /* @0x80054f14  ~AIHigh_BTC_Cop */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_Cop::FreezeAndEndChase)},
 };
-__vtbl_ptr_type AIHigh_BTC_AIPerp_vtable[3] = {   /* @0x80054fa0 */
+__vtbl_ptr_type AIHigh_BTC_AIPerp_vtable[4] = {   /* @0x80054fa0 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054fa0  null */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_AIPerp::HighExecute)}, /* @0x80054fa8  HighExecute__17AIHigh_BTC_AIPerp */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_AIPerp)},  /* @0x80054fb0  ~AIHigh_BTC_AIPerp */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
-__vtbl_ptr_type AIHigh_BTC_HumanPerp_vtable[3] = {   /* @0x80054fc0 */
+__vtbl_ptr_type AIHigh_BTC_HumanPerp_vtable[4] = {   /* @0x80054fc0 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054fc0  null */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BTC_HumanPerp::HighExecute)}, /* @0x80054fc8  HighExecute__20AIHigh_BTC_HumanPerp */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_HumanPerp)}, /* @0x80054fd0  ~AIHigh_BTC_HumanPerp */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
-__vtbl_ptr_type AIHigh_BTC_Perp_vtable[3] = {   /* @0x80054fe0 */
+__vtbl_ptr_type AIHigh_BTC_Perp_vtable[4] = {   /* @0x80054fe0 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80054fe0  null */
   {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},             /* @0x80054fe8  __pure_virtual */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_Perp)},    /* @0x80054ff0  ~AIHigh_BTC_Perp */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
-__vtbl_ptr_type AIHigh_Player_vtable[3] = {   /* @0x80055098 */
+__vtbl_ptr_type AIHigh_Player_vtable[4] = {   /* @0x80055098 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80055098  null */
   {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},             /* @0x800550a0  __pure_virtual */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_Player)},      /* @0x800550a8  ~AIHigh_Player */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
-__vtbl_ptr_type AIHigh_Human_vtable[3] = {   /* @0x800550c8 */
+__vtbl_ptr_type AIHigh_Human_vtable[4] = {   /* @0x800550c8 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x800550c8  null */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_Human::HighExecute)},  /* @0x800550d0  HighExecute__12AIHigh_Human */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_Human)},       /* @0x800550d8  ~AIHigh_Human */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
-__vtbl_ptr_type AIHigh_Opponent_vtable[3] = {   /* @0x800550f8 */
+__vtbl_ptr_type AIHigh_Opponent_vtable[4] = {   /* @0x800550f8 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x800550f8  null */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_Opponent::HighExecute)}, /* @0x80055100  HighExecute__15AIHigh_Opponent */
   {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_Opponent)},    /* @0x80055108  ~AIHigh_Opponent */
+  {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},
 };
 __vtbl_ptr_type AIHigh_Cop_vtable[3] = {   /* @0x80055154 */
   {0, 0, NFS4_VTABLE_ENTRY(0)},                           /* @0x80055154  null */

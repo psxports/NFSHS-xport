@@ -58,10 +58,10 @@ extern "C" unsigned int iSNDpsxfxinit(int mode);                                
 extern "C" void iSNDserver(void);                                                                       /* sserver */
 extern "C" void iSNDleaveaudio(void);                                                                   /* sserver */
 extern "C" int iSNDdmqueue(intptr srcRam, int dstSpu, int len, unsigned char prio, unsigned char flag); /* sdma */
-extern "C" void DMACallback(void);                                                                      /* syslib INTR  */
-extern "C" int addtimer(int callback);                                                                  /* addtimer */
-extern "C" int deltimer(int callback);                                                                  /* addtimer */
-extern "C" int addexit(int handler);                                                                    /* exit     */
+extern "C" void *DMACallback(int dma, void *callback);                                                  /* syslib INTR  */
+extern "C" void addtimer(void (*callback)(void));                                                       /* addtimer */
+extern "C" void deltimer(void (*callback)(void));                                                       /* addtimer */
+extern "C" void addexit(void (*handler)(void));                                                         /* exit     */
 extern "C" void SNDSYS_service(void);                                                                   /* ssysserv */
 extern "C" void SNDSYS_restore(void);                                                                   /* ssysinit (exit handler) */
 
@@ -182,7 +182,7 @@ extern "C" void iSNDinit(void)
     wr_sr(rd_sr() & 0xfffffbfe);
     EXT_VOL_R = 0;
     *((unsigned short *)&SPU_ADDR + 1) = 0xc000;
-    DMACallback();
+    DMACallback(4, 0);
     wr_sr(sr);
 #endif
     iSNDdmqueue((intptr)&DAT_80136df0, 0x1000, 0x10, 1, 0); /* clear first SPU page */
@@ -230,10 +230,10 @@ extern "C" void iSNDinit(void)
 #endif
     iSNDpsxfxinit(DAT_8014791c);
     DAT_80147919 = 0;
-    addtimer((int)iSNDserver);
+    addtimer(iSNDserver);
     if (sndpd == 0)
     {
-        addexit((int)SNDSYS_restore);
+        addexit(SNDSYS_restore);
         sndpd = 1;
     }
 }
@@ -276,11 +276,11 @@ extern "C" void iSNDrestore(void)
         iSNDserver();
         SNDSYS_service();
     } while (!quiet);
-    deltimer((int)iSNDserver);
+    deltimer(iSNDserver);
     iSNDpsxfxinit(0);
     sr = rd_sr();
     wr_sr(rd_sr() & 0xfffffbfe);
-    DMACallback();
+    DMACallback(4, 0);
     wr_sr(sr);
 #if defined(AP_WIN)
     SpuQuit();

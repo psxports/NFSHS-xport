@@ -7,14 +7,14 @@
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern "C"
 {
     char *TextSys_Word(int id);
 }
 extern Draw_tPixMap *gLeafPixmap; /* 0x8013d218 */
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern Object_tIMassObjInfo *Object_IMassObjInst;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern Trk_NewSlice *BWorldSm_slices;
@@ -33,7 +33,7 @@ extern int SceneLoaded;
 extern int Scene_BuildCustomSceneList(void);
 extern int TrgSfx_AddCarExtraCheck(int car, int wheel);
 extern long Camera_gGeomScreen[2];
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
 extern void Physics_FixEngineRpm(Car_tObj *car);
 extern "C"

@@ -26,9 +26,9 @@ extern "C" void SNDI_mutexunlock(void);                /* sdfx     */
 extern "C" void iSNDserve(void);                       /* slib     */
 extern "C" int iSNDcalcpitch(int note);                /* sclcptch */
 extern "C" int iSNDplatformpitch(int chan, int pitch); /* sdriver */
-extern "C" void iSNDvol(int chan, int level);          /* sdriver */
+extern "C" int iSNDvol(int chan, int level);           /* sdriver */
 extern "C" void iSNDcalcvol(int chan);                 /* spatkey */
-extern "C" int SNDstop(int tag);                       /* sstop   */
+extern "C" int SNDstop(unsigned int tag);              /* sstop   */
 extern "C" void trap(unsigned int code);
 
 extern "C" void iSNDserver(void);      /* @0x800EA138 */

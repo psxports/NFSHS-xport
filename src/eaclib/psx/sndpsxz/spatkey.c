@@ -24,13 +24,14 @@ extern "C" unsigned char &DAT_80147a0e; /* +0x1e routing mode */
 extern "C" unsigned char &DAT_80147a0f; /* +0x1f channel count */
 extern "C" unsigned char &DAT_80147a10; /* +0x20 linked voice */
 extern "C" unsigned char &DAT_80147a12; /* +0x22 fx send level */
+extern "C" unsigned char &DAT_80147a13; /* +0x23 cached fx level */
 extern "C" unsigned char &DAT_80147a14; /* +0x24 L cache */
 extern "C" unsigned char &DAT_80147a15; /* +0x25 R cache */
 extern "C" unsigned char &DAT_80147a16; /* +0x26 flag */
 extern "C" unsigned char &DAT_80147a17; /* +0x27 partner-addr mode (bit7) / table index */
 
-extern "C" void iSNDvol(int chan, int level); /* sdriver */
-extern "C" void iSNDplatformfxlevel(int chan);
+extern "C" int iSNDvol(int chan, int level); /* sdriver */
+extern "C" int iSNDplatformfxlevel(unsigned int chan, int bus, int fxon);
 
 extern "C" int iSNDsetslot(int chan, int addr, int pitch); /* @0x800FF394 */
 
@@ -321,6 +322,6 @@ extern "C" unsigned int iSNDstartvoice(unsigned int chan)
         mask = mask | (1u << ((int)link & 0x1f));
     }
     iSNDvol((int)chan, (int)(char)SB(DAT_80147a12, vt));
-    iSNDplatformfxlevel(chan);
+    iSNDplatformfxlevel(chan, 0, (int)(signed char)SB(DAT_80147a13, vt));
     return mask;
 }

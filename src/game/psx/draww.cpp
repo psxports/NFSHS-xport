@@ -248,9 +248,9 @@ void DrawW_AddSubdividPrimGT3(POLY_GT3 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
 void DrawW_DivVertice(Draw_SVertex *v0,Draw_SVertex *v1,Draw_SVertex *v2)
 
 {
-  v0->vx = (short)((int)v1->vx + (int)v2->vx + 1 >> 1);
-  v0->vy = (short)((int)v1->vy + (int)v2->vy + 1 >> 1);
-  v0->vz = (short)((int)v1->vz + (int)v2->vz + 1 >> 1);
+  v0->vx = (short)nfs4_mips_sra_s32((int)v1->vx + (int)v2->vx + 1, 1);
+  v0->vy = (short)nfs4_mips_sra_s32((int)v1->vy + (int)v2->vy + 1, 1);
+  v0->vz = (short)nfs4_mips_sra_s32((int)v1->vz + (int)v2->vz + 1, 1);
   v0->u = (u_char)((int)((u_int)v1->u + (u_int)v2->u + 1) >> 1);
   v0->v = (u_char)((int)((u_int)v1->v + (u_int)v2->v + 1) >> 1);
   v0->r = (u_char)((int)((u_int)v1->r + (u_int)v2->r) >> 1);
@@ -302,7 +302,6 @@ void DrawW_SubdividFacet(Draw_tGiveShelbyMoreCache *sd,int l,Draw_SVertex *v0,Dr
                Draw_SVertex *v2,Draw_SVertex *v3,short n,short subDivide)
 
 {
-  u_int tu1;
   int iVar1;
   int subdivisionLevel;
   u_int *tp2;
@@ -326,7 +325,7 @@ void DrawW_SubdividFacet(Draw_tGiveShelbyMoreCache *sd,int l,Draw_SVertex *v0,Dr
   u_char *tp5;
   u_char *tp3;
   u_char *prim_00;
-  u_long *otEntry;
+  uint32 *otEntry;
   int vertexWord0;
   int vertexWord1;
   
@@ -467,14 +466,8 @@ gte_stflg(&flag);
   if (v0->a == '\0') {
     if (v1->a == '\0') {
       if (v4->a == '\0') {
-        otEntry = (u_long *)(Render_gPalettePtr + subOtz_local * 4);
-#ifdef AP_WIN
+        otEntry = (uint32 *)(Render_gPalettePtr + subOtz_local * 4);
         AddPrim(otEntry,Render_gPacketPtr);
-#else
-        *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *otEntry & 0xffffff;
-        tu1 = (u_int)Render_gPacketPtr & 0xffffff;
-        *otEntry = *otEntry & 0xff000000 | tu1;
-#endif
         Render_gPacketPtr = Render_gPacketPtr + 0x28;
         DrawW_AddSubdividPrimGT3((POLY_GT3 *)tp3,v0,v1,v4,sd);
       }
@@ -486,13 +479,7 @@ DrawWSubdiv_testV2:
     if (v3->a == '\0') {
     if (v6->a == '\0') {
         tp2 = (u_int *)(Render_gPalettePtr + subOtz_local * 4);
-#ifdef AP_WIN
         AddPrim(tp2,Render_gPacketPtr);
-#else
-        *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *tp2 & 0xffffff;
-        tu1 = (u_int)Render_gPacketPtr & 0xffffff;
-        *tp2 = *tp2 & 0xff000000 | tu1;
-#endif
         Render_gPacketPtr = Render_gPacketPtr + 0x28;
         DrawW_AddSubdividPrimGT3((POLY_GT3 *)tp5,v2,v3,v6,sd);
       }
@@ -505,14 +492,8 @@ DrawWSubdiv_testV1:
     if (v1->a != '\0') goto DrawWSubdiv_testV2;
     if (v2->a == '\0') {
       if (v5->a == '\0') {
-        otEntry = (u_long *)(Render_gPalettePtr + subOtz_local * 4);
-#ifdef AP_WIN
+        otEntry = (uint32 *)(Render_gPalettePtr + subOtz_local * 4);
         AddPrim(otEntry,Render_gPacketPtr);
-#else
-        *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *otEntry & 0xffffff;
-        tu1 = (u_int)Render_gPacketPtr & 0xffffff;
-        *otEntry = *otEntry & 0xff000000 | tu1;
-#endif
         Render_gPacketPtr = Render_gPacketPtr + 0x28;
         DrawW_AddSubdividPrimGT3((POLY_GT3 *)tp4,v1,v2,v5,sd);
       }
@@ -522,13 +503,7 @@ DrawWSubdiv_testV3:
     prim_00 = (u_char *)Render_gPacketPtr;
   if (((v3->a == '\0') && (v0->a == '\0')) && (v7->a == '\0')) {
       tp2 = (u_int *)(Render_gPalettePtr + subOtz_local * 4);
-#ifdef AP_WIN
       AddPrim(tp2,Render_gPacketPtr);
-#else
-      *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *tp2 & 0xffffff;
-      tu1 = (u_int)Render_gPacketPtr & 0xffffff;
-      *tp2 = *tp2 & 0xff000000 | tu1;
-#endif
       Render_gPacketPtr = Render_gPacketPtr + 0x28;
       DrawW_AddSubdividPrimGT3((POLY_GT3 *)prim_00,v3,v0,v7,sd);
     }
@@ -798,8 +773,10 @@ void Night_NightCalc(VECTOR *v,short *idx,Draw_tGiveShelbyMoreCache *sd)
     if ((-iVar2 < iVar3) && (iVar3 < iVar2)) {
       *idx = (u_short)(*Night_gCurrentNightColor)[*idx]
                      [(u_char)Night_gNightTbl
-                            [(iVar4 - iVar5 >> (sd->night_ZDistShift & 0x1f)) * 0x40 +
-                             (iVar3 + iVar2 >> (sd->night_XDistShift & 0x1f))]];
+                            [nfs4_mips_srav_s32(nfs4_mips_subu_s32(iVar4, iVar5),
+                                               sd->night_ZDistShift) * 0x40 +
+                             nfs4_mips_srav_s32(nfs4_mips_addu_s32(iVar3, iVar2),
+                                               sd->night_XDistShift)]];
     }
   }
   return;
@@ -997,12 +974,12 @@ void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
   int newIndex;
   DR_TWIN * aprim;
   int p0;
-  u_long l1;
-  u_long l2;
-  u_long l3;
+  uint32 l1;
+  uint32 l2;
+  uint32 l3;
   int dU;
   short vert2_proj_x;
-  u_long l0;
+  uint32 l0;
   short vert0_proj_x;
   short tu27;
   short vert1_proj_x;
@@ -1013,9 +990,7 @@ void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
   int bfctResult;
   intptr tu24;
   int dV;
-  int tu4;
   int ti5;
-  u_int uVar3_00;
   short sVar1;
   short ts27;
   int iVar2;
@@ -1044,7 +1019,7 @@ void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
   int zeroTransFlag;
   POLY_GT4 *prim;
   Draw_tPixMap *workPmx;
-  u_long *otEntry;
+  uint32 *otEntry;
   int save_pre_otz;
   char flag;
   int doSubdivision;
@@ -1207,13 +1182,7 @@ gte_swc2(0x8,&depthcue);
         r.h = 0;
         r.x = 0;
         r.y = 0;
-#ifdef AP_WIN
         AddPrim(Render_gPalettePtr+sd->otz*4,Render_gPacketPtr);
-#else
-        *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xffffff;
-        tu4 = (u_int)Render_gPacketPtr & 0xffffff;
-        *(u_int *)(tp18 + sd->otz * 4) = *(u_int *)(tp18 + sd->otz * 4) & 0xff000000 | tu4;
-#endif
         Render_gPacketPtr = Render_gPacketPtr + 0xc;
         SetTexWindow((DR_TWIN *)tp19,&r);
       }
@@ -1221,7 +1190,7 @@ gte_swc2(0x8,&depthcue);
         prim = (POLY_GT4 *)(sd->head).cprim.PrimPtr;
         otEntry = (sd->head).cprim.LastPrim + sd->otz;
         (sd->head).cprim.PrimPtr = (char *)(prim + 1);
-        prim->tag = (u_long)(intptr)(u_long *)0x0c000000;
+        prim->tag = (uint32)(intptr)(uint32 *)0x0c000000;
         AddPrim(otEntry,prim);
       }
       else {
@@ -1347,13 +1316,7 @@ gte_SetTransMatrix(((char *)sd + 0x14));
         r.h = (short)ti5 + 1;
         r.x = 0;
         r.y = 0;
-#ifdef AP_WIN
         AddPrim(Render_gPalettePtr+sd->otz*4,Render_gPacketPtr);
-#else
-        *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xffffff;
-        uVar3_00 = (u_int)Render_gPacketPtr & 0xffffff;
-        *(u_int *)(tp20 + sd->otz * 4) = *(u_int *)(tp20 + sd->otz * 4) & 0xff000000 | uVar3_00;
-#endif
         Render_gPacketPtr = Render_gPacketPtr + 0xc;
         SetTexWindow((DR_TWIN *)p,&r);
       }
@@ -2461,13 +2424,13 @@ void Draw_kCtrlSkidmark(Draw_tCtrlSkidmark *fskid)
   int r0;
   int r1;
   int r2;
-  u_long l1;
-  u_long l0;
+  uint32 l1;
+  uint32 l0;
   int skidChunk_p;
   int vert_count;
   int vert_idx;
-  u_long l2;
-  u_long l3;
+  uint32 l2;
+  uint32 l3;
   POLY_GT4 *prim;
   POLY_GT4 *primPtr;
   Draw_tPixMap *pmx;
@@ -2760,19 +2723,19 @@ void DrawW_OnyxLinePrim(CCOORD16 *geomVertices,Trk_Line *lineQuad,int count,Draw
   int t1;
   int t2;
   long b;
-  u_long l3;
+  uint32 l3;
   VECTOR temp0;
-  u_long l0;
+  uint32 l0;
   int ot_addr_pack;
   int CVar19;
   int vert_iter;
   CVECTOR *tC8;
   int color_pack;
-  u_long l1;
+  uint32 l1;
   int depth_avg;
   int CVar23;
   int uVar8_00;
-  u_long l2;
+  uint32 l2;
   u_int uVar1;
   int depth_index;
   u_int uVar2;

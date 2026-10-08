@@ -40,7 +40,7 @@ extern "C" void Platform_InitMemory(void)
 }
 
 /* ---- Platform_ReserveMemory__FiPc  [PLATFORM.CPP:139-156] SLD-VERIFIED ---- */
-extern "C" char *Platform_ReserveMemory(int size,char *string)
+extern "C" char *Platform_ReserveMemory(int size,const char *string)
 
 {
   int alignedSize;
@@ -61,7 +61,7 @@ extern "C" char *Platform_ReserveMemory(int size,char *string)
 }
 
 /* ---- Platform_TempReserveMemory__FiPc  [PLATFORM.CPP:161-178] SLD-VERIFIED ---- */
-extern "C" char *Platform_TempReserveMemory(int size,char *string)
+extern "C" char *Platform_TempReserveMemory(int size,const char *string)
 
 {
   int alignedSize;
@@ -95,7 +95,7 @@ extern "C" void Platform_SysStartUp(void)
   endofcode = (char *)gEAMemPoolBase;
   nfs_sysInfo.userRam = (int)((intptr)0x801fc000 - (intptr)endofcode);   /* PSX RAM top (2MB) - 16KB stack reserve */
 #endif
-  initmemadr(endofcode,nfs_sysInfo.userRam);
+  initmemadr((int)(intptr)endofcode,nfs_sysInfo.userRam);
   nfs2eacinit();
   Draw_SetEnvironment(0x200,0xf0,1,0,1,0,0,0);
   initlinkmode(0,1,1);
@@ -137,7 +137,7 @@ extern "C" void Platform_ResetDCTBuffer(void)
 }
 
 /* ---- Platform_GetDCTBuffer__FiPc  [PLATFORM.CPP:444-461] SLD-VERIFIED ---- */
-extern "C" char * Platform_GetDCTBuffer(int size,char *string)
+extern "C" char * Platform_GetDCTBuffer(int size,const char *string)
 
 {
   char *p;

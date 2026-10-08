@@ -8,12 +8,12 @@ extern void trap(int); /* MIPS break (gcc div-guard) */
 /* ---- libc + harvested + SYM ---- */
 extern Car_tObj *Cars_gRaceCarList[]; /* 0x8010fa00 */
 extern Car_tObj *Cars_gHumanRaceCarList[2];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* 0x8011e0ac */
 extern "C" Sim_tSimSystemVar simVar;
 extern int gNumSlices; /* 0x8013c7c8 */
 extern int Cars_gNumRaceCars;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern "C"
 {
     extern int Input_Interface(unsigned long, int);

@@ -8,7 +8,7 @@
 #include "bworld_externs.h"
 
 /* ---- bworld.obj anon file-statics (no SYM name; Ghidra DAT_; real .bss bytes = 0) ---- */
-static void *gBWPrimPtr;    /* @0x8013c75c */
+static unsigned int gBWCopRotationAngle; /* @0x8013c75c */
 static int   gBWMemTotal;   /* @0x8013c760 */
 
 
@@ -220,7 +220,6 @@ void SetupBuildMatrices(DRender_tView *Vi,Draw_DCache *sd)
   int iVar3;
   Car_tObj *pCVar4;
   int iVar5;
-  Car_tObj **ppCVar6;
   matrixtdef mStack_60;
   matrixtdef mStack_38;
   
@@ -242,23 +241,20 @@ void SetupBuildMatrices(DRender_tView *Vi,Draw_DCache *sd)
   gWorldMat.m[7] = -(Vi->cview).mrotationInv.m[7];
   if (gNight_renderNight != 0) {
     transpose(&(Camera_gInfo[Vi->player].target)->orientMat,&gNightMat);
-    gNightMat.m[1] = 0;
-                    
-    gNightMat.m[7] = 0;
-                    
-    gNightMat.m[4] = 0;
+    gNightMat.m[1] = nfs4_mips_negu_s32(gNightMat.m[1]);
+    gNightMat.m[7] = nfs4_mips_negu_s32(gNightMat.m[7]);
+    gNightMat.m[4] = nfs4_mips_negu_s32(gNightMat.m[4]);
                     
     DrawW_WorldSetUpMatrix(&gNightMat,&sd->matNight);
     BW_gCopCarObj = (Car_tObj *)0x0;
     iVar2 = 0xb40000;
     if (GameSetup_gData.commMode != 1) {
-      ppCVar6 = Cars_gTrafficCarList + 8;
       for (iVar5 = -1; iVar5 < Cars_gNumCopCars; iVar5 = iVar5 + 1) {
         if (iVar5 < 0) {
-          pCVar4 = (Car_tObj *)0x0;
+          pCVar4 = Cars_gList[0];
         }
         else {
-          pCVar4 = *ppCVar6;
+          pCVar4 = Cars_gCopCarList[iVar5];
         }
         if ((((pCVar4->N).active != '\0') && ((pCVar4->AIFlags & 2U) != 0)) &&
            (((pCVar4->render).damageParts & 4U) == 0)) {
@@ -281,19 +277,16 @@ void SetupBuildMatrices(DRender_tView *Vi,Draw_DCache *sd)
             BW_gCopCarObj = pCVar4;
           }
         }
-        ppCVar6 = ppCVar6 + 1;
       }
       if (BW_gCopCarObj != (Car_tObj *)0x0) {
         Night_SetCopColor(BW_gCopCarObj->carInfo);
-        gBWPrimPtr = (void *)((u_char *)gBWPrimPtr + 0x40);
-        xformy(&mStack_38,gBWPrimPtr);
+        gBWCopRotationAngle += 0x40U;
+        xformy(&mStack_38,(int)gBWCopRotationAngle);
         transpose(&(BW_gCopCarObj->N).orientMat,&mStack_60);
         Math_fasttransmult(&mStack_60,&mStack_38,&gCopMat);
-        gCopMat.m[1] = 0;
-                    
-        gCopMat.m[7] = 0;
-                    
-        gCopMat.m[4] = 0;
+        gCopMat.m[1] = nfs4_mips_negu_s32(gCopMat.m[1]);
+        gCopMat.m[7] = nfs4_mips_negu_s32(gCopMat.m[7]);
+        gCopMat.m[4] = nfs4_mips_negu_s32(gCopMat.m[4]);
                     
         DrawW_WorldSetUpMatrix(&gCopMat,&sd->matCop);
       }
@@ -367,7 +360,7 @@ LAB_8007dd44:
 /* ---- GetRezIndex__Fi  [@0x8007dd54] ---- */
 int GetRezIndex(int dist)
 {
-  return (gCurrContext->lowDetailDistSq < dist ^ 1) << 2;
+  return ((gCurrContext->lowDetailDistSq < dist) ^ 1) << 2;
 }
 
 /* ---- SetupChunkBuildList__FP13DRender_tView  [@0x8007dd74] ---- */
@@ -476,7 +469,7 @@ void BWorld_OnyxBuildFacets(DRender_tView *Vi)
   Chunk*chunkPtr;
   int chunkInd;
   u_short uVar1;
-  u_long uVar2;
+  uint32 uVar2;
   void *pvVar3;
   int iVar4;
   int *piVar5;
@@ -511,7 +504,7 @@ void BWorld_OnyxBuildFacets(DRender_tView *Vi)
     scratchBytes[0x10d] = (u_char)Night_gLightningType;
     uVar1 = (u_short)Night_gZNear;
   }
-  uVar2 = (u_long)uVar1;
+  uVar2 = (uint32)uVar1;
   gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   DrawW_DoTrough(Vi,(tBuildEntry *)BWorld_gChunkBuildList);
@@ -647,6 +640,11 @@ void BWorld_StartLoop(void)
 /* ---- BWorld_Init__Fv  [@0x8007e5c8] ---- */
 extern "C" void BWorld_Init(void)
 {
+  static char dayGroupExtension[] = ".grp";
+  static char weatherGroupExtension[] = "W.grp";
+  static char nightGroupExtension[] = "N.grp";
+  static char nightWeatherGroupExtension[] = "S.grp";
+  static char emptyExtension[] = "";
   int AudioScene;
   bool bVar1;
   int iVar2;
@@ -712,17 +710,17 @@ extern "C" void BWorld_Init(void)
   SetContext(0);
   if (GameSetup_gData.Time == 0) {
     if (GameSetup_gData.Weather == 0) {
-      pcVar3 = ".grp";
+      pcVar3 = dayGroupExtension;
     }
     else {
-      pcVar3 = "W.grp";
+      pcVar3 = weatherGroupExtension;
     }
   }
   else if (GameSetup_gData.Weather == 0) {
-    pcVar3 = "N.grp";
+    pcVar3 = nightGroupExtension;
   }
   else {
-    pcVar3 = "S.grp";
+    pcVar3 = nightWeatherGroupExtension;
   }
   pcVar3 = Track_MakeTrackPathName(pcVar3);
   Track_Init(pcVar3);
@@ -732,7 +730,7 @@ extern "C" void BWorld_Init(void)
     Scene_Init(gPersistObjDef->m_num_elements);
   }
   Loading_UpdateLoadingScreen(5);
-  pcVar3 = Track_MakeTrackDataPathName("");
+  pcVar3 = Track_MakeTrackDataPathName(emptyExtension);
   Anim_InitSystem(pcVar3);
   if (((GameSetup_gData.commMode != 1) && (GameSetup_gData.raceType != 1)) &&
      (GameSetup_gData.raceType != 5)) {

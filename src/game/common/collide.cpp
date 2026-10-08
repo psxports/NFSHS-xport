@@ -5944,11 +5944,11 @@ LAB_80091014:
 
         if (0x1ff < o0->objID) {
 
-          local_90 = local_90 - (iVar8 >> 0x1f) >> 1;
+          local_90 = (local_90 - (iVar8 >> 0x1f)) >> 1;
 
-          local_8c = local_8c - (iVar4 >> 0x1f) >> 1;
+          local_8c = (local_8c - (iVar4 >> 0x1f)) >> 1;
 
-          local_88 = local_88 - (iVar12 >> 0x1f) >> 1;
+          local_88 = (local_88 - (iVar12 >> 0x1f)) >> 1;
 
         }
 
@@ -5956,11 +5956,11 @@ LAB_80091014:
 
         if (o1->objID < 0x200) goto LAB_800912c8;
 
-        local_a0 = local_a0 - (-(iVar7 >> 0xe) >> 0x1f) >> 1;
+        local_a0 = (local_a0 - (-(iVar7 >> 0xe) >> 0x1f)) >> 1;
 
-        local_9c = local_9c - (-(iVar3 >> 0xe) >> 0x1f) >> 1;
+        local_9c = (local_9c - (-(iVar3 >> 0xe) >> 0x1f)) >> 1;
 
-        local_98 = local_98 - (-(iVar2 >> 0xe) >> 0x1f) >> 1;
+        local_98 = (local_98 - (-(iVar2 >> 0xe) >> 0x1f)) >> 1;
 
       }
 
@@ -6153,9 +6153,9 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
   
 
-  a = point->x - (newObj->position).x;
+  a = nfs4_mips_subu_s32(point->x,(newObj->position).x);
 
-  iVar1 = point->z - (newObj->position).z;
+  iVar1 = nfs4_mips_subu_s32(point->z,(newObj->position).z);
 
   iVar2 = fixedmult(a,(newObj->orientMat).m[0]);
 
@@ -6163,7 +6163,9 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
   iVar4 = fixedmult(iVar1,(newObj->orientMat).m[2]);
 
-  if (iVar2 + iVar3 + iVar4 < 1) {
+  temp = nfs4_mips_addu_s32(nfs4_mips_addu_s32(iVar2,iVar3),iVar4);
+
+  if (temp < 1) {
 
     iVar2 = fixedmult(a,(newObj->orientMat).m[0]);
 
@@ -6171,7 +6173,8 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
     iVar4 = fixedmult(iVar1,(newObj->orientMat).m[2]);
 
-    iVar2 = -(iVar2 + iVar3 + iVar4);
+    iVar2 = nfs4_mips_negu_s32(
+        nfs4_mips_addu_s32(nfs4_mips_addu_s32(iVar2,iVar3),iVar4));
 
   }
 
@@ -6183,13 +6186,13 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
     iVar2 = fixedmult(iVar1,(newObj->orientMat).m[2]);
 
-    iVar2 = iVar3 + iVar4 + iVar2;
+    iVar2 = nfs4_mips_addu_s32(nfs4_mips_addu_s32(iVar3,iVar4),iVar2);
 
   }
 
   uVar5 = 0;
 
-  if (iVar2 <= (newObj->dimension).x + radius) {
+  if (iVar2 <= nfs4_mips_addu_s32((newObj->dimension).x,radius)) {
 
     iVar2 = fixedmult(a,(newObj->orientMat).m[6]);
 
@@ -6197,7 +6200,9 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
     iVar4 = fixedmult(iVar1,(newObj->orientMat).m[8]);
 
-    if (iVar2 + iVar3 + iVar4 < 1) {
+    temp = nfs4_mips_addu_s32(nfs4_mips_addu_s32(iVar2,iVar3),iVar4);
+
+    if (temp < 1) {
 
       iVar2 = fixedmult(a,(newObj->orientMat).m[6]);
 
@@ -6205,7 +6210,8 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
       iVar1 = fixedmult(iVar1,(newObj->orientMat).m[8]);
 
-      iVar1 = -(iVar2 + iVar3 + iVar1);
+      iVar1 = nfs4_mips_negu_s32(
+          nfs4_mips_addu_s32(nfs4_mips_addu_s32(iVar2,iVar3),iVar1));
 
     }
 
@@ -6217,11 +6223,11 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
       iVar1 = fixedmult(iVar1,(newObj->orientMat).m[8]);
 
-      iVar1 = iVar2 + iVar3 + iVar1;
+      iVar1 = nfs4_mips_addu_s32(nfs4_mips_addu_s32(iVar2,iVar3),iVar1);
 
     }
 
-    uVar5 = (newObj->dimension).z + radius < iVar1 ^ 1;
+    uVar5 = (nfs4_mips_addu_s32((newObj->dimension).z,radius) < iVar1) ^ 1;
 
   }
 

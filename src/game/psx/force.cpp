@@ -4,6 +4,7 @@
  *   Full SYM-locals applied.
  */
 #include "../../nfs4_types.h"
+#include "../../mips_semantics.h"
 #include "force_externs.h"
 
 /* ---- Force.obj-OWNED globals -- DEFINED here (self-contained; SYM-typed via gen_owned_defs:
@@ -231,7 +232,7 @@ ForceUpd_audioRevLoop:
             iVar2 = iVar2 * 0x20;
             iVar10 = iVar2 >> 0x10;
             if (iVar2 < 0) {
-              iVar10 = iVar2 + 0xffff >> 0x10;
+              iVar10 = nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar2, 0xffff), 0x10);
             }
           }
           else {
@@ -305,10 +306,10 @@ void Force_StartUp(void)
     force_walk = force_walk + 1;
     actuator_walk = actuator_walk + 8;
   } while (force_walk < (Force_tGlobal *)colourRGB);
-  VSyncCallback(Force_Vbl);
-  Sched_AddFunction(simGlobal.schedule32Hz,Force_Update,Cars_gHumanRaceCarList[0],0x32);
+  VSyncCallback((void *)Force_Vbl);
+  Sched_AddFunction(simGlobal.schedule32Hz,(void *)Force_Update,Cars_gHumanRaceCarList[0],0x32);
   if (GameSetup_gData.commMode == 1) {
-    Sched_AddFunction(simGlobal.schedule32Hz,Force_Update,Cars_gHumanRaceCarList[1],0x32);
+    Sched_AddFunction(simGlobal.schedule32Hz,(void *)Force_Update,Cars_gHumanRaceCarList[1],0x32);
   }
   return;
 }

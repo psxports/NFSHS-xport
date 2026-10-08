@@ -12,7 +12,7 @@ extern "C" int timerhz; /* global tick-rate (used as value: timerhz>>1) */
 
 /* ---- harvested from sealed *_externs.h ---- */
 extern "C" Draw_tView Draw_gView[]; /* @0x8011ec54 */
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" char *&Render_gPacketEnd;
 extern "C" dflip gEnviro[2]; /* @0x8011f424 */
 extern "C" int Draw_gPlayer1View, Draw_gPlayer2View;
@@ -34,7 +34,7 @@ extern "C" int gLoop;
 extern "C" int gTotalMem;
 extern "C"
 {
-    extern void *Platform_ReserveMemory(int, char *);
+    extern char *Platform_ReserveMemory(int, const char *);
 }
 extern void Texture_Vramcf(shapetbl *, int, int, int, int);
 

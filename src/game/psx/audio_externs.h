@@ -18,7 +18,7 @@ extern "C"
 }
 extern "C"
 {
-    extern void AudioMus_SysStartUp(int, int, char *);
+    extern void AudioMus_SysStartUp(int, int, const char *);
 }
 
 /* ---- SNDSYS / SND-bank audio lib (sigs from call sites) ---- */

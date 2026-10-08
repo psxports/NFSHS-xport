@@ -11,19 +11,19 @@
 #include "new.h"
 
 /* ---- #75: aihigh.obj-owned anonymous vtables (real nfs4-f.exe bytes; pfn VAs symbolicated) ---- */
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 static int NFS4_VT_THUNK _vtdtor_AIHigh_BTC_Perp(AIHigh_BTC_Perp *p){ p->~AIHigh_BTC_Perp(); return 0; }   /* @0x8005b438 */
 static int NFS4_VT_THUNK _vtdtor_AIHigh_None(AIHigh_None *p){ p->~AIHigh_None(); return 0; }   /* @0x8005b468 */
 __vtbl_ptr_type AIHigh_kVtbl_80054dcc[4] = {   /* @0x80054dcc  BTC_Perp-family abstract vtable: {null, __pure_virtual, ~AIHigh_BTC_Perp, AIHigh_BasicPerp::CheckForCrimes}. Distinct from size-3 AIHigh_BTC_Perp_vtable@0x80054fe0. Address-name = #148 cleanup carry-over. */
-  {0, 0, (int (*)(...))0},                                  /* @0x80054dcc */
-  {0, 0, (int (*)(...))&__pure_virtual},                    /* @0x80054dd4  fn=0x800e4354 __pure_virtual */
-  {0, 0, (int (*)(...))&_vtdtor_AIHigh_BTC_Perp},           /* @0x80054ddc  fn=0x8005b438 ~AIHigh_BTC_Perp */
+  {0, 0, nullptr},                                  /* @0x80054dcc */
+  {0, 0, NFS4_VTABLE_ENTRY(&__pure_virtual)},                    /* @0x80054dd4  fn=0x800e4354 __pure_virtual */
+  {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_BTC_Perp)},           /* @0x80054ddc  fn=0x8005b438 ~AIHigh_BTC_Perp */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_BasicPerp::CheckForCrimes)},  /* @0x80054de4  fn=0x8005b500 */
 };
 __vtbl_ptr_type AIHigh_None_vtable[3] = {   /* @0x80054dec (AIHigh_None vtable) */
-  {0, 0, (int (*)(...))0},                                  /* @0x80054dec */
+  {0, 0, nullptr},                                  /* @0x80054dec */
   {0, 0, NFS4_VTABLE_ENTRY(&AIHigh_None::HighExecute)},          /* @0x80054df4  fn=0x8005b460 */
-  {0, 0, (int (*)(...))&_vtdtor_AIHigh_None},               /* @0x80054dfc  fn=0x8005b468 ~AIHigh_None */
+  {0, 0, NFS4_VTABLE_ENTRY(&_vtdtor_AIHigh_None)},               /* @0x80054dfc  fn=0x8005b468 ~AIHigh_None */
 };
 
 /* ---- aihigh.obj-owned globals (.bss zero) ---- */
@@ -410,13 +410,7 @@ void AIHigh_CleanUp(void)
       pAVar1 = *ppAVar2;
 
       if (pAVar1 != (AIHigh_Base *)0x0) {
-#ifdef AP_WIN
         pAVar1->~AIHigh_Base();
-#else
-        (**(int (**)(...))(pAVar1->_vf[6] + 2))
-
-                  ((int)&pAVar1->carObj_ + (int)*(short *)(pAVar1->_vf[5] + 1),3);
-#endif
 
         *ppAVar2 = (AIHigh_Base *)0x0;
 
@@ -510,12 +504,8 @@ LAB_8005b2bc:
       if (bVar1) {
 
         pa_Var3 = (*ppAVar5)->_vf;
-#ifdef AP_WIN
         NFS4_VCALL0(pa_Var3[0][1].pfn,
                     (char *)(*ppAVar5) + pa_Var3[0][1].delta);
-#else
-        (**(int (**)(...))(pa_Var3 + 4))((int)&(*ppAVar5)->carObj_ + (int)*(short *)(pa_Var3[2] + 2));
-#endif
 
       }
 

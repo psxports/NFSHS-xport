@@ -42,9 +42,9 @@ extern "C" unsigned int FILE_size(int fd, int a2, int a3);
 extern "C" unsigned int FILE_addbig(char *name, int a2, int a3, int a4);
 extern "C" unsigned int FILE_delbig(int a0, int a1, int a2);
 extern "C" unsigned int FILE_read(intptr handle, unsigned int offset, intptr dest, int chunk, int cbarg, intptr ctrl); /* @0x800EC4EC */
-extern "C" void FILE_waitop(unsigned int op);
+extern "C" int FILE_waitop(unsigned int op);
 extern "C" int FILE_opstatus(unsigned int op);
-extern "C" unsigned int FILE_completeop(unsigned int op);
+extern "C" int FILE_completeop(unsigned int op);
 extern "C" void FILE_callbackop(unsigned int op, void *cb);
 
 extern "C" void synccallback(int op, int type, SyncCtrl *ctrl);                                                 /* @0x800EA6CC */
@@ -186,12 +186,13 @@ extern "C" int FILE_addbigsync(char *name, int a2, int a3, int *out)
 }
 
 /* FILE_delbigsync @0x800EAA70 : blocking remove-from-BIG. */
-extern "C" void FILE_delbigsync(int a0, int a1)
+extern "C" int FILE_delbigsync(int a0, int a1)
 {
     unsigned int op = FILE_delbig(a0, a1, 0);
     if (op != 0)
     {
         FILE_waitop(op);
-        FILE_completeop(op);
+        return (int)FILE_completeop(op);
     }
+    return 0;
 }

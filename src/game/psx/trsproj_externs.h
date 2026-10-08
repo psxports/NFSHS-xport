@@ -27,11 +27,11 @@ extern "C" void NFSHS_GTE_WriteControl(int reg, int value);
     #endif
     #ifdef AP_WIN
         #define gte_ldv0(v) NFSHS_GTE_LoadV0(v)
-        #define gte_mvmva(...) NFSHS_GTE_MVMVA()
+        #define gte_mvmva() NFSHS_GTE_MVMVA()
         #define gte_stlvnl(p) NFSHS_GTE_StoreLVNL(p)
     #else
         #define gte_ldv0(v) ((void)(v))
-        #define gte_mvmva(...) ((void)0)
+        #define gte_mvmva() ((void)0)
         #define gte_stlvnl(p) ((void)(p))
     #endif
     #ifdef AP_WIN
@@ -42,8 +42,8 @@ extern "C" void NFSHS_GTE_WriteControl(int reg, int value);
 
 /* ---- globals (SYM Globals.jsonl) ---- */
 /* TrsProj_precision (0x8013db9c) is TrsProj.obj-OWNED -> DEFINED in trsproj.cpp (=10), not externed. */
-extern long Camera_gGeomScreen[2];                 /* 0x8013c7dc; empty format word at +4 */
-extern "C" extern GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern long Camera_gGeomScreen[2];          /* 0x8013c7dc; empty format word at +4 */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
 
 /* ---- eaclib transform (fixed-point matrix*vector; func_800EAED8) ---- */
 

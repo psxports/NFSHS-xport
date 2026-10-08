@@ -835,7 +835,7 @@ void SetCameraZoom(int player,int targetDist)
       else if (((uVar1 == 2) &&
                (Camera_gGeomScreen[0] = (targetDist * 0xbe) / 0x3000,
                0x4b0 < Camera_gGeomScreen[0])) &&
-              (Camera_gGeomScreen[0] = 6000 - Camera_gGeomScreen[0] >> 2,
+              (Camera_gGeomScreen[0] = (6000 - Camera_gGeomScreen[0]) >> 2,
               Camera_gGeomScreen[0] < 0x2ee)) {
         Camera_gGeomScreen[0] = 0x2ee;
         Camera_gGeomScreen[1] = 0;
@@ -982,9 +982,6 @@ void Camera_UpdateFinishCam(int player)
   BO_tNewtonObj *pBVar2;
   Camera_tInfo *pCVar3;
   coorddef cStack_60;
-  int local_50;
-  int local_4c;
-  int local_48;
   matrixtdef mStack_40;
   
   pCVar3 = Camera_gInfo + player;
@@ -997,11 +994,11 @@ void Camera_UpdateFinishCam(int player)
   if (iVar1 < 1) {
     Anim_GetLastAnimPosRot(1,6,&cStack_60,&mStack_40);
   }
-  transform(&cStack_60,(pCVar3->anchor->orientMat).m,&local_50);
+  transform(&cStack_60.x,(pCVar3->anchor->orientMat).m,&newarm.x);
   pBVar2 = pCVar3->anchor;
-  Camera_gInfo[player].position.x = (pCVar3->anchor->position).x + local_50;
-  Camera_gInfo[player].position.y = (pBVar2->position).y + local_4c;
-  Camera_gInfo[player].position.z = (pBVar2->position).z + local_48;
+  Camera_gInfo[player].position.x = (pCVar3->anchor->position).x + newarm.x;
+  Camera_gInfo[player].position.y = (pBVar2->position).y + newarm.y;
+  Camera_gInfo[player].position.z = (pBVar2->position).z + newarm.z;
   Math_fasttransmult(&mStack_40,&pBVar2->orientMat,&Camera_gInfo[player].rotation);
   *(u_int *)((char *)&(Camera_gInfo[player]) + 0x74) =
        *(u_int *)((char *)&(Camera_gInfo[player]) + 0x74) & 0xfffffff1 | 0x70;
@@ -1375,9 +1372,9 @@ void Camera_UpdateCopCam1(int player)
   iVar2 = (pCVar6->anchor->position).z;
   iVar4 = ((Camera_gInfo[player].target)->position).z;
   gCop1Target[player].x =
-       (pCVar6->anchor->position).x + ((Camera_gInfo[player].target)->position).x >> 1;
-  gCop1Target[player].y = iVar1 + iVar3 >> 1;
-  gCop1Target[player].z = iVar2 + iVar4 >> 1;
+       ((pCVar6->anchor->position).x + ((Camera_gInfo[player].target)->position).x) >> 1;
+  gCop1Target[player].y = (iVar1 + iVar3) >> 1;
+  gCop1Target[player].z = (iVar2 + iVar4) >> 1;
   local_18.x = (pCVar6->anchor->position).x - ((Camera_gInfo[player].target)->position).x;
   local_18.y = (pCVar6->anchor->position).y - ((Camera_gInfo[player].target)->position).y;
   local_18.z = (pCVar6->anchor->position).z - ((Camera_gInfo[player].target)->position).z;
@@ -1903,8 +1900,8 @@ void Camera_CheckWallCollisions(int player,coorddef *pos)
   iVar13 = 0;
   pThis = feeler3;
   do {
-    transform(pThis,((Camera_gInfo[player].anchor)->orientMat).m,
-               &feelerOffset);
+    transform(&pThis->x,((Camera_gInfo[player].anchor)->orientMat).m,
+               &feelerOffset.x);
     local_40.x = pos->x + feelerOffset.x;
     local_40.y = pos->y + feelerOffset.y;
     local_40.z = pos->z + feelerOffset.z;
@@ -1939,9 +1936,9 @@ void Camera_CheckWallCollisions(int player,coorddef *pos)
   local_90.x = (pBVar4->position).x;
   local_90.y = (pBVar4->position).y;
   local_90.z = (pBVar4->position).z;
-  local_70 = (pCVar12->anchor->position).x - local_40.x >> 7;
-  local_68 = (pCVar12->anchor->position).z - local_40.z >> 7;
-  local_6c = (pCVar12->anchor->position).y - local_40.y >> 7;
+  local_70 = ((pCVar12->anchor->position).x - local_40.x) >> 7;
+  local_68 = ((pCVar12->anchor->position).z - local_40.z) >> 7;
+  local_6c = ((pCVar12->anchor->position).y - local_40.y) >> 7;
   do {
     local_90.x = local_90.x - local_70;
     local_90.y = local_90.y - local_6c;
@@ -1968,9 +1965,9 @@ void Camera_CheckWallCollisions(int player,coorddef *pos)
   } while( true );
   pCVar12 = Camera_gInfo + player;
   uVar15 = 1;
-  local_70 = (pCVar12->anchor->position).x - local_90.x >> 1;
-  local_6c = (pCVar12->anchor->position).y - local_90.y >> 1;
-  local_68 = (pCVar12->anchor->position).z - local_90.z >> 1;
+  local_70 = ((pCVar12->anchor->position).x - local_90.x) >> 1;
+  local_6c = ((pCVar12->anchor->position).y - local_90.y) >> 1;
+  local_68 = ((pCVar12->anchor->position).z - local_90.z) >> 1;
   do {
     intsincos(uVar15,&local_20,&local_1c);
     iVar13 = fixedmult(local_1c,local_70);

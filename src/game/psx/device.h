@@ -8,10 +8,10 @@ int Device_Fail__Fi(int port);                     /* :72 */
 void Device_Update__Fv(void);                      /* :109 */
 void Device_StartUp__Fv(void);                     /* :169 */
 void Device_SetHardCodedKeys__Fv(void);            /* :195 */
-int Device_PSXPad__FUl(u_long param);              /* :244 */
-BOOL Device_ReadPad__FiUl(int port, u_long param); /* :261 */
-int Device_PSXPadMulti__FUl(u_long param);         /* :306 */
-int Device_Analog__FUl(u_long param);              /* :352 */
-int Device_Null__FUl(u_long param);                /* :393 */
+int Device_PSXPad__FUl(uint32 param);              /* :244 */
+BOOL Device_ReadPad__FiUl(int port, uint32 param); /* :261 */
+int Device_PSXPadMulti__FUl(uint32 param);         /* :306 */
+int Device_Analog__FUl(uint32 param);              /* :352 */
+int Device_Null__FUl(uint32 param);                /* :393 */
 
 #endif /* _GAME_PSX_DEVICE_H_ */

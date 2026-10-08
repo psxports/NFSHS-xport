@@ -4,6 +4,7 @@
  *   track.obj convention (ctors explicitly called on __builtin_new memory).
  */
 #include "../../nfs4_types.h"
+#include "../../mips_semantics.h"
 #include "object_externs.h"
 
 
@@ -64,7 +65,7 @@ int CalcObjYawAngle(CCOORD16 *pts)
   int angle;
   
   angle = fixedatan((int)pts[1].x - (int)pts->x,(int)pts[1].z - (int)pts->z);
-  return angle + -0x4000 >> 8;
+  return nfs4_mips_sra_s32(nfs4_mips_addu_s32(angle,-0x4000),8);
 }
 
 
@@ -82,20 +83,20 @@ void CalcObjExtentPoints(coorddef *cp,CCOORD16 *pts,coorddef *resultPts,tQuat *q
 
   cpx = cp->x;
   cpz = cp->z;
-  pt0.x = (int)pts->x << 10;
-  pt0.z = (int)pts->z << 10;
-  pt1.x = (int)pts[1].x << 10;
-  pt1.z = (int)pts[1].z << 10;
+  pt0.x = nfs4_mips_sll_s32(pts->x,10);
+  pt0.z = nfs4_mips_sll_s32(pts->z,10);
+  pt1.x = nfs4_mips_sll_s32(pts[1].x,10);
+  pt1.z = nfs4_mips_sll_s32(pts[1].z,10);
   resultPts->x = cpx;
   resultPts->z = cpz;
   Quatern_QuatToMat(quat,&matrix);
   transform(&pt0.x,matrix.m,&resultPts[1].x);
   transform(&pt1.x,matrix.m,&resultPts[2].x);
-  resultPts[1].x = resultPts[1].x + cpx;
+  resultPts[1].x = nfs4_mips_addu_s32(resultPts[1].x,cpx);
   tmpx = resultPts[2].x;
-  resultPts[1].z = resultPts[1].z + cpz;
-  resultPts[2].x = tmpx + cpx;
-  resultPts[2].z = resultPts[2].z + cpz;
+  resultPts[1].z = nfs4_mips_addu_s32(resultPts[1].z,cpz);
+  resultPts[2].x = nfs4_mips_addu_s32(tmpx,cpx);
+  resultPts[2].z = nfs4_mips_addu_s32(resultPts[2].z,cpz);
   return;
 }
 
@@ -111,9 +112,9 @@ void BuildObjCollisionMatrix(int weight,int objAngle,int impactAngle,matrixtdef 
   matrixtdef objAngleMat;
   matrixtdef tmpMat;
   
-  impactComp = fixedmult(-impactAngle,0x10000 - weight);
-  objComp = fixedmult(-objAngle,weight);
-  fixedxformy(&objAngleMat,impactComp + objComp);
+  impactComp = fixedmult(nfs4_mips_negu_s32(impactAngle),nfs4_mips_subu_s32(0x10000,weight));
+  objComp = fixedmult(nfs4_mips_negu_s32(objAngle),weight);
+  fixedxformy(&objAngleMat,nfs4_mips_addu_s32(impactComp,objComp));
   fixedxformy(&impactMat,impactAngle);
   Math_fasttransmult(&objAngleMat,mat,&tmpMat);
   Math_fasttransmult(&tmpMat,&impactMat,mat);
@@ -268,7 +269,7 @@ int Object_GetRadiusCollisionData(Object_tSimObjList *objList,int objIndex,coord
     pos->x = simObj->point[0];
     pos->y = iVar1;
     pos->z = iVar2;
-    *radius = (int)simObj->radius << 7;
+    *radius = nfs4_mips_sll_s32(simObj->radius,7);
   }
   return 0;
 }
@@ -418,10 +419,10 @@ int Object_CheckCollisionResults(Object_tSimObjList *objList,int objIndex,BO_tNe
   iVar3 = (N->linearVel).x;
   iVar1 = (N->linearVel).z;
   if (iVar3 < 0) {
-    iVar3 = -iVar3;
+    iVar3 = nfs4_mips_negu_s32(iVar3);
   }
   if (iVar1 < 0) {
-    iVar1 = -iVar1;
+    iVar1 = nfs4_mips_negu_s32(iVar1);
   }
   simObj = GetSimObj(objIndex,objList,&chunk);
   type = simObj->type & 0xf;
@@ -430,7 +431,7 @@ int Object_CheckCollisionResults(Object_tSimObjList *objList,int objIndex,BO_tNe
     if (objStatus != (ObjectAnim *)0x0) {
       return 0;
     }
-    if (-1 < iVar3 + iVar1 >> 0x10) {
+    if (-1 < nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar3,iVar1),0x10)) {
       objInstance = (Trk_CollideBoomInst *)
            FindObjInstanceFromSerialNum(Track_chunkList[chunk].objInstanceBuf,(int)simObj->instIndex);
       if (objInstance->type == '\x06') {
@@ -451,8 +452,9 @@ int Object_CheckCollisionResults(Object_tSimObjList *objList,int objIndex,BO_tNe
         (finishedSign->_base_ObjectAnim)._vf =
              (__vtbl_ptr_type (*) [3])ObjectFinishedSignAnim_vtable;
         signAnim = (ObjectSignAnim *)__builtin_new(sizeof(ObjectSignAnim));
-        vel = fixedatan((N->linearVel).x >> 8,(N->linearVel).z >> 8);
-        signAnim = ObjectSignAnim_ct(signAnim,&N->linearVel,vel >> 8,animDef,objInstance,objDef,
+        vel = fixedatan(nfs4_mips_sra_s32((N->linearVel).x,8),
+                        nfs4_mips_sra_s32((N->linearVel).z,8));
+        signAnim = ObjectSignAnim_ct(signAnim,&N->linearVel,nfs4_mips_sra_s32(vel,8),animDef,objInstance,objDef,
                                      simObj,(coorddef *)((N->roadMatrix).m + 3),finishedSign);
       }
       else {
@@ -958,11 +960,11 @@ void Object_GetIMassObjectMotion(int objIndex,coorddef *cpoint,matrixtdef *orien
   }
   else {
     iVar3 = cpoint->x - Object_IMassObjInst[objIndex].lastPos.x;
-    velocity->x = iVar3 / timeDiff << 6;
+    velocity->x = nfs4_mips_sll_s32(iVar3 / timeDiff,6);
     iVar3 = cpoint->y - pOVar1[objIndex].lastPos.y;
-    velocity->y = iVar3 / timeDiff << 6;
+    velocity->y = nfs4_mips_sll_s32(iVar3 / timeDiff,6);
     iVar3 = cpoint->z - pOVar1[objIndex].lastPos.z;
-    velocity->z = iVar3 / timeDiff << 6;
+    velocity->z = nfs4_mips_sll_s32(iVar3 / timeDiff,6);
   }
   pOVar1 = Object_IMassObjInst;
   iVar2 = cpoint->y;
@@ -1083,9 +1085,9 @@ int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim *pThis,DRender_tView *Vi,
       quat.z = oci->qz;
       quat.w = oci->qw;
       Quatern_QuatToMat(&quat,&RSmatrix);
-      sx = (int)oci->sx << 8;
-      sy = (int)oci->sy << 8;
-      sz = (int)oci->sz << 8;
+      sx = nfs4_mips_sll_s32(oci->sx,8);
+      sy = nfs4_mips_sll_s32(oci->sy,8);
+      sz = nfs4_mips_sll_s32(oci->sz,8);
       RSmatrix.m[0] = fixedmult(RSmatrix.m[0],sx);
       RSmatrix.m[3] = fixedmult(RSmatrix.m[3],sx);
       RSmatrix.m[6] = fixedmult(RSmatrix.m[6],sx);
@@ -1170,20 +1172,20 @@ ObjectSignAnim * ObjectSignAnim_ct(ObjectSignAnim *pThis,coorddef *impactVel,int
   (pThis->impactVel).x = impactVel->x;
   (pThis->impactVel).y = iVar3;
   (pThis->impactVel).z = iVar4;
-  pThis->impactAngle = impactAngle << 8;
+  pThis->impactAngle = nfs4_mips_sll_s32(impactAngle,8);
   pThis->animParms = def;
   if (iVar5 < 0) {
-    iVar5 = -iVar5;
+    iVar5 = nfs4_mips_negu_s32(iVar5);
   }
   if (iVar1 < 0) {
-    iVar1 = -iVar1;
+    iVar1 = nfs4_mips_negu_s32(iVar1);
   }
   pThis->objCollideInstance = objCollideInstance;
   pThis->objDef = objDef;
   pThis->simObj = simObj;
   iVar3 = CalcObjYawAngle((CCOORD16 *)(objDef + 1));
-  pThis->objectAngle = iVar3 << 8;
-  if (iVar5 + iVar1 >> 0x10 < 10) {
+  pThis->objectAngle = nfs4_mips_sll_s32(iVar3,8);
+  if (nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar5,iVar1),0x10) < 10) {
     pAVar2 = (AnimScript *)__builtin_new(sizeof(AnimScript));
     iVar5 = pThis->animParms->baseAnim;
     iVar1 = pThis->animParms->numPieces;
@@ -1225,7 +1227,7 @@ ObjectSignAnim * ObjectSignAnim_ct(ObjectSignAnim *pThis,coorddef *impactVel,int
   iVar5 = fixedmult((finishedAnim->finalMatrix).m[0],(finishedAnim->finalMatrix).m[4]);
   iVar1 = fixedmult((finishedAnim->finalMatrix).m[1],(finishedAnim->finalMatrix).m[3]);
   (finishedAnim->finalMatrix).m[8] = iVar5 - iVar1;
-  reorthogonalize(m2);
+  reorthogonalize(m2->m);
   fixedxformx(&mat,0x4000);
   fixedxformy(&objAngleMat,-pThis->objectAngle);
   fixedxformy(&yawMat,pThis->impactAngle);
@@ -1280,7 +1282,7 @@ int NFS4_VT_THUNK ObjectSignAnim_Draw(ObjectSignAnim *pThis,DRender_tView *Vi,Dr
     cp.x = pTVar4->x + animcp.x;
     cp.y = pTVar4->y + animcp.y;
     cp.z = pTVar4->z + animcp.z;
-    BuildObjCollisionMatrix((frame << 0x10) / numFrames,pThis->objectAngle,pThis->impactAngle,&matrix);
+    BuildObjCollisionMatrix(nfs4_mips_sll_s32(frame,0x10) / numFrames,pThis->objectAngle,pThis->impactAngle,&matrix);
     DrawObjectTransform(Vi,sd,&matrix,pObjDef,&cp,offset,-1);
     ret = 4;
   }

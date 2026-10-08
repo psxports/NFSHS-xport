@@ -14,10 +14,10 @@ extern void Hud_Kill(void);                                                   /*
 extern void Hud_PositionMap(void);                                            /* hud.obj */
 
 /* ---- cross-TU globals ---- */
-extern "C" extern GameSetup_tData GameSetup_gData; /* gmesetup.obj */
-extern "C" int Replay_ReplayMode;                  /* replay.obj */
-extern camera_info Camera_gInfo[2];                /* camera.obj */
-extern Car_tObj *Cars_gHumanRaceCarList[9];        /* cars.obj */
-extern "C" Sim_tSimGlobalVar simGlobal;            /* sim.obj */
+extern "C" GameSetup_tData GameSetup_gData; /* gmesetup.obj */
+extern "C" int Replay_ReplayMode;           /* replay.obj */
+extern camera_info Camera_gInfo[2];         /* camera.obj */
+extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* sim.obj */
 
 #endif /* DASHHUD_EXTERNS_H */

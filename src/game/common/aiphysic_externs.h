@@ -7,17 +7,17 @@
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern AIDataRecord_TrackCurve_t AIDataRecord_TrackCurve[];
 extern AIScript_tReactionDetails AIPerson_ScriptData[];
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern Trk_NewSlice *BWorldSm_slices;
 extern int AIInit_forceHumanHandBrake;
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int AIWorld_IsDriveableLane(int slice, int lane);
 extern int Cars_topSpeedCap[22]; /* [carType] */
 extern int AIScript_DoReAction(AIScript_t *script, AIScript_tAIReaction testReaction);

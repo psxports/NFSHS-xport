@@ -4,7 +4,7 @@
  *   Verified vs disasm-v2.txt. NOT original source; SYM-faithful, recompilable C++.
  */
 #include "../../nfs4_types.h"
-#include "AITUNE_externs.h"
+#include "aitune_externs.h"
 
 
 /* ---- AITUNE.obj-owned globals (SYM-typed; .data=real EXE bytes, .bss=zero) ---- */

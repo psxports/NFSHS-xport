@@ -21,7 +21,7 @@ int DS_active;                                                 /* @8013bf68 4B *
 int Device_gForcePause;                                        /* @8013d778 4B */
 int Device_gPausePort;                                         /* @8013d77c 4B */
 int Device_gPaused;                                            /* @8013d780 4B */
-u_long Device_gPrev[2];                                        /* @8013d78c 8B */
+uint32 Device_gPrev[2];                                        /* @8013d78c 8B */
 int Device_gToggleTime[2];                                     /* @8013d784 8B */
 DrawC_tEnvMap * DrawC_gEnvMap;                                 /* @8013d7f0 4B */
 int DrawC_gEnvMapMax;                                          /* @8013d7f8 4B */
@@ -104,7 +104,7 @@ short download;                                                /* @80052a30 2B *
 int drawpending;                                               /* @8013dd10 4B */
 int exceedRedline;                                             /* @8013d300 4B */
 BWorldSm_Pos      * fogslicePos;                               /* @8013db8c 4B */
-u_long font_abr;                                               /* @8013d860 4B */
+uint32 font_abr;                                               /* @8013d860 4B */
 u_short font_currentTPage[2];                                  /* @8013d868 4B */
 int frontMult;                                                 /* @8013d308 4B */
 int gBrakeRatio;                                               /* @8013d2f0 4B */

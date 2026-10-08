@@ -8,7 +8,7 @@ extern "C" COORD16 Fe3D_lightsVertex[64]; /* 0x80051334  ARY STRUCT COORD16 x64 
 extern "C" COORD16 Fe3D_spotVertex[33];   /* 0x8005126c  ARY STRUCT COORD16 x33 */
 extern "C" char bigBuf[];
 extern "C" int gMenuRotate[2];
-extern "C" extern int R3DCar_Clock, R3DCar_ClockLast, R3DCar_InMenu;
+extern "C" int R3DCar_Clock, R3DCar_ClockLast, R3DCar_InMenu;
 extern "C" int &Render_gMenuRenderFlag, &gScratchLastWord, generic128HzClock, stackSpeedUpEnbabledFlag, showRoomFlag;
 extern intptr gWSavePtr;
 

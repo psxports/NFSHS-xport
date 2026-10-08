@@ -6,9 +6,9 @@
 
 /* ===== globals ===== */
 extern "C" int ticks;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tFEApplication *FEApp;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern tTrackManager trackManager;
 extern tCarManager carManager;
 extern tTournamentManager tournamentManager;
@@ -63,7 +63,7 @@ extern "C"
 }
 extern "C"
 {
-    void MCRD_savefile(int, MCRDFILE_def *);
+    int MCRD_savefile(int, MCRDFILE_def *);
 }
 extern "C"
 {
@@ -108,11 +108,11 @@ extern "C"
 }
 extern "C"
 {
-    void FECheat_SaveBonus(u_long *);
+    void FECheat_SaveBonus(uint32 *);
 }
 extern "C"
 {
-    void FECheat_LoadBonus(u_long *);
+    void FECheat_LoadBonus(uint32 *);
 }
 
 /* ===== game-manager methods (rendered free by Ghidra; first arg is the manager ptr) ===== */

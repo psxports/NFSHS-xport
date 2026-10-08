@@ -215,119 +215,32 @@ void Blockade_AddRoadFlare(coorddef *pos)
 /* ---- Blockade_AddObject__FiP8coorddefi  Blockade_AddObject  [AIH_BASICCOP.CPP:134-193] SLD-VERIFIED ---- */
 
 void Blockade_AddObject(int slice,coorddef *pos,int objectID)
-
-
-
 {
   SceneElem theObj;
   BWorldSm_Pos slicePos;
-  coorddef*rotx;
-  coorddef*roty;
-  coorddef*rotz;
-
-  coorddef *pcVar1;
-
-  int iVar2;
-
-  u_char local_100 [32];
-
-  int local_e0;
-
-  int local_dc;
-
-  int local_d8;
-
-  int local_d4;
-
-  int local_d0;
-
-  int local_cc;
-
-  int local_c8;
-
-  int local_c4;
-
-  int local_c0;
-
-  int local_bc;
-
-  int local_b8;
-
-  int local_b4;
-
-  int local_b0;
-
-  BWorldSm_Pos BStack_a0;
-
-  
-
-  (*(int *)&(local_100)) = 0;
-
-  local_bc = 1;
-
-  local_b4 = Object_GetObjDefID(objectID);
-
-  local_b0 = 0x23916;
-
-  (*(int *)((u_char *)&(local_100) + 16)) = pos->x;
-
-  (*(int *)((u_char *)&(local_100) + 20)) = pos->y;
-
-  (*(int *)((u_char *)&(local_100) + 24)) = pos->z;
-
-  local_b8 = objectID;
-
-  BWorldSm_SetSlice(slice,&BStack_a0);
-
-  BWorldSm_FindClosestQuadRez(pos,&BStack_a0,1);
-
-  pcVar1 = (coorddef *)BWorldSm_UNormal(&BStack_a0);
-
-  local_d4 = pcVar1->x;
-
-  local_d0 = pcVar1->y;
-
-  local_cc = pcVar1->z;
-
-  pcVar1 = (coorddef *)BWorldSm_UForward(&BStack_a0);
-
-  local_c8 = pcVar1->x;
-
-  local_c4 = pcVar1->y;
-
-  local_c0 = pcVar1->z;
-
-  iVar2 = fixedmult(local_d0,local_c0);
-
-  local_e0 = fixedmult(local_cc,local_c4);
-
-  local_e0 = iVar2 - local_e0;
-
-  iVar2 = fixedmult(local_cc,local_c8);
-
-  local_dc = fixedmult(local_d4,local_c0);
-
-  local_dc = iVar2 - local_dc;
-
-  iVar2 = fixedmult(local_d4,local_c4);
-
-  local_d8 = fixedmult(local_d0,local_c8);
-
-  local_d8 = iVar2 - local_d8;
-
-  transpose((MATRIX *)&local_e0,(MATRIX *)&local_e0);
-
-  Object_AddCustomObject((SceneElem *)local_100,1);
-
-  return;
-
+  theObj.type = 0;
+  theObj.subType = 1;
+  theObj.scalar1 = Object_GetObjDefID(objectID);
+  theObj.scalar2 = 0x23916;
+  theObj.cp = *pos;
+  theObj.subTypeIndex = objectID;
+  BWorldSm_SetSlice(slice,&slicePos);
+  BWorldSm_FindClosestQuadRez(pos,&slicePos,1);
+  const coorddef *up = (coorddef *)BWorldSm_UNormal(&slicePos);
+  theObj.orient.m[3] = up->x;
+  theObj.orient.m[4] = up->y;
+  theObj.orient.m[5] = up->z;
+  const coorddef *forward = (coorddef *)BWorldSm_UForward(&slicePos);
+  theObj.orient.m[6] = forward->x;
+  theObj.orient.m[7] = forward->y;
+  theObj.orient.m[8] = forward->z;
+  int *m = theObj.orient.m;
+  m[0] = (int)((unsigned)fixedmult(m[4],m[8]) - (unsigned)fixedmult(m[5],m[7]));
+  m[1] = (int)((unsigned)fixedmult(m[5],m[6]) - (unsigned)fixedmult(m[3],m[8]));
+  m[2] = (int)((unsigned)fixedmult(m[3],m[7]) - (unsigned)fixedmult(m[4],m[6]));
+  transpose(&theObj.orient,&theObj.orient);
+  Object_AddCustomObject(&theObj,1);
 }
-
-
-
-
-
-
 
 
 /* ---- PlacePointOnRoad__FiP8coorddef  PlacePointOnRoad  [AIH_BASICCOP.CPP:165-193] SLD-VERIFIED ---- */
@@ -745,9 +658,10 @@ void AIHigh_BasicCop::HandleBlockadeSpeech()
 
           pSVar4 = (Speaker *)Speech_Mobile((this->_base_AIHigh_Base).carObj_);
 
-          (**(int (**)(...))(pSVar4->_vf[1] + 0x1d))
-
-                    ((int)&(pSVar4->fPosition).flags + (int)*(short *)(pSVar4->_vf[1] + 0x19));
+          {
+            const __vtbl_ptr_type &entry = (*pSVar4->_vf)[7];
+            ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta));
+          }
 
           (this->blockade_).blockadeSpeechFlags = 0;
 

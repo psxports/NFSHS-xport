@@ -7,10 +7,10 @@
 
 /* ---- harvested from sealed *_externs.h ---- */
 extern "C" Draw_tPixMap *CarIO_carPixMap;
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern Texture_pal8bit *Texture_palCopy; /* 0x8013db0c */
 extern int Texture_palNum;               /* 0x8013db10 */
-extern "C" extern int R3DCar_InMenu;
+extern "C" int R3DCar_InMenu;
 /* generic shape-data ptr (int, char, void ptr) */
 extern void Texture_MenuReleaseClutId(short id);
 extern void ChangeTPage(u_short *tpage, int abr);

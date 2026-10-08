@@ -9,11 +9,11 @@ extern __vtbl_ptr_type AIHigh_Base_vtable[], AIHigh_None_vtable[], AIState_None_
 
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern __vtbl_ptr_type AIHigh_BTC_Perp_vtable[], AIHigh_BTC_HumanPerp_vtable[], AIHigh_BTC_AIPerp_vtable[], AIState_NonActive_vtable[], AIState_Base_vtable[];
 extern __vtbl_ptr_type AIHigh_BasicPerp_vtable[];
 extern int Cars_gNumCars;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int AI_elapsedTime; /* @0x8013c554 */
 extern int AI_iTime;       /* @0x8013c558 */
 extern int AI_time;        /* @0x8013c550 */

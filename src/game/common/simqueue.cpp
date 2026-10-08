@@ -130,7 +130,8 @@ int SimQueue_IsBlocking(int pIndex)
   if ((GameSetup_gData.commMode != 0) && (GameSetup_gData.commMode != 1)) {
     return 0;
   }
-  return inputQueue.TailTime[0] < inputQueue.HeadTime + maxTicksPerFrame ^ 1;
+  return (inputQueue.TailTime[0] <
+          nfs4_mips_addu_s32(inputQueue.HeadTime,maxTicksPerFrame)) ^ 1;
 }
 
 /* end of simqueue.cpp */

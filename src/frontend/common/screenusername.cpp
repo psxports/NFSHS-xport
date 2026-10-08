@@ -24,7 +24,7 @@ void tScreenUserName::Initialize()
     idx = 0;
     do {
       rowLabel = TextSys_Word((idx >> 0x10) + 0x1fb);
-      sprintf(this->fRowList[0] + (idx >> 0x10) * 9,rowLabel);
+      sprintf(this->fRowList[0] + (idx >> 0x10) * 9,"%s",rowLabel);
       i = i + 1;
       idx = i * 0x10000;
     } while (i * 0x10000 >> 0x10 < (int)menu_kUserNameRows);
@@ -42,8 +42,8 @@ void tScreenUserName::GetShapeInfo(short &numPermShapes,short &numSwapShapes,cha
   *swapFileName = (char *)0x0;
   numSwapShapes = 0;
   numPermShapes = 0x5c;
-  sprintf("","zUser%d",(uint)(byte)frontEnd.language);
-  *permFileName = "";
+  sprintf(UserPermFileName,"zUser%d",(uint)(byte)frontEnd.language);
+  *permFileName = UserPermFileName;
   return;
 }
 

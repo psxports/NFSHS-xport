@@ -23,11 +23,11 @@ extern "C" int gPreLoadTicks;           /* speech pre-load tick offset */
 extern "C" int gFilterSetting;          /* active filter mode (1 = length/priority filter on) */
 extern "C" intptr gEventDats[4];        /* @0x80148048 : four bound event-data pointers */
 
-extern "C" int gettick(void);                                  /* eaclib timer.obj */
-extern "C" int iSPCH_Rand(int n);                              /* spchrand */
-extern "C" int iSPCH_OneChosen(void);                          /* spchpick */
-extern "C" void iSPCH_PlayChosen(void);                        /* spchpick */
-extern "C" void iSPCH_ChooseSentence(unsigned int *eventArgs); /* spchpick */
+extern "C" int gettick(void);                                 /* eaclib timer.obj */
+extern "C" int iSPCH_Rand(int n);                             /* spchrand */
+extern "C" int iSPCH_OneChosen(void);                         /* spchpick */
+extern "C" void iSPCH_PlayChosen(void);                       /* spchpick */
+extern "C" int iSPCH_ChooseSentence(unsigned int *eventArgs); /* spchpick */
 
 /* ---- per-TU static copies of shared helpers (canon in spchdata.obj) ---- */
 static int VoxEvent_GetFilterLengthFlag(intptr e) /* @0x800E6E88 */

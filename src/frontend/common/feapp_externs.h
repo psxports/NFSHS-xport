@@ -5,11 +5,11 @@
 
 /* global instances / data */
 extern tFEApplication *FEApp;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tCarManager carManager;
 extern tGlobalMenuDefs *menuDefs;
 extern tScreenUserName *screenUserName;
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Car_tStats Cars_gNewCarStatsList[9];
 extern "C" tPadModuleState gPadinfo;
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
@@ -42,7 +42,7 @@ extern "C"
 }
 extern "C"
 {
-    void Audio_InitDriver(...);
+    void Audio_InitDriver(int buffersize, int spusize);
 }
 extern "C"
 {
@@ -50,7 +50,7 @@ extern "C"
 }
 extern "C"
 {
-    int Audio_FECleanUp(void);
+    void Audio_FECleanUp(void);
 }
 void FeAudio_systemtask(int);
 
@@ -94,7 +94,7 @@ extern "C"
 }
 extern "C"
 {
-    int FeTools_deinit(void);
+    void FeTools_deinit(void);
 }
 void LoadAllHelpShapes(void);
 void FreeHelpShapeCluts(void);
@@ -115,15 +115,15 @@ extern "C"
 }
 extern "C"
 {
-    int Init_Memcard(...);
+    void Init_Memcard(bool redraw, bool pinkslips);
 }
 extern "C"
 {
-    int DeInit_Memcard(void);
+    void DeInit_Memcard(void);
 }
 extern "C"
 {
-    int StatChk_ClearNewRecords(void);
+    void StatChk_ClearNewRecords(void);
 }
 extern "C"
 {

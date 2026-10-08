@@ -10,6 +10,7 @@
  */
 #include "memcard.h"
 #include "memcard_externs.h"
+#include "../../mips_semantics.h"
 
 /* forward decls for the file-local statics (called before their definitions) */
 static void iMCRD_timersub(void);
@@ -280,7 +281,7 @@ int iMCRD_DoFileLoad(int card)
 
             (gMemCardInfo.channel, gMemCardInfo.fileinfo.name,
 
-             (u_long *)&gMemCardInfo.fileinfo.header, 0, 0x200);
+             (uint32 *)&gMemCardInfo.fileinfo.header, 0, 0x200);
 
         while (sync_done = MemCardSync(1, &cmd, &res), sync_done == 0)
         {
@@ -384,7 +385,7 @@ int iMCRD_DoFileLoad(int card)
 
             (gMemCardInfo.channel, gMemCardInfo.fileinfo.name,
 
-             (u_long *)gMemCardInfo.fileinfo.pData, gMemCardInfo.fileinfo.offset + 0x200,
+             (uint32 *)gMemCardInfo.fileinfo.pData, gMemCardInfo.fileinfo.offset + 0x200,
 
              gMemCardInfo.fileinfo.size);
 
@@ -497,7 +498,7 @@ extern "C" int MCRD_savefile(int card, MCRDFILE_def *pFILE)
 
             if (i < 0)
             {
-                gMemCardInfo.fileinfo.header.nslots = (uchar)(pFILE->size + 0x3fff >> 0xd);
+                gMemCardInfo.fileinfo.header.nslots = (uchar)nfs4_mips_sra_s32(nfs4_mips_addu_s32(pFILE->size, 0x3fff), 0xd);
             }
 
             if (pFILE->title == (char *)0x0)
@@ -612,7 +613,7 @@ int iMCRD_DoFileWrite(int card)
 
             (gMemCardInfo.channel, gMemCardInfo.fileinfo.name,
 
-             (u_long *)&gMemCardInfo.fileinfo.header, 0, 0x200);
+             (uint32 *)&gMemCardInfo.fileinfo.header, 0, 0x200);
 
         if (res == 0)
         {
@@ -639,7 +640,7 @@ int iMCRD_DoFileWrite(int card)
 
         (gMemCardInfo.channel, gMemCardInfo.fileinfo.name,
 
-         (u_long *)gMemCardInfo.fileinfo.pData, gMemCardInfo.fileinfo.offset + 0x200,
+         (uint32 *)gMemCardInfo.fileinfo.pData, gMemCardInfo.fileinfo.offset + 0x200,
 
          gMemCardInfo.fileinfo.size);
 
@@ -730,9 +731,9 @@ extern "C" int MCRD_handlecardevents(int card)
 
     int status;
 
-    u_long cmd;
+    uint32 cmd;
 
-    u_long res;
+    uint32 res;
 
     ret = 0x17;
 
@@ -1034,7 +1035,7 @@ extern "C" int garyMemCardGrabBlocks(int card, int filenum)
 
     dir = pCI->dir;
 
-    MemCardGetDirentry(gMemCardInfo.channel, "*", dir, &pCI->numfiles, 0, 0xf);
+    MemCardGetDirentry(gMemCardInfo.channel, NFS4_WRITABLE_LITERAL("*"), dir, &pCI->numfiles, 0, 0xf);
 
     i = 0;
 
@@ -1097,7 +1098,7 @@ int iMCRD_LoadCard(int card)
     {
         opResult = MemCardGetDirentry
 
-            (gMemCardInfo.channel, "*", dir, &pcard->numfiles, 0, 0xf);
+            (gMemCardInfo.channel, NFS4_WRITABLE_LITERAL("*"), dir, &pcard->numfiles, 0, 0xf);
 
         ret_state = iMCRD_HandleError(1, opResult, card);
 

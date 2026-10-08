@@ -114,7 +114,7 @@ void AudioEng_Update(void)
   int n;
   AudioEng_tState*s;
   int tick;
-  u_long vol;
+  uint32 vol;
   SNDPLAYOPTS playopts;
   u_short leftazim;
   u_short rightazim;
@@ -378,6 +378,10 @@ int AudioEng_StartUp(int player,char *carname)
   int iVar7;
   AudioEng_t *pAVar8;
   char *pcVar9;
+  const char *archiveFormat;
+  char bankPattern[] = "*.bnk";
+  char loadTablePattern[] = "*.ltb";
+  char cruiseTablePattern[] = "*.ctb";
   AudioEng_tDef *pAVar10;
   AudioEng_tDef *pAVar11;
   int iVar12;
@@ -389,8 +393,8 @@ int AudioEng_StartUp(int player,char *carname)
   int iVar17;
   char acStack_80 [64];
   int local_40;
-  long local_3c;
-  u_int local_38;
+  int local_3c;
+  int local_38;
   AudioEng_tDef *local_34;
   AudioEng_tDef *local_30 [2];
   
@@ -438,21 +442,21 @@ int AudioEng_StartUp(int player,char *carname)
   pAVar3->plypos = '\0';
   bVar1 = false;
   if (GameSetup_gData.commMode == 1) {
-    pcVar9 = "%s%sens.viv";
+    archiveFormat = "%s%sens.viv";
   }
   else {
-    pcVar9 = "%s%seng.viv";
+    archiveFormat = "%s%seng.viv";
   }
-  sprintf(acStack_80,pcVar9,Paths_Paths[28],carname);
+  sprintf(acStack_80,archiveFormat,Paths_Paths[28],carname);
   pcVar9 = (char *)loadbigfileheader(acStack_80,0x10);
   if (pcVar9 == (char *)0x0) {
     if (GameSetup_gData.commMode == 1) {
-      pcVar9 = "%sp993ens.viv";
+      archiveFormat = "%sp993ens.viv";
     }
     else {
-      pcVar9 = "%sp993eng.viv";
+      archiveFormat = "%sp993eng.viv";
     }
-    sprintf(acStack_80,pcVar9,Paths_Paths[28]);
+    sprintf(acStack_80,archiveFormat,Paths_Paths[28]);
     pcVar9 = (char *)loadbigfileheader(acStack_80,0x10);
     if (pcVar9 == (char *)0x0) goto LAB_8007c1ac;
   }
@@ -460,11 +464,11 @@ int AudioEng_StartUp(int player,char *carname)
   for (iVar15 = 0; iVar4 = bigcount(pcVar9), iVar15 < iVar4;
       iVar15 = iVar15 + 1) {
     pThis = locatebigentry(pcVar9,(char *)0x0,iVar15,&local_3c,&local_38);   /* oracle 0x8007c06c: a2=i a3=&offset stk=&size */
-    iVar4 = wildcard((u_char *)pThis,"*.bnk");
+    iVar4 = wildcard((char *)pThis,bankPattern);
     if ((iVar4 == 0) || (bVar1)) {
-      iVar4 = wildcard((u_char *)pThis,"*.ltb");
+      iVar4 = wildcard((char *)pThis,loadTablePattern);
       if ((iVar4 == 0) || (local_34 != (AudioEng_tDef *)0x0)) {
-        iVar4 = wildcard((u_char *)pThis,"*.ctb");
+        iVar4 = wildcard((char *)pThis,cruiseTablePattern);
         if ((iVar4 == 0) || (local_30[0] != (AudioEng_tDef *)0x0)) goto LAB_8007c190;
         ed = local_30;
       }
@@ -474,7 +478,7 @@ int AudioEng_StartUp(int player,char *carname)
       AudioEng_LoadDef(acStack_80,(char *)pThis,local_40,local_3c,local_38,ed);
     }
     else {
-      pdata = (char *)reservememadr(pThis,local_38,0x10);
+      pdata = (char *)reservememadr((char *)pThis,local_38,0x10);
       if (pdata != (char *)0x0) {
         bVar1 = true;
         FILE_readsync(local_40,local_3c,(intptr)pdata,local_38,0x64);   /* oracle 0x8007c0c8: a0=h a1=off a2=pdata a3=size stk=0x64 */

@@ -16,7 +16,15 @@ tScreenControllerConfig *screenControllerConfig;   /* @0x800528d0  (bss(zero)) *
 /* fn-static state gen omits -- materialized byte-exact from NFS4.EXE (Offset @0x800520d8,
    fileNames @0x800520e8 -> .rodata strings; flare_intensity = persistent accumulator). */
 static unsigned char Offset[7][2] = {{0,0},{133,117},{228,117},{130,117},{130,117},{130,117},{130,117}};
-static char *fileNames[7] = {"None","Neg","Whl","Ctrl","aCtrl","aCtrl","aCtrl"};
+static char fileNameNone[] = "None";
+static char fileNameNeg[] = "Neg";
+static char fileNameWheel[] = "Whl";
+static char fileNameController[] = "Ctrl";
+static char fileNameAnalogController[] = "aCtrl";
+static char *fileNames[7] = {fileNameNone,fileNameNeg,fileNameWheel,fileNameController,
+                            fileNameAnalogController,fileNameAnalogController,
+                            fileNameAnalogController};
+static char permanentControllerShapes[] = "zpCtrl";
 static int flare_intensity;            /* DrawForeground flare accumulator (persists) */
 
 /* ---- tScreenControllerConfig::ClearActuators  (screencontroller.cpp:41) ---- */
@@ -1151,7 +1159,7 @@ void tScreenControllerConfig::DrawForeground()
           k = (int)coord;
           if (this->fTextTypeOn < TextIndex) {
             astringpointer = TextSys_Word((int)TL[2]);
-            sprintf(string2,astringpointer);
+            sprintf(string2,"%s",astringpointer);
             howfarout = slen - k;
             coord = (short)howfarout;
             if (TL[3] == 0) {
@@ -1260,9 +1268,9 @@ void tScreenControllerConfig::GetShapeInfo(short &numPermShapes,short &numSwapSh
 
 {
   numPermShapes = 0x18;
-  *permFileName = "zpCtrl";
+  *permFileName = permanentControllerShapes;
   numSwapShapes = 0x42;
-  *swapFileName = "aCtrl";
+  *swapFileName = fileNameAnalogController;
   return;
 }
 

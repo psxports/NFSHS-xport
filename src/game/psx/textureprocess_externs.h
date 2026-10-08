@@ -4,22 +4,22 @@
     #define TEXTUREPROCESS_EXTERNS_H
 
 /* ---- globals (SYM Globals.jsonl) ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
-extern "C" extern char *Paths_Paths[50];               /* 0x80116468 */
-extern "C" BWorldSm_Pos *fogslicePos;                  /* 0x8013db8c */
-extern "C" TP_ZPaletteSystem TP_gZPaletteSystem;       /* 0x8013db78 */
-extern "C" int Fog_gNumKeys;                           /* 0x8013db7c */
-extern "C" FogKey *Fog_gHeadKey;                       /* 0x8013db88 */
-extern "C" FogKey *Fog_gCurrentKey[2];                 /* 0x8013db80 */
-extern "C" FogKey Fog_gBuf[32];                        /* 0x8012307c */
-extern "C" int openkeys[32];                           /* 0x801231fc */
-extern "C" int gZDepth;                                /* 0x8013db74 */
-extern int gNumSlices;                                 /* 0x8013c7c8 */
-extern "C" short gClutDepth[256][16];                  /* 0x8012107c */
-extern "C" extern DRender_tView gCView;                /* 0x80116f7c */
-extern "C" int Chunk_numLight;                         /* 0x8013d4ec */
-extern "C" CVECTOR *Chunk_lightTable;                  /* 0x8013c818 */
+extern "C" GameSetup_tData GameSetup_gData;      /* 0x801131ec */
+extern "C" CTrackSpec TrackSpec_gSpec;           /* 0x8012327c */
+extern "C" char *Paths_Paths[50];                /* 0x80116468 */
+extern "C" BWorldSm_Pos *fogslicePos;            /* 0x8013db8c */
+extern "C" TP_ZPaletteSystem TP_gZPaletteSystem; /* 0x8013db78 */
+extern "C" int Fog_gNumKeys;                     /* 0x8013db7c */
+extern "C" FogKey *Fog_gHeadKey;                 /* 0x8013db88 */
+extern "C" FogKey *Fog_gCurrentKey[2];           /* 0x8013db80 */
+extern "C" FogKey Fog_gBuf[32];                  /* 0x8012307c */
+extern "C" int openkeys[32];                     /* 0x801231fc */
+extern "C" int gZDepth;                          /* 0x8013db74 */
+extern int gNumSlices;                           /* 0x8013c7c8 */
+extern "C" short gClutDepth[256][16];            /* 0x8012107c */
+extern "C" DRender_tView gCView;                 /* 0x80116f7c */
+extern "C" int Chunk_numLight;                   /* 0x8013d4ec */
+extern "C" CVECTOR *Chunk_lightTable;            /* 0x8013c818 */
 
 /* ---- external subsystems (eaclib + game + PsyQ) ---- */
 extern "C"

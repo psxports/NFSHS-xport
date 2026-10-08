@@ -349,8 +349,8 @@ StatChkSave_validateCarFinish:
             slot = (uint)(ushort)nLapIndicator;
             bTopTenFlag = true;
             DummyRaceResult.nBestLap = dummyCars[*pSlot].finalBestLap;
-            *(u_long *)pRec[7].sName = *(u_long *)(DummyRaceResult.sName);
-            *(u_long *)(pRec[7].sName + 4) = *(u_long *)(DummyRaceResult.sName + 4);
+            *(uint32 *)pRec[7].sName = *(uint32 *)(DummyRaceResult.sName);
+            *(uint32 *)(pRec[7].sName + 4) = *(uint32 *)(DummyRaceResult.sName + 4);
             pRec[7].nCar = DummyRaceResult.nCar;
             pRec[7].nTime = k;
             pRec[7].nBestLap = DummyRaceResult.nBestLap;
@@ -391,8 +391,8 @@ StatChkSave_validateCarFinish:
             k = 0;
             playerName = PlayerName((int)nRankCarTotalTimes[idx]);
             strcpy(DummyRaceResult.sName,playerName);
-            *(u_long *)pRec[7].sName = *(u_long *)(DummyRaceResult.sName);
-            *(u_long *)(pRec[7].sName + 4) = *(u_long *)(DummyRaceResult.sName + 4);
+            *(uint32 *)pRec[7].sName = *(uint32 *)(DummyRaceResult.sName);
+            *(uint32 *)(pRec[7].sName + 4) = *(uint32 *)(DummyRaceResult.sName + 4);
             pRec[7].nCar = DummyRaceResult.nCar;
             pRec[7].nTime = DummyRaceResult.nTime;
             pRec[7].nBestLap = DummyRaceResult.nBestLap;

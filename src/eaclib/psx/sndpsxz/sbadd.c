@@ -10,7 +10,7 @@
 
 extern "C" int sndgs[];
 extern "C" int iSNDbankalloc(void);                                 /* sballoc */
-extern "C" void SNDbankremove(void);                                /* sbremove (the @0x80147860[0x1f] exit hook) */
+extern "C" void SNDbankremove(int bankId);                          /* sbremove (the @0x80147860[0x1f] exit hook) */
 extern "C" int iSNDdownloadbank(intptr bankData, intptr bankData2); /* sbdload */
 
 extern "C" int SNDbankadd(int *bank_out, intptr bankData); /* @0x800E7DEC */

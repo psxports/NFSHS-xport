@@ -22,13 +22,13 @@
 struct MemBlock;
 struct MemClass;
 
-extern "C" MemClass *gMemClassTable[16];                                                                                            /* @0x8013E900 */
-extern "C" void FREE_add(MemClass *cls, MemBlock *node);                                                                            /* @0x800E4E70 */
-extern "C" void FREE_remove(MemClass *cls, MemBlock *node);                                                                         /* @0x800E4F04 */
-extern "C" int initmemblock(MemBlock *blk, char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext); /* @0x800E4F2C */
-extern "C" int MEM_tailsize(char *name, int id);                                                                                    /* @0x800E5030 */
-extern "C" char *getblockname(void *p);                                                                                             /* @0x800E52E0 */
-extern "C" void blockmove(void *src, void *dst, int n);                                                                             /* @0x800E62DC */
+extern "C" MemClass *gMemClassTable[16];                                                                                                  /* @0x8013E900 */
+extern "C" void FREE_add(MemClass *cls, MemBlock *node);                                                                                  /* @0x800E4E70 */
+extern "C" void FREE_remove(MemClass *cls, MemBlock *node);                                                                               /* @0x800E4F04 */
+extern "C" int initmemblock(MemBlock *blk, const char *name, int size, int tailextra, int flags, MemBlock *physprev, MemBlock *physnext); /* @0x800E4F2C */
+extern "C" int MEM_tailsize(const char *name, int id);                                                                                    /* @0x800E5030 */
+extern "C" char *getblockname(void *p);                                                                                                   /* @0x800E52E0 */
+extern "C" void blockmove(void *src, void *dst, int n);                                                                                   /* @0x800E62DC */
 
 extern "C" void *resizememadr(void *userptr, int newsize) /* @0x800F1950 */
 {

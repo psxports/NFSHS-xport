@@ -15,7 +15,7 @@
 #include "../../../nfs4_types.h"
 
 extern "C" unsigned int geti(void *p, char nbits);     /* getm */
-extern "C" int shapedepth(unsigned char *shape);       /* shpdepth */
+extern "C" int shapedepth(const void *shapeData);      /* shpdepth */
 extern "C" int decodeansi(unsigned char **cursor);     /* textcode */
 extern "C" int decodeshiftjis(unsigned char **cursor); /* isqrttbl (obj name misnomer) */
 extern "C" void blockclear(void *dst, int n);          /* blkfill */

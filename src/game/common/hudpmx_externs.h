@@ -5,20 +5,20 @@
     #define HUDPMX_EXTERNS_H
 
 /* ---- cross-TU globals ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData; /* gmesetup.obj */
-extern dashhud_info DashHUD_gInfo;                     /* dashHUD.obj */
-extern "C" extern "C" char *Paths_Paths[50];           /* paths.obj */
-extern "C" u_short gFontClut;                          /* font.obj */
-extern char *Track_gShapeNamePtrs[];                   /* track.obj (shape-name ptr list) */
-extern char *Track_gShapeNamePtrs_end[];
-extern char *_Track_gShapeNamePtrs_end[];
-extern char *Track_gTachNamePtrs[];    /* track.obj (tachometer name ptrs) */
-extern char *gShapeNamePtrs_subList[]; /* track.obj */
+extern "C" GameSetup_tData GameSetup_gData; /* gmesetup.obj */
+extern dashhud_info DashHUD_gInfo;          /* dashHUD.obj */
+extern "C" char *Paths_Paths[50];           /* paths.obj */
+extern "C" u_short gFontClut;               /* font.obj */
+extern const char *Track_gShapeNamePtrs[];  /* track.obj (shape-name ptr list) */
+extern const char *Track_gShapeNamePtrs_end[];
+extern const char *_Track_gShapeNamePtrs_end[];
+extern const char *Track_gTachNamePtrs[];    /* track.obj (tachometer name ptrs) */
+extern const char *gShapeNamePtrs_subList[]; /* track.obj */
 
 /* ---- cross-TU fns ---- */
 extern "C"
 {
-    extern void Font_LoadFont(char *buf, int w, int h, int flag); /* font.obj */
+    extern int Font_LoadFont(char *buf, int w, int h, int flag); /* font.obj */
 }
 extern "C"
 {
@@ -26,7 +26,7 @@ extern "C"
 }
 extern "C"
 {
-    extern int Texture_LoadPmx(char *a, char *b, int c, int d, int e, int f, int g, Draw_tPixMap *pm); /* texture.obj */
+    extern void Texture_LoadPmx(char *a, char *b, int c, int d, int e, int f, int g, Draw_tPixMap *pm); /* texture.obj */
 }
 extern void Texture_ResetPaletteSharing(void); /* texture.obj */
                                                /* eaclib EACPSXZ locatshp */

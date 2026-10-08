@@ -138,7 +138,7 @@ void AIHigh_Player::SetupBlockade()
 
   int iVar7;
 
-  int (*pcVar8)(...);
+  void (*pcVar8)(MobileSpeaker *);
 
   Car_tObj *pCVar9;
 
@@ -644,9 +644,9 @@ LAB_800620e8: ;   /* empty stmt: gcc2.7.2 label before brace */
 
         pSVar5 = (Speaker *)Speech_Mobile(pAVar18->carObj_);
 
-        sVar1 = *(short *)(pSVar5->_vf[2] + 0x12);
+        sVar1 = (*pSVar5->_vf)[10].delta;
 
-        pcVar8 = *(int (**)(...))(pSVar5->_vf[2] + 0x16);
+        pcVar8 = (void (*)(MobileSpeaker *))(*pSVar5->_vf)[10].pfn;
 
       }
 
@@ -654,35 +654,34 @@ LAB_800620e8: ;   /* empty stmt: gcc2.7.2 label before brace */
 
         pSVar5 = (Speaker *)Speech_Mobile(pAVar18->carObj_);
 
-        sVar1 = *(short *)(pSVar5->_vf[2] + 0x1a);
+        sVar1 = (*pSVar5->_vf)[11].delta;
 
-        pcVar8 = *(int (**)(...))(pSVar5->_vf[2] + 0x1e);
+        pcVar8 = (void (*)(MobileSpeaker *))(*pSVar5->_vf)[11].pfn;
 
       }
 
-      (*pcVar8)((int)&(pSVar5->fPosition).flags + (int)sVar1);
+      (*pcVar8)((MobileSpeaker *)((char *)pSVar5 + sVar1));
 
       pSVar5 = (Speaker *)Speech_Mobile(pAVar18->carObj_);
 
-      (**(int (**)(...))(pSVar5->_vf[1] + 0x15))
-
-                ((int)&(pSVar5->fPosition).flags + (int)*(short *)(pSVar5->_vf[1] + 0x11),
-
-                 (this->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
-
-      pSVar5 = (Speaker *)Speech_Dispatch();
-
-      (**(int (**)(...))(pSVar5->_vf[1] + 5))
-
-                ((int)&(pSVar5->fPosition).flags + (int)*(short *)(pSVar5->_vf[1] + 1));
+      {
+        const __vtbl_ptr_type &entry = (*pSVar5->_vf)[6];
+        ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar5 + entry.delta), (this->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
+      }
 
       pSVar5 = (Speaker *)Speech_Dispatch();
 
-      (**(int (**)(...))(pSVar5->_vf[1] + 0xd))
+      {
+        const __vtbl_ptr_type &entry = (*pSVar5->_vf)[4];
+        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar5 + entry.delta));
+      }
 
-                ((int)&(pSVar5->fPosition).flags + (int)*(short *)(pSVar5->_vf[1] + 9),
+      pSVar5 = (Speaker *)Speech_Dispatch();
 
-                 pAVar18->carObj_);
+      {
+        const __vtbl_ptr_type &entry = (*pSVar5->_vf)[5];
+        ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar5 + entry.delta), pAVar18->carObj_);
+      }
 
     }
 
@@ -794,9 +793,11 @@ LAB_80062328:
 
   pa_Var1 = (this->_base_AIHigh_BasicPerp)._base_AIHigh_Base._vf;
 
-  (**(int (**)(...))(pa_Var1[9] + 1))
-
-            ((int)(this->_base_AIHigh_BasicPerp).positionVSCopList_ + *(short *)pa_Var1[8] + -0x1c);
+  {
+    const __vtbl_ptr_type &entry = ((__vtbl_ptr_type *)pa_Var1)[3];
+    ((void (NFS4_THISCALL *)(void *))entry.pfn)
+        ((char *)&this->_base_AIHigh_BasicPerp._base_AIHigh_Base + entry.delta);
+  }
 
   if ((this->_base_AIHigh_BasicPerp).basicPerpInfo_.crime_ == 0) goto LAB_8006249c;
 
@@ -1004,9 +1005,10 @@ LAB_800625d0:
 
   pSVar1 = (Speaker *)Speech_Mobile(Cars_gList[iVar2]);
 
-  (**(int (**)(...))(pSVar1->_vf[2] + 0xe))
-
-            ((int)&(pSVar1->fPosition).flags + (int)*(short *)(pSVar1->_vf[2] + 10),iVar3);
+  {
+    const __vtbl_ptr_type &entry = (*pSVar1->_vf)[9];
+    ((void (*)(MobileSpeaker *, int))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta), iVar3);
+  }
 
   return;
 

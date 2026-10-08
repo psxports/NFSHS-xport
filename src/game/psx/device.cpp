@@ -11,11 +11,11 @@ int Device_Fail(int port);
 void Device_Update(void);
 void Device_StartUp(void);
 void Device_SetHardCodedKeys(void);
-int Device_PSXPad(u_long param);
-void * Device_ReadPad(int port,u_long param);
-int Device_PSXPadMulti(u_long param);
-int Device_Analog(u_long param);
-int Device_Null(u_long param);
+int Device_PSXPad(uint32 param);
+void * Device_ReadPad(int port,uint32 param);
+int Device_PSXPadMulti(uint32 param);
+int Device_Analog(uint32 param);
+int Device_Null(uint32 param);
 
 
 /* ---- Device_VerifyType__Fi  [DEVICE.CPP:51-66] SLD-VERIFIED ---- */
@@ -136,7 +136,7 @@ void Device_SetHardCodedKeys(void)
 }
 
 /* ---- Device_PSXPad__FUl  [DEVICE.CPP:244-250] SLD-VERIFIED ---- */
-int Device_PSXPad(u_long param)
+int Device_PSXPad(uint32 param)
 
 {
   int iVar1;
@@ -151,7 +151,7 @@ int Device_PSXPad(u_long param)
 }
 
 /* ---- Device_ReadPad__FiUl  [DEVICE.CPP:261-302] SLD-VERIFIED ---- */
-void * Device_ReadPad(int port,u_long param)
+void * Device_ReadPad(int port,uint32 param)
 
 {
   int iVar1;
@@ -219,7 +219,7 @@ DevReadPad_negconPath:
 }
 
 /* ---- Device_PSXPadMulti__FUl  [DEVICE.CPP:306-342] SLD-VERIFIED ---- */
-int Device_PSXPadMulti(u_long param)
+int Device_PSXPadMulti(uint32 param)
 
 {
   void *pvVar1;
@@ -261,7 +261,7 @@ int Device_PSXPadMulti(u_long param)
 }
 
 /* ---- Device_Analog__FUl  [DEVICE.CPP:352-384] SLD-VERIFIED ---- */
-int Device_Analog(u_long param)
+int Device_Analog(uint32 param)
 
 {
   int iVar1;
@@ -319,7 +319,7 @@ DevAnalog_scaledByteCalc:
 }
 
 /* ---- Device_Null__FUl  [DEVICE.CPP:393-394] SLD-VERIFIED ---- */
-int Device_Null(u_long param)
+int Device_Null(uint32 param)
 
 {
   return 0;

@@ -5,11 +5,11 @@
 #include "../../lib/libfns.h"
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 extern tFEApplication *FEApp;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" tPadModuleState gPadinfo;
 extern "C" int ticks;
 extern short MENUUSERNAME_STARTY; /* @0x800529b2 ScreenUserName.obj-owned (cross-TU) */
-extern "C" extern "C" char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern tGlobalMenuDefs *menuDefs;
 /* class vtables (FeMenuOptions.obj-defined subclasses) */
 extern __vtbl_ptr_type tMenuItemGoToMenuButtonFade_vtable[], tMenuItemLeftRightFade_vtable[], tOptionsMenu_vtable[], tInsideBoxMenu_vtable[], tMenuItemSlidingMenu_vtable[], tMenuItemSlidingActivated_vtable[], tMenuItemDisplayLeftRightChoice_vtable[], tMenuItemOnOffLeftRightChoice_vtable[], tMenuItemLeftRightAudioSlider_vtable[], tInsideBoxSongMenu_vtable[], tMenuItemControllerLeftRightChoice_vtable[], tInsideBoxLeftRightSlider_vtable[], tInsideBoxTwoWaySlider_vtable[], tUserNameMenuItem_vtable[], tMemoryCardMenuItem_vtable[], tInsideBoxControllerLeftRightSlider_vtable[];
@@ -59,12 +59,12 @@ extern "C"
 }
 extern "C"
 {
-    void FETextRender_WordWrapTextRGBJustify(char *, PSX_RECT &, int, int, int, bool);
+    int FETextRender_WordWrapTextRGBJustify(char *, PSX_RECT &, int, int, int, bool);
 }
 extern "C"
 {
-    int CalcTextFadeSelToHi(...);
-    int CalcTextFadeUnselToSel(...);
+    int CalcTextFadeSelToHi(tMenuTextType type, short fSelFade, short fFade);
+    int CalcTextFadeUnselToSel(tMenuTextType type, short fSelFade, short fFade);
 }
 extern "C"
 {
@@ -72,14 +72,14 @@ extern "C"
 }
 extern "C"
 {
-    void AudioMus_SysStartUp(...);
-    void AudioMus_SysCleanUp(...);
-    void AudioMus_StopSong(...);
-    void AudioMus_PlaySong(...);
+    void AudioMus_SysStartUp(int buffersize, int spusize, const char *songs);
+    void AudioMus_SysCleanUp(void);
+    void AudioMus_StopSong(int fadeticks);
+    int AudioMus_PlaySong(char *pattern);
 }
 extern "C"
 {
-    int AudioMus_GetSongList(...);
+    AudioMus_tSongList *AudioMus_GetSongList(char *pattern, int memtype);
     void AudioMus_Volume(int);
 }
 extern "C"
@@ -113,7 +113,7 @@ extern short _UNK_80010a02, _UNK_80010a06, _UNK_80010a0a;
 extern "C"
 {
     void FeMenuOptions_drawLeftFlareOut(int, int, int);
-    void FeAudio_AsyncPlaySpeech(...);
+    short FeAudio_AsyncPlaySpeech(int type, int index);
 }
 extern "C"
 {

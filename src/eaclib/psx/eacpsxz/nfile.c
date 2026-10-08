@@ -141,7 +141,7 @@ extern "C" int FILE_operror(unsigned int id)
 }
 
 /* the FILE system backend (allocator + device init) */
-extern "C" void *reservememadr(char *name, int size, int classid);                        /* eacpsxz @0x800E533C */
+extern "C" void *reservememadr(const char *name, int size, int classid);                  /* eacpsxz @0x800E533C */
 extern "C" int FILE_initwithmem(int handlecount, int memsize, int opcount, void *membuf); /* below (todo) */
 
 /* FILE_init @0x800EBBF4 : bring the FILE system up, allocating its own pool ("File Sys"). */
@@ -222,7 +222,7 @@ extern "C" char *strncpy(char *d, const char *s, int n); /* libc */
 #endif
 extern "C" void iFILE_perror(void);          /* @0x800ED0D4 (below) */
 extern "C" int iFILE_ExecCommand(void *cmd); /* @0x800ECB98 (below, todo) */
-extern "C" int systemtask(int);              /* @0x800E6C04 vsync/idle pump */
+extern "C" unsigned int systemtask(int);     /* @0x800E6C04 vsync/idle pump */
 
 #define OPI(op, off) (*(int *)((char *)(op) + (off)))   /* int  field at byte offset */
 #define OPP(op, off) (*(void **)((char *)(op) + (off))) /* ptr  field at byte offset */
@@ -420,7 +420,7 @@ extern "C" void FILE_priorityop(unsigned int id, int priority)
 
 /* FILE device backend (other objs) + the manager init's CD/file-io bring-up. */
 extern "C" int CD_Init(int handlecount, int memsize, void *iomem, void (*cb)(void)); /* @0x800FA394 */
-extern "C" void initfileio(void);                                                    /* @0x800F3A34 */
+extern "C" int initfileio(void);                                                     /* @0x800F3A34 */
 extern "C" int iFILE_CommandCompleteCallback(int result);                            /* @0x800ED020 (below) */
 extern "C" int disablecd;                                                            /* global: nonzero == CD backend off */
 
@@ -454,7 +454,7 @@ extern "C" int FILE_initwithmem(int handlecount, int memsize, int opcount, void 
     return 1;
 }
 
-extern "C" void stopreadfile(int dev); /* @0x800F4100 abort an in-flight read on a device */
+extern "C" int stopreadfile(int dev); /* @0x800F4100 abort an in-flight read on a device */
 
 /* FILE_cancelop @0x800EC008 : cancel the op named by `id` (no-op for close/type-10 ops or stale ids).
  *   - if the op is the one currently being dispatched (mgr.curop): flag op->cancelreq=1, and if it is a
@@ -588,7 +588,7 @@ extern "C" int iFILE_CommandCompleteCallback(int result)
 /* ---- BIG-archive (.BIG) mount: FILE_addbig + its open/read completion callbacks ---- */
 #include <stddef.h> /* size_t (target-faithful ptr<->int casts) */
 
-extern "C" void purgememadr(void *p);                   /* eacpsxz @0x800E5540 : free a reservememadr block */
+extern "C" int purgememadr(void *p);                    /* eacpsxz @0x800E5540 : free a reservememadr block */
 extern "C" int typeofbigfile(void *hdr);                /* eacpsxz @0x800E5F1C : archive type from header  */
 extern "C" int sizeofbigfileheader(void *hdr);          /* eacpsxz @0x800E5F84 : full header byte size      */
 extern "C" int getblocksize(void *hdr);                 /* eacpsxz @0x800E52D4 : bytes valid in the buffer  */
@@ -771,12 +771,12 @@ extern "C" unsigned int FILE_delbig(int delHandle, unsigned int a2, unsigned int
 }
 
 /* ---- the device backend (fileio.obj @0x800F3xxx) + string helpers used by the dispatcher ---- */
-extern "C" int openfile(char *name, int flags, void *handle);                                       /* @0x800F3BE0 */
-extern "C" int closefile(int dev);                                                                  /* @0x800F3E84 */
-extern "C" int readfile(int dev, int dest, int offset, int len);                                    /* @0x800F3EE0 (async; completes via CD cb) */
-extern "C" int writefile(int dev, int buf, int offset, int len);                                    /* @0x800F4020 (async) */
-extern "C" int getfilesize(int dev);                                                                /* @0x800F409C */
-extern "C" int locatebigentryz(void *bighdr, char *entry, int flags, int *outOffset, int *outSize); /* @0x800E5FFC */
+extern "C" int openfile(char *name, int flags, void *handle);                                             /* @0x800F3BE0 */
+extern "C" int closefile(int dev);                                                                        /* @0x800F3E84 */
+extern "C" int readfile(int dev, int dest, int offset, int len);                                          /* @0x800F3EE0 (async; completes via CD cb) */
+extern "C" int writefile(int dev, int buf, int offset, int len);                                          /* @0x800F4020 (async) */
+extern "C" int getfilesize(int dev);                                                                      /* @0x800F409C */
+extern "C" int locatebigentryz(void *bighdr, const char *entry, int flags, int *outOffset, int *outSize); /* @0x800E5FFC */
 #ifndef _MSC_VER
 extern "C" char *strchr(const char *s, int c); /* @0x800F6214 */
 #endif

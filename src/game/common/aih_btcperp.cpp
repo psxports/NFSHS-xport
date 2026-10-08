@@ -325,9 +325,10 @@ void AIHigh_BTC_Perp::HandlePullOver()
 
         pSVar3 = (Speaker *)Speech_Mobile((Car_tObj *)0x0);
 
-        (**(int (**)(...))(pSVar3->_vf[1] + 0x1d))
-
-                  ((int)&(pSVar3->fPosition).flags + (int)*(short *)(pSVar3->_vf[1] + 0x19));
+        {
+          const __vtbl_ptr_type &entry = (*pSVar3->_vf)[7];
+          ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar3 + entry.delta));
+        }
 
       }
 
@@ -790,33 +791,31 @@ void AIHigh_BTC_HumanPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
 
   pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-  (**(int (**)(...))(pSVar4->_vf[4] + 8))
-
-            ((int)&(pSVar4->fPosition).flags + (int)*(short *)(pSVar4->_vf[4] + 4));
+  {
+    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[16];
+    ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta));
+  }
 
   pSVar4 = (Speaker *)Speech_Dispatch();
 
-  (**(int (**)(...))(*pSVar4->_vf + 0xc))
-
-            ((int)&(pSVar4->fPosition).flags + (int)*(short *)(*pSVar4->_vf + 8),
-
-             (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
-
-  pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
-
-  (**(int (**)(...))(*pSVar4->_vf + 0xc))
-
-            ((int)&(pSVar4->fPosition).flags + (int)*(short *)(*pSVar4->_vf + 8),
-
-             (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  {
+    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[1];
+    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar4 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  }
 
   pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-  (**(int (**)(...))(pSVar4->_vf[1] + 0x15))
+  {
+    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[1];
+    ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  }
 
-            ((int)&(pSVar4->fPosition).flags + (int)*(short *)(pSVar4->_vf[1] + 0x11),
+  pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-             (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  {
+    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[6];
+    ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  }
 
   TrgSfx_RestartTrgSfx();
 
@@ -1363,11 +1362,10 @@ void AIHigh_BTC_AIPerp::HighExecute()
 
           pSVar2 = (Speaker *)Speech_Mobile((((this->_base_AIHigh_BTC_Perp).originalActivationCop_)->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-          (**(int (**)(...))(*pSVar2->_vf + 0xc))
-
-                    ((int)&(pSVar2->fPosition).flags + (int)*(short *)(*pSVar2->_vf + 8),
-
-                     (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+          {
+            const __vtbl_ptr_type &entry = (*pSVar2->_vf)[1];
+            ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+          }
 
         }
 
@@ -1411,11 +1409,10 @@ void AIHigh_BTC_AIPerp::HighExecute()
 
           pSVar2 = (Speaker *)Speech_Mobile((((this->_base_AIHigh_BTC_Perp).originalActivationCop_)->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-          (**(int (**)(...))(pSVar2->_vf[1] + 0x15))
-
-                    ((int)&(pSVar2->fPosition).flags + (int)*(short *)(pSVar2->_vf[1] + 0x11),
-
-                     (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+          {
+            const __vtbl_ptr_type &entry = (*pSVar2->_vf)[6];
+            ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+          }
 
           Camera_ResetRelPos(3);
 
@@ -1551,11 +1548,10 @@ switchD_8006094c_default:
 
         pSVar2 = (Speaker *)Speech_Mobile((((this->_base_AIHigh_BTC_Perp).originalActivationCop_)->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
-        (**(int (**)(...))(*pSVar2->_vf + 0xc))
-
-                  ((int)&(pSVar2->fPosition).flags + (int)*(short *)(*pSVar2->_vf + 8),
-
-                   (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+        {
+          const __vtbl_ptr_type &entry = (*pSVar2->_vf)[1];
+          ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+        }
 
       }
 
@@ -1971,17 +1967,17 @@ void AIHigh_BTC_AIPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
 
   pSVar6 = (Speaker *)Speech_Mobile(carObj);
 
-  (**(int (**)(...))(pSVar6->_vf[4] + 8))
-
-            ((int)&(pSVar6->fPosition).flags + (int)*(short *)(pSVar6->_vf[4] + 4));
+  {
+    const __vtbl_ptr_type &entry = (*pSVar6->_vf)[16];
+    ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar6 + entry.delta));
+  }
 
   pSVar6 = (Speaker *)Speech_Dispatch();
 
-  (**(int (**)(...))(*pSVar6->_vf + 0xc))
-
-            ((int)&(pSVar6->fPosition).flags + (int)*(short *)(*pSVar6->_vf + 8),
-
-             (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  {
+    const __vtbl_ptr_type &entry = (*pSVar6->_vf)[1];
+    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar6 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+  }
 
   TrgSfx_RestartTrgSfx();
 

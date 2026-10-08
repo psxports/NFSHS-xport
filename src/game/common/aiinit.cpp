@@ -466,13 +466,15 @@ void AIInit_DeInitAICar(Car_tObj *carObj)
   pAVar2 = carObj->curveSpeedTable;
   if (pAVar2 != (AIDataRecord_CurveSpeedTable_t *)0x0) {
     pa_Var1 = (pAVar2->_base_AIDataRecord_t)._vf;
-    (**(int (**)(...))(pa_Var1 + 4))((pAVar2->_base_AIDataRecord_t).name_ + *(short *)(pa_Var1[2] + 2) + -8,3);
+    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
+        ((char *)pAVar2 + (*pa_Var1)[1].delta,3);
     carObj->curveSpeedTable = (AIDataRecord_CurveSpeedTable_t *)0x0;
   }
   pAVar3 = carObj->accelerationRecord;
   if (pAVar3 != (AIDataRecord_AccTable_t *)0x0) {
     pa_Var1 = pAVar3->_vf;
-    (**(int (**)(...))(pa_Var1 + 4))(pAVar3->name_ + *(short *)(pa_Var1[2] + 2) + -8,3);
+    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
+        ((char *)pAVar3 + (*pa_Var1)[1].delta,3);
     carObj->accelerationRecord = (AIDataRecord_AccTable_t *)0x0;
   }
   return;

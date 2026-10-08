@@ -263,10 +263,11 @@ void tScreenAudio::GetShapeInfo(short &numPermShapes,short &numSwapShapes,char *
                char **swapFileName)
 
 {
+  static char audioShapeFile[] = "zAudio";
   numSwapShapes = 0;
   *swapFileName = (char *)0x0;
   numPermShapes = 0x34;
-  *permFileName = "zAudio";
+  *permFileName = audioShapeFile;
   return;
 }
 

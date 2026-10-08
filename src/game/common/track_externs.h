@@ -12,7 +12,7 @@ extern "C" CTrackSpec TrackSpec_gSpec;
 extern "C" CVECTOR *Chunk_lightTable;
 extern "C" Chunk *Track_chunkList;
 extern "C" Draw_tPixMap Track_gReflectionMaps[4];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Group *gPersistMidgroundObjInst;
 extern "C" Group *gPersistObjDefBoundingSpheres;
 extern "C" Group *gPersistObjInst;
@@ -20,7 +20,7 @@ extern "C" Sim_tSimGlobalVar simGlobal; /* 0x8011e0ac */
 extern "C" Track_tArtresource gInitialArt;
 extern "C" Track_tMaterial *Track_materials;
 extern "C" Trk_ObjectDef **Track_gObjDefs;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern coorddef *Chunk_chunkCenters;
 extern "C" int Chunk_numLight; /* 0x8013d4ec */
 extern "C" short *Track_gInViewList;
@@ -40,7 +40,7 @@ extern "C"
 extern void BWorldSm_DeInit(void);
 extern "C"
 {
-    extern void BWorldSm_Init(Group *);
+    extern int BWorldSm_Init(Group *);
 }
 extern void Chunk_DeInit(void);
 extern void Chunk_Init(void);

@@ -5,11 +5,11 @@
 #include "../../lib/libfns.h"
 
 /* --- globals --- */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tTournamentManager tournamentManager;
 extern tGlobalMenuDefs *menuDefs;
 extern "C" int ticks;
-extern "C" extern tTexture_ShapeInfo *gCurrentShapes;
+extern "C" tTexture_ShapeInfo *gCurrentShapes;
 extern "C" tPadModuleState gPadinfo;
 
 /* --- data owned by ScreenTrophyRoom.obj (EXT linkage) --- */

@@ -17,11 +17,11 @@
 
 #include "../../../mips_semantics.h"
 
-extern "C" int shapedepth(unsigned char *shape); /* shpdepth */
-extern "C" int drawpending;                      /* primate */
+extern "C" int shapedepth(const void *shapeData); /* shpdepth */
+extern "C" int drawpending;                       /* primate */
 
 extern "C" unsigned int checkrect(PSX_RECT *rect);                                        /* @0x800F6934 */
-extern "C" int vramimage(PSX_RECT *rect, u_long *data);                                   /* @0x800F6960 */
+extern "C" int vramimage(PSX_RECT *rect, uint32 *data);                                   /* @0x800F6960 */
 extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, short clutY); /* @0x800F69A8 */
 
 /* checkrect @0x800F6934 : if the PSX_RECT is flagged (+4 bit0), set bit0 of the +6 word.  Returns the +4 flag. */
@@ -37,7 +37,7 @@ extern "C" unsigned int checkrect(PSX_RECT *rect)
 }
 
 /* vramimage @0x800F6960 : pre-check the PSX_RECT, DMA `data` into VRAM, mark a draw as pending.  Returns 1. */
-extern "C" int vramimage(PSX_RECT *rect, u_long *data)
+extern "C" int vramimage(PSX_RECT *rect, uint32 *data)
 {
     checkrect(rect);
     LoadImagePSX(rect, data);
@@ -59,7 +59,7 @@ extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, shor
 
     do
     {
-        u_long *data;
+        uint32 *data;
         int count = (short)c[1];
         int i;
         unsigned char *src;
@@ -81,11 +81,11 @@ extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, shor
                         dst = dst + 1;
                     } while (i < count);
                 }
-                data = (u_long *)clut22;
+                data = (uint32 *)clut22;
                 break;
 
             case 0x23: /* raw CLUT words */
-                data = (u_long *)(c + 4);
+                data = (uint32 *)(c + 4);
                 break;
 
             case 0x24: /* CLUT, 8->5 bit via >>3 */
@@ -105,7 +105,7 @@ extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, shor
                         dst = dst + 1;
                     } while (i < count);
                 }
-                data = (u_long *)clut24;
+                data = (uint32 *)clut24;
                 break;
 
             case 0x40:
@@ -124,7 +124,7 @@ extern "C" void vramfxya(void *shapep, short imgX, short imgY, short clutX, shor
                     w = bits + 0x1e;
                 rect.w = (short)(w >> 4); /* width in 16-bit VRAM words */
                 rect.h = *(short *)((unsigned char *)c + 6);
-                data = (u_long *)(c + 4);
+                data = (uint32 *)(c + 4);
                 vramimage(&rect, data);
             }
                 goto walk;

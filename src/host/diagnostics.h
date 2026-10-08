@@ -15,9 +15,9 @@
     #define NFSHS_DIAGNOSTICS 1
 #endif
 #if NFSHS_DIAGNOSTICS
-    #define NFSHS_DIAGNOSTIC_CALL(...) __VA_ARGS__
+    #define NFSHS_DIAGNOSTIC_CALL(arg0) arg0
 #else
     /* Arguments are deliberately not evaluated in Release. */
-    #define NFSHS_DIAGNOSTIC_CALL(...) ((void)0)
+    #define NFSHS_DIAGNOSTIC_CALL(arg0) ((void)0)
 #endif
 #endif

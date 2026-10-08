@@ -6,8 +6,8 @@
 #include "../../../lib/snd.h"
 
 extern "C" int sndgs[];
-extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);     /* sst */
-extern "C" void SNDautovol(int chan, int steps, int targetVol); /* sautovol */
+extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);                 /* sst */
+extern "C" int SNDautovol(unsigned int tag, unsigned int rate, int target); /* sautovol */
 
 extern "C" int SNDSTRM_autovol(int tag, int steps, int vol); /* @0x800E9DE8 */
 

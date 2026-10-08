@@ -64,9 +64,9 @@ extern "C" void *gPreLoadTicks;       /* @0x80148040 (fn-ptr) */
 /* sibling-obj dependencies */
 extern "C" int iSNDpsxmalloc(int size);                                                                     /* sdmemman */
 extern "C" void iSNDpsxfree(int spuAddr);                                                                   /* sdmemman */
-extern "C" void iSNDpsxdisablespuirq(void);                                                                 /* sdspuirq */
-extern "C" void iSNDpsxenablespuirq(void);                                                                  /* sdspuirq */
-extern "C" void InterruptCallback(void);                                                                    /* syslib INTR */
+extern "C" int iSNDpsxdisablespuirq(void);                                                                  /* sdspuirq */
+extern "C" int iSNDpsxenablespuirq(void);                                                                   /* sdspuirq */
+extern "C" void *InterruptCallback(int interrupt, void *callback);                                          /* syslib INTR */
 extern "C" intptr iSNDpacketget(int p, int chanIdx, int *frameSizeOut);                                     /* spktplay */
 extern "C" unsigned int iSNDpacketfreeframes(int p, int chanIdx, int bytes);                                /* spktplay */
 extern "C" void iSNDstreamhotroddatachunks(void);                                                           /* sst */
@@ -79,6 +79,7 @@ extern "C" void trap(unsigned int code);                                        
 /* forward decls (mutually referential within this obj) */
 extern "C" void iSNDpacketgetirq(void);
 extern "C" void iSNDpacketsetirq(void);
+extern "C" void iSNDpacketirqcallback(void);
 extern "C" int iSNDfillspuwithpackets(int p, int chunk);
 extern "C" unsigned int iSNDpacketpurgeframes(int p, unsigned int byteoff, int count);
 extern "C" void iSNDpsxpacketstop(void *voice);
@@ -164,7 +165,7 @@ extern "C" void iSNDpacketsetirq(void)
 #if !defined(AP_WIN)
                 *(short *)(DAT_80147e2c + 0x1a4) = (short)((ctx->spuAddr + 8) >> 3);
 #endif
-                InterruptCallback();
+                InterruptCallback(9, (void *)iSNDpacketirqcallback);
                 iSNDpsxenablespuirq();
                 return;
             }

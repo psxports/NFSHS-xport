@@ -9,7 +9,7 @@ void Input_Update__Fv(void);                          /* :104 */
 void Input_Store__Fv(void);                           /* :436 */
 void Input_Fetch__Fi(int humanIndex);                 /* :456 */
 char Input_Gear__Fci(char currentGear, int numGears); /* :466 */
-int Input_Interface__FUli(u_long key, int debounce);  /* :488 */
+int Input_Interface__FUli(uint32 key, int debounce);  /* :488 */
 int Input_MainExitKey__Fv(void);                      /* :543 */
 
 #endif /* _GAME_COMMON_INPUT_H_ */

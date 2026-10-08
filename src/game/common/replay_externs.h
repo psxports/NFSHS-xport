@@ -29,11 +29,11 @@ extern int gNumSlices;                           /* 0x8013c7c8 */
 extern "C" Sim_tSimGlobalVar simGlobal; /* 0x8011e0ac */
 extern "C" Sim_tSimSystemVar simVar;    /* 0x8011e0c4 */
 extern Car_tObj *Cars_gHumanRaceCarList[2];
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern Input_tResults Input_gSim; /* per-frame fetched controller state */
 extern "C" int StatsTimer[2];
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
-extern "C" extern char *Paths_Paths[]; /* 0x80116468 */
+extern "C" GameSetup_tData GameSetup_gData;
+extern "C" char *Paths_Paths[]; /* 0x80116468 */
 
 /* ---- functions ---- */
 extern void Input_Fetch(int car);

@@ -7,26 +7,27 @@
 
 extern "C"
 {
-    char *Platform_GetDCTBuffer(...);
+    char *Platform_GetDCTBuffer(int size, const char *string);
     void Platform_ResetDCTBuffer();
 }
 extern "C" CVECTOR *Chunk_lightTable;
-extern Car_tObj *Cars_gTrafficCarList[];
+extern Car_tObj *Cars_gList[9];
+extern Car_tObj *Cars_gCopCarList[9];
 extern "C" Chunk *Track_chunkList;
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" CTrackSpec TrackSpec_gSpec;
 extern Group *Object_customSFXInst; /* 0x8013d2d0 */
 extern "C" Group *gPersistObjDef;   /* track.obj */
 extern "C" MATRIX &Render_gWorldMat, &Render_gNightMat;
 extern Trk_NewSlice *BWorldSm_slices;
 extern camera_info Camera_gInfo[2]; /* camera.obj */
-extern char *Track_MakeTrackDataPathName(char *ext);
-extern char *Track_MakeTrackPathName(char *ext);
+extern char *Track_MakeTrackDataPathName(const char *ext);
+extern char *Track_MakeTrackPathName(const char *ext);
 extern char Night_gDrawLightning;
 extern coorddef *Chunk_chunkCenters;
 extern int Cars_gNumCopCars;
 extern int Object_customSliceNum; /* 0x8013d2d4 */
-extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern "C" int generic128HzClock, stackSpeedUpEnbabledFlag;
 extern "C" int Replay_ReplayMode; /* replay.obj */
 extern "C" int screenheight, ticks, gFlip, gLargestUnused, Draw_gPlayer1View, Draw_gDoVSync, currentVideo;
 extern "C" int Chunk_numLight; /* 0x8013d4ec */
@@ -37,13 +38,13 @@ extern int BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez);
 extern "C" u_char *Track_gInViewCount;
 extern "C"
 {
-    extern int Loading_UpdateLoadingScreen(int);
+    extern void Loading_UpdateLoadingScreen(int);
 }
 extern int Night_gLightningType;
 extern int Night_gXDistShift;
 extern int Night_gZDistShift;
 extern int Night_gZNear;
-extern "C" extern int gNight_renderNight;
+extern "C" int gNight_renderNight;
 extern "C" short *Track_gInViewList;
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 extern intptr gWSavePtr;

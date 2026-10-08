@@ -5,6 +5,9 @@
 #include "../../nfs4_types.h"
 #include "render_externs.h"
 extern "C" int Draw_gViewOtSize;
+#if NFSHS_WEB_RENDER_PROBE
+extern void NFSHS_WebRenderProbe(DRender_tView *view, int phase);
+#endif
 
 /* ---- link-harness owned-global definition (extern-declared, never defined) ---- */
 #ifndef AP_WIN
@@ -142,7 +145,13 @@ void Render_RenderWorld(DRender_tView *Vi)
   pvVar1 = SetSp(getScratchAddr(0xff));
   Souffle_InsertFacet(Vi);
   SetSp(pvVar1);
+#if NFSHS_WEB_RENDER_PROBE
+  NFSHS_WebRenderProbe(Vi,0);
+#endif
   R3DCar_InsertAllListFacet(Vi);
+#if NFSHS_WEB_RENDER_PROBE
+  NFSHS_WebRenderProbe(Vi,1);
+#endif
   Hrz_BuildHorizon(Vi);
   pvVar1 = SetSp(getScratchAddr(0xff));
   Weather_BuildWeather(Vi);
@@ -302,7 +311,7 @@ void FlareThing(void)
       rec.w = 5;
       rec.h = 5;
       rec.y = gEnviro[gFlip].disp.disp.y + flare_walk->oldpos[0].vy + -2;
-      StoreImage(&rec,(u_long *)screen_walk);
+      StoreImage(&rec,(uint32 *)screen_walk);
       gFlare_LensFlare.isDrawn[i_2] = '\0';
     }
     screen_walk = screen_walk + 0x19;
@@ -388,7 +397,6 @@ void StampImage(int xo,int depth)
 
 {
   POLY_FT4 * ft4_p;
-  int addr_24;
   int tu1;
   u_int *pal_link;
   int i;
@@ -411,10 +419,8 @@ void StampImage(int xo,int depth)
   do {
     ft4_packet = Render_gPacketPtr;
     pal_link = (u_int *)(Render_gPalettePtr + depth * 4);
-    *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *pal_link & 0xffffff;
-    addr_24 = (u_int)Render_gPacketPtr & 0xffffff;
+    nfs4_add_prim(pal_link,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x28;
-    *pal_link = *pal_link & 0xff000000 | addr_24;
     ft4_packet[3] = 9;
     ft4_packet[7] = 0x2e;
     ts1 = (short)xo;
@@ -480,13 +486,10 @@ void Render_InsertDepthOfField(void)
   POLY_F4 * prim;
   DR_STP * stp_prim;
   short tpage;
-  int pkt_addr24_a;
-  int pkt_addr24_b;
   u_int *puVar1;
   int frame;
   DR_MODE *dr_mode;
   int i;
-  int pkt_addr24_c;
   int players;
   PSX_RECT rec;
   void *prev_pkt_drm2;
@@ -505,10 +508,8 @@ void Render_InsertDepthOfField(void)
     }
     cur_pkt_poly = Render_gPacketPtr;
     puVar1 = (u_int *)(Render_gPalettePtr + Render_gBlurEffectDepth1 * 4);
-    *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *puVar1 & 0xffffff;
-    pkt_addr24_a = (u_int)Render_gPacketPtr & 0xffffff;
+    nfs4_add_prim(puVar1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x18;
-    *puVar1 = *puVar1 & 0xff000000 | pkt_addr24_a;
     cur_pkt_poly[3] = 5;
     cur_pkt_poly[7] = 0x2a;
     *(u_short *)(cur_pkt_poly + 8) = 0;
@@ -524,17 +525,13 @@ void Render_InsertDepthOfField(void)
     *(u_short *)(cur_pkt_poly + 0x14) = 0x140;
     *(u_short *)(cur_pkt_poly + 0x16) = 0xf0;
     puVar1 = (u_int *)(Render_gPalettePtr + Render_gBlurEffectDepth1 * 4);
-    *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *puVar1 & 0xffffff;
-    pkt_addr24_b = (u_int)Render_gPacketPtr & 0xffffff;
+    nfs4_add_prim(puVar1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
-    *puVar1 = *puVar1 & 0xff000000 | pkt_addr24_b;
     SetDrawStp((DR_STP *)cur_pkt_stp,1);
     cur_pkt_drm = Render_gPacketPtr;
     puVar1 = (u_int *)(Render_gPalettePtr + Render_gBlurEffectDepth1 * 4);
-    *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *puVar1 & 0xffffff;
-    pkt_addr24_c = (u_int)Render_gPacketPtr & 0xffffff;
+    nfs4_add_prim(puVar1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
-    *puVar1 = *puVar1 & 0xff000000 | pkt_addr24_c;
     tpage = GetTPage(2,1,0,0x100);
     SetDrawMode((DR_MODE *)cur_pkt_drm,0,0,(u_int)(u_short)tpage,(PSX_RECT *)0x0);
   }

@@ -462,6 +462,7 @@ short Weather_CheckAndResetParticles(SVECTOR *pt)
   short z_off;
   short sVar4;
   short reset_flag;
+  int zfarPacked;
   
   sVar3 = 0;
   if ((int)Weather_gSys.width < (int)pt->vx) {
@@ -508,8 +509,10 @@ WeatherReset_frontWrap:
     if (Weather_gSys.znear <= pt->vz) goto WeatherReset_topCheck;
     sVar3 = 4;
     uVar1 = random();
-    uVar2 = ((int)((u_int)(u_short)Weather_gSys.zfar << 0x10) >> 0x10) -
-            ((int)((u_int)(u_short)Weather_gSys.zfar << 0x10) >> 0x1f) >> 1;
+    zfarPacked = nfs4_mips_sll_s32((int)(u_short)Weather_gSys.zfar,0x10);
+    uVar2 = (u_int)nfs4_mips_sra_s32(
+        nfs4_mips_subu_s32(nfs4_mips_sra_s32(zfarPacked,0x10),
+                           nfs4_mips_sra_s32(zfarPacked,0x1f)),1);
     if (uVar2 == 0) {
     }
     pt->vz = Weather_gSys.znear + (short)(uVar1 % uVar2);
@@ -739,9 +742,8 @@ void Weather_CreateSnow(SVECTOR *pt)
   gte_ldv3(&gv[0],&gv[1],&gv[2]);
   gte_rtpt();
   prim = (POLY_FT4 *)Render_gPacketPtr;
-  *(u_int *)prim = *(u_int *)prim & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
+  nfs4_add_prim(Render_gPalettePtr,prim);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
-  *(u_int *)Render_gPalettePtr = *(u_int *)Render_gPalettePtr & 0xff000000 | (u_int)prim & 0xffffff;
   *((char *)prim + 3) = 9;                                  /* OT tag length (9 words) */
   gte_stsxy3(&prim->x0,&prim->x1,&prim->x2);
 
@@ -777,9 +779,8 @@ void Weather_CreateRain(SVECTOR *pt0,DVECTOR *pt1,char *wd)
     gte_ldv0(&gv);
     gte_rtps();
     prim = (LINE_G2 *)Render_gPacketPtr;
-    *(u_int *)prim = *(u_int *)prim & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
+    nfs4_add_prim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x14;
-    *(u_int *)Render_gPalettePtr = *(u_int *)Render_gPalettePtr & 0xff000000 | (u_int)prim & 0xffffff;
     *((char *)prim + 3) = 4;                       /* OT tag length (4 words) */
     *(u_int *)&prim->r0 = 0x52000000;              /* rgb0=0, code=0x52 (LINE_G2) */
     *(u_int *)&prim->r1 = 0x402020;                /* r1=0x20,g1=0x20,b1=0x40 */
@@ -792,9 +793,8 @@ void Weather_CreateRain(SVECTOR *pt0,DVECTOR *pt1,char *wd)
     gte_ldv0(&gv);
     gte_rtps();
     prim = (LINE_G2 *)Render_gPacketPtr;
-    *(u_int *)prim = *(u_int *)prim & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
+    nfs4_add_prim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x14;
-    *(u_int *)Render_gPalettePtr = *(u_int *)Render_gPalettePtr & 0xff000000 | (u_int)prim & 0xffffff;
     *((char *)prim + 3) = 4;
     *(u_int *)&prim->r0 = 0x52000000;
     *(u_int *)&prim->r1 = 0x402020;
@@ -812,16 +812,15 @@ void Weather_CreateSplat
 {
   short screen_x;
   u_char splat_glyph;
-  u_long l3;
+  uint32 l3;
   int color_pack;
-  u_long l0;
+  uint32 l0;
   short screen_y;
   int splatTick;
-  u_long l1;
+  uint32 l1;
   short size_y;
-  int uv_pack;
   int pkt_addr24;
-  u_long l2;
+  uint32 l2;
   short splat_size;
   int tpage_pack;
   short size_x;
@@ -838,11 +837,8 @@ void Weather_CreateSplat
   tp3 = (u_char *)Render_gPalettePtr;
   ts3 = (splat->pos).vx;
   ts1 = (splat->pos).vy;
-  *(u_int *)Render_gPacketPtr =
-       *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-  uv_pack = (u_int)Render_gPacketPtr & 0xffffff;
+  nfs4_add_prim(tp3,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
-  *(u_int *)tp3 = *(u_int *)tp3 & 0xff000000 | uv_pack;
   prim[3] = 9;
   prim[7] = 0x2e;
   splat_size = 0x12;
@@ -1006,12 +1002,7 @@ void Weather_DoWeather(DRender_tView *Vi)
     }
     /* tail: link a DR_MODE primitive into the OT to reset the texture page */
     prim = (DR_MODE *)Render_gPacketPtr;
-#ifdef AP_WIN
     AddPrim(Render_gPalettePtr,prim);
-#else
-    *(u_int *)prim = *(u_int *)prim & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-    *(u_int *)Render_gPalettePtr = *(u_int *)Render_gPalettePtr & 0xff000000 | (u_int)prim & 0xffffff;
-#endif
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     SetDrawMode(prim,0,0,0x20,(PSX_RECT *)0x0);
   }

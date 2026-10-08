@@ -14,10 +14,10 @@ extern "C" long colourRGB[16]; /* 0x8011fd70  array-end sentinel for Force_g loo
 // [owned->defined in force.cpp] extern long              Force_gVblHandle;    /* 0x8013d850 */
 
 /* ---- shared game globals ---- */
-extern "C" Sim_tSimGlobalVar simGlobal;            /* 0x8011e0ac */
-extern "C" extern GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern Car_tObj *Cars_gHumanRaceCarList[9];        /* 0x8010fa48 (36 bytes) */
-extern "C" int Replay_ReplayMode;                  /* 0x8013d3f4 */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* 0x8011e0ac */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern Car_tObj *Cars_gHumanRaceCarList[9]; /* 0x8010fa48 (36 bytes) */
+extern "C" int Replay_ReplayMode;           /* 0x8013d3f4 */
 
 /* ---- PsyQ libpad (DualShock actuators) + libetc ---- */
 

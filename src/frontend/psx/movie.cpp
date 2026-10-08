@@ -12,12 +12,12 @@ static CdlLOC  loc;                                 /* 0x80052cf8 */
 static short   PPWTop, PPWBottom, gMode;            /* 0x80052cfc/cfe/d00 */
 static int     gIsRGB24;                            /* 0x80052d04 */
 static short   gMovieHeight, gMovieWidth;           /* 0x80052d08/d0a */
-static u_long  gMovieFrame, gEndFrame;              /* 0x80052d0c/d10 */
+static uint32  gMovieFrame, gEndFrame;              /* 0x80052d0c/d10 */
 static int     bMovieLoaded, bStopMovie, bRewindMovie, isFirstSlice; /* 0x80052d14..d20 */
 static DECENV  dec;                                 /* 0x80052d28 */
-static u_long *vlcbuf0, *vlcbuf1;                   /* 0x80052d58/d5c */
+static uint32 *vlcbuf0, *vlcbuf1;                   /* 0x80052d58/d5c */
 static u_short *imgbuf;                             /* 0x80052d60 */
-static u_long *sect_buff;                           /* 0x80052d64 */
+static uint32 *sect_buff;                           /* 0x80052d64 */
 
 /* lines 1-129: file header, #includes, static data, macros (no symbols emitted) */
 
@@ -35,21 +35,21 @@ void Movie_Init(char movie)
   bMovieLoaded = 0;
   settrans(0);
   download = 0;
-  vlcbuf0 = (u_long *)reservememadr("vlcbuf0",0x28000,0x10);
-  vlcbuf1 = (u_long *)reservememadr("vlcbuf1",0x28000,0x10);
+  vlcbuf0 = (uint32 *)reservememadr("vlcbuf0",0x28000,0x10);
+  vlcbuf1 = (uint32 *)reservememadr("vlcbuf1",0x28000,0x10);
   if ((int)PPWBottom == 0) {
     trap(0x1c00);
   }
   imgbuf = (u_short *)reservememadr
                      ("imgbuf",((uint)((int)PPWTop << 5) / (uint)(int)PPWBottom) * 0x1e0,0x10);
-  sect_buff = (u_long *)reservememadr("sect_buff",0x10000,0x10);
+  sect_buff = (uint32 *)reservememadr("sect_buff",0x10000,0x10);
   Platform_ResetDCTBuffer();
   CD_Restart(0);
   CdControlB('\v',(u_char *)0x0,(u_char *)0x0);
   CdControlB('\t',(u_char *)0x0,(u_char *)0x0);
   CdControlB('\f',(u_char *)0x0,(u_char *)0x0);
-  DecDCToutCallback((void *)0x0);
-  CdDataCallback((void *)0x0);
+  DecDCToutCallback(nullptr);
+  CdDataCallback(0);
   CdReadyCallback(0);
   DecDCTvlcSize(0);
   return;
@@ -66,9 +66,9 @@ void Movie_DeInit(void)
   bMovieLoaded = 0;
   param[0] = 0x80;
   CdControlB('\x0e',param,(u_char *)0x0);
-  DecDCToutCallback((void *)0x0);
+  DecDCToutCallback(nullptr);
   StUnSetRing();
-  CdDataCallback((void *)0x0);
+  CdDataCallback(0);
   CdReadyCallback(0);
   CdControlB('\v',(u_char *)0x0,(u_char *)0x0);
   CdControlB('\t',(u_char *)0x0,(u_char *)0x0);
@@ -188,7 +188,7 @@ int Movie_NextFrame(void)
     vh = dec.slice.h + 0xe;
   }
   DecDCTout
-            ((u_long *)dec.imgbuf,
+            ((uint32 *)dec.imgbuf,
              ((dec.slice.w + -1) / xstep + 1) * xstep * 0x10 * ((vh >> 4) + 1) >> 1);
   ret = strNextVlc(&dec);
   if (ret < 0) {
@@ -319,8 +319,8 @@ void strSetDefDecEnv(DECENV *dec)
 
 {
   short mh;
-  u_long *vb0;
-  u_long *vb1;
+  uint32 *vb0;
+  uint32 *vb1;
   u_short *img;
   int bottom;
   int top;
@@ -359,10 +359,10 @@ void strInit(CdlLOC *loc,int frame_size,fn_void *callback,fn_void *endcallback)
   
   DecDCTReset(0);
   bRewindMovie = 0;
-  DecDCToutCallback((void *)callback);
+  DecDCToutCallback(callback);
   StSetRing(sect_buff,0x20);
   StClearRing();
-  StSetStream(gIsRGB24,1,frame_size,(void *)0x0,(void *)endcallback);
+  StSetStream(gIsRGB24,1,frame_size,nullptr,endcallback);
   strKickCD(loc);
   return;
 }
@@ -387,7 +387,7 @@ void strCallback(void)
     StCdIntrFlag = 0;
   }
   if (download != 0) {
-    LoadImagePSX(&dec.slice,(u_long *)dec.imgbuf);
+    LoadImagePSX(&dec.slice,(uint32 *)dec.imgbuf);
   }
   if (isFirstSlice != 0) {
     bottom = (int)PPWBottom;
@@ -450,7 +450,7 @@ strCallback_inlinedJoin:
       vh = dec.slice.h + 0xe;
     }
     DecDCTout
-              ((u_long *)dec.imgbuf,
+              ((uint32 *)dec.imgbuf,
                ((dec.slice.w + -1) / hstep + 1) * hstep * 0x10 * ((vh >> 4) + 1) >> 1);
   }
   else {
@@ -469,7 +469,7 @@ strCallback_inlinedJoin:
 int strNextVlc(DECENV *dec)
 
 {
-  u_long *next;
+  uint32 *next;
   uint vid;
   int cnt;
   int r;
@@ -478,12 +478,12 @@ int strNextVlc(DECENV *dec)
   do {
     next = strNext(dec);
     cnt = cnt + -1;
-    if (next != (u_long *)0x0) {
+    if (next != (uint32 *)0x0) {
       vid = (uint)(dec->vlcid == 0);
       dec->vlcid = vid;
       r = DecDCTvlc(next,dec->vlcbuf[vid]);
       while (r != 0) {
-        r = DecDCTvlc((u_long *)0x0,(u_long *)0x0);
+        r = DecDCTvlc((uint32 *)0x0,(uint32 *)0x0);
       }
       StFreeRing(next);
       return 0;
@@ -495,29 +495,31 @@ int strNextVlc(DECENV *dec)
 /* lines 519-536: (static data / macros / comments - no emitted code) */
 
 /* ---- strNext  (movie.cpp:537, code lines 537-600) ---- */
-u_long * strNext(DECENV *dec)
+uint32 * strNext(DECENV *dec)
 
 {
-  u_long st;
-  u_long fc;
+  uint32 st;
+  uint32 fc;
   short mh;
   short ws;
   int bottom;
   int cnt;
   int wt;
   PSX_RECT rect;
-  u_long *addr;
+  uint32 *addr;
   CDSECTOR *sector;
+  uint32 *sectorWords;
   
   cnt = 50000;
   while( true ) {
-    st = StGetNext((u_long *)&addr,(u_long *)&sector);
+    st = StGetNext(&addr,&sectorWords);
     cnt = cnt + -1;
     if (st == 0) break;
     if (cnt == 0) {
-      return (u_long *)0x0;
+      return (uint32 *)0x0;
     }
   }
+  sector = (CDSECTOR *)sectorWords;
   if ((*addr == sector->headm) && (addr[1] == sector->headv)) {
     fc = sector->frameCount;
     if ((fc < gMovieFrame) || (gEndFrame <= fc)) {
@@ -559,7 +561,7 @@ u_long * strNext(DECENV *dec)
     return addr;
   }
   StFreeRing(addr);
-  return (u_long *)0x0;
+  return (uint32 *)0x0;
 }
 
 /* lines 601-603: (static data / macros / comments - no emitted code) */
@@ -571,7 +573,7 @@ void strSync(DECENV *dec,int arg1)
   int viewOff;
   uint nextRect;
   int ridx;
-  u_long cnt;
+  uint32 cnt;
   
   cnt = 0x800000;
   if (dec->isdone == 0) {

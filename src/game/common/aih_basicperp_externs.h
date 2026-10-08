@@ -14,13 +14,13 @@ extern "C" AIHigh_Base *highLevelAIObjs[];
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gCopCarList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern Trk_NewSlice *BWorldSm_slices;
 extern int Cars_gNumCopCars;
 extern int AITune_driveSide;
 extern int Cars_gNumCars;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int AISpeeds_GetLegalSpeed(int slice);
 extern int AITune_oneWay;
 extern int AIWorld_CheckForBarrierBetweenLanes(int slice, int lane0, int lane1);

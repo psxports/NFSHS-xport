@@ -7,7 +7,7 @@
 
 extern CAudioList *gGameAudioList;
 extern DRender_tCalcView AudioClc_gRenderView;
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern Trk_AnimateInst *Anim_gInstanceFromIndex[8];
 extern Trk_NewSlice *BWorldSm_slices;
@@ -19,7 +19,7 @@ extern int DrawW_GetAnimationTime(Trk_AnimateInst *animInst);
 extern "C" int Anim_GetPos(Trk_AnimateInst *animInst, int flags, int ticks, coorddef *pt, int *animTicks, int *animLength);
 extern int CopSpeak_gNumTrackSfx;
 extern int Math_Dist3D(coorddef *a, coorddef *b);
-extern "C" extern int gMasterAmbientLevel;
+extern "C" int gMasterAmbientLevel;
 extern void BWorldSm_SetSlice(int slice, BWorldSm_Pos *pos);
 extern void CopSpeak_Server(void);
 int BWorldSm_FindClosestSlice(coorddef *pt, BWorldSm_Pos *slicePos);

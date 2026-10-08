@@ -218,19 +218,27 @@ void nfs4_gte_ldir0(int value) {
     if(value<0)value=0; else if(value>4095)value=4095;
     nfs4_gte_data[8]=(unsigned int)value;
 }
-void nfs4_gte_rt(void) {
+static void nfs4_gte_mvmva(int shift)
+{
     nfs4_gte_flag=0;
     int x=(short)nfs4_gte_data[0], y=(short)(nfs4_gte_data[0]>>16), z=(short)nfs4_gte_data[1];
-    long long tx=(((long long)nfs4_gte_rot.m[0][0]*x+(long long)nfs4_gte_rot.m[0][1]*y+(long long)nfs4_gte_rot.m[0][2]*z)>>12)+nfs4_gte_trans[0];
-    long long ty=(((long long)nfs4_gte_rot.m[1][0]*x+(long long)nfs4_gte_rot.m[1][1]*y+(long long)nfs4_gte_rot.m[1][2]*z)>>12)+nfs4_gte_trans[1];
-    long long tz=(((long long)nfs4_gte_rot.m[2][0]*x+(long long)nfs4_gte_rot.m[2][1]*y+(long long)nfs4_gte_rot.m[2][2]*z)>>12)+nfs4_gte_trans[2];
+    long long tx=(long long)nfs4_gte_rot.m[0][0]*x+(long long)nfs4_gte_rot.m[0][1]*y+(long long)nfs4_gte_rot.m[0][2]*z+(long long)nfs4_gte_trans[0]*4096;
+    long long ty=(long long)nfs4_gte_rot.m[1][0]*x+(long long)nfs4_gte_rot.m[1][1]*y+(long long)nfs4_gte_rot.m[1][2]*z+(long long)nfs4_gte_trans[1]*4096;
+    long long tz=(long long)nfs4_gte_rot.m[2][0]*x+(long long)nfs4_gte_rot.m[2][1]*y+(long long)nfs4_gte_rot.m[2][2]*z+(long long)nfs4_gte_trans[2]*4096;
+    if (shift) {
+        tx >>= 12;
+        ty >>= 12;
+        tz >>= 12;
+    }
     nfs4_gte_data[25]=(unsigned int)tx; nfs4_gte_data[26]=(unsigned int)ty; nfs4_gte_data[27]=(unsigned int)tz;
     nfs4_gte_data[9]=(unsigned int)nfs4_gte_clamp_ir(tx,1u<<24);
     nfs4_gte_data[10]=(unsigned int)nfs4_gte_clamp_ir(ty,1u<<23);
     nfs4_gte_data[11]=(unsigned int)nfs4_gte_clamp_ir(tz,1u<<22);
     nfs4_gte_finish_flag();
 }
-extern "C" void NFSHS_GTE_MVMVA(void) { nfs4_gte_rt(); }
+void nfs4_gte_rt(void) { nfs4_gte_mvmva(1); }
+void nfs4_gte_mvmva_sf1(void) { nfs4_gte_mvmva(1); }
+extern "C" void NFSHS_GTE_MVMVA(void) { nfs4_gte_mvmva_sf1(); }
 static unsigned int nfs4_gte_depth_color(unsigned int color) {
     int ir0=(int)nfs4_gte_data[8];
     int c[3]={(int)(color&255),(int)((color>>8)&255),(int)((color>>16)&255)};
@@ -309,6 +317,16 @@ extern "C" int NFSHS_GTE_VectorNormal(const void *input,void *output) {
     }
     nfs4_gte_data[20]=nfs4_gte_data[21];nfs4_gte_data[21]=nfs4_gte_data[22];nfs4_gte_data[22]=rgb;
     nfs4_gte_finish_flag();memcpy(output,out,12);return (int)magnitude;
+}
+
+extern "C" int NFSHS_GTE_VectorNormalS(const void *input,void *output) {
+    int normalized[3];
+    short *result=(short *)output;
+    int magnitude=NFSHS_GTE_VectorNormal(input,normalized);
+    result[0]=(short)normalized[0];
+    result[1]=(short)normalized[1];
+    result[2]=(short)normalized[2];
+    return magnitude;
 }
 
 extern "C" {

@@ -11,7 +11,7 @@ void tScreenTrackRecords::GetShapeInfo(short &numPermShapes,short &numSwapShapes
 {
   numPermShapes = 0x28;
   numSwapShapes = 0;
-  *permFileName = "zRec";
+  *permFileName = NFS4_WRITABLE_LITERAL("zRec");
   *swapFileName = (char *)0x0;
   return;
 }
@@ -89,7 +89,7 @@ void tScreenTrackRecords::DrawOneRecord(int index,bool newrecord,int y)
     wx = this->TrackRecords[index].nTime;
     if (wx == 0) {
       word = TextSys_Word(0x261);
-      sprintf(sBuildOutput,word);
+      sprintf(sBuildOutput,"%s",word);
     }
     else {
       Stattool_ParseTime(wx,sBuildOutput);

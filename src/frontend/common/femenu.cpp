@@ -5,6 +5,8 @@
  *   Member defs; base ctors via member-init-lists; manual _vf vtable dispatch; ref params.
  */
 #include "femenu.h"
+#include "../../mips_semantics.h"
+#include <stdlib.h>
 
 /* ---- FEMenu.obj-OWNED globals -- DEFINED here (self-contained; .data=real EXE bytes) ---- */
 tPlayer      gMenu_SubMenuPlayer = (tPlayer)-1;   /* @0x800517c0 */
@@ -837,7 +839,7 @@ void tMenuItemLeftRightSlider::ProcessInput(tPlayer fromPlayer,tInputKeyType &ke
 
 {
   short sVar1;
-  int (*pcVar3)(...);
+  nfs4_vtbl_pfn pcVar3;
   tListIterator *ptVar4;
   
   if (((this->_base_tMenuItemInteractive)._base_tMenuItem.fFlags & 1) == 0) {
@@ -964,11 +966,18 @@ extern "C" void DrawSlider(short value,short min,short max,short fX,short fY,sho
           else {
             ti5 = ts2 - rel_x;
             amount_00 = amount;
-            interp_color = CalcFadeVal(0xc83c1e,((ti5 * -0xd2) / amountWidth + 0xd2 >> shiftAmount)
-                                               << 0x10 | (((ti5 * 0x7c) / amountWidth + 0x42 >>
-                                                          shiftAmount) << 0x10) >> 8 |
-                                               (int)(short)((ti5 * 0xbe) / amountWidth >>
-                                                           shiftAmount),amount);
+            interp_color = CalcFadeVal(0xc83c1e,
+                                       nfs4_mips_srav_s32(
+                                           nfs4_mips_addu_s32(
+                                               nfs4_mips_div_s32(nfs4_mips_mult_s32(ti5,-0xd2),amountWidth),
+                                               0xd2),shiftAmount) << 0x10 |
+                                       (nfs4_mips_srav_s32(
+                                           nfs4_mips_addu_s32(
+                                               nfs4_mips_div_s32(nfs4_mips_mult_s32(ti5,0x7c),amountWidth),
+                                               0x42),shiftAmount) << 0x10) >> 8 |
+                                       (int)(short)nfs4_mips_srav_s32(
+                                           nfs4_mips_div_s32(nfs4_mips_mult_s32(ti5,0xbe),amountWidth),
+                                           shiftAmount),amount);
           }
         }
         else {
@@ -1019,9 +1028,18 @@ extern "C" void DrawSlider(short value,short min,short max,short fX,short fY,sho
             }
             else {
               amount_00 = amount;
-              col1 = CalcFadeVal(0xc83c1e,((ti7 * -0xd2) / amountWidth + 0xd2 >> bVar1) << 0x10 |
-                                         (((ti7 * 0x7c) / amountWidth + 0x42 >> bVar1) << 0x10) >> 8
-                                         | (int)(short)((ti7 * 0xbe) / amountWidth >> bVar1),amount)
+              col1 = CalcFadeVal(0xc83c1e,
+                                 nfs4_mips_srav_s32(
+                                     nfs4_mips_addu_s32(
+                                         nfs4_mips_div_s32(nfs4_mips_mult_s32(ti7,-0xd2),amountWidth),
+                                         0xd2),bVar1) << 0x10 |
+                                 (nfs4_mips_srav_s32(
+                                     nfs4_mips_addu_s32(
+                                         nfs4_mips_div_s32(nfs4_mips_mult_s32(ti7,0x7c),amountWidth),
+                                         0x42),bVar1) << 0x10) >> 8 |
+                                 (int)(short)nfs4_mips_srav_s32(
+                                     nfs4_mips_div_s32(nfs4_mips_mult_s32(ti7,0xbe),amountWidth),
+                                     bVar1),amount)
               ;
             }
           }
@@ -1152,23 +1170,20 @@ int tMenuItemGoToMenuButton::ProcessInput(tPlayer fromPlayer,tInputKeyType &keyv
 
 /* ---- tMenu::tMenuConstructor  [FEMENU.CPP:966-980] SLD-VERIFIED ---- */
 
-void tMenu::tMenuConstructor(tMenuItem *firstItem,void *ap)
+void tMenu::tMenuConstructor(tMenuItem *firstItem,std::initializer_list<tMenuItem *> rest)
 
 {
-  int i;
-  tMenuItem *ptVar1;
-  tMenuItem **items;
-  
-  i = 0;
+  if (rest.size() == 0 || rest.size() > 15 || *(rest.end() - 1) != nullptr)
+    abort();
+  int i = 0;
   this->VertHelp = 0;
   this->fItemList[0] = firstItem;
-  items = (tMenuItem **)ap;
-  do {
-    ptVar1 = *items;
-    this->fItemList[i + 1] = ptVar1;
+  for (tMenuItem *item : rest) {
+    this->fItemList[i + 1] = item;
     i = i + 1;
-    items++;
-  } while (ptVar1 != (tMenuItem *)0x0);
+    if (item == nullptr)
+      break;
+  }
   return;
 }
 

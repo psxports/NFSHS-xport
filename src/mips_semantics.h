@@ -1,6 +1,8 @@
 #ifndef NFS4_MIPS_SEMANTICS_H
 #define NFS4_MIPS_SEMANTICS_H
 
+#include <stdlib.h>
+
 /* Defined C++ equivalents for the R3000A's 32-bit bit operations.  Keep these
    at reconstruction sites where signed C++ arithmetic would otherwise be
    undefined, while the original instruction has modulo-2^32 semantics. */

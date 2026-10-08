@@ -78,7 +78,7 @@ void TextureProcess_ColorClut(int level,int maxlevel,char *data,int numentry,int
     r.w = (short)numentry;
     r.y = (short)cy;
     r.h = 1;
-    LoadImagePSX(&r,(u_long *)newdata);
+    LoadImagePSX(&r,(uint32 *)newdata);
   }
 }
 
@@ -252,7 +252,7 @@ void Fog_Update(int player)
 }
 
 /* ---- Fog_MakeTrackPathName__FPc  [TEXTUREPROCESS.CPP:1015-1022] SLD-VERIFIED ---- */
-char * Fog_MakeTrackPathName(char *ext)
+char * Fog_MakeTrackPathName(const char *ext)
 
 {
   sprintf(fogstrspc,"%sTr%02d%s",Paths_Paths[6],GameSetup_gData.track & 0xf,ext);
@@ -268,7 +268,7 @@ int Fog_ReadFogKeys(void)
   bool bVar3;
   char *strspc;
   int i;
-  char *ext;
+  const char *ext;
   u_int *puVar5;
   int *readmem;
   u_int numkeys;

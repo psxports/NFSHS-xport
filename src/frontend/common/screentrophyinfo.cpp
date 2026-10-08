@@ -28,7 +28,7 @@ void tScreenTrophyInfo::GetShapeInfo(short &numPermShapes,short &numSwapShapes,
   GetTrophyName(&tournamentManager,tourn + (uint)tournOffset + (uint)(byte)curTourn,ts_Large,gSwapFileNameTI,-1);
   numSwapShapes = 0x20;
   *swapFileName = gSwapFileNameTI;
-  *permFileName = "zSTI";
+  *permFileName = NFS4_WRITABLE_LITERAL("zSTI");
   numPermShapes = 0xb;
   return;
 }

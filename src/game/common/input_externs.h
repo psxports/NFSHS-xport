@@ -16,6 +16,6 @@ extern "C" int gSimQueue_BlockSelf;
 
 /* ---- sim.obj / gmesetup.obj ---- */
 extern "C" Sim_tSimGlobalVar simGlobal;
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 
 #endif /* INPUT_EXTERNS_H */

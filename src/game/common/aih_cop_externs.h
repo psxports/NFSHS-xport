@@ -11,7 +11,7 @@ extern __vtbl_ptr_type AIHigh_Cop_vtable[], AIState_Idle_vtable[];
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; cast result to Speaker* */
 extern AICop_spikeBelt_t AICop_spikeBelt;
@@ -21,15 +21,15 @@ extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gRaceCarList[];       /* 0x8010fa00 */
 extern Car_tObj *AILife_IsSliceInAnyVisibleArea(int slice);
 extern Car_tObj *Cars_gTotalSortedList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern Trk_NewSlice *BWorldSm_slices;
 extern copTuning_t copTuningInfo[];
-extern "C" extern int generic128HzClock, stackSpeedUpEnbabledFlag;
+extern "C" int generic128HzClock, stackSpeedUpEnbabledFlag;
 extern int Cars_gNumRaceCars;
 extern int Cars_gNumCars;
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int AICop_NoCopsInArea(int slice, int sliceDistance);
 extern int AICop_gRoadBlockState;
 extern int AILife_EvaluateLife(Car_tObj *carObj);

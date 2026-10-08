@@ -35,12 +35,12 @@ extern void nfs4_gte_rt(void);
                 gte_swc2(19, &nfs4_sz_); \
                 *(int *)(p) = nfs4_mips_sra_s32(nfs4_sz_, 2); \
             } while (0)
-        #define gte_rt(...) nfs4_gte_rt()
-        #define gte_nclip(...) nfs4_gte_nclip()
-        #define gte_nclip_b(...) nfs4_gte_nclip()
-        #define gte_avsz4(...) nfs4_gte_avsz4()
-        #define gte_avsz4_b(...) nfs4_gte_avsz4()
-        #define gte_avsz3(...) nfs4_gte_avsz3()
+        #define gte_rt() nfs4_gte_rt()
+        #define gte_nclip() nfs4_gte_nclip()
+        #define gte_nclip_b() nfs4_gte_nclip()
+        #define gte_avsz4() nfs4_gte_avsz4()
+        #define gte_avsz4_b() nfs4_gte_avsz4()
+        #define gte_avsz3() nfs4_gte_avsz3()
         #define gte_ldVXY0(p) gte_lwc2(0, *(int *)(p))
         #define gte_ldVZ0(p) gte_lwc2(1, *(short *)(p))
         #define gte_ldVXY1(p) gte_lwc2(2, *(int *)(p))
@@ -48,45 +48,45 @@ extern void nfs4_gte_rt(void);
         #define gte_ldVXY2(p) gte_lwc2(4, *(int *)(p))
         #define gte_ldVZ2(p) gte_lwc2(5, *(short *)(p))
         /* These original macros store into fixed Draw_CarCache scratch offsets. */
-        #define gte_stMAC0(...) gte_swc2(24, &sd->bfct)
-        #define gte_stOTZ(...) gte_swc2(7, &sd->otz)
-        #define gte_stSXY0(...) gte_swc2(12, &sd->dvx0)
-        #define gte_stSXY1(...) gte_swc2(13, &sd->dvx1)
-        #define gte_stSXY2(...) gte_swc2(14, &sd->dvx2)
+        #define gte_stMAC0() gte_swc2(24, &sd->bfct)
+        #define gte_stOTZ() gte_swc2(7, &sd->otz)
+        #define gte_stSXY0() gte_swc2(12, &sd->dvx0)
+        #define gte_stSXY1() gte_swc2(13, &sd->dvx1)
+        #define gte_stSXY2() gte_swc2(14, &sd->dvx2)
     #else
-        #define gte_SetRotMatrix(...) ((void)0)
-        #define gte_SetTransMatrix(...) ((void)0)
-        #define gte_stsz(...) ((void)0)
-        #define gte_rt(...) ((void)0)
-        #define gte_nclip(...) ((void)0)
-        #define gte_nclip_b(...) ((void)0)
-        #define gte_avsz4(...) ((void)0)
-        #define gte_avsz4_b(...) ((void)0)
-        #define gte_avsz3(...) ((void)0)
-        #define gte_ldVXY0(...) ((void)0)
-        #define gte_ldVZ0(...) ((void)0)
-        #define gte_ldVXY1(...) ((void)0)
-        #define gte_ldVZ1(...) ((void)0)
-        #define gte_ldVXY2(...) ((void)0)
-        #define gte_ldVZ2(...) ((void)0)
-        #define gte_stMAC0(...) ((void)0)
-        #define gte_stOTZ(...) ((void)0)
-        #define gte_stSXY0(...) ((void)0)
-        #define gte_stSXY1(...) ((void)0)
-        #define gte_stSXY2(...) ((void)0)
+        #define gte_SetRotMatrix(arg0) ((void)0)
+        #define gte_SetTransMatrix(arg0) ((void)0)
+        #define gte_stsz(arg0) ((void)0)
+        #define gte_rt() ((void)0)
+        #define gte_nclip() ((void)0)
+        #define gte_nclip_b() ((void)0)
+        #define gte_avsz4() ((void)0)
+        #define gte_avsz4_b() ((void)0)
+        #define gte_avsz3() ((void)0)
+        #define gte_ldVXY0(arg0) ((void)0)
+        #define gte_ldVZ0(arg0) ((void)0)
+        #define gte_ldVXY1(arg0) ((void)0)
+        #define gte_ldVZ1(arg0) ((void)0)
+        #define gte_ldVXY2(arg0) ((void)0)
+        #define gte_ldVZ2(arg0) ((void)0)
+        #define gte_stMAC0() ((void)0)
+        #define gte_stOTZ() ((void)0)
+        #define gte_stSXY0() ((void)0)
+        #define gte_stSXY1() ((void)0)
+        #define gte_stSXY2() ((void)0)
     #endif
-    #define gte_ldsv(...) ((void)0)
-    #define gte_stsv(...) ((void)0)
-    #define gte_stsxy(...) ((void)0)
-    #define gte_stflg(...) ((void)0)
-    #define gte_rtir(...) ((void)0)
-    #define gte_ldtr(...) ((void)0)
-    #define gte_rtps_b(...) ((void)0)
+    #define gte_ldsv(arg0) ((void)0)
+    #define gte_stsv(arg0) ((void)0)
+    #define gte_stsxy(arg0) ((void)0)
+    #define gte_stflg(arg0) ((void)0)
+    #define gte_rtir() ((void)0)
+    #define gte_ldtr(arg0, arg1, arg2) ((void)0)
+    #define gte_rtps_b() ((void)0)
     /* GTE ops Ghidra inlines as macro CALLS in draww (nclip/avsz/depth-cue/ldsxy3/ldIR0/rt) */
-    #define gte_dpcs(...) ((void)0)
-    #define gte_dpct(...) ((void)0)
-    #define gte_ldsxy3(...) ((void)0)
-    #define gte_ldIR0(...) ((void)0)
+    #define gte_dpcs() ((void)0)
+    #define gte_dpct() ((void)0)
+    #define gte_ldsxy3(arg0, arg1, arg2) ((void)0)
+    #define gte_ldIR0(arg0) ((void)0)
 /* ---- PsyQ libgte / libgpu (seed; extend as compile demands) ---- */
 
 /* ---- game externs (harvested from sealed modules + usage-typed; int=TODO refine) ---- */
@@ -121,12 +121,13 @@ extern "C" int Draw_gViewOtSize;
 extern "C" COORD16 Fe3D_lightsVertex[64]; /* 0x80051334  ARY STRUCT COORD16 x64 */
 extern "C" COORD16 Fe3D_spotVertex[33];   /* 0x8005126c  ARY STRUCT COORD16 x33 */
 extern short *Flare_CarShapedHalo(int, COORD16 *, COORD16 *, COORD16 *, short, int, Draw_FlareCache *);
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern void Night_AdditiveNightCalc(VECTOR *, CVECTOR *);
-extern "C" extern char *Paths_Paths[]; /* 0x80116468 */
+extern "C" char *Paths_Paths[]; /* 0x80116468 */
 extern void R3DCar_GetCarName(char *, int, int);
-extern "C" extern int R3DCar_Clock, R3DCar_ClockLast, R3DCar_InMenu;
+extern "C" int R3DCar_Clock, R3DCar_ClockLast, R3DCar_InMenu;
 extern CVECTOR R3DCar_eMapColour;
+extern char R3DCar_SignalBrakeFlare[28];
 extern "C" short R3DCar_yawCam;
 extern void R3DCcar_ReadTrackShadow(void);
 extern void R3DCcar_ReadeMapData(void);
@@ -137,13 +138,13 @@ extern void Texture_ProcessPaletteCopy(Texture_pal8bit *, int, int);
 extern "C" Draw_tPixMap Track_gReflectionMaps[4];
 extern void TrsProj_ResetTransPrecision(void);
 extern void TrsProj_SetTransPrecision(int);
-extern int TrsProj_precision;           /* 0x8013db9c */
-extern "C" extern DRender_tView gCView; /* 0x80116f7c */
-extern "C" int gFlip;                   /* 0x8013d7b4 */
-extern Draw_tPixMap *gMenuPixmap[8];    /* 0x80120fd0 */
+extern int TrsProj_precision;        /* 0x8013db9c */
+extern "C" DRender_tView gCView;     /* 0x80116f7c */
+extern "C" int gFlip;                /* 0x8013d7b4 */
+extern Draw_tPixMap *gMenuPixmap[8]; /* 0x80120fd0 */
 extern matrixtdef gNightMat;
 extern Draw_tPixMap *gShadowPixmap[2];
 extern "C" int gShowroomLights; /* TODO type-refine */
-extern "C" u_long hilight_colors[5];
+extern "C" uint32 hilight_colors[5];
 
 #endif

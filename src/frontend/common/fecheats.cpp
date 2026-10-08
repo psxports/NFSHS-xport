@@ -92,6 +92,21 @@ void FECheat_HandleActivation(tCheatCode cheat)
     for (sVar2 = 0; sVar2 < 0x40; sVar2 = sVar2 + 1) {
       tournamentManager.fBestPlacement[sVar2] = (char)cheat + -0x1b;
     }
+    break;
+  case cheat_FiveFingerDiscount:
+  case cheat_FreeRepairs:
+  case cheat_NoDamage:
+  case cheat_AllCops:
+  case cheat_BonusTrack1:
+  case cheat_BonusTrack2:
+  case cheat_BonusTrack3:
+  case cheat_BonusTrack4:
+  case cheat_MyMomSaysImCool:
+  case cheat_FullGridTraffic:
+  case cheat_FinishedTournament:
+  case cheat_FinishedSpecialEvent:
+  case cheat_NumCheats:
+    break;
   }
   return;
 }
@@ -268,7 +283,7 @@ extern "C" void * FECheat_IsCheatEnabled(tCheatCode cheat)
 
 /* ---- FECheat_SaveBonus  [FECHEATS.CPP:285-286] SLD-VERIFIED ---- */
 
-extern "C" void FECheat_SaveBonus(u_long &cheat)
+extern "C" void FECheat_SaveBonus(uint32 &cheat)
 
 {
   cheat = gFEBonus;
@@ -279,7 +294,7 @@ extern "C" void FECheat_SaveBonus(u_long &cheat)
 
 /* ---- FECheat_LoadBonus  [FECHEATS.CPP:293-305] SLD-VERIFIED ---- */
 
-extern "C" void FECheat_LoadBonus(u_long &cheat)
+extern "C" void FECheat_LoadBonus(uint32 &cheat)
 
 {
   int i;

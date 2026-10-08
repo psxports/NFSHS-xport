@@ -19,8 +19,8 @@ extern "C" int gTAddCarWheelDelay;           /* 0x8013d4f0 */
 extern "C" int gTAddCSmoke;                  /* 0x8013d4f4 */
 
 /* ---- game globals ---- */
-extern "C" Sim_tSimGlobalVar simGlobal;            /* 0x8011e0ac */
-extern "C" extern GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* 0x8011e0ac */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
 
 /* ---- helpers (souffle/skidmark/eaclib) ---- */
 extern Souffle_tISouffle *Souffle_Add(coorddef *emitterpt, int type, coorddef *vec, int velXZ, int ground, int colour);

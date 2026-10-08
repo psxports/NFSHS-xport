@@ -7,8 +7,8 @@
 
 /* ---- input.obj OWNED globals (EXT; SYM names already resolved by Ghidra; Globals.jsonl) ---- */
 int             Input_gHandler[184];          /* 0x8013... */
-u_long          Input_gDBFlags[8];
-u_long          Input_gInterfaceResults[32];
+uint32          Input_gDBFlags[8];
+uint32          Input_gInterfaceResults[32];
 int             Input_gPressTime[2][17];
 int             Input_gTime;
 Input_tResults  Input_gResults[2];
@@ -23,7 +23,7 @@ void Input_Update(void);
 void Input_Store(void);
 void Input_Fetch(int humanIndex);
 char Input_Gear(char currentGear,int numGears);
-extern "C" { int Input_Interface(u_long key,int debounce); }
+extern "C" { int Input_Interface(uint32 key,int debounce); }
 extern "C" { u_int Input_MainExitKey(void); }
 
 /* ---- Input_StartUp__Fv  [INPUT.CPP:55-77] SLD-VERIFIED ---- */
@@ -37,7 +37,7 @@ extern "C" int * Input_StartUp(void)
   int iVar2;
   int iVar3;
   int iVar4;
-  u_long *puVar5;
+  uint32 *puVar5;
   int iVar6;
   
   Device_StartUp();
@@ -99,8 +99,8 @@ void Input_Update(void)
   int right;
   int active;
   u_char bVar1;
-  u_long *puVar2;
-  u_long *puVar3;
+  uint32 *puVar2;
+  uint32 *puVar3;
   u_char bVar4;
   char *pcVar5;
   int iVar6;
@@ -120,7 +120,7 @@ void Input_Update(void)
   u_int *puVar16;
   int m;
   u_char *puVar17;
-  u_long acc;
+  uint32 acc;
   int mode;
   int iVar18;
   int i;
@@ -129,9 +129,9 @@ void Input_Update(void)
   char hactive [17];
   char acStack_70 [40];
   Input_tResults *r;
-  u_long menukeys;
+  uint32 menukeys;
   char *pcStack_40;
-  u_long *puStack_3c;
+  uint32 *puStack_3c;
   int iStack_38;
   int iStack_34;
   int iStack_30;
@@ -161,7 +161,7 @@ void Input_Update(void)
         if (iactive[uVar9] != '\0') {
           uVar10 = *piVar15;
           if (uVar10 != 0) {
-            iVar19 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8);
+            iVar19 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8);
             if (0x40 < iVar19) {
               menukeys = menukeys | 1 << (uVar9 & 0x1f);
             }
@@ -182,7 +182,7 @@ void Input_Update(void)
       puVar16 = (u_int *)piVar15;
       uVar9 = *puVar16;
       if ((uVar9 != 0) &&
-         (iVar6 = (*(int (*)(...))Device_gDeviceList[uVar9 & 0xff].devicefunc)((int)uVar9 >> 8),
+         (iVar6 = Device_gDeviceList[uVar9 & 0xff].devicefunc((int)uVar9 >> 8),
          0x40 < iVar6)) {
         iVar18 = iVar14 + 1;
       }
@@ -192,18 +192,18 @@ void Input_Update(void)
     *(int *)((int)Input_gMode + iStack_38) = iVar18;
     if (iVar18 == 0) {
       uVar9 = 0;
-      iVar18 = (*(int (*)(...))Device_gDeviceList[*piVar15 & 0xff].devicefunc)(*piVar15 >> 8);
-      iVar14 = (*(int (*)(...))Device_gDeviceList[puVar16[2] & 0xff].devicefunc)((int)puVar16[2] >> 8);
+      iVar18 = Device_gDeviceList[*piVar15 & 0xff].devicefunc(*piVar15 >> 8);
+      iVar14 = Device_gDeviceList[puVar16[2] & 0xff].devicefunc((int)puVar16[2] >> 8);
       r->steering = (char)((iVar14 - iVar18) / 2);
-      bVar4 = (*(int (*)(...))Device_gDeviceList[puVar16[3] & 0xff].devicefunc)((int)puVar16[3] >> 8);
+      bVar4 = Device_gDeviceList[puVar16[3] & 0xff].devicefunc((int)puVar16[3] >> 8);
       puVar17[-2] = bVar4;
       piVar15 = (int *)(puVar16 + 5);
-      bVar4 = (*(int (*)(...))Device_gDeviceList[puVar16[4] & 0xff].devicefunc)((int)puVar16[4] >> 8);
+      bVar4 = Device_gDeviceList[puVar16[4] & 0xff].devicefunc((int)puVar16[4] >> 8);
       puVar17[-1] = bVar4;
       do {
         uVar10 = *piVar15;
         if ((uVar10 == 0) ||
-           (iVar18 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8),
+           (iVar18 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8),
            iVar18 < 0x41)) {
           *puVar17 = *puVar17 & ~(u_char)(1 << (uVar9 & 0x1f));
         }
@@ -228,7 +228,7 @@ void Input_Update(void)
       for (uVar9 = 0; puVar3 = puStack_3c, (int)uVar9 < 0x11; uVar9 = uVar9 + 1) {
         uVar10 = *piVar15;
         if (uVar10 != 0) {
-          iVar7 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8);
+          iVar7 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8);
           if (iVar7 < 0x41) {
             *puVar2 = *puVar2 & ~(1 << (uVar9 & 0x1f));
             *(u_int *)((int)Input_gPressTime[0] + iVar14) = 0;
@@ -261,7 +261,7 @@ void Input_Update(void)
       do {
         uVar10 = *piVar15;
         if (uVar10 != 0) {
-          iVar18 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8);
+          iVar18 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8);
           if (iVar18 < 0x41) {
             piVar8 = (int *)((int)Input_gPressTime[0] + uVar9 * 4 + iStack_34);
             uVar10 = 1 << (uVar9 & 0x1f);
@@ -294,7 +294,7 @@ void Input_Update(void)
         do {
           uVar10 = *piVar15;
           if (uVar10 != 0) {
-            iVar14 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8);
+            iVar14 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8);
             uVar10 = 1 << (uVar9 & 0x1f);
             if (iVar14 < 0x41) {
               uVar10 = *puVar2 & ~uVar10;
@@ -350,17 +350,17 @@ void Input_Update(void)
         iVar6 = iVar6 + 1;
         iVar14 = iVar14 + 4;
       } while (iVar6 < 0x20);
-      iVar14 = (*(int (*)(...))Device_gDeviceList[*piVar15 & 0xff].devicefunc)(*piVar15 >> 8);
-      iVar6 = (*(int (*)(...))Device_gDeviceList[puVar16[2] & 0xff].devicefunc)((int)puVar16[2] >> 8);
+      iVar14 = Device_gDeviceList[*piVar15 & 0xff].devicefunc(*piVar15 >> 8);
+      iVar6 = Device_gDeviceList[puVar16[2] & 0xff].devicefunc((int)puVar16[2] >> 8);
       if ((acStack_70[0] != '\0') && (acStack_70[1] != '\0')) {
         r->steering = (char)((iVar6 - iVar14) / 2);
       }
       if (acStack_70[2] != '\0') {
-        bVar4 = (*(int (*)(...))Device_gDeviceList[puVar16[3] & 0xff].devicefunc)((int)puVar16[3] >> 8);
+        bVar4 = Device_gDeviceList[puVar16[3] & 0xff].devicefunc((int)puVar16[3] >> 8);
         puVar17[-2] = bVar4;
       }
       if (acStack_70[3] != '\0') {
-        bVar4 = (*(int (*)(...))Device_gDeviceList[puVar16[4] & 0xff].devicefunc)((int)puVar16[4] >> 8);
+        bVar4 = Device_gDeviceList[puVar16[4] & 0xff].devicefunc((int)puVar16[4] >> 8);
         puVar17[-1] = bVar4;
       }
       puVar16 = puVar16 + 5;
@@ -369,7 +369,7 @@ void Input_Update(void)
         if (acStack_70[uVar9 + 4] != '\0') {
           uVar10 = *puVar16;
           if ((uVar10 == 0) ||
-             (iVar14 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8),
+             (iVar14 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8),
              iVar14 < 0x41)) {
             *puVar17 = *puVar17 & ~(u_char)(1 << (uVar9 & 0x1f));
           }
@@ -397,7 +397,7 @@ void Input_Update(void)
         if (uVar10 != 0) {
           if ((acStack_70[uVar9 + 6] == '\0') ||
              (iStack_30 = iVar14,
-             iVar11 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8),
+             iVar11 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8),
              iVar14 = iStack_30, iVar11 < 0x41)) {
             *puVar2 = *puVar2 & ~(1 << (uVar9 & 0x1f));
             *(u_int *)((int)Input_gPressTime[0] + iVar7) = 0;
@@ -431,7 +431,7 @@ void Input_Update(void)
         uVar10 = *puVar16;
         if (uVar10 != 0) {
           if (acStack_70[uVar9 + 0x17] != '\0') {
-            iVar14 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8);
+            iVar14 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8);
             uVar10 = 1 << (uVar9 & 0x1f);
             if (0x40 < iVar14) {
               if (((*puVar3 & uVar10) == 0) && (pcStack_40[uVar9] != '\0')) {
@@ -465,7 +465,7 @@ InputUpd_bitLoopNext:
       do {
         uVar10 = *puVar16;
         if (uVar10 != 0) {
-          iVar14 = (*(int (*)(...))Device_gDeviceList[uVar10 & 0xff].devicefunc)((int)uVar10 >> 8);
+          iVar14 = Device_gDeviceList[uVar10 & 0xff].devicefunc((int)uVar10 >> 8);
           if (iVar14 < 0x41) {
             *puVar2 = *puVar2 & ~(1 << (uVar9 & 0x1f));
           }
@@ -578,7 +578,7 @@ char Input_Gear(char currentGear,int numGears)
 }
 
 /* ---- Input_Interface__FUli  [INPUT.CPP:488-499] SLD-VERIFIED ---- */
-extern "C" int Input_Interface(u_long key,int debounce)
+extern "C" int Input_Interface(uint32 key,int debounce)
 
 {
   int iVar1;

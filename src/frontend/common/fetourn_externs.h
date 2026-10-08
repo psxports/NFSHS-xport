@@ -6,11 +6,11 @@
 
 /* ===== globals ===== */
 extern "C" int ticks;
-extern "C" extern tfrontEnd frontEnd;
-extern "C" extern char *Paths_Paths[];
+extern "C" tfrontEnd frontEnd;
+extern "C" char *Paths_Paths[];
 extern tTournamentManager tournamentManager;
 extern tCarManager carManager;
-extern "C" Car_tStats *Cars_gNewCarStatsList;
+extern "C" Car_tStats Cars_gNewCarStatsList[9];
 extern tTrackManager trackManager;
 extern int _i;               /* Ghidra phantom local */
 extern int gFEData_8001165c; /* trophy-letter pack (unresolved data global) */
@@ -25,7 +25,6 @@ static long retbonus; /* STAT */
 extern __vtbl_ptr_type tListIteratorTournament_vtable[];
 
 /* ===== base iterator ctor (rendered free by Ghidra) ===== */
-void tListIterator_ctor(tListIterator *, short *, char *);
 
 /* ===== eaclib / syslib / game helpers ===== */
 extern "C"
@@ -36,7 +35,7 @@ void GetGarageCar(tCarManager *, unsigned short, tCarInfo *, int);
 void GetStockCar(tCarManager *, unsigned short, tCarInfo *, int);
 extern "C"
 {
-    void tListIterator_dtor(tListIterator *);
+    void tListIterator_dtor(tListIterator *iterator, int mode);
 }
 void *GetCarFromID(tCarManager *, int);
 extern "C"

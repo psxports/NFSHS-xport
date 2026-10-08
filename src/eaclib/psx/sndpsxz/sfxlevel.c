@@ -10,11 +10,11 @@
  */
 
 extern "C" int sndgs[];
-extern "C" int iSNDpsxeffectvol(int left, int right);            /* spatkey */
-extern "C" int iSNDgetchan(unsigned int tag);                    /* salloc  */
-extern "C" int iSNDpatchkey(int chan, int *tag);                 /* spatkey */
-extern "C" int iSNDplatformfxlevel(int chan, int bus, int fxon); /* sdriver (3-arg) */
-extern "C" void iSNDenteraudio(void);                            /* sserver */
+extern "C" int iSNDpsxeffectvol(int left, int right);                     /* spatkey */
+extern "C" int iSNDgetchan(unsigned int tag);                             /* salloc  */
+extern "C" int iSNDpatchkey(int chan, int *tag);                          /* spatkey */
+extern "C" int iSNDplatformfxlevel(unsigned int chan, int bus, int fxon); /* sdriver (3-arg) */
+extern "C" void iSNDenteraudio(void);                                     /* sserver */
 extern "C" void iSNDleaveaudio(void);
 
 extern "C" int iSNDplatformfxmasterlevel(int bus, int level); /* @0x801005BC */

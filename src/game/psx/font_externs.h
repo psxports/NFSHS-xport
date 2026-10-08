@@ -10,8 +10,8 @@ typedef void fn_void(int, int, void *, int, int, charactertbl *, int);
 /* ---- font module state globals (SYM) ---- */
 extern "C" int font_clutx;            /* 0x8013d854 */
 extern "C" int font_cluty;            /* 0x8013d858 */
-extern "C" u_long font_tint;          /* 0x8013d85c */
-extern "C" u_long font_abr;           /* 0x8013d860 */
+extern "C" uint32 font_tint;          /* 0x8013d85c */
+extern "C" uint32 font_abr;           /* 0x8013d860 */
 extern "C" u_short gFontClut;         /* 0x8013d864 */
 extern "C" u_char gFontSpaceWidth;    /* 0x8013d866 */
 extern "C" u_short font_currentTPage; /* 0x8013d868 */

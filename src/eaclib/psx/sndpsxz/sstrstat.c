@@ -2,11 +2,11 @@
 
 /* eaclib/psx/sndpsxz/sstrstat.c -- RECONSTRUCTED. NOT original.  *** 1/1 ***  obj sstrstat.obj @0x800E87D0 */
 extern "C" int sndgs[];
-extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);             /* sst      */
-extern "C" SndStreamRequest *iSNDstreamgetrequestptr(unsigned int tag); /* sstgetrp */
-extern "C" void iSNDmulu64(int *out, unsigned int a, unsigned int b);   /* smath64 */
-extern "C" int iSNDdivu64(int lo, int hi, unsigned int div);            /* smath64 */
-extern "C" void iSNDenteraudio(void);                                   /* sserver */
+extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);                       /* sst      */
+extern "C" SndStreamRequest *iSNDstreamgetrequestptr(unsigned int tag);           /* sstgetrp */
+extern "C" int *iSNDmulu64(int *out, unsigned int a, unsigned int b);             /* smath64 */
+extern "C" int iSNDdivu64(unsigned int low, unsigned int high, unsigned int div); /* smath64 */
+extern "C" void iSNDenteraudio(void);                                             /* sserver */
 extern "C" void iSNDleaveaudio(void);
 extern "C" void trap(unsigned int code);
 extern "C" int SNDSTRM_requeststatus(unsigned int reqTag, SNDREQUESTSTATUS *status); /* @0x800E87D0 */

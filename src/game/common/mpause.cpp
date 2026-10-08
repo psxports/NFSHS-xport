@@ -42,11 +42,11 @@ tPauseMenuDefs *tPauseMenuDefs_ct(tPauseMenuDefs *pThis)
   new ((void*)(&pThis->itemOptions)) tPMenuItemGoToMenuButton(3, &pThis->menuOptions, (void (*)(tPMenuCommand&))0);
   new ((void*)(&pThis->itemQuitRace)) tPMenuItemCommandButton(4, (tPMenuCommandType)4);
   new ((void*)(&pThis->itemForfeitRace)) tPMenuItemCommandButton(5, (tPMenuCommandType)5);
-  new ((void*)(&pThis->menuPause)) tPMenu((tPMenuItem *)&pThis->itemGamePaused, &pThis->itemContinue, &pThis->itemRestart, &pThis->itemOptions, &pThis->itemQuitRace, &pThis->itemForfeitRace, 0);
+  new ((void*)(&pThis->menuPause)) tPMenu(&pThis->itemGamePaused._base_tPMenuItem, {&pThis->itemContinue._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemRestart._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemOptions._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemQuitRace._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemForfeitRace._base_tPMenuItemInteractive._base_tPMenuItem, nullptr});
   new ((void*)(&pThis->itemOptionsTitle)) tPMenuItemNonInteractiveText(6);
   new ((void*)(&pThis->itemAudioSettings)) tPMenuItemGoToMenuButton(7, &pThis->menuAudioSettings, (void (*)(tPMenuCommand&))0);
   new ((void*)(&pThis->itemControllerSettings)) tPMenuItemGoToMenuButton(8, &pThis->menuControllerConfig, (void (*)(tPMenuCommand&))0);
-  new ((void*)(&pThis->menuOptions)) tPMenu((tPMenuItem *)&pThis->itemOptionsTitle, &pThis->itemAudioSettings, &pThis->itemControllerSettings, 0);
+  new ((void*)(&pThis->menuOptions)) tPMenu(&pThis->itemOptionsTitle._base_tPMenuItem, {&pThis->itemAudioSettings._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemControllerSettings._base_tPMenuItemInteractive._base_tPMenuItem, nullptr});
   new ((void*)(&pThis->itemAudioSettingsTitle)) tPMenuItemNonInteractiveText(10);
   new ((void*)(&pThis->iteratorAudioMode)) tPListIterator(InGameSelectListAudioMode, (int *)((char *)&GameSetup_gData + 0xec));
   new ((void*)(&pThis->itemAudioSettingsAudioMode)) tPMenuItemLeftRightChoice(0xb, &pThis->iteratorAudioMode);
@@ -55,18 +55,18 @@ tPauseMenuDefs *tPauseMenuDefs_ct(tPauseMenuDefs *pThis)
   new ((void*)(&pThis->itemAudioSettingsSpeechVolume)) tPMenuItemLeftRightSlider(0xe, &gMasterFENarrationLevel, 0x7f);
   new ((void*)(&pThis->itemAudioSettingsEngineVolume)) tPMenuItemLeftRightSlider(0xf, &gMasterEngineLevel, 0x7f);
   new ((void*)(&pThis->itemAudioSettingsAmbientVolume)) tPMenuItemLeftRightSlider(0x10, &gMasterAmbientLevel, 0x7f);
-  new ((void*)(&pThis->menuAudioSettings)) tPMenu((tPMenuItem *)&pThis->itemAudioSettingsTitle, &pThis->itemAudioSettingsAudioMode, &pThis->itemAudioSettingsMusicVolume, &pThis->itemAudioSettingsFXVolume, &pThis->itemAudioSettingsSpeechVolume, &pThis->itemAudioSettingsEngineVolume, &pThis->itemAudioSettingsAmbientVolume, 0);
+  new ((void*)(&pThis->menuAudioSettings)) tPMenu(&pThis->itemAudioSettingsTitle._base_tPMenuItem, {&pThis->itemAudioSettingsAudioMode._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemAudioSettingsMusicVolume._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemAudioSettingsFXVolume._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemAudioSettingsSpeechVolume._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemAudioSettingsEngineVolume._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemAudioSettingsAmbientVolume._base_tPMenuItemInteractive._base_tPMenuItem, nullptr});
   new ((void*)(&pThis->iteratorConfig)) tPListIteratorIndexed(SelectListConfig, (int *)((char *)&GameSetup_gData + 0x60), &Device_gPausePortIndex);
   new ((void*)(&pThis->itemControllerSettingsTitle)) tPMenuItemNonInteractiveText(0x14);
   new ((void*)(&pThis->itemControllerConfig)) tPMenuItemLeftRightChoice(0x15, (tPListIterator *)&pThis->iteratorConfig);
   new ((void*)(&pThis->itemControllerShockMode)) tPMenuItemLeftRightSliderIndexed(0x1b, (int *)((char *)&GameSetup_gData + 0xa8), 0x7f, &Device_gPausePortIndex);
   new ((void*)(&pThis->itemControllerShockImpact)) tPMenuItemLeftRightSliderIndexed(0x1c, (int *)((char *)&GameSetup_gData + 0xb0), 0x7f, &Device_gPausePortIndex);
-  new ((void*)(&pThis->menuControllerConfig)) tPMenu((tPMenuItem *)&pThis->itemControllerSettingsTitle, &pThis->itemControllerConfig, &pThis->itemControllerShockMode, &pThis->itemControllerShockImpact, 0);
+  new ((void*)(&pThis->menuControllerConfig)) tPMenu(&pThis->itemControllerSettingsTitle._base_tPMenuItem, {&pThis->itemControllerConfig._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemControllerShockMode._base_tPMenuItemLeftRightSlider._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemControllerShockImpact._base_tPMenuItemLeftRightSlider._base_tPMenuItemInteractive._base_tPMenuItem, nullptr});
   new ((void*)(&pThis->itemConfirmTitle)) tPMenuItemNonInteractiveText(4);
   new ((void*)(&pThis->itemConfirmAreYouSure)) tPMenuItemNonInteractiveText(0x24);
   new ((void*)(&pThis->itemConfirmNo)) tPMenuItemCommandButton(0x26, (tPMenuCommandType)7);
   new ((void*)(&pThis->itemConfirmYes)) tPMenuItemCommandButton(0x25, (tPMenuCommandType)7);
-  new ((void*)(&pThis->menuConfirmYesNo)) tPMenu((tPMenuItem *)&pThis->itemConfirmTitle, &pThis->itemConfirmAreYouSure, &pThis->itemConfirmNo, &pThis->itemConfirmYes, 0);
+  new ((void*)(&pThis->menuConfirmYesNo)) tPMenu(&pThis->itemConfirmTitle._base_tPMenuItem, {&pThis->itemConfirmAreYouSure._base_tPMenuItem, &pThis->itemConfirmNo._base_tPMenuItemInteractive._base_tPMenuItem, &pThis->itemConfirmYes._base_tPMenuItemInteractive._base_tPMenuItem, nullptr});
   return pThis;
 }
 
@@ -74,37 +74,37 @@ tPauseMenuDefs *tPauseMenuDefs_ct(tPauseMenuDefs *pThis)
 void tPauseMenuDefs_dt(tPauseMenuDefs *pThis, u_int __in_chrg)
 
 {
-  (((tPMenu*)(&pThis->menuConfirmYesNo))->~tPMenu(), (tPMenu*)(&pThis->menuConfirmYesNo));
-  (((tPMenuItemCommandButton*)(&pThis->itemConfirmYes))->~tPMenuItemCommandButton(), (tPMenuItemCommandButton*)(&pThis->itemConfirmYes));
-  (((tPMenuItemCommandButton*)(&pThis->itemConfirmNo))->~tPMenuItemCommandButton(), (tPMenuItemCommandButton*)(&pThis->itemConfirmNo));
-  (((tPMenuItemNonInteractiveText*)(&pThis->itemConfirmAreYouSure))->~tPMenuItemNonInteractiveText(), (tPMenuItemNonInteractiveText*)(&pThis->itemConfirmAreYouSure));
-  (((tPMenuItemNonInteractiveText*)(&pThis->itemConfirmTitle))->~tPMenuItemNonInteractiveText(), (tPMenuItemNonInteractiveText*)(&pThis->itemConfirmTitle));
-  (((tPMenu*)(&pThis->menuControllerConfig))->~tPMenu(), (tPMenu*)(&pThis->menuControllerConfig));
-  (((tPMenuItemLeftRightSliderIndexed*)(&pThis->itemControllerShockImpact))->~tPMenuItemLeftRightSliderIndexed(), (tPMenuItemLeftRightSliderIndexed*)(&pThis->itemControllerShockImpact));
-  (((tPMenuItemLeftRightSliderIndexed*)(&pThis->itemControllerShockMode))->~tPMenuItemLeftRightSliderIndexed(), (tPMenuItemLeftRightSliderIndexed*)(&pThis->itemControllerShockMode));
-  (((tPMenuItemLeftRightChoice*)(&pThis->itemControllerConfig))->~tPMenuItemLeftRightChoice(), (tPMenuItemLeftRightChoice*)(&pThis->itemControllerConfig));
-  (((tPMenuItemNonInteractiveText*)(&pThis->itemControllerSettingsTitle))->~tPMenuItemNonInteractiveText(), (tPMenuItemNonInteractiveText*)(&pThis->itemControllerSettingsTitle));
-  (((tPListIteratorIndexed*)(&pThis->iteratorConfig))->~tPListIteratorIndexed(), (tPListIteratorIndexed*)(&pThis->iteratorConfig));
-  (((tPMenu*)(&pThis->menuAudioSettings))->~tPMenu(), (tPMenu*)(&pThis->menuAudioSettings));
-  (((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsAmbientVolume))->~tPMenuItemLeftRightSlider(), (tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsAmbientVolume));
-  (((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsEngineVolume))->~tPMenuItemLeftRightSlider(), (tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsEngineVolume));
-  (((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsSpeechVolume))->~tPMenuItemLeftRightSlider(), (tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsSpeechVolume));
-  (((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsFXVolume))->~tPMenuItemLeftRightSlider(), (tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsFXVolume));
-  (((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsMusicVolume))->~tPMenuItemLeftRightSlider(), (tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsMusicVolume));
-  (((tPMenuItemLeftRightChoice*)(&pThis->itemAudioSettingsAudioMode))->~tPMenuItemLeftRightChoice(), (tPMenuItemLeftRightChoice*)(&pThis->itemAudioSettingsAudioMode));
-  (((tPListIterator*)(&pThis->iteratorAudioMode))->~tPListIterator(), (tPListIterator*)(&pThis->iteratorAudioMode));
-  (((tPMenuItemNonInteractiveText*)(&pThis->itemAudioSettingsTitle))->~tPMenuItemNonInteractiveText(), (tPMenuItemNonInteractiveText*)(&pThis->itemAudioSettingsTitle));
-  (((tPMenu*)(&pThis->menuOptions))->~tPMenu(), (tPMenu*)(&pThis->menuOptions));
-  (((tPMenuItemGoToMenuButton*)(&pThis->itemControllerSettings))->~tPMenuItemGoToMenuButton(), (tPMenuItemGoToMenuButton*)(&pThis->itemControllerSettings));
-  (((tPMenuItemGoToMenuButton*)(&pThis->itemAudioSettings))->~tPMenuItemGoToMenuButton(), (tPMenuItemGoToMenuButton*)(&pThis->itemAudioSettings));
-  (((tPMenuItemNonInteractiveText*)(&pThis->itemOptionsTitle))->~tPMenuItemNonInteractiveText(), (tPMenuItemNonInteractiveText*)(&pThis->itemOptionsTitle));
-  (((tPMenu*)(&pThis->menuPause))->~tPMenu(), (tPMenu*)(&pThis->menuPause));
-  (((tPMenuItemCommandButton*)(&pThis->itemForfeitRace))->~tPMenuItemCommandButton(), (tPMenuItemCommandButton*)(&pThis->itemForfeitRace));
-  (((tPMenuItemCommandButton*)(&pThis->itemQuitRace))->~tPMenuItemCommandButton(), (tPMenuItemCommandButton*)(&pThis->itemQuitRace));
-  (((tPMenuItemGoToMenuButton*)(&pThis->itemOptions))->~tPMenuItemGoToMenuButton(), (tPMenuItemGoToMenuButton*)(&pThis->itemOptions));
-  (((tPMenuItemCommandButton*)(&pThis->itemRestart))->~tPMenuItemCommandButton(), (tPMenuItemCommandButton*)(&pThis->itemRestart));
-  (((tPMenuItemCommandButton*)(&pThis->itemContinue))->~tPMenuItemCommandButton(), (tPMenuItemCommandButton*)(&pThis->itemContinue));
-  (((tPMenuItemNonInteractiveText*)(&pThis->itemGamePaused))->~tPMenuItemNonInteractiveText(), (tPMenuItemNonInteractiveText*)(&pThis->itemGamePaused));
+  ((tPMenu*)(&pThis->menuConfirmYesNo))->~tPMenu();
+  ((tPMenuItemCommandButton*)(&pThis->itemConfirmYes))->~tPMenuItemCommandButton();
+  ((tPMenuItemCommandButton*)(&pThis->itemConfirmNo))->~tPMenuItemCommandButton();
+  ((tPMenuItemNonInteractiveText*)(&pThis->itemConfirmAreYouSure))->~tPMenuItemNonInteractiveText();
+  ((tPMenuItemNonInteractiveText*)(&pThis->itemConfirmTitle))->~tPMenuItemNonInteractiveText();
+  ((tPMenu*)(&pThis->menuControllerConfig))->~tPMenu();
+  ((tPMenuItemLeftRightSliderIndexed*)(&pThis->itemControllerShockImpact))->~tPMenuItemLeftRightSliderIndexed();
+  ((tPMenuItemLeftRightSliderIndexed*)(&pThis->itemControllerShockMode))->~tPMenuItemLeftRightSliderIndexed();
+  ((tPMenuItemLeftRightChoice*)(&pThis->itemControllerConfig))->~tPMenuItemLeftRightChoice();
+  ((tPMenuItemNonInteractiveText*)(&pThis->itemControllerSettingsTitle))->~tPMenuItemNonInteractiveText();
+  ((tPListIteratorIndexed*)(&pThis->iteratorConfig))->~tPListIteratorIndexed();
+  ((tPMenu*)(&pThis->menuAudioSettings))->~tPMenu();
+  ((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsAmbientVolume))->~tPMenuItemLeftRightSlider();
+  ((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsEngineVolume))->~tPMenuItemLeftRightSlider();
+  ((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsSpeechVolume))->~tPMenuItemLeftRightSlider();
+  ((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsFXVolume))->~tPMenuItemLeftRightSlider();
+  ((tPMenuItemLeftRightSlider*)(&pThis->itemAudioSettingsMusicVolume))->~tPMenuItemLeftRightSlider();
+  ((tPMenuItemLeftRightChoice*)(&pThis->itemAudioSettingsAudioMode))->~tPMenuItemLeftRightChoice();
+  ((tPListIterator*)(&pThis->iteratorAudioMode))->~tPListIterator();
+  ((tPMenuItemNonInteractiveText*)(&pThis->itemAudioSettingsTitle))->~tPMenuItemNonInteractiveText();
+  ((tPMenu*)(&pThis->menuOptions))->~tPMenu();
+  ((tPMenuItemGoToMenuButton*)(&pThis->itemControllerSettings))->~tPMenuItemGoToMenuButton();
+  ((tPMenuItemGoToMenuButton*)(&pThis->itemAudioSettings))->~tPMenuItemGoToMenuButton();
+  ((tPMenuItemNonInteractiveText*)(&pThis->itemOptionsTitle))->~tPMenuItemNonInteractiveText();
+  ((tPMenu*)(&pThis->menuPause))->~tPMenu();
+  ((tPMenuItemCommandButton*)(&pThis->itemForfeitRace))->~tPMenuItemCommandButton();
+  ((tPMenuItemCommandButton*)(&pThis->itemQuitRace))->~tPMenuItemCommandButton();
+  ((tPMenuItemGoToMenuButton*)(&pThis->itemOptions))->~tPMenuItemGoToMenuButton();
+  ((tPMenuItemCommandButton*)(&pThis->itemRestart))->~tPMenuItemCommandButton();
+  ((tPMenuItemCommandButton*)(&pThis->itemContinue))->~tPMenuItemCommandButton();
+  ((tPMenuItemNonInteractiveText*)(&pThis->itemGamePaused))->~tPMenuItemNonInteractiveText();
   if ((__in_chrg & 1) != 0) {
     __builtin_delete(pThis);
   }
@@ -473,7 +473,7 @@ void MPause_KillMPause(void)
 {
   DrawSync(0);
   if (gPauseMenuDefs != 0) {
-    (((tPauseMenuDefs*)(gPauseMenuDefs))->~tPauseMenuDefs(), (tPauseMenuDefs*)(gPauseMenuDefs));
+    ((tPauseMenuDefs*)(gPauseMenuDefs))->~tPauseMenuDefs();
   }
   TextSys_UnloadWords();
   return;

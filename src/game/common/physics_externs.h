@@ -9,14 +9,14 @@
 extern void trap(int code); /* gcc MIPS div/overflow break helper */
 
 /* ---- cross-TU globals ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal;
 extern int AITune_driveSide;
 extern int AIInit_forceHumanHandBrake;
 extern Trk_NewSlice *BWorldSm_slices;
 extern int gNumSlices;
 extern Car_tObj *Cars_gHumanRaceCarList[9];
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
 
 /* ---- cross-TU functions ---- */
@@ -24,7 +24,7 @@ extern void Math_NormalizeVector(coorddef *v);
 extern void Math_ResolveRotatedVector(int x, int z, int angle, int *outx, int *outz);
 extern "C"
 {
-    extern int Collide_TestWithPlane(void *n, coorddef *normal, coorddef *pos);
+    extern void Collide_TestWithPlane(void *n, coorddef *normal, coorddef *pos);
 }
 extern void Force_HitWall(int impulse);
 extern int Force_IsForceOn(Car_tObj *car);

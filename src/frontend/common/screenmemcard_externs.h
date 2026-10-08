@@ -7,7 +7,7 @@
 typedef long long longlong;
 typedef unsigned long long ulonglong;
 
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" int ticks;
 extern "C" int CURRENTLYUSINGMEMCARD;
 extern char (*fMemIcon)[15][3][192];    /* global icon data table: 15 icons x 3 frames x 192B */

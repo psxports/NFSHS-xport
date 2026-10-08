@@ -1,3 +1,4 @@
+#include <stdio.h>
 /* game/common/nfs3.cpp -- RECONSTRUCTED (game boot / module start-up + game entry; C TU, 11 fns) */
 #include "../../nfs4_types.h"
 #include "nfs3_externs.h"
@@ -26,11 +27,11 @@ char         befuddleTemp[10];   /* @0x80115c3c  (bss(zero)) */
 char         gMusicInSimIsOn = 1;   /* @0x8013d270 */
 int          gUseFrontend = 1;   /* @0x8013d274 */
 #ifdef AP_WIN
-extern "C" void NFSHS_HostLog(const char *fmt, ...); /* explicit TEST_DIRECT_RACE boundary */
+extern "C" void NFSHS_HostLog(const char *fmt); /* explicit TEST_DIRECT_RACE boundary */
 extern "C" { extern void Front_InitialMemCardCheck(void); }
 #endif
-extern "C" { u_long       gFECheats; } /* @0x8013d278  (bss(zero)) */
-extern "C" { u_long       gFEBonus; } /* @0x8013d27c  (bss(zero)) */
+extern "C" { uint32       gFECheats; } /* @0x8013d278  (bss(zero)) */
+extern "C" { uint32       gFEBonus; } /* @0x8013d27c  (bss(zero)) */
 int          gFEBigHandle;   /* @0x8013d280  (bss(zero)) */
 extern "C" { int          MEMCARDFRONTENDISINITTED; } /* @0x8013d284  (bss(zero)) */
 char         gCheckTotalTime = 1;   /* @0x8013d288 */
@@ -115,15 +116,15 @@ void NFS4_LoadPerps(void)
   u_char bVar1;
   int *addr;
   u_int *addr_00;
-  u_long numTiers;
+  uint32 numTiers;
   tCarInfo *carCandidate;
-  u_long j;
+  uint32 j;
   u_int uVar4;
-  char *pcVar6;
+  const char *pcVar6;
   u_char *pbVar7;
   char *data;
   u_char *pbVar8;
-  u_long numCars;
+  uint32 numCars;
   int numMissions;
   u_int uVar9;
   tCarInfo *carData;
@@ -189,7 +190,7 @@ NFS4LoadPerps_defaultZero:
         pGVar11->GlueFactor = *(int *)(pbVar7 + 0x17);
         pGVar11->SpeechColour = cars[uVar4].fSpeechColors[*pbVar7];
         bVar1 = *pbVar7;
-        u_long carColor = cars[uVar4].fColorList[bVar1];
+        uint32 carColor = cars[uVar4].fColorList[bVar1];
         pGVar11->HudColour = (carColor >> 16 & 0xff) | (carColor & 0xff00) |
                               (carColor & 0xff) << 0x10;
         pbVar8 = pbVar8 + 0x2c;
@@ -337,7 +338,7 @@ void LoadFrontendOverlay(void)
   int handle;
   int iVar1;
   
-  handle = asyncloadfileat("front.bin",bigBuf);
+  handle = asyncloadfileat("front.bin",(intptr)bigBuf);
   while (iVar1 = getasyncreadstatus(handle), iVar1 == 0) {
     systemtask(0);
   }
@@ -428,22 +429,20 @@ void NFS3_CheckForFileOperations(void)
 extern "C"
 {
 // XPORT REVISION: 2026-09-24T13:10:20Z
-int xport_main(int argc, char **argv)
+void xport_main(void)
 
 {
   u_int uVar1;
   int *setup;
   int iVar2;
+  static char winPattern[] = "win*";
+  static char losePattern[] = "lose*";
   char *pattern;
   short oldReplayMode;
 #ifdef AP_WIN
   int hostDirectRace;
 #endif
 
-  if (argc < 0 || argv == 0) {
-    return 1;
-  }
-  
   __main();
   oldReplayMode = 0;
   Platform_DebuggerPollHost();
@@ -494,9 +493,9 @@ int xport_main(int argc, char **argv)
     frontEnd.traffic[0] = (char)(NFSHS_HostTestRaceParam("traffic",0) != 0);
     frontEnd.laps = (char)NFSHS_HostTestRaceParam("laps",0);
     frontEnd.catchup = (char)(NFSHS_HostTestRaceParam("catchup",0) != 0);
-    NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("TEST_DIRECT_RACE track=%d car=%d color=%d opponents=%d race=%d skill=%d traffic=%d laps=%d",
+    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "TEST_DIRECT_RACE track=%d car=%d color=%d opponents=%d race=%d skill=%d traffic=%d laps=%d",
                   track,car,color,opponents,(int)frontEnd.raceType,(int)frontEnd.skillLevel,
-                  (int)frontEnd.traffic[0],(int)frontEnd.laps));
+                  (int)frontEnd.traffic[0],(int)frontEnd.laps); NFSHS_HostLog(nfshsLogLine); }()));
   }
 #endif
   if (gUseFrontend != 0
@@ -563,10 +562,10 @@ int xport_main(int argc, char **argv)
                  ((Cars_gNumHumanRaceCars != 2 ||
                   ((Cars_gHumanRaceCarList[1]->carFlags & 0x200U) == 0)))))))) {
               if ((Cars_gHumanRaceCarList[0]->stats).finalPosition == 1) {
-                pattern = "win*";
+                pattern = winPattern;
               }
               else {
-                pattern = "lose*";
+                pattern = losePattern;
               }
               AudioMus_PlaySong(pattern);
             }

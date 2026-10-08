@@ -24,7 +24,7 @@ int AudioMus_Server(int mode,int ticks);
 void AudioMus_InitGlobals(void);
 void AudioMus_InitDriverGlobals(void);
 void AudioMus_DriverStartUp(int buffersize,int spusize);
-extern "C" { void AudioMus_SysStartUp(int buffersize,int spusize,char *songs); }
+extern "C" { void AudioMus_SysStartUp(int buffersize,int spusize,const char *songs); }
 void AudioMus_DriverCleanUp(void);
 extern "C" { void AudioMus_SysCleanUp(void); }
 extern "C" { void AudioMus_StopSong(int fadeticks); }
@@ -84,6 +84,8 @@ int AudioMus_Buffered(void)
 /* ---- AudioMus_GetCurrentSong__Fv  [@0x8007a028] ---- */
 extern "C" AudioMus_tCurrentSong * AudioMus_GetCurrentSong(void)
 {
+  static char bufferNotAllocated[] = "BUFFER NOT ALLOCATED";
+  static char streamNotCreated[] = "STREAM NOT CREATED";
   AudioMus_tCurrentSong*curr;
   AudioMus_tSongEntry*info;
   AudioMus_tMusicGlobals *pAVar1;
@@ -101,11 +103,11 @@ extern "C" AudioMus_tCurrentSong * AudioMus_GetCurrentSong(void)
   }
   (pAVar1->current).index = iVar2;
   if (AudioMus_g->errorcode == -4) {
-    pcVar3 = "BUFFER NOT ALLOCATED";
+    pcVar3 = bufferNotAllocated;
   }
   else {
     if (AudioMus_g->errorcode != -3) goto LAB_8007a0ac;
-    pcVar3 = "STREAM NOT CREATED";
+    pcVar3 = streamNotCreated;
   }
   (pAVar1->current).info.title = pcVar3;
 LAB_8007a0ac:
@@ -188,7 +190,7 @@ void AudioMus_Fail(int errorcode)
 /* ---- AudioMus_QueueRequestedSong__Fv  [@0x8007a258] ---- */
 void AudioMus_QueueRequestedSong(void)
 {
-  long offset;
+  int offset;
   AudioMus_tSongEntry*info;
   AudioMus_tMusicGlobals *pAVar2;
   char *pcVar3;
@@ -196,7 +198,7 @@ void AudioMus_QueueRequestedSong(void)
   
   pcVar3 = (char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,
                           (u_char)AudioMus_g->playlist[AudioMus_g->requestsong],
-                          &offset,(long *)0x0);   /* oracle 0x6a280: a2=playlist[requestsong] a3=&offset stk=NULL */
+                          &offset,(int *)0x0);   /* oracle 0x6a280: a2=playlist[requestsong] a3=&offset stk=NULL */
   AudioMus_g->songname = pcVar3;
   if (-1 < AudioMus_g->streamhandle) {
     AudioMus_g->requesthandle =
@@ -287,7 +289,7 @@ int AudioMus_Server(int mode,int ticks)
   int iVar3;
   AudioMus_tMusicGlobals *pAVar4;
   int iVar5;
-  void *pThis;
+  int streamHandle;
   int iVar6;
   int iVar7;
   
@@ -403,16 +405,16 @@ int AudioMus_Server(int mode,int ticks)
             return 0;
           }
           if (AudioMus_g->errorcode == -5) {
-            pThis = (void *)(intptr)AudioMus_g->streamhandle;
+            streamHandle = AudioMus_g->streamhandle;
             iVar3 = AudioMus_g->volume;
             AudioMus_g->errorcode = 0;
           }
           else {
             AudioMus_SetCurrentSongInfo();
-            pThis = (void *)(intptr)AudioMus_g->streamhandle;
+            streamHandle = AudioMus_g->streamhandle;
             iVar3 = AudioMus_g->volume;
           }
-          SNDSTRM_autovol(pThis,2000,iVar3);
+          SNDSTRM_autovol(streamHandle,2000,iVar3);
           AudioMus_g->switchsong = 0;
           return 0;
         }
@@ -458,7 +460,7 @@ extern "C" AudioMus_tSongList *AudioMus_GetSongList(char *pattern,int memtype)
   AudioMus_tSongEntry*song;
   int numsongs;
   int i;
-  long size;
+  int size;
   char*songname;
   AudioMus_tMusicGlobals *pAVar1;
   u_char *pbVar2;
@@ -479,8 +481,8 @@ extern "C" AudioMus_tSongList *AudioMus_GetSongList(char *pattern,int memtype)
     iVar5 = 0;
     if (0 < AudioMus_g->totalsongs) {
       do {
-        pbVar2 = (u_char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,iVar5,(long *)0x0,(long *)0x0);   /* oracle 0x6a8d8: a2=i a3=NULL stk=NULL */
-        iVar3 = wildcard(pbVar2,pattern);
+        pbVar2 = (u_char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,iVar5,(int *)0x0,(int *)0x0);   /* oracle 0x6a8d8: a2=i a3=NULL stk=NULL */
+        iVar3 = wildcard((char *)pbVar2,pattern);
         if (iVar3 != 0) {
           iVar6 = iVar6 + 1;
         }
@@ -493,8 +495,8 @@ extern "C" AudioMus_tSongList *AudioMus_GetSongList(char *pattern,int memtype)
     pAVar4->numsongs = 0;
     pAVar4->currentsong = -1;
     for (iVar6 = 0; iVar6 < AudioMus_g->totalsongs; iVar6 = iVar6 + 1) {
-      pbVar2 = (u_char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,iVar6,(long *)0x0,&size);   /* oracle 0x6a974: a2=i a3=NULL stk=&size */
-      iVar5 = wildcard(pbVar2,pattern);
+      pbVar2 = (u_char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,iVar6,(int *)0x0,&size);   /* oracle 0x6a974: a2=i a3=NULL stk=&size */
+      iVar5 = wildcard((char *)pbVar2,pattern);
       if (iVar5 != 0) {
         info->filename = (char *)pbVar2;
         AudioMus_SetEntry(info);
@@ -604,7 +606,7 @@ void AudioMus_DriverStartUp(int buffersize,int spusize)
 }
 
 /* ---- AudioMus_SysStartUp__FiiPc  [@0x8007ac18] ---- */
-extern "C" void AudioMus_SysStartUp(int buffersize,int spusize,char *songs)
+extern "C" void AudioMus_SysStartUp(int buffersize,int spusize,const char *songs)
 {
   char *pcVar1;
   int iVar2;
@@ -746,8 +748,8 @@ void AudioMus_BuildPattern(char *pattern)
         if (0x1f < AudioMus_g->availablesongs) {
           return;
         }
-        pattern_00 = (u_char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,iVar3,(long *)0x0,(long *)0x0);   /* oracle 0x6afb4: a2=i a3=NULL stk=NULL */
-        iVar2 = wildcard(pattern_00,pattern);
+        pattern_00 = (u_char *)locatebigentry(AudioMus_g->bigfileheader,(char *)0x0,iVar3,(int *)0x0,(int *)0x0);   /* oracle 0x6afb4: a2=i a3=NULL stk=NULL */
+        iVar2 = wildcard((char *)pattern_00,pattern);
         if (iVar2 != 0) {
           AudioMus_g->playlist[AudioMus_g->availablesongs] = (char)iVar3;
           AudioMus_g->availablesongs = AudioMus_g->availablesongs + 1;

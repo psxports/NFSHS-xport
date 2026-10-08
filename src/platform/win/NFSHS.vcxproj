@@ -77,8 +77,7 @@
       <AdditionalOptions>/permissive /vms /EHsc- /FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
-      <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateFullProgramDatabaseFile>true</GenerateFullProgramDatabaseFile>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -110,8 +109,7 @@
       <AdditionalOptions>/permissive /vms /EHsc- /FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
-      <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateFullProgramDatabaseFile>true</GenerateFullProgramDatabaseFile>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -146,22 +144,20 @@
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx_spu.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="$(XportRoot)src\xport_trace.c"><CompileAs>CompileAsC</CompileAs></ClCompile>
+    
     <ClCompile Include="$(XportRoot)src\psx_gpu.c">
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx_gpu.obj</ObjectFileName>
       <Optimization Condition="'$(Configuration)'=='Debug'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)'=='Debug'">Default</BasicRuntimeChecks>
     </ClCompile>
-    <ClCompile Include="$(XportRoot)src\psx_pad.c">
-      <CompileAs>CompileAsC</CompileAs>
-      <ObjectFileName>$(IntDir)xport_psx_pad.obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="$(XportRoot)src\psx.c">
+<ClCompile Include="$(XportRoot)src\psx.c">
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx_memory.obj</ObjectFileName>
       <PreprocessorDefinitions>XPORT_PSX_MEMORY_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Update="$(ReconRoot)game\common\spchevnt.c">
+<ClCompile Update="$(ReconRoot)game\common\spchevnt.c">
       <ObjectFileName>$(IntDir)game_spchevnt.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Update="$(ReconRoot)eaclib\psx\spchpsxz\spchevnt.c">

@@ -25,7 +25,7 @@ extern "C"
 /* shape lib */
 extern "C"
 {
-    extern char *Platform_GetDCTBuffer(int n, char *name);
+    extern char *Platform_GetDCTBuffer(int n, const char *name);
 }
 extern "C"
 {

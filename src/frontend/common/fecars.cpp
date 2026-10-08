@@ -4,6 +4,7 @@
  *   Member defs; base ctors via init-lists; manual _vf vtable for the iterator virtuals.
  */
 #include "fecars.h"
+#include "../../mips_semantics.h"
 
 /* ---- FECars.obj-OWNED globals -- DEFINED here (self-contained; .bss zero; SYM-typed) ---- */
 char         cars_disableBonuses;   /* @0x80051540  (bss(zero)) */
@@ -160,10 +161,10 @@ long tCarManager::CalcUsedPrice(short garageNumber)
           result = iVar5 >> 1;
         }
         else {
-          iVar5 = iVar5 * 3;
-          result = iVar5 >> 2;
+          iVar5 = nfs4_mips_mult_s32(iVar5,3);
+          result = nfs4_mips_sra_s32(iVar5,2);
           if (iVar5 < 0) {
-            result = iVar5 + 3 >> 2;
+            result = nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar5,3),2);
           }
         }
       }
@@ -408,7 +409,7 @@ void tCarManager::LoadCars(tSaveCarInfo &load,short playerNum)
 void tCarManager::SaveCars(tSaveCarInfo &save)
 
 {
-  u_long i;
+  uint32 i;
   
   blockmove(this->fCarGarage,&save,0x80);
   i = 0;
@@ -667,11 +668,11 @@ void tCarManager::GetPinkSlipsCar(short garageNumber,tCarInfo &carInfo,short pla
 void tCarManager::LoadDescription()
 
 {
-  u_long *input;
+  uint32 *input;
   tCarInfo *ptVar1;
   int iVar2;
   tCarInfo *ptVar3;
-  u_long uVar4;
+  uint32 uVar4;
   char *data;
   int iVar5;
   int j;
@@ -683,7 +684,7 @@ void tCarManager::LoadDescription()
    * "fecars.car" literal.  The reconstructed offset had skipped the format. */
   sprintf(data,"%s%s",Paths_Paths[0x25],"fecars.car");
   this->ReleaseDescription();
-  input = (u_long *)loadfileadr(filename,0x10);
+  input = (uint32 *)loadfileadr(filename,0x10);
   if (input == 0) {
     this->fNumCars = 0;
     this->fCars = 0;
@@ -1082,8 +1083,8 @@ void tListIteratorCar::AdjustPosition(tPlayer atIndex,short direction)
   tCarManager *ptVar12;
   u_int uVar13;
   tCarInfo *carInfo;
-  u_long lastCar;
-  u_long firstCar;
+  uint32 lastCar;
+  uint32 firstCar;
   u_short uStackX_4;
   char oldCountry;
   

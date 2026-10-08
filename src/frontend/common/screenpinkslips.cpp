@@ -4,6 +4,7 @@
  *   void ProcessInput) resolved via m2c oracle C:\Temp\nfs4-split\cur_c\front\*.c
  */
 #include "screenpinkslips.h"
+#include "../../mips_semantics.h"
 
 
 /* ---- tScreenPinkSlips::DrawBackground  [SCREENPINKSLIPS.CPP:71-194] ---- */
@@ -160,7 +161,7 @@ void tScreenPinkSlips::GetShapeInfo(short &numPermShapes,short &numSwapShapes,ch
   GetTrack(&trackManager,(ushort)(byte)frontEnd.track[0],&trackInfo);
   numPermShapes = 0x39;
   numSwapShapes = 4;
-  *permFileName = "zPink";
+  *permFileName = NFS4_WRITABLE_LITERAL("zPink");
   sprintf(gSwapFileName,"TR%02dPS",(int)trackInfo.fTrackID);
   *swapFileName = gSwapFileName;
   this->fPreviousTrack = (short)trackInfo.fTrackID;
@@ -272,7 +273,7 @@ void tScreenPinkSlips::DrawVideoWall()
     } while (iVar2 * 0x10000 >> 0x10 < 4);
     this->fTVsInitialized = 1;
   }
-  tv_ticks = (short)(ticks - this->fTVTicks >> 2);
+  tv_ticks = (short)nfs4_mips_sra_s32(nfs4_mips_subu_s32(ticks,this->fTVTicks),2);
   if (this->fTransitionDirection < '\x01') {
     j = 0;
     if (0 < tv_ticks) {

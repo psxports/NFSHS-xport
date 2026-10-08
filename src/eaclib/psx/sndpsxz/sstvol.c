@@ -3,7 +3,7 @@
 /* eaclib/psx/sndpsxz/sstvol.c -- RECONSTRUCTED. NOT original.  *** 1/1 ***  obj sstvol.obj @0x800EA0D8 */
 extern "C" int sndgs[];
 extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag); /* sst */
-extern "C" int SNDvol(unsigned int tag, int vol);           /* svol */
+extern "C" int SNDvol(int handle, int vol);                 /* svol */
 extern "C" int SNDSTRM_vol(int tag, int vol);               /* @0x800EA0D8 */
 
 /* SNDSTRM_vol : set a stream's volume (cached at +0x54) and apply it. */

@@ -5,10 +5,10 @@
 #include "../../lib/libfns.h"
 
 extern "C" int ticks;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tFEApplication *FEApp;
 extern tGlobalMenuDefs *menuDefs;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern tCarManager carManager;
 extern tTournamentManager tournamentManager;
 extern tTrackManager trackManager;
@@ -24,8 +24,6 @@ extern short SelectListDisplayMap[4], SelectListDisplayOpponentID[4], SelectList
 extern short SelectListSplitDisplay[3], SelectListUpgrades[4], SelectListControllerConfig[4], SelectListAudioMode[4];
 
 /* ===== auto-generated stubs ===== */
-int AddToPinkSlipsList(...);
-int AddUpgradesToPinkSlipsList(...);
 void AudioCmn_PlayFESFX(int);
 long CalcUsedPrice(tCarManager *, short);
 long CheapestCarStockPrice(tCarManager *);
@@ -35,19 +33,15 @@ extern "C"
 }
 extern "C"
 {
-    int Decrement(...);
+    void Display(tDialogBase *dialog);
 }
 extern "C"
 {
-    int Display(...);
+    void *FECheat_IsTheUserACryBabyCheater(void);
 }
 extern "C"
 {
-    int FECheat_IsTheUserACryBabyCheater(...);
-}
-extern "C"
-{
-    int GetAwardInformation(...);
+    void GetAwardInformation(tTournamentManager *manager, tAwardInformation *info);
 }
 tCarInfo *GetCarFromID(tCarManager *, short);
 void GetGarageCar(tCarManager *, unsigned short, tCarInfo *, int);
@@ -55,15 +49,14 @@ short GetNumOwnedCars(tCarManager *, short);
 short GetNumTourneyCars(tCarManager *, short);
 extern "C"
 {
-    int GetPinkSlipsCar(...);
+    void GetPinkSlipsCar(tCarManager *manager, short garageNumber, tCarInfo *carInfo, short playerNum);
 }
 void GetStockCar(tCarManager *, unsigned short, tCarInfo *);
 void GetTrack(tTrackManager *, unsigned short, tTrackInformation *);
 extern "C"
 {
-    int Hide(...);
+    void Hide(tDialogBase *dialog);
 }
-int Increment(...);
 extern "C"
 {
     void Init_Memcard(bool redraw, bool pinkslips);
@@ -78,41 +71,39 @@ long PurchaseCar(tCarManager *, short, short, short);
 long PurchaseUpgrade(tCarManager *, short, short, short);
 extern "C"
 {
-    int Redraw(...);
+    void Redraw(tFEApplication *application);
 }
 extern "C"
 {
-    int Run(...);
+    short Run(tDialogInteractive *dialog);
 }
 extern "C"
 {
-    int SaveGame(...);
+    void *SaveGame(short player);
 }
 PinkSlipsErrorCode SavePinkSlipsCarsWithErrorDialogs(short player, short WillLoseCar, short withoutCarInGarageNumber);
-int SellCar(...);
 void SetCarAvailable(tCarManager *, int, bool);
 void SetDimensions(tMenuItemLeftRightSlider *, short, short, short, short);
 void SetState(tScreenCarSelect *, int);
-int StartNewTournament(...);
 extern "C"
 {
-    int StatChk_ClearNewRecords(...);
+    void StatChk_ClearNewRecords(void);
 }
 extern "C"
 {
-    int StatChk_IsRecordLapTime(...);
+    void *StatChk_IsRecordLapTime(Car_tStats *cars, short count, short *bestCar);
 }
 extern "C"
 {
-    int StatChk_IsTopTime(...);
+    short StatChk_IsTopTime(Car_tStats *cars, short count);
 }
 extern "C"
 {
-    int StatChk_SaveRecordLapTime(...);
+    void StatChk_SaveRecordLapTime(Car_tStats *cars, short count, short bestCar);
 }
 extern "C"
 {
-    int StatChk_SaveTopTime(...);
+    void StatChk_SaveTopTime(Car_tStats *cars, short count);
 }
 void SwapBackground(tScreenMain *, int);
 extern "C"
@@ -121,68 +112,19 @@ extern "C"
 }
 void __builtin_delete(void *deleteMe);
 void tDialogYesNo_ctor(tDialogYesNo *);
-tInsideBoxLeftRightSlider *tInsideBoxLeftRightSlider_ctor(...);
-tInsideBoxLeftRightSlider *tInsideBoxLeftRightSlider_dtor(...);
-tInsideBoxMenu *tInsideBoxMenu_ctor(...);
-tInsideBoxMenu *tInsideBoxMenu_dtor(...);
-tInsideBoxSongMenu *tInsideBoxSongMenu_ctor(...);
-tInsideBoxSongMenu *tInsideBoxSongMenu_dtor(...);
-tInsideBoxTwoWaySlider *tInsideBoxTwoWaySlider_ctor(...);
-tInsideBoxTwoWaySlider *tInsideBoxTwoWaySlider_dtor(...);
-tListIteratorCarColor *tListIteratorCarColor_ctor(...);
-tListIteratorCarColor *tListIteratorCarColor_dtor(...);
-tListIteratorCar *tListIteratorCar_ctor(...);
-tListIteratorCar *tListIteratorCar_dtor(...);
-tListIteratorIndexed *tListIteratorIndexed_ctor(...);
-tListIteratorIndexed *tListIteratorIndexed_dtor(...);
-tListIteratorRangeIndexed *tListIteratorRangeIndexed_ctor(...);
-tListIteratorRangeIndexed *tListIteratorRangeIndexed_dtor(...);
-tListIteratorRange *tListIteratorRange_ctor(...);
-tListIteratorRange *tListIteratorRange_dtor(...);
-tListIteratorTournament *tListIteratorTournament_ctor(...);
-tListIteratorTournament *tListIteratorTournament_dtor(...);
-tListIteratorTrack *tListIteratorTrack_ctor(...);
-tListIteratorTrack *tListIteratorTrack_dtor(...);
-tListIterator *tListIterator_ctor(...);
 extern "C"
 {
-    tListIterator *tListIterator_dtor(...);
+    void tListIterator_dtor(tListIterator *iterator, int mode);
 }
-tMenuBlank *tMenuBlank_ctor(...);
-tMenuBlank *tMenuBlank_dtor(...);
-tMenuItemGoToMenuButton *tMenuItemGoToMenuButton_ctor(...);
-tMenuItemGoToMenuButton *tMenuItemGoToMenuButton_dtor(...);
-tMenuItemGoToMenuNFS4Button *tMenuItemGoToMenuNFS4Button_ctor(...);
-tMenuItemGoToMenuNFS4Button *tMenuItemGoToMenuNFS4Button_dtor(...);
-tMenuItemLeftRightAudioSlider *tMenuItemLeftRightAudioSlider_ctor(...);
-tMenuItemLeftRightAudioSlider *tMenuItemLeftRightAudioSlider_dtor(...);
-tMenuItemLeftRightChoice *tMenuItemLeftRightChoice_ctor(...);
-tMenuItemLeftRightChoice *tMenuItemLeftRightChoice_dtor(...);
-tMenuItemLeftRightFade *tMenuItemLeftRightFade_ctor(...);
-tMenuItemNFS4LeftRightChoice *tMenuItemNFS4LeftRightChoice_ctor(...);
-tMenuItemNFS4LeftRightChoice *tMenuItemNFS4LeftRightChoice_dtor(...);
-tMenuItemSlidingMenu *tMenuItemSlidingMenu_ctor(...);
-tMenuItemSlidingMenu *tMenuItemSlidingMenu_dtor(...);
-tMenuItem *tMenuItem_dtor(...);
-tMenuNFS4Bottom *tMenuNFS4Bottom_ctor(...);
-tMenuNFS4Bottom *tMenuNFS4Bottom_dtor(...);
-tMenuNFS4TwoPlayer *tMenuNFS4TwoPlayer_ctor(...);
-tMenuNFS4TwoPlayer *tMenuNFS4TwoPlayer_dtor(...);
 extern "C"
 {
-    tMenuNFS4 *tMenuNFS4_ctor(...);
+    tMenuNFS4 *tMenuNFS4_ctor(tMenuNFS4 *menu, u_int flags, tScreen *screen, tMenu *next, tMenu *options, void (*onPress)(tMenuCommand &), short title, tMenuItem *first, std::initializer_list<tMenuItem *> items);
 }
-tMenuNFS4 *tMenuNFS4_dtor(...);
-tMenuOptions *tMenuOptions_ctor(...);
-tMenuOptions *tMenuOptions_dtor(...);
-tOptionsMenu *tOptionsMenu_ctor(...);
-tOptionsMenu *tOptionsMenu_dtor(...);
 void tScreen_dtor(tScreen *, int);
-tUserNameMenuItem *tUserNameMenuItem_ctor(...);
 extern "C" int CURRENTLYUSINGMEMCARD;
-extern "C" int Cars_gNewCarStatsList;
+extern "C" Car_tStats Cars_gNewCarStatsList[9];
 extern int Cars_gNumRaceCars;
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" int MEMCARD_INITIALIZED;
 
 extern int gCarActivation[6][5];

@@ -5,11 +5,11 @@
 #include "../../lib/libfns.h"
 
 /* --- globals --- */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tTournamentManager tournamentManager;
 extern tGlobalMenuDefs *menuDefs;
 extern "C" int ticks;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 
 /* --- data owned by ScreenTournSelect.obj --- */
 tScreenTournSelect *screenTournSelect;              /* EXT @0x8005205c (runtime-set) */

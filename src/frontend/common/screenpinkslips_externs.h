@@ -5,12 +5,12 @@
 #include "../../lib/libfns.h"
 
 /* ===== globals ===== */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tTrackManager trackManager;
 extern tGlobalMenuDefs *menuDefs;
 extern tFEApplication *FEApp;
 extern "C" int ticks;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 
 /* ===== statics owned by ScreenPinkSlips.obj ===== */
 tScreenPinkSlips *screenPinkSlips = 0;      /* @0x80051E64 bss(zero), owned here; referenced cross-TU (front.cpp/femenudefs) as pointer */

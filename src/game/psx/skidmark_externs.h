@@ -18,7 +18,7 @@
 /* 16.16 fixed-point multiply */
 
 /* ---- game globals / sibling helpers ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData;     /* 0x801131ec */
+extern "C" GameSetup_tData GameSetup_gData;                /* 0x801131ec */
 extern void Draw_kCtrlSkidmark(Draw_tCtrlSkidmark *fskid); /* DrawW: queue skid render */
 
 /* ---- this module (forward decls for intra-TU calls) ---- */

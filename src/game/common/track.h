@@ -4,8 +4,8 @@
 #include "../../nfs4_types.h"
 
 void Track_SetTrackNumber__Fi(int tracknum);                                                                                                                              /* :95 */
-char *Track_MakeTrackPathName__FPc(char *ext);                                                                                                                            /* :103 */
-char *Track_MakeTrackDataPathName__FPc(char *ext);                                                                                                                        /* :114 */
+char *Track_MakeTrackPathName__FPc(const char *ext);                                                                                                                      /* :103 */
+char *Track_MakeTrackDataPathName__FPc(const char *ext);                                                                                                                  /* :114 */
 void AllocArtResource__FP18Track_tArtresourcei(Track_tArtresource *artRes, int numPmx);                                                                                   /* :142 */
 void InitArtResources__Fv(void);                                                                                                                                          /* :155 */
 void DeInitArtResources__Fv(void);                                                                                                                                        /* :176 */

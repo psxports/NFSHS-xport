@@ -5,7 +5,7 @@
  *   Ghidra nfs4-f.exe.c (saetodv) + IDA sig (6-arg; Ghidra dropped out_r/prevL/prevR as in_a3/in_stack_*).
  */
 
-extern "C" void iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r); /* saelib */
+extern "C" int iSNDlibatodlrv(int angle, int level, int *out_l, int *out_r); /* saelib */
 
 extern "C" int iSNDabs(int a);                                                                  /* @0x8010AEDC */
 extern "C" int iSNDatodlrv(int angle, int level, int *out_l, int *out_r, int prevL, int prevR); /* @0x8010AEF4 */

@@ -39,14 +39,14 @@
 // [owned->defined in night.cpp] extern char           Night_gCopCountryLightTbl[][5][2]; /* 0x80120d18 */
 
 /* ---- engine globals ---- */
-extern "C" extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar simGlobal;                /* 0x8011e0ac */
-extern "C" CTrackSpec TrackSpec_gSpec;                 /* 0x8012327c */
-extern camera_info Camera_gInfo[];                     /* 0x8010f2ac */
-extern "C" extern char *Paths_Paths[];                 /* 0x80116468 */
-extern "C" tCompRGB *Chunk_lightTable;                 /* 0x8013c818 */
-extern "C" int Chunk_numLight;                         /* 0x8013d4ec */
-extern "C" u_char *&Render_gPalettePtr;                /* scratch the table-cache aliases */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* 0x8011e0ac */
+extern "C" CTrackSpec TrackSpec_gSpec;      /* 0x8012327c */
+extern camera_info Camera_gInfo[];          /* 0x8010f2ac */
+extern "C" char *Paths_Paths[];             /* 0x80116468 */
+extern "C" tCompRGB *Chunk_lightTable;      /* 0x8013c818 */
+extern "C" int Chunk_numLight;              /* 0x8013d4ec */
+extern "C" u_char *&Render_gPalettePtr;     /* scratch the table-cache aliases */
 
 /* ---- eaclib / syslib / sibling-module helpers ---- */
 extern void AudioCmn_PlayThunder(int intensity, int azimuth);

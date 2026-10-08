@@ -11,7 +11,7 @@ void *Fog_FindKey__FiP6FogKey(int currentslice, FogKey *fkey);                  
 void *Fog_AllocKey__Fv(void);                                                                               /* :716 */
 void Fog_AddKey__Fii(int slice, int distance);                                                              /* :733 */
 void Fog_Update__Fi(int player);                                                                            /* :840 */
-char *Fog_MakeTrackPathName__FPc(char *ext);                                                                /* :1015 */
+char *Fog_MakeTrackPathName__FPc(const char *ext);                                                          /* :1015 */
 int Fog_ReadFogKeys__Fv(void);                                                                              /* :1026 */
 void Fog_InitFogTriggers__Fv(void);                                                                         /* :1082 */
 void Fog_DeInitFogTriggers__Fv(void);                                                                       /* :1123 */

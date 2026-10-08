@@ -12,14 +12,14 @@ extern "C" unsigned char *SQVright; /* node right-child table base */
 extern "C" unsigned int geti(void *p, char nbits);                                 /* getm */
 extern "C" void puti(unsigned char *buf, unsigned int val, int n);                 /* textcrnt */
 extern "C" unsigned char *refcpy(unsigned char *src, unsigned int count, int len); /* unhuff */
-extern "C" void memcpyl(char *dst, char *src, int len);                            /* unhuff */
+extern "C" char *memcpyl(char *dst, char *src, int len);                           /* unhuff */
 
-extern "C" int unrefpack(unsigned char *comp, unsigned char *out, unsigned char *dst); /* @0x800F52B8 */
-extern "C" unsigned char *chase(int code);                                             /* @0x800F5530 */
+extern "C" int unrefpack(unsigned char *comp, unsigned char *out, int decode); /* @0x800F52B8 */
+extern "C" unsigned char *chase(int code);                                     /* @0x800F5530 */
 
-/* unrefpack @0x800F52B8 : decompress RefPack stream `comp` into `out` (only if `dst` != 0, else size-query);
+/* unrefpack @0x800F52B8 : decompress RefPack stream `comp` into `out` (only if `decode` != 0, else size-query);
  *   returns the 24-bit uncompressed size. */
-extern "C" int unrefpack(unsigned char *comp, unsigned char *out, unsigned char *dst)
+extern "C" int unrefpack(unsigned char *comp, unsigned char *out, int decode)
 {
     int size = 0;
     unsigned char trail[8];
@@ -32,7 +32,7 @@ extern "C" int unrefpack(unsigned char *comp, unsigned char *out, unsigned char 
             hdr = comp + 5;
         ip = hdr + 3;
         size = (int)((unsigned int)hdr[0] * 0x10000 + (unsigned int)hdr[1] * 0x100 + hdr[2]);
-        if (dst != (unsigned char *)0)
+        if (decode != 0)
         {
             puti(trail, geti(out + size, 4), 4); /* save the bytes at the splice point */
             for (;;)

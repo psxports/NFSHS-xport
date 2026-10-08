@@ -7,18 +7,18 @@
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern Trk_NewSlice *BWorldSm_slices;
 extern int Hud_BeTheCop;
 extern "C" bool bSirenOn[];
 extern camera_info Camera_gInfo[2]; /* camera.obj */
 extern int Cars_gNumCars;
 extern "C" int gMasterSFXLevel;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern "C"
 {
     extern int AudioCmn_GetAsyncSfx(int a, int b, bool c);

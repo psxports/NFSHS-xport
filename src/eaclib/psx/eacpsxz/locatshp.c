@@ -8,8 +8,9 @@
  *   (the value at *namekey is the packed tag to find).  The directory is scanned from the LAST entry
  *   down to the first; the highest-index match wins.  Returns base + entry.dataoffset, or 0 if absent.
  */
-extern "C" void *locateshape(void *shapefile, int *namekey);  /* @0x800EB110 */
-extern "C" void *locateshapez(void *shapefile, int *namekey); /* @0x800EB170 */
+#include <string.h>
+extern "C" void *locateshape(void *shapefile, const void *namekey);  /* @0x800EB110 */
+extern "C" void *locateshapez(void *shapefile, const void *namekey); /* @0x800EB170 */
 
 static void *locate_shape(char *sf, int name)
 {
@@ -23,12 +24,16 @@ static void *locate_shape(char *sf, int name)
     return 0;
 }
 
-extern "C" void *locateshape(void *shapefile, int *namekey) /* @0x800EB110 */
+extern "C" void *locateshape(void *shapefile, const void *namekey) /* @0x800EB110 */
 {
-    return locate_shape((char *)shapefile, *namekey);
+    int name;
+    memcpy(&name, namekey, sizeof(name));
+    return locate_shape((char *)shapefile, name);
 }
 
-extern "C" void *locateshapez(void *shapefile, int *namekey) /* @0x800EB170 (identical to locateshape) */
+extern "C" void *locateshapez(void *shapefile, const void *namekey) /* @0x800EB170 (identical to locateshape) */
 {
-    return locate_shape((char *)shapefile, *namekey);
+    int name;
+    memcpy(&name, namekey, sizeof(name));
+    return locate_shape((char *)shapefile, name);
 }

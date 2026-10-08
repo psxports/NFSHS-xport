@@ -5,7 +5,7 @@
 #include "../../lib/libfns.h"
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 extern tFEApplication *FEApp;
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" tPadModuleState gPadinfo;
 extern "C" int ticks;
 extern tGlobalMenuDefs *menuDefs;
@@ -42,12 +42,12 @@ extern "C"
 void FETextRender_Title(short);
 extern "C"
 {
-    void FETextRender_WordWrapTextRGBJustify(char *, PSX_RECT &, int, int, int, bool);
+    int FETextRender_WordWrapTextRGBJustify(char *, PSX_RECT &, int, int, int, bool);
 }
 extern "C"
 {
-    int CalcTextFadeSelToHi(...);
-    int CalcTextFadeUnselToSel(...);
+    int CalcTextFadeSelToHi(tMenuTextType type, short fSelFade, short fFade);
+    int CalcTextFadeUnselToSel(tMenuTextType type, short fSelFade, short fFade);
 }
 extern "C" char textDefinitions[6][14];
 extern int kRGBVals[];
@@ -61,8 +61,8 @@ extern "C"
 /* FEMenuExtended-specific helpers */
 extern "C"
 {
-    void DrawShape_SubtractNFS4RectEdges(...);
-    void DrawShape_NFS4RoundRectangle(...);
+    void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect);
+    void DrawShape_NFS4RoundRectangle(int textID, PSX_RECT &position, short selected);
 }
 extern "C"
 {
@@ -72,9 +72,9 @@ extern "C"
 }
 extern "C"
 {
-    void Font_SetBlitter(...);
+    void Font_SetBlitter(void (*blitter)(int, int, void *, int, int, charactertbl *, int));
     void Font_ReSetBlitter();
-    void FontUpsideDownBlit(...);
+    void FontUpsideDownBlit(int x, int y, void *src, int u, int v, charactertbl *ch, int arg6);
 }
 extern "C" void MenuNFS4_SetHelpPos(PSX_RECT *);
 extern "C" void CalcOnOffFade(tMenuTextType, short, short, short, int &, int &);

@@ -26,7 +26,7 @@ extern "C" long unpackz(void *src, void *dst)
         {
             if (magic == 0x10)
             {
-                len = unrefpack(src, dst, 1);
+                len = unrefpack((unsigned char *)src, (unsigned char *)dst, 1);
                 return len;
             }
             if (magic != 0x30)
@@ -40,11 +40,11 @@ extern "C" long unpackz(void *src, void *dst)
             {
                 return 0;
             }
-            len = unbtree(src, dst, 0);
+            len = unbtree((unsigned char *)src, (unsigned char *)dst);
             return len;
         }
     }
-    len = unhuff(src, dst, 1);
+    len = unhuff((unsigned char *)src, (unsigned char *)dst, 1);
     return len;
 }
 

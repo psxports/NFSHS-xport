@@ -6,8 +6,8 @@
 
 /* ===== globals ===== */
 extern "C" int ticks;
-extern "C" extern tfrontEnd frontEnd;
-extern "C" extern char *Paths_Paths[];
+extern "C" tfrontEnd frontEnd;
+extern "C" char *Paths_Paths[];
 extern "C" tScreenMain *screenMain; /* EXT PTR @0x80051E58 */
 extern int CREDFADETICKS;           /* EXT @0x80051AA0 */
 static int FECredits_lastFadeTick;  /* STAT 'lasttick' */

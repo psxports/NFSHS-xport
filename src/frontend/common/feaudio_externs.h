@@ -10,7 +10,7 @@ extern char *allLanguages[6];       /* 0x800514d0  ARY PTR CHAR dims 6 */
 extern int commentaryActualLevel;   /* 0x80051538  INT */
 extern char gCurrentVIV;            /* 0x800514cc  CHAR */
 extern "C" char bigBuf[];           /* 0x80010000  shared big buffer */
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern "C" int gMasterFENarrationLevel, gMasterMusicLevel, gStopCommentaryNow;
 
 /* free functions (SNDPSXZ.LIB + nsync + CRT; sigs inferred from call sites) */

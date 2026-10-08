@@ -155,7 +155,7 @@ void AIHigh_Cop::HighExecute()
 
   int iVar9;
 
-  u_long uVar10;
+  uint32 uVar10;
 
   AIState_Purgatory *pAVar11;
 

@@ -8,5 +8,5 @@
  */
 #include "drawdbg.h"
 
-u_long gSavePtr;   /* @0x8013d818  EXT ULONG (.bss) -- draw-debug saved primitive ptr */
+uint32 gSavePtr;   /* @0x8013d818  EXT ULONG (.bss) -- draw-debug saved primitive ptr */
 /* end of drawdbg.cpp */

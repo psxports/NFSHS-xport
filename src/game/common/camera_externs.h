@@ -8,11 +8,11 @@
 AnimScript *Anim_GetAnim(int handle);
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern "C" Sim_tSimSystemVar simVar;
 extern Trk_NewSlice *BWorldSm_slices;
@@ -21,7 +21,7 @@ extern "C" int Replay_ReplayMode; /* replay.obj */
 extern int Cars_gNumCars;
 extern int Input_gLookBehind[2];
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez);
 extern "C" int InBetween;
 extern int Math_Dist3D(coorddef *a, coorddef *b);
@@ -43,7 +43,7 @@ int Anim_GetLastAnimPosRot(int animNum, int flags, coorddef *pt, matrixtdef *mat
 int Anim_Handle(int num);
 int BWorldSm_FindClosestQuadMaxIterations(coorddef *pt, BWorldSm_Pos *slicePos, int maxIterations);
 /* @0x800EAD98 eaclib arccos, verify #148 */
-/* @0x800EADBC eaclib: out-args *sin/*cos dropped by Ghidra, verify #148 */
+/* @0x800EADBC eaclib: sine/cosine out-args dropped by Ghidra, verify #148 */
 void Math_NormalizeVector(coorddef *v);
 /* eaclib trnsfrm, verify #148 */
 

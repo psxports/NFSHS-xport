@@ -12,6 +12,7 @@ extern void gte_swc2(int, void *);
 extern void nfs4_gte_set_rot_matrix(const void *);
 extern void nfs4_gte_set_trans_matrix(const void *);
 extern void nfs4_gte_rt(void);
+extern void nfs4_gte_mvmva_sf1(void);
         #define gte_SetRotMatrix(m) nfs4_gte_set_rot_matrix(m)
         #define gte_SetTransMatrix(m) nfs4_gte_set_trans_matrix(m)
         #define gte_SetRotMatrix_pc(m) nfs4_gte_set_rot_matrix(m)
@@ -57,7 +58,7 @@ extern void nfs4_gte_rt(void);
                 gte_swc2(26, (char *)(p) + 4); \
                 gte_swc2(27, (char *)(p) + 8); \
             } while (0)
-        #define gte_mvmva(...) nfs4_gte_rt()
+        #define gte_mvmva() nfs4_gte_mvmva_sf1()
     #else
         #define gte_SetRotMatrix(m) ((void)(m))
         #define gte_SetTransMatrix(m) ((void)(m))
@@ -76,7 +77,7 @@ extern void nfs4_gte_rt(void);
         #define gte_ctc2(v, r) ((void)0)
         #define gte_lwc2(r, v) ((void)0)
         #define gte_swc2(r, p) ((void)0)
-        #define gte_mvmva(...) ((void)0)
+        #define gte_mvmva() ((void)0)
     #endif
 
 /* ---- Weather state globals (SYM Globals.jsonl) ---- */
@@ -107,13 +108,13 @@ extern "C" int Weather_gTrackIntensityLimit;                /* 0x8013dc0c */
 extern "C" int Weather_gLastProcessTime[2];                 /* 0x8013de54 */
 
 /* ---- shared game globals (SYM Globals.jsonl; declared in their owning TUs) ---- */
-extern "C" extern GameSetup_tData GameSetup_gData; /* 0x801131ec */
-extern "C" Sim_tSimGlobalVar simGlobal;            /* 0x8011e0ac */
-extern "C" CTrackSpec TrackSpec_gSpec;             /* 0x8012327c */
-extern camera_info Camera_gInfo[2];                /* 0x8010f2ac */
-extern "C" coorddef prevCamPos[2];                 /* 0x8012342c */
-extern "C" matrixtdef prevCamMat[2];               /* 0x80123444 */
-extern "C" int gCurrentNumSplats;                  /* 0x8013dba0 */
+extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
+extern "C" Sim_tSimGlobalVar simGlobal;     /* 0x8011e0ac */
+extern "C" CTrackSpec TrackSpec_gSpec;      /* 0x8012327c */
+extern camera_info Camera_gInfo[2];         /* 0x8010f2ac */
+extern "C" coorddef prevCamPos[2];          /* 0x8012342c */
+extern "C" matrixtdef prevCamMat[2];        /* 0x80123444 */
+extern "C" int gCurrentNumSplats;           /* 0x8013dba0 */
 
 /* ---- external subsystems (eaclib + game-side; sigs from call sites) ---- */
 /* eaclib EACPSXZ random  */

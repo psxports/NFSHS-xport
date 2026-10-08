@@ -404,7 +404,8 @@ void AudioTrk_SoundTrack(Car_tObj *car,int trkazi)
         }
       }
       else if ((((*(u_int *)(pcVar9 + -4) & 0xffff0000) != 0) &&
-               ((int)(u_int)*(u_short *)(pcVar9 + -8) < local_38)) && (pcVar9[1] == 0xff)) {
+               ((int)(u_int)*(u_short *)(pcVar9 + -8) < local_38)) &&
+               ((u_char)pcVar9[1] == 0xff)) {
         sVar3 = 0;
         if (1 < (u_char)pcVar9[-1]) {
           uVar1 = random();

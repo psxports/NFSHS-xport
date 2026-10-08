@@ -11,7 +11,7 @@ extern __vtbl_ptr_type AIHigh_BTC_Perp_vtable[], AIHigh_BTC_HumanPerp_vtable[], 
 
 extern "C"
 {
-    CARDINFO_def *MCRD_getcard(...);
+    CARDINFO_def *MCRD_getcard(int card);
 }
 int Speech_Dispatch(void);              /* speech.obj flat (was Dispatch__6Speech; Speech::Dispatch is static->flat) */
 intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; cast result to Speaker* */
@@ -19,17 +19,17 @@ extern "C" AIHigh_Base *highLevelAIObjs[];
 extern AITune_BTC_t AITune_BTC[];
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
 extern __vtbl_ptr_type AIHigh_Human_vtable[], AIHigh_BasicPerp_vtable[], AIState_Idle_vtable[];
 extern camera_info Camera_gInfo[2]; /* camera.obj */
 extern int Cars_gNumCars;
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int AICop_gRoadBlockState;
 extern "C"
 {
-    extern int Hud_InitMap(void);
+    extern void Hud_InitMap(void);
 }
 extern u_int fastRandom, randSeed, randtemp; /* fastrand.obj PRNG state */
 extern void Camera_Update(void);

@@ -8,10 +8,16 @@
  *   constants offset by the seed.
  */
 
+#include "../../../host/diagnostics.h"
+
 static unsigned g_rngstate[6] = {/* @0x8012349C (== seedrandom(0)) */
                                  0xF22D0E56u, 0x883126E9u, 0xC624DD2Fu, 0x0702C49Cu, 0x9E353F7Du, 0x6FDF3B64u};
 
+#if defined(__EMSCRIPTEN__)
+extern "C" long random(void) /* @0x800E77A8 */
+#else
 extern "C" int random(void) /* @0x800E77A8 */
+#endif
 {
 #ifdef AP_WIN
     /* Opt-in test boundary for omitted audio's shared-RNG consumption.

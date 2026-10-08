@@ -14,7 +14,7 @@ void R3DCcar_ReadTrackShadow__Fv(void);                                         
 void R3DCar_CalcCarDimensions__FP8Car_tObjP18Transformer_zScenei(Car_tObj *carObj, Transformer_zScene *scene, int carType); /* :958 */
 void R3DCar_DeInstantiate3DCar__FP8Car_tObj(Car_tObj *carObj);                                                              /* :1046 */
 void R3DCar_DeInstantiate3DCarMenu__FP8Car_tObj(Car_tObj *carObj);                                                          /* :1054 */
-void R3DCar_GetFileName__FPcN20(char *infilename, char *filename, char *suffix);                                            /* :1118 */
+void R3DCar_GetFileName__FPcN20(char *infilename, char *filename, const char *suffix);                                      /* :1118 */
 char *R3DCar_LoadFileAdr__FPc(char *name);                                                                                  /* :1133 */
 void R3DCar_GetCarName__FPcii(char *filename, int carType, int country);                                                    /* :1145 */
 void R3DCar_Instantiate3DCar__FP8Car_tObji(Car_tObj *carObj, int index);                                                    /* :1159 */

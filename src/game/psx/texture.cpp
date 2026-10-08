@@ -2,6 +2,7 @@
  *   26 fns (Texture_ + FETexture_): palette sharing, CLUT alloc, PMX texture load, VRAM blit. No GTE.
  */
 #include "../../nfs4_types.h"
+#include "../../mips_semantics.h"
 #include "texture_externs.h"
 
 /* ---- Texture.obj-OWNED globals (.bss; zero in NFS4.EXE) -- DEFINED here (self-contained;
@@ -324,7 +325,7 @@ void Texture_ProcessPaletteCopy(Texture_pal8bit *palCopy,int palStart,int palNum
         i = i + 1;
         r.y = (short)src->y;
         src = src + 1;
-        LoadImagePSX(&r,(u_long *)tmpPal);
+        LoadImagePSX(&r,(uint32 *)tmpPal);
       } while (i < palNum);
     }
   }
@@ -332,7 +333,7 @@ void Texture_ProcessPaletteCopy(Texture_pal8bit *palCopy,int palStart,int palNum
 }
 
 /* ---- Texture_LoadImage__FP4RECTPUl  [TEXTURE.CPP:393-396] SLD-VERIFIED ---- */
-void Texture_LoadImage(PSX_RECT *imgrect,u_long *p)
+void Texture_LoadImage(PSX_RECT *imgrect,uint32 *p)
 
 {
   if ((imgrect->w & 1U) != 0) {
@@ -381,7 +382,7 @@ void Texture_Vramf(shapetbl *shp,int x,int y,int clutx,int cluty)
         r.w = (short)(rowround >> 4);
         r.h = shp->height;
 TexVramf_loadImageEmit:
-        Texture_LoadImage(&r,(u_long *)&shp->data);
+        Texture_LoadImage(&r,(uint32 *)&shp->data);
       }
       shp = Texture_NextShape(shp);
     } while (shp != (shapetbl *)0x0);
@@ -413,12 +414,12 @@ void Texture_Vramcf(shapetbl *shp,int x,int y,int clutx,int cluty)
     r.w = 1;
     r.h = 2;
     r.x = (short)x;
-    LoadImagePSX(&r,(u_long *)((char *)shp + 0xe + off));
+    LoadImagePSX(&r,(uint32 *)((char *)shp + 0xe + off));
     r.x = (short)x + 1;
     r.y = ybot + -1;
     r.w = ((int)rowall >> 4) + -1;
     r.h = 1;
-    LoadImagePSX(&r,(u_long *)((char *)shp + 0x12 + off));
+    LoadImagePSX(&r,(uint32 *)((char *)shp + 0x12 + off));
     shp->height = shp->height + -1;
     Texture_Vramf(shp,x,y,clutx,cluty);
     shp->height = height;
@@ -679,7 +680,8 @@ extern "C" void Texture_InitMenuClut(void)
     do {
       y = y + 1;
       idx = gNbFreePal4 + 1;
-      pal4[gNbFreePal4] = clut | (u_short)(x + 0x200 >> 4) & 0x3f;
+      pal4[gNbFreePal4] =
+          clut | (u_short)nfs4_mips_sra_s32(nfs4_mips_addu_s32(x,0x200),4) & 0x3f;
       pal8 = gFreePal8;
       clut = clut + 0x40;
       gNbFreePal4 = idx;
@@ -694,7 +696,8 @@ extern "C" void Texture_InitMenuClut(void)
     do {
       y = y + 1;
       idx = gNbFreePal8 + 1;
-      pal8[gNbFreePal8] = clut | (u_short)(x + 0x200 >> 4) & 0x3f;
+      pal8[gNbFreePal8] =
+          clut | (u_short)nfs4_mips_sra_s32(nfs4_mips_addu_s32(x,0x200),4) & 0x3f;
       gNbFreePal8 = idx;
       clut = clut + 0x40;
     } while (y < 0x8c);
@@ -744,6 +747,12 @@ extern "C" void Texture_CleanupMenuTexture(void)
 void Texture_LoadMenuTexture(void)
 
 {
+  static char showName[] = "show";
+  static char shadowName[] = "shad";
+  static char light3Name[] = "lgt3";
+  static char lightAName[] = "lgta";
+  static char lightBName[] = "lgtb";
+  static char lightCName[] = "lgtc";
   char *shapefile;
   Draw_tPixMap *pmx;
   char *shpfile;
@@ -753,17 +762,17 @@ void Texture_LoadMenuTexture(void)
     sprintf(name,"%sshow.psh",Paths_Paths[0x19]);
     shapefile = (char *)loadfileadr(name,0);
     Texture_ResetPaletteSharing();
-    Texture_LoadPmx(shapefile,"show",0,0x380,0x180,-1,-1,gMenuPixmapAlloc);
+    Texture_LoadPmx(shapefile,showName,0,0x380,0x180,-1,-1,gMenuPixmapAlloc);
     gMenuPixmap[0] = gMenuPixmapAlloc;
-    Texture_LoadPmx(shapefile,"shad",0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 1);
+    Texture_LoadPmx(shapefile,shadowName,0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 1);
     gMenuPixmap[1] = gMenuPixmapAlloc + 1;
-    Texture_LoadPmx(shapefile,"lgt3",0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 2);
+    Texture_LoadPmx(shapefile,light3Name,0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 2);
     gMenuPixmap[3] = gMenuPixmapAlloc + 2;
-    Texture_LoadPmx(shapefile,"lgta",0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 3);
+    Texture_LoadPmx(shapefile,lightAName,0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 3);
     gMenuPixmap[4] = gMenuPixmapAlloc + 3;
-    Texture_LoadPmx(shapefile,"lgtb",0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 4);
+    Texture_LoadPmx(shapefile,lightBName,0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 4);
     gMenuPixmap[5] = gMenuPixmapAlloc + 4;
-    Texture_LoadPmx(shapefile,"lgtc",0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 5);
+    Texture_LoadPmx(shapefile,lightCName,0,0x380,0x180,-1,-1,gMenuPixmapAlloc + 5);
     gMenuPixmap[6] = gMenuPixmapAlloc + 5;
     purgememadr(shapefile);
   }

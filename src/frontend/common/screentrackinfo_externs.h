@@ -4,7 +4,7 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern "C" int ticks;
 extern tTournamentManager tournamentManager;
 extern tTrackManager trackManager;

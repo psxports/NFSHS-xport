@@ -389,7 +389,7 @@ int AISpeeds_NeedToSlowDownForCurve(Car_tObj *carObj,int distanceMeters,int curr
       iVar3 = 0x80;
     }
     iVar3 = (u_int)(u_char)*piVar1 * 0x20000 + (u_int)pAVar2->brakeTable_[iVar3] * -0x20000;
-    return iVar3 + (iVar3 >> 3) < distanceMeters ^ 1;
+    return (iVar3 + (iVar3 >> 3) < distanceMeters) ^ 1;
   }
   return 0;
 }

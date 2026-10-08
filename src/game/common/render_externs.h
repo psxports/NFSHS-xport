@@ -17,7 +17,7 @@ extern "C" int gFlip, gMPauseUpdate, gMPauseUpdateNextTime;
 // [owned->defined in render.cpp] extern PSX_RECT  gPauseMenuRect;
 extern "C" dflip gEnviro[];
 extern FLARE_DEF gFlare_LensFlare;
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
     #ifdef AP_WIN
 extern "C" void NFSHS_HostTraceFlareState(const void *);
     #endif

@@ -36,37 +36,37 @@ extern "C" void NFSHS_HostTraceDrawQuadCandidate(const void *, const void *, con
     #else
         #define gte_stflg(p) ((void)(p))
     #endif
-    #define gte_rtir(...) ((void)0)
-    #define gte_ldtr(...) ((void)0)
+    #define gte_rtir() ((void)0)
+    #define gte_ldtr(arg0, arg1, arg2) ((void)0)
     #ifdef AP_WIN
-        #define gte_rtps_b(...) gte_rtps()
+        #define gte_rtps_b() gte_rtps()
     #else
-        #define gte_rtps_b(...) ((void)0)
+        #define gte_rtps_b() ((void)0)
     #endif
     /* GTE ops Ghidra inlines as macro CALLS in draww (nclip/avsz/depth-cue/ldsxy3/ldIR0/rt) */
     #ifdef AP_WIN
-        #define gte_nclip(...) nfs4_gte_nclip()
-        #define gte_nclip_b(...) nfs4_gte_nclip()
-        #define gte_avsz4(...) nfs4_gte_avsz4()
-        #define gte_avsz4_b(...) nfs4_gte_avsz4()
+        #define gte_nclip() nfs4_gte_nclip()
+        #define gte_nclip_b() nfs4_gte_nclip()
+        #define gte_avsz4() nfs4_gte_avsz4()
+        #define gte_avsz4_b() nfs4_gte_avsz4()
     #else
-        #define gte_nclip(...) ((void)0)
-        #define gte_nclip_b(...) ((void)0)
-        #define gte_avsz4(...) ((void)0)
-        #define gte_avsz4_b(...) ((void)0)
+        #define gte_nclip() ((void)0)
+        #define gte_nclip_b() ((void)0)
+        #define gte_avsz4() ((void)0)
+        #define gte_avsz4_b() ((void)0)
     #endif
     #ifdef AP_WIN
-        #define gte_dpcs(...) nfs4_gte_dpcs()
-        #define gte_dpct(...) nfs4_gte_dpct()
+        #define gte_dpcs() nfs4_gte_dpcs()
+        #define gte_dpct() nfs4_gte_dpct()
         #define gte_ldsxy3(a, b, c) nfs4_gte_ldsxy3((int)(a), (int)(b), (int)(c))
         #define gte_ldIR0(p) nfs4_gte_ldir0((int)(p))
-        #define gte_rt(...) nfs4_gte_rt()
+        #define gte_rt() nfs4_gte_rt()
     #else
-        #define gte_dpcs(...) ((void)0)
-        #define gte_dpct(...) ((void)0)
+        #define gte_dpcs() ((void)0)
+        #define gte_dpct() ((void)0)
         #define gte_ldsxy3(a, b, c) ((void)0)
         #define gte_ldIR0(p) ((void)(p))
-        #define gte_rt(...) ((void)0)
+        #define gte_rt() ((void)0)
     #endif
 
 extern "C" char *&Render_gPacketPtr;
@@ -94,12 +94,12 @@ extern "C" u_char CF_DVLC[49096];
 extern camera_info Camera_gInfo[136];
 extern Car_tObj *Cars_gHumanRaceCarList[2];
 extern Car_tObj *Cars_gList[2];
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern coorddef *Chunk_chunkCenters;
 extern "C" CVECTOR *Chunk_lightTable;
 extern "C" int Draw_gMidGroundOtz;
 extern "C" int Draw_gViewOtSize;
-extern "C" extern "C" GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern u_char (*Night_gCopColor[2])[256][8];
 extern "C" u_char (*Night_gCurrentNightColor)[256][16];
 extern char *Night_gNightTbl;
@@ -121,7 +121,7 @@ extern Draw_tPixMap *gDLPixmap[2];
 // [owned->defined in draww.cpp] extern MATRIX gIdentTemplate;
 extern "C" Track_tArtresource gInitialArt;
 extern matrixtdef gNightMat;
-extern "C" extern int gNight_renderNight;
+extern "C" int gNight_renderNight;
 extern "C" Group *gPersistMidgroundObjInst;
 extern "C" Group *gPersistObjDefBoundingSpheres;
 extern "C" Group *gPersistObjInst;
@@ -140,7 +140,7 @@ extern "C" Sim_tSimGlobalVar simGlobal;
 // [owned->defined in draww.cpp] extern int trk4[10][2];
 extern "C"
 {
-    extern void Anim_GetRotPos(Trk_AnimateInst *, int, int, coorddef *, matrixtdef *);
+    extern int Anim_GetRotPos(Trk_AnimateInst *, int, int, coorddef *, matrixtdef *);
 }
 extern "C"
 {

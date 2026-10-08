@@ -13,17 +13,19 @@ char *Paths_File;        /* @0x8013d2e8 */
 void Paths_StartUp(void)
 
 {
+  static char pathPrefix[] = "z";
+  static char emptyPath[] = "";
   int dirCounter;
   char *scan;
 
-  scan = "z";
+  scan = pathPrefix;
   dirCounter = 0x31;
   do {
     Paths_Paths[dirCounter] = scan;
     dirCounter = dirCounter + -1;
   } while (-1 < dirCounter);
-  Paths_Paths[0x24] = "";
-  Paths_Paths[0x20] = "";
+  Paths_Paths[0x24] = emptyPath;
+  Paths_Paths[0x20] = emptyPath;
   return;
 }
 

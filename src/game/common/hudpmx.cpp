@@ -18,6 +18,7 @@ HudPmx_tShape  HudPmx_gShapes[175];        /* 0x80110c98 */
 
 /* ---- intra-TU forward declarations ---- */
 void HudPmx_LoadShape(char *n,HudPmx_tShape *s);
+static void HudPmx_LoadShapeName(const char *n,HudPmx_tShape *s);
 void HudPmx_InitTextures(void);
 void HudPmx_Kill(void);
 
@@ -39,6 +40,11 @@ void HudPmx_LoadShape(char *n,HudPmx_tShape *s)
   return;
 }
 
+static void HudPmx_LoadShapeName(const char *n,HudPmx_tShape *s)
+{
+  HudPmx_LoadShape(const_cast<char *>(n),s);
+}
+
 /* ---- HudPmx_InitTextures__Fv  [HUDPMX.CPP:40-204] SLD-VERIFIED ---- */
 void HudPmx_InitTextures(void)
 
@@ -56,11 +62,9 @@ void HudPmx_InitTextures(void)
   int w;
   int h;
   int yo;
-  u_char **ppuVar1;
   void *pvVar2;
-  u_int *puVar3;
-  char **ppcVar4;
-  u_int uVar5;
+  const char **puVar3;
+  const char *shapeName;
   u_char *puVar6;
   char *pcVar7;
   u_char *puVar8;
@@ -73,53 +77,28 @@ void HudPmx_InitTextures(void)
   int iVar15;
   int iVar16;
   char acStack_648 [256];
-  u_int local_548 [30];
-  u_int local_4d0 [30];
+  const char *local_548 [29];
+  const char *local_4d0 [29];
   char acStack_458 [8];
-  // One entry for every name in local_240.  The decompiler inferred 74 here,
-  // which made the copy below walk off this array halfway through the HUD list.
-  u_int local_450 [132];
   u_int local_328 [55];
-  char *local_24c;
-  char *local_244;
-  char *local_240 [132] = { 0 };
+  const char *local_24c;
+  const char *local_244;
+  const char *local_240 [132] = { 0 };
   uchar local_30 [4];
   uchar local_2c [4];
   u_char auStack_28 [4];
   u_char auStack_24 [4];
   u_char auStack_20 [8];
   
-  puVar3 = local_548;
-  ppuVar1 = (u_char **)&Track_gShapeNamePtrs;
-  do {
-    puVar6 = ppuVar1[1];
-    puVar8 = ppuVar1[2];
-    puVar10 = ppuVar1[3];
-    *puVar3 = (u_int)(intptr)*ppuVar1;
-    puVar3[1] = (u_int)(intptr)puVar6;
-    puVar3[2] = (u_int)(intptr)puVar8;
-    puVar3[3] = (u_int)(intptr)puVar10;
-    ppuVar1 = ppuVar1 + 4;
-    puVar3 = puVar3 + 4;
-  } while (ppuVar1 != (u_char **)&Track_gShapeNamePtrs_end);
-  *puVar3 = (u_int)(intptr)(u_char *)Track_gShapeNamePtrs_end;
-  puVar3 = local_4d0;
-  ppuVar1 = (u_char **)&Track_gTachNamePtrs;
-  do {
-    puVar6 = ppuVar1[1];
-    puVar8 = ppuVar1[2];
-    puVar10 = ppuVar1[3];
-    *puVar3 = (u_int)(intptr)*ppuVar1;
-    puVar3[1] = (u_int)(intptr)puVar6;
-    puVar3[2] = (u_int)(intptr)puVar8;
-    puVar3[3] = (u_int)(intptr)puVar10;
-    ppuVar1 = ppuVar1 + 4;
-    puVar3 = puVar3 + 4;
-  } while (ppuVar1 != (u_char **)(gShapeNamePtrs_subList + 3));
-  *puVar3 = (u_int)(intptr)gShapeNamePtrs_subList[3];
+  /* MIPS 0x80092504..0x80092588 copies two 29-pointer tables */
+  for (i = 0; i < 28; ++i)
+    local_548[i] = Track_gShapeNamePtrs[i];
+  local_548[28] = Track_gShapeNamePtrs_end[0];
+  for (i = 0; i < 25; ++i)
+    local_4d0[i] = Track_gTachNamePtrs[i];
+  for (i = 0; i < 4; ++i)
+    local_4d0[25 + i] = gShapeNamePtrs_subList[i];
   sprintf(acStack_458,"mp%02d",GameSetup_gData.track);
-  puVar3 = local_450;
-  ppcVar4 = local_240;
   local_240[0] = "cmra";
   local_240[1] = "cam0";
   local_240[2] = "cam1";
@@ -252,9 +231,6 @@ void HudPmx_InitTextures(void)
   local_240[0x82] = "tpno";
   local_240[0x81] = (char *)local_548[0];
   local_240[0x83] = (char *)local_548[0];
-  for (iVar14 = 0; iVar14 < 132; ++iVar14) {
-    local_450[iVar14] = (u_int)local_240[iVar14];
-  }
   loadShapeXOff = 0;
   sprintf(acStack_648,"%sfont.pfn",Paths_Paths[0x1a]);
   gHudFont = (char *)loadfileadrz(acStack_648,0);
@@ -298,14 +274,16 @@ void HudPmx_InitTextures(void)
     local_244 = "nbon";
   }
 HudPmxInit_shapeLoadLoop:
+  local_240[129] = local_24c;
+  local_240[131] = local_244;
   iVar14 = 0;
-  puVar3 = local_450;
+  puVar3 = local_240;
   pHVar13 = HudPmx_gShapes;
   do {
-    uVar5 = *puVar3;
+    shapeName = *puVar3;
     puVar3 = puVar3 + 1;
     iVar14 = iVar14 + 1;
-    HudPmx_LoadShape((char *)uVar5,pHVar13);
+    HudPmx_LoadShapeName(shapeName,pHVar13);
     pHVar13 = pHVar13 + 1;
   } while (iVar14 < 0x83);
   for (iVar15 = 0x84; iVar15 < 0x9e; iVar15 = iVar15 + 1) {
@@ -318,21 +296,21 @@ HudPmxInit_shapeLoadLoop:
       alph[3] = (char)iVar15 + -0x6e;
       HudPmx_LoadShape(alph,&HudPmx_gShapes[iVar15]); }
   }
-  HudPmx_LoadShape("alTR",&HudPmx_gShapes[168]);
-  HudPmx_LoadShape("alCI",&HudPmx_gShapes[169]);
-  HudPmx_LoadShape("alSQ",&HudPmx_gShapes[170]);
-  HudPmx_LoadShape("negA",&HudPmx_gShapes[171]);
-  HudPmx_LoadShape("negB",&HudPmx_gShapes[172]);
-  HudPmx_LoadShape("neg2",&HudPmx_gShapes[173]);
-  HudPmx_LoadShape("alUP",&HudPmx_gShapes[174]);
+  HudPmx_LoadShapeName("alTR",&HudPmx_gShapes[168]);
+  HudPmx_LoadShapeName("alCI",&HudPmx_gShapes[169]);
+  HudPmx_LoadShapeName("alSQ",&HudPmx_gShapes[170]);
+  HudPmx_LoadShapeName("negA",&HudPmx_gShapes[171]);
+  HudPmx_LoadShapeName("negB",&HudPmx_gShapes[172]);
+  HudPmx_LoadShapeName("neg2",&HudPmx_gShapes[173]);
+  HudPmx_LoadShapeName("alUP",&HudPmx_gShapes[174]);
   for (iVar16 = 0; iVar16 < 0x1c; ++iVar16)
-    HudPmx_LoadShape((char *)local_450[74 + iVar16],&HudPmx_gShapes[74 + iVar16]);
-  HudPmx_LoadShape("a229",&HudPmx_gShapes[103]);
-  HudPmx_LoadShape("ahyp",&HudPmx_gShapes[72]);
-  HudPmx_LoadShape("acol",&HudPmx_gShapes[73]);
+    HudPmx_LoadShapeName(local_240[74 + iVar16],&HudPmx_gShapes[74 + iVar16]);
+  HudPmx_LoadShapeName("a229",&HudPmx_gShapes[103]);
+  HudPmx_LoadShapeName("ahyp",&HudPmx_gShapes[72]);
+  HudPmx_LoadShapeName("acol",&HudPmx_gShapes[73]);
   if (DashHUD_gInfo.splitscreen != 0) {
     loadShapeXOff = 0x16;
-    HudPmx_LoadShape(local_244,&HudPmx_gShapes[131]);
+    HudPmx_LoadShapeName(local_244,&HudPmx_gShapes[131]);
   }
   purgememadr(gShpfile);
   return;

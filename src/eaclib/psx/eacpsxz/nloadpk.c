@@ -11,13 +11,13 @@
  */
 
 /* ---- helpers from sibling reconstructed objs ---- */
-extern "C" int loadfileadr(char *name, int memclass);              /* nsync   @0x800E57E8 */
-extern "C" int unpacksize(void *buf);                              /* unpack  -- 0 if not packed */
-extern "C" int unpackz(void *src, void *dst);                      /* unpack  -- nonzero = success */
-extern "C" int getblocksize(void *p);                              /* memstd  @0x800E52D4 */
-extern "C" void *reservememadr(char *name, int size, int classid); /* memstd @0x800E533C */
-extern "C" int purgememadr(void *p);                               /* memstd  @0x800E5540 */
-extern "C" void blockmove(void *src, void *dst, int n);            /* eacpsxz @0x800E62DC */
+extern "C" int loadfileadr(char *name, int memclass);                    /* nsync   @0x800E57E8 */
+extern "C" int unpacksize(void *buf);                                    /* unpack  -- 0 if not packed */
+extern "C" int unpackz(void *src, void *dst);                            /* unpack  -- nonzero = success */
+extern "C" int getblocksize(void *p);                                    /* memstd  @0x800E52D4 */
+extern "C" void *reservememadr(const char *name, int size, int classid); /* memstd @0x800E533C */
+extern "C" int purgememadr(void *p);                                     /* memstd  @0x800E5540 */
+extern "C" void blockmove(void *src, void *dst, int n);                  /* eacpsxz @0x800E62DC */
 
 /* ===================================================================== *
  *  loadpackadrz @0x800E5C64 : load + transparently unpack `name`.        *

@@ -10,6 +10,8 @@
  *            DAT_80148788 = high-water mark (words), DAT_8014878c = {block:u16, size:u16}[] entry table.
  */
 
+#include "../../../mips_semantics.h"
+
 extern "C" int &sndmm;                   /* pool base (byte address) */
 extern "C" short &DAT_80148784;          /* live allocation count    */
 extern "C" short &DAT_80148786;          /* pool size in words       */
@@ -60,7 +62,7 @@ extern "C" int iSNDmalloc(int size)
 
     if (DAT_80148784 < 0x80)
     {
-        need = size + 3 >> 2;
+        need = nfs4_mips_sra_s32(nfs4_mips_addu_s32(size, 3), 2);
         if (DAT_80148784 == 0)
         { /* empty pool -> whole thing free */
             local_avail = (unsigned int)DAT_80148786;

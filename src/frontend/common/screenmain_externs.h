@@ -5,11 +5,11 @@
 #include "../../lib/libfns.h"
 
 /* ===== globals ===== */
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tGlobalMenuDefs *menuDefs;
 extern tFEApplication *FEApp;
 extern "C" int ticks;
-extern "C" extern char *Paths_Paths[];
+extern "C" char *Paths_Paths[];
 extern tCreditManager CreditManager;
 extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 
@@ -88,7 +88,7 @@ extern "C"
 }
 
 /* credits manager (member fns rendered free by Ghidra) */
-void Init(tCreditManager *, u_long);
+void Init(tCreditManager *, uint32);
 void DeInit(tCreditManager *);
 void Draw(tCreditManager *, int);
 

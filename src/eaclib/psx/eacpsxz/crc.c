@@ -6,11 +6,12 @@
 extern "C" unsigned char DAT_80135c58[256]; /* @0x80135C58 : CRC table A [256] */
 extern "C" unsigned char DAT_80135d58[256]; /* @0x80135D58 : CRC table B [256] */
 
-extern "C" unsigned int crc16(unsigned char *buf, int len); /* @0x800F614C */
+extern "C" unsigned int crc16(const void *data, int len); /* @0x800F614C */
 
 /* crc16 @0x800F614C : running CRC-16 over `buf[0..len)`; 4-byte unrolled body then a 1-byte tail. */
-extern "C" unsigned int crc16(unsigned char *buf, int len)
+extern "C" unsigned int crc16(const void *data, int len)
 {
+    const unsigned char *buf = (const unsigned char *)data;
     unsigned int hi = 0xfb;
     unsigned int lo = 0xea;
     while (-1 < len + -4)

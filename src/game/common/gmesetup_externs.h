@@ -8,7 +8,7 @@ extern "C" Input_tDeviceList Device_gDeviceList[]; /* device.obj; .startupfunc f
 extern void Device_SetHardCodedKeys(void);         /* device.obj */
 extern "C"
 {
-    extern void Input_StartUp(void); /* input.obj */
+    extern int *Input_StartUp(void); /* input.obj */
 }
 /* libpad (eaclib PADPSXZ) */
 /* libpad */
@@ -16,8 +16,8 @@ extern "C"
 /* eaclib EACPSXZ timer */
 
 /* ---- cross-TU globals ---- */
-extern FEI_tList FEI_gList[];                                                                                               /* FEI.obj [114] */
-extern int Input_gHandler[184];                                                                                             /* input.obj @0x80113C14 */
-extern "C" extern int gMasterMusicLevel, gMasterSFXLevel, gMasterEngineLevel, gMasterAmbientLevel, gMasterFENarrationLevel; /* audiocmn.obj */
+extern FEI_tList FEI_gList[];                                                                                        /* FEI.obj [114] */
+extern int Input_gHandler[184];                                                                                      /* input.obj @0x80113C14 */
+extern "C" int gMasterMusicLevel, gMasterSFXLevel, gMasterEngineLevel, gMasterAmbientLevel, gMasterFENarrationLevel; /* audiocmn.obj */
 
 #endif /* GMESETUP_EXTERNS_H */

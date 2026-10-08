@@ -2,7 +2,7 @@
  * object.cpp models these classes as FLAT C fns (Class_Draw/Class_dt) -> pfns ref those names.
  * __vtbl_ptr_type; null-delimited size. @0xVA breadcrumbs. Self-contained + faithful + links. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 /* flat fns defined in game/common/object.cpp: */
 int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim*,DRender_tView*,Draw_DCache*,int);
 int NFS4_VT_THUNK ObjectSignAnim_Draw(ObjectSignAnim*,DRender_tView*,Draw_DCache*,int);

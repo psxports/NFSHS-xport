@@ -3,6 +3,8 @@
  */
 #include "screendisplay.h"
 
+static char displayShapes[] = "zDsply";
+
 tScreenDisplay *screenDisplay;   /* global instance pointer owned by this TU (SYM EXT @0x800528d8) */
 
 /* ---- tScreenDisplay::DrawBackground  (screendisplay.cpp:30) ---- */
@@ -33,7 +35,7 @@ void tScreenDisplay::GetShapeInfo(short &numPermShapes,short &numSwapShapes,char
   *swapFileName = (char *)0x0;
   numSwapShapes = 0;
   numPermShapes = 0x2b;
-  *permFileName = "zDsply";
+  *permFileName = displayShapes;
   return;
 }
 

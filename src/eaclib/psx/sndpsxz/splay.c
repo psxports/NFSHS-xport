@@ -7,16 +7,22 @@
  *   bank @ (bankid*0xc + sndgs[0x26]): +4 type(b), +6 patch count(u16), +0xc/+0x14 patch ptr table.
  */
 #include "../../../nfs4_types.h"
+#include <stddef.h>
+
+static_assert(sizeof(SNDPLAYOPTS) == 20, "SND play descriptor size");
+static_assert(offsetof(SNDPLAYOPTS, bhandle) == 4, "SND bank offset");
+static_assert(offsetof(SNDPLAYOPTS, vol) == 8, "SND volume offset");
+static_assert(offsetof(SNDPLAYOPTS, azimuth) == 16, "SND azimuth offset");
 
 extern "C" int sndgs[];
 extern "C" int iSNDvalidbank(int bankid);                            /* sbvalid */
 extern "C" int iSNDplaytaggedpatch(unsigned char *patch, int *info); /* stagpat */
 
-extern "C" int cSNDplay(int *info); /* @0x800E7A68 */
-extern "C" int SNDplay(int *info);  /* @0x800E7A30 */
+extern "C" int cSNDplay(SNDPLAYOPTS *info); /* @0x800E7A68 */
+extern "C" int SNDplay(SNDPLAYOPTS *info);  /* @0x800E7A30 */
 
 /* SNDplay @0x800E7A30 : play `info` if the audio system is up. */
-extern "C" int SNDplay(int *info)
+extern "C" int SNDplay(SNDPLAYOPTS *info)
 {
     if ((char)sndgs[0xf] != 0)
         return cSNDplay(info);
@@ -24,14 +30,14 @@ extern "C" int SNDplay(int *info)
 }
 
 /* cSNDplay @0x800E7A68 : resolve the play-info's (bank, patch) to a tagged patch and play it. */
-extern "C" int cSNDplay(int *info)
+extern "C" int cSNDplay(SNDPLAYOPTS *info)
 {
     int patch, bank;
     intptr pp;
-    if (-1 < iSNDvalidbank((int)(char)info[1]))
+    if (-1 < iSNDvalidbank((int)info->bhandle))
     {
-        patch = info[0];
-        bank = *(int *)((char)info[1] * 0xc + sndgs[0x26]);
+        patch = info->patnum;
+        bank = *(int *)(info->bhandle * 0xc + sndgs[0x26]);
         if (patch < 0)
             return -8;
         if (patch < (int)(unsigned)*(unsigned short *)(bank + 6))
@@ -40,7 +46,7 @@ extern "C" int cSNDplay(int *info)
                 pp = *(int *)(bank + patch * 4 + 0x14);
             else
                 pp = *(int *)(bank + patch * 4 + 0xc);
-            return iSNDplaytaggedpatch((unsigned char *)pp, info);
+            return iSNDplaytaggedpatch((unsigned char *)pp, (int *)info);
         }
     }
     return -8;

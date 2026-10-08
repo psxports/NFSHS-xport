@@ -5,7 +5,6 @@
  */
 #include "femenuextended.h"
 #include "../../mips_semantics.h"
-#include <stdarg.h>
 
 /* ---- FEMenuExtended.obj-OWNED globals -- DEFINED here (self-contained; .bss zero; SYM-typed) ---- */
 PSX_RECT         gHelpPos;   /* @0x80052b58  (bss(zero)) */
@@ -38,7 +37,7 @@ void MenuNFS4_DrawTextBox(int helpText,PSX_RECT &r,int initialWidth,short drawOf
     drawFlags.tint[0] = CalcFadeVal(0,drawFlags.tint[0],
         nfs4_mips_subu_s32(0xe0,(int)r.y));
   }
-  DrawShape_SubtractNFS4RectEdges(&r);
+  DrawShape_SubtractNFS4RectEdges(r);
   if (-1 < helpText) {
     daprim = (DR_AREA *)Render_gPacketPtr;
     temp.x = 0;
@@ -509,7 +508,7 @@ void tMenuItemOptionsLeftRightChoice::Draw(int x,int y,bool selected)
   r.y = (short)y;
   r.w = 0x129;
   r.h = left[0x29].height;
-  DrawShape_NFS4RoundRectangle(-1,&r,(short)iVar6);
+  DrawShape_NFS4RoundRectangle(-1,r,(short)iVar6);
   return;
 }
 
@@ -593,7 +592,7 @@ void tMenuItemOptionsTwoItemChoice::Draw(int x,int y,bool selected)
   r.y = (short)y;
   r.w = 0x129;
   r.h = left[0x29].height;
-  DrawShape_NFS4RoundRectangle(-1,&r,(short)iVar8);
+  DrawShape_NFS4RoundRectangle(-1,r,(short)iVar8);
   return;
 }
 
@@ -602,15 +601,12 @@ void tMenuItemOptionsTwoItemChoice::Draw(int x,int y,bool selected)
 /* ---- tMenuNFS4::ctor  [FEMENUEXTENDED.CPP:439-444] SLD-VERIFIED ---- */
 
 tMenuNFS4::tMenuNFS4(u_int flags,tScreen *screenHandler,tMenu *nextMenu,
-                 tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,tMenuItem *firstItem,...)
+                 tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,tMenuItem *firstItem,std::initializer_list<tMenuItem *> rest)
   : _base_tMenu(flags,screenHandler,nextMenu,optionsMenu,OnButtonPress,title)
 {
-  va_list ap;
 
   *(void **)&((this->_base_tMenu)._vf) = (void *)tMenuNFS4_vtable;
-  va_start(ap,firstItem);
-  this->_base_tMenu.tMenuConstructor(firstItem,ap);
-  va_end(ap);
+  this->_base_tMenu.tMenuConstructor(firstItem,rest);
   return;
 }
 
@@ -847,16 +843,13 @@ void tMenuNFS4::Draw()
 /* ---- tMenuNFS4TwoPlayer::ctor  [FEMENUEXTENDED.CPP:566-571] SLD-VERIFIED ---- */
 
 tMenuNFS4TwoPlayer::tMenuNFS4TwoPlayer(u_int flags,tScreen *screenHandler,tMenu *nextMenu,
-                 tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,tMenuItem *firstItem,...)
+                 tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,tMenuItem *firstItem,std::initializer_list<tMenuItem *> rest)
   : _base_tMenuNFS4(flags,screenHandler,nextMenu,optionsMenu,OnButtonPress,title)
 {
-  va_list ap;
 
   *(void **)&((this->_base_tMenuNFS4)._base_tMenu._vf) = (void *)tMenuNFS4TwoPlayer_vtable;
   (this->_base_tMenuNFS4)._base_tMenu.fChildMenu = (tMenu *)0x0;
-  va_start(ap,firstItem);
-  ((tMenu *)this)->tMenuConstructor(firstItem,ap);
-  va_end(ap);
+  ((tMenu *)this)->tMenuConstructor(firstItem,rest);
   return;
 }
 
@@ -898,15 +891,12 @@ void tMenuNFS4TwoPlayer::DrawItem(int item)
 /* ---- tMenuNFS4Bottom::ctor  [FEMENUEXTENDED.CPP:607-611] SLD-VERIFIED ---- */
 
 tMenuNFS4Bottom::tMenuNFS4Bottom(u_int flags,tScreen *screenHandler,tMenu *nextMenu,
-                 tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,tMenuItem *firstItem,...)
+                 tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,tMenuItem *firstItem,std::initializer_list<tMenuItem *> rest)
   : _base_tMenuNFS4(flags,screenHandler,nextMenu,optionsMenu,OnButtonPress,title)
 {
-  va_list ap;
 
   *(void **)&((this->_base_tMenuNFS4)._base_tMenu._vf) = (void *)tMenuNFS4Bottom_vtable;
-  va_start(ap,firstItem);
-  ((tMenu *)this)->tMenuConstructor(firstItem,ap);
-  va_end(ap);
+  ((tMenu *)this)->tMenuConstructor(firstItem,rest);
   return;
 }
 
@@ -1068,7 +1058,7 @@ void * tMenuBlank::TransitionIsFinished()
   u_int uVar1;
   
   if ((this->_base_tMenuNFS4).fTransitionDirection < '\x01') {
-    uVar1 = (this->_base_tMenuNFS4).fTransitionVal < -0x6f ^ 1;
+    uVar1 = (u_int)((this->_base_tMenuNFS4).fTransitionVal < -0x6f ? 0 : 1);
   }
   else {
     uVar1 = (u_int)(int)(this->_base_tMenuNFS4).fTransitionVal >> 0x1f;
@@ -1083,15 +1073,12 @@ void * tMenuBlank::TransitionIsFinished()
 
 tMenuOptions::tMenuOptions(u_int flags,tScreen *screenHandler,tMenu *nextMenu,
               tMenu *optionsMenu,void (*OnButtonPress)(tMenuCommand&),short title,short player,
-              tMenuItem *firstItem,...)
+              tMenuItem *firstItem,std::initializer_list<tMenuItem *> rest)
   : _base_tMenuNFS4(flags,screenHandler,nextMenu,optionsMenu,OnButtonPress,title)
 {
-  va_list ap;
 
   *(void **)&((this->_base_tMenuNFS4)._base_tMenu._vf) = (void *)tMenuOptions_vtable;
-  va_start(ap,firstItem);
-  ((tMenu *)this)->tMenuConstructor(firstItem,ap);
-  va_end(ap);
+  ((tMenu *)this)->tMenuConstructor(firstItem,rest);
   this->fPlayer = player;
   return;
 }

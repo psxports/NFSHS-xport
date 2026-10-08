@@ -22,6 +22,11 @@ int          Skid_gCtrlScratch_94, Skid_gCtrlScratch_98;
 #endif
 extern "C" { int Skid_gScratchPos1, Skid_gScratchPos2; }
 
+static int Skidmark_OffsetCoordinate(int point,int offset,int center)
+{
+  return nfs4_mips_sra_s32(
+      nfs4_mips_subu_s32(nfs4_mips_addu_s32(point,offset),center),6);
+}
 
 /* ---- CalcStartSegment__FP16Skidmark_SegmentT0P8coorddefN22i  [SKIDMARK.CPP:48-72] SLD-VERIFIED ---- */
 void CalcStartSegment(Skidmark_Segment *r1,Skidmark_Segment *r2,coorddef *cp,coorddef *pt1,
@@ -33,20 +38,20 @@ void CalcStartSegment(Skidmark_Segment *r1,Skidmark_Segment *r2,coorddef *cp,coo
   int pzp;
 
   angle = intatan(pt2->x - pt1->x,pt2->z - pt1->z);
-  pxp = fixedmult(tireWidth,-fastintcos(angle)) >> 1;
-  pzp = fixedmult(tireWidth,fastintsin(angle)) >> 1;
-  r1->svx[0].vx = (short)((pt1->x + pxp) - cp->x >> 6);
-  r1->svx[0].vy = (short)(pt1->y - cp->y >> 6);
-  r1->svx[0].vz = (short)((pt1->z + pzp) - cp->z >> 6);
-  r1->svx[1].vx = (short)((pt1->x - pxp) - cp->x >> 6);
-  r1->svx[1].vy = (short)(pt1->y - cp->y >> 6);
-  r1->svx[1].vz = (short)((pt1->z - pzp) - cp->z >> 6);
-  r2->svx[1].vx = (short)((pt2->x - pxp) - cp->x >> 6);
-  r2->svx[1].vy = (short)(pt2->y - cp->y >> 6);
-  r2->svx[1].vz = (short)((pt2->z - pzp) - cp->z >> 6);
-  r2->svx[0].vx = (short)((pt2->x + pxp) - cp->x >> 6);
-  r2->svx[0].vy = (short)(pt2->y - cp->y >> 6);
-  r2->svx[0].vz = (short)((pt2->z + pzp) - cp->z >> 6);
+  pxp = nfs4_mips_sra_s32(fixedmult(tireWidth,-fastintcos(angle)),1);
+  pzp = nfs4_mips_sra_s32(fixedmult(tireWidth,fastintsin(angle)),1);
+  r1->svx[0].vx = (short)Skidmark_OffsetCoordinate(pt1->x,pxp,cp->x);
+  r1->svx[0].vy = (short)Skidmark_OffsetCoordinate(pt1->y,0,cp->y);
+  r1->svx[0].vz = (short)Skidmark_OffsetCoordinate(pt1->z,pzp,cp->z);
+  r1->svx[1].vx = (short)Skidmark_OffsetCoordinate(pt1->x,nfs4_mips_negu_s32(pxp),cp->x);
+  r1->svx[1].vy = (short)Skidmark_OffsetCoordinate(pt1->y,0,cp->y);
+  r1->svx[1].vz = (short)Skidmark_OffsetCoordinate(pt1->z,nfs4_mips_negu_s32(pzp),cp->z);
+  r2->svx[1].vx = (short)Skidmark_OffsetCoordinate(pt2->x,nfs4_mips_negu_s32(pxp),cp->x);
+  r2->svx[1].vy = (short)Skidmark_OffsetCoordinate(pt2->y,0,cp->y);
+  r2->svx[1].vz = (short)Skidmark_OffsetCoordinate(pt2->z,nfs4_mips_negu_s32(pzp),cp->z);
+  r2->svx[0].vx = (short)Skidmark_OffsetCoordinate(pt2->x,pxp,cp->x);
+  r2->svx[0].vy = (short)Skidmark_OffsetCoordinate(pt2->y,0,cp->y);
+  r2->svx[0].vz = (short)Skidmark_OffsetCoordinate(pt2->z,pzp,cp->z);
   return;
 }
 
@@ -61,12 +66,14 @@ void CalcOneSegment(Skidmark_Segment *r1,coorddef *cp,coorddef *pt1,coorddef *pt
   angle = intatan(pt2->x - pt1->x,pt2->z - pt1->z);
   pxp = fixedmult(tireWidth,-fastintcos(angle));
   pzp = fixedmult(tireWidth,fastintsin(angle));
-  r1->svx[0].vx = (short)((pt2->x + (pxp >> 1)) - cp->x >> 6);
-  r1->svx[0].vy = (short)(pt2->y - cp->y >> 6);
-  r1->svx[0].vz = (short)((pt2->z + (pzp >> 1)) - cp->z >> 6);
-  r1->svx[1].vx = (short)((pt2->x - (pxp >> 1)) - cp->x >> 6);
-  r1->svx[1].vy = (short)(pt2->y - cp->y >> 6);
-  r1->svx[1].vz = (short)((pt2->z - (pzp >> 1)) - cp->z >> 6);
+  pxp = nfs4_mips_sra_s32(pxp,1);
+  pzp = nfs4_mips_sra_s32(pzp,1);
+  r1->svx[0].vx = (short)Skidmark_OffsetCoordinate(pt2->x,pxp,cp->x);
+  r1->svx[0].vy = (short)Skidmark_OffsetCoordinate(pt2->y,0,cp->y);
+  r1->svx[0].vz = (short)Skidmark_OffsetCoordinate(pt2->z,pzp,cp->z);
+  r1->svx[1].vx = (short)Skidmark_OffsetCoordinate(pt2->x,nfs4_mips_negu_s32(pxp),cp->x);
+  r1->svx[1].vy = (short)Skidmark_OffsetCoordinate(pt2->y,0,cp->y);
+  r1->svx[1].vz = (short)Skidmark_OffsetCoordinate(pt2->z,nfs4_mips_negu_s32(pzp),cp->z);
   return;
 }
 

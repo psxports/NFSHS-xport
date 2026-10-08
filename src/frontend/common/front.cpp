@@ -640,9 +640,9 @@ extern "C" void Front_InitGraphics(void)
   int iVar1;
   char buffer [40];
   
-  initlinkmode(0,1);
+  initlinkmode(0,1,1);
   sprintf(buffer,"%szzFE.viv",Paths_Paths[0x23]);
-  iVar1 = FILE_addbigsync(buffer,(void *)0x0,100,&gFEBigHandle);
+  iVar1 = FILE_addbigsync(buffer,0,100,&gFEBigHandle);
   if (iVar1 == 0) {
     do {
                     /* WARNING: Do nothing block with infinite loop */
@@ -737,7 +737,7 @@ FrontMenu_runFrontEndCleanup:
   TextSys_UnloadWords();
   FeTools_deinit();
   PSXExitFrontend();
-  FILE_delbigsync((char *)gFEBigHandle,(void *)0x64);
+  FILE_delbigsync(gFEBigHandle,0x64);
   gFEBigHandle = 0;
   frontEnd.recordlaptime =
        Stattool_ReturnRecordLapTime((ushort)(byte)frontEnd.track[0]);
@@ -2628,7 +2628,7 @@ extern "C" void SetLicensePlate(void)
     player = p >> 0x10;
     fmt = (char *)(intptr)PlayerName(player);
     s = frontEnd.licensePlate + player;
-    sprintf(*s,fmt);
+    sprintf(*s,"%s",fmt);
     StatTool_UpperCaseItKeepingInMindThoseBloodySpecialCharacters(*s);
     s_lower(*s);
     CarIO_CleanUpLicense(player);
@@ -2657,6 +2657,7 @@ extern "C" void SetLicensePlate(void)
 extern "C" void SetPlayList(int ivealreadygotone)
 
 {
+  static char gamePattern[] = "game*";
   AudioMus_tSongList *addr;
   int iVar1;
   int i;
@@ -2666,7 +2667,7 @@ extern "C" void SetPlayList(int ivealreadygotone)
   
   AudioMus_SysCleanUp();
   AudioMus_SysStartUp(0xc000,0x18000,"ymus");
-  addr = (AudioMus_tSongList *)(intptr)AudioMus_GetSongList("game*",0);
+  addr = (AudioMus_tSongList *)(intptr)AudioMus_GetSongList(gamePattern,0);
   if (ivealreadygotone == 0) {
     memset(frontEnd.FEPlayList,0,sizeof(frontEnd.FEPlayList));
     iVar1 = 0;
@@ -2770,7 +2771,7 @@ extern "C" char * PlayerName(int player)
   int wordnum;
   
   s = frontEnd.allUpperCasedPlayerNameList + player;
-  sprintf(*s,frontEnd.playerNameList[player]);
+  sprintf(*s,"%s",frontEnd.playerNameList[player]);
   name_len = strlen(*s);
   if (name_len == 0) {
     wordnum = 0x4e;
@@ -2991,41 +2992,39 @@ tAllScreens::~tAllScreens()
   char carColor;
   short lapconv [2];
   
-  (((tScreen*)((tScreen *)&this->screenTournamentCongrats))->~tScreen(), (tScreen*)((tScreen *)&this->screenTournamentCongrats));
-  (((tScreen*)((tScreen *)&this->screenBeTheCopCongrats))->~tScreen(), (tScreen*)((tScreen *)&this->screenBeTheCopCongrats));
-  (((tScreen*)(&(this->screenPinkSlips)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenPinkSlips)._base_tScreen));
-  (((tScreen*)((tScreen *)&this->screenTournamentStandings3item))->~tScreen(), (tScreen*)((tScreen *)&this->screenTournamentStandings3item));
-  (((tScreen*)((tScreen *)&this->screenPinkSlipStandings))->~tScreen(), (tScreen*)((tScreen *)&this->screenPinkSlipStandings));
-  (((tScreen*)((tScreen *)&this->screenPinkSlipCongrats))->~tScreen(), (tScreen*)((tScreen *)&this->screenPinkSlipCongrats));
-  (((tScreen*)(&(this->screenUserName)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenUserName)._base_tScreen));
-  (((tScreen*)(&(this->screenMemcard)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenMemcard)._base_tScreen));
-  (((tScreen*)(&(this->screenAudio)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenAudio)._base_tScreen));
-  (((tScreen*)(&(this->screenDisplay)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenDisplay)._base_tScreen));
-  (((tScreen*)((tScreen *)&(this->screenControllerConfig).negconPopUp))->~tScreen(), (tScreen*)((tScreen *)&(this->screenControllerConfig).negconPopUp));
-  (((tScreen*)(&(this->screenControllerConfig)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenControllerConfig)._base_tScreen));
-  (((tScreen*)(&(this->screenTrophyInfo)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenTrophyInfo)._base_tScreen));
-  (((tScreenTrophyRoom*)(&this->screenTrophyRoom))->~tScreenTrophyRoom(), (tScreenTrophyRoom*)(&this->screenTrophyRoom));
-  (((tScreen*)((tScreen *)&this->screenTournamentTrophy))->~tScreen(), (tScreen*)((tScreen *)&this->screenTournamentTrophy));
-  (((tScreen*)(&(this->screenTournamentStandings)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenTournamentStandings)._base_tScreen));
-  (((tScreenTournSelect*)(&this->screenTournSelect))->~tScreenTournSelect(), (tScreenTournSelect*)(&this->screenTournSelect));
-  (((tScreen*)(&(this->screenTrackSelect)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenTrackSelect)._base_tScreen));
-  (((tScreen*)(&(this->screenTrackInfo)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenTrackInfo)._base_tScreen));
-  (((tScreen*)(&(this->screenTrackRecords)._base_tScreen))->~tScreen(), (tScreen*)(&(this->screenTrackRecords)._base_tScreen));
-  (((tScreen*)((tScreen *)
-                    &(this->screenPinkSlipsCarSelectPlayerTwo)._base_tScreenCarSelectTwoPlayer.CarDialog))->~tScreen(), (tScreen*)((tScreen *)
-                    &(this->screenPinkSlipsCarSelectPlayerTwo)._base_tScreenCarSelectTwoPlayer.CarDialog));
+  ((tScreen*)((tScreen *)&this->screenTournamentCongrats))->~tScreen();
+  ((tScreen*)((tScreen *)&this->screenBeTheCopCongrats))->~tScreen();
+  ((tScreen*)(&(this->screenPinkSlips)._base_tScreen))->~tScreen();
+  ((tScreen*)((tScreen *)&this->screenTournamentStandings3item))->~tScreen();
+  ((tScreen*)((tScreen *)&this->screenPinkSlipStandings))->~tScreen();
+  ((tScreen*)((tScreen *)&this->screenPinkSlipCongrats))->~tScreen();
+  ((tScreen*)(&(this->screenUserName)._base_tScreen))->~tScreen();
+  ((tScreen*)(&(this->screenMemcard)._base_tScreen))->~tScreen();
+  ((tScreen*)(&(this->screenAudio)._base_tScreen))->~tScreen();
+  ((tScreen*)(&(this->screenDisplay)._base_tScreen))->~tScreen();
+  ((tScreen*)((tScreen *)&(this->screenControllerConfig).negconPopUp))->~tScreen();
+  ((tScreen*)(&(this->screenControllerConfig)._base_tScreen))->~tScreen();
+  ((tScreen*)(&(this->screenTrophyInfo)._base_tScreen))->~tScreen();
+  ((tScreenTrophyRoom*)(&this->screenTrophyRoom))->~tScreenTrophyRoom();
+  ((tScreen*)((tScreen *)&this->screenTournamentTrophy))->~tScreen();
+  ((tScreen*)(&(this->screenTournamentStandings)._base_tScreen))->~tScreen();
+  ((tScreenTournSelect*)(&this->screenTournSelect))->~tScreenTournSelect();
+  ((tScreen*)(&(this->screenTrackSelect)._base_tScreen))->~tScreen();
+  ((tScreen*)(&(this->screenTrackInfo)._base_tScreen))->~tScreen();
+  ((tScreen*)(&(this->screenTrackRecords)._base_tScreen))->~tScreen();
+  ((tScreen*)((tScreen *)
+                  &(this->screenPinkSlipsCarSelectPlayerTwo)._base_tScreenCarSelectTwoPlayer.CarDialog))->~tScreen();
   tScreenCarSelect_dtor((tScreenCarSelect *)&this->screenPinkSlipsCarSelectPlayerTwo,2);
-  (((tScreen*)((tScreen *)
-                    &(this->screenPinkSlipsCarSelectTwoPlayer)._base_tScreenCarSelectTwoPlayer.CarDialog))->~tScreen(), (tScreen*)((tScreen *)
-                    &(this->screenPinkSlipsCarSelectTwoPlayer)._base_tScreenCarSelectTwoPlayer.CarDialog));
+  ((tScreen*)((tScreen *)
+                  &(this->screenPinkSlipsCarSelectTwoPlayer)._base_tScreenCarSelectTwoPlayer.CarDialog))->~tScreen();
   tScreenCarSelect_dtor((tScreenCarSelect *)&this->screenPinkSlipsCarSelectTwoPlayer,2);
-  (((tScreen*)((tScreen *)&(this->screenCarSelectPlayerTwo).CarDialog))->~tScreen(), (tScreen*)((tScreen *)&(this->screenCarSelectPlayerTwo).CarDialog));
+  ((tScreen*)((tScreen *)&(this->screenCarSelectPlayerTwo).CarDialog))->~tScreen();
   tScreenCarSelect_dtor(&(this->screenCarSelectPlayerTwo)._base_tScreenCarSelect,2);
-  (((tScreen*)((tScreen *)&(this->screenCarSelectTwoPlayer).CarDialog))->~tScreen(), (tScreen*)((tScreen *)&(this->screenCarSelectTwoPlayer).CarDialog));
+  ((tScreen*)((tScreen *)&(this->screenCarSelectTwoPlayer).CarDialog))->~tScreen();
   tScreenCarSelect_dtor(&(this->screenCarSelectTwoPlayer)._base_tScreenCarSelect,2);
   tScreenCarSelect_dtor(&(this->screenCarSelectDuel)._base_tScreenCarSelect,2);
   tScreenCarSelect_dtor(&this->screenCarSelect,2);
-  (((tScreen*)((tScreen *)this))->~tScreen(), (tScreen*)((tScreen *)this));
+  ((tScreen*)((tScreen *)this))->~tScreen();
   return;
 }
 

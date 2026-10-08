@@ -111,13 +111,13 @@ void RaceSummary(void)
       sprintf(string,"%s",car->carNameLocalized);
       Font_TextXY(string,colcar,dataY + pos * 0xc);
       if (GameSetup_gData.pinkSlipsForfeit == i) {
-        sprintf(string,TextSys_Word(0x36));
+        sprintf(string,"%s",TextSys_Word(0x36));
       }
       else if ((GameSetup_gData.raceType == 1) && (car->stats.finalNumArrests != 0)) {
-        sprintf(string,TextSys_Word(0x3d));
+        sprintf(string,"%s",TextSys_Word(0x3d));
       }
       else if (car->stats.finalFinishType != 2) {
-        sprintf(string,TextSys_Word(0x35));
+        sprintf(string,"%s",TextSys_Word(0x35));
       }
       else {
         Hud_ParseTime(car->stats.finalTotalTime,string);
@@ -227,7 +227,7 @@ void RaceStatistics(void)
       } while ((int)j < GameSetup_gData.numLaps);
     }
     if (GameSetup_gData.numLaps * 2 + 4 < StatsTimer[1]) {
-      sprintf(string,TextSys_Word(0x37));
+      sprintf(string,"%s",TextSys_Word(0x37));
       Font_TextColor(3);
       rowY = dataY + GameSetup_gData.numLaps * 0xc;
       if (GameSetup_gData.numLaps != 1) {
@@ -236,14 +236,14 @@ void RaceStatistics(void)
       Font_TextXY(string,(int)col1,rowY);
       car = Cars_gHumanRaceCarList[i];
       if (GameSetup_gData.pinkSlipsForfeit == i) {
-        sprintf(string,TextSys_Word(0x36));
+        sprintf(string,"%s",TextSys_Word(0x36));
       }
       else if ((car->stats).finalFinishType != 2) {
         if ((GameSetup_gData.raceType == 1) && ((car->stats).finalNumArrests != 0)) {
-          sprintf(string,TextSys_Word(0x3d));
+          sprintf(string,"%s",TextSys_Word(0x3d));
         }
         else {
-          sprintf(string,TextSys_Word(0x35));
+          sprintf(string,"%s",TextSys_Word(0x35));
         }
       }
       else {
@@ -257,7 +257,7 @@ void RaceStatistics(void)
     }
     if (GameSetup_gData.raceType == 1) {
       if (GameSetup_gData.numLaps * 2 + 6 < StatsTimer[1]) {
-        sprintf(string,TextSys_Word(0x3e));
+        sprintf(string,"%s",TextSys_Word(0x3e));
         Font_TextColor(3);
         rowY = HUD_STATS_HOTPURSUIT_Y + 1;
         Font_TextXY(string,(int)col1,rowY);
@@ -265,7 +265,7 @@ void RaceStatistics(void)
         Font_TextXY(string,col2 + 5,rowY);
       }
       if (GameSetup_gData.numLaps * 2 + 8 < StatsTimer[1]) {
-        sprintf(string,TextSys_Word(0x3f));
+        sprintf(string,"%s",TextSys_Word(0x3f));
         Font_TextColor(3);
         rowY = HUD_STATS_HOTPURSUIT_Y + 0xd;
         Font_TextXY(string,(int)col1,rowY);

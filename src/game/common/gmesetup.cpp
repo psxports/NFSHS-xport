@@ -1,3 +1,4 @@
+#include <stdio.h>
 /* game/common/gmesetup.cpp -- RECONSTRUCTED (NFS4 PSX game-setup startup/cleanup; C++ TU)
  *   2 free fns: GameSetup_StartUp(int*) + GameSetup_CleanUp(void). Full SYM-locals applied.
  *   GTE-free. Device startup fn-ptr dispatch via Device_gDeviceList[].startupfunc.
@@ -6,7 +7,7 @@
 #include "gmesetup_externs.h"
 
 #ifdef AP_WIN
-extern "C" void NFSHS_HostLog(const char *, ...);
+extern "C" void NFSHS_HostLog(const char *fmt);
 #endif
 
 /* ---- gmesetup.obj OWNED global (EXT) ---- */
@@ -85,8 +86,8 @@ extern "C" void GameSetup_StartUp(int *FrontEndDataStream)
     iVar3 = *piVar7;
 #ifdef AP_WIN
     if (iVar3 == 282 || iVar3 == 283)
-      NFSHS_DIAGNOSTIC_CALL(NFSHS_HostLog("TEST_SETUP_TAG tag=%d car=%d value=%08x stream=%p",
-                    iVar3,piVar7[1],(unsigned int)piVar7[2],piVar7));
+      NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "TEST_SETUP_TAG tag=%d car=%d value=%08x stream=%p",
+                    iVar3,piVar7[1],(unsigned int)piVar7[2],piVar7); NFSHS_HostLog(nfshsLogLine); }()));
 #endif
     if (iVar3 < 0x103) {
       pFVar4 = FEI_gList;
@@ -123,8 +124,8 @@ extern "C" void GameSetup_StartUp(int *FrontEndDataStream)
       }
       else {
         Input_gHandler[iVar3 - 0x4d] = piVar7[1];
-        if (Device_gDeviceList[piVar7[1] & 0xff].startupfunc != (u_char **)0x0) {
-          (*(int (*)(...))Device_gDeviceList[piVar7[1] & 0xff].startupfunc)(piVar7[1] >> 8);
+        if (Device_gDeviceList[piVar7[1] & 0xff].startupfunc != 0) {
+          Device_gDeviceList[piVar7[1] & 0xff].startupfunc((uint32)piVar7[1] >> 8);
           piVar7 = piVar7 + 2;
           goto GameSetupStart_iterValuesLoop;
         }

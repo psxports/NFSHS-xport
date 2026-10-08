@@ -5,7 +5,7 @@
 #include "../../lib/libfns.h"
 #include "stattool.h" /* Stattool_* helpers */
 
-extern "C" extern tfrontEnd frontEnd;
+extern "C" tfrontEnd frontEnd;
 extern tCarManager carManager;
 extern "C" tRecordBuffer Stats_gTrackRecords[187];
 

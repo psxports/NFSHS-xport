@@ -34,11 +34,34 @@ void GenericPMX_LoadTexture(void);
 void GenericPMX_LoadTexture(void)
 
 {
+  static char spikeName[] = "spik";
+  static char debugName[] = "DEBG";
+  static char shadowName[] = "SHAD";
+  static char skid0Name[] = "SKD0";
+  static char skid1Name[] = "SKD1";
+  static char flakeName[] = "FLAK";
+  static char flakeAltName[] = "FLA1";
+  static char splashName[] = "SPLT";
+  static char smoke0Name[] = "SMX0";
+  static char smoke1Name[] = "SMX1";
+  static char smokePaletteName[] = "SMOK";
+  static char dirtPaletteName[] = "DIRT";
+  static char gravel0Name[] = "GRX0";
+  static char gravel1Name[] = "GRX1";
+  static char gravelPaletteName[] = "GRAV";
+  static char grassPaletteName[] = "GRAS";
+  static char snowPaletteName[] = "SNOW";
+  static char damageName[] = "DAMG";
+  static char moonFlareName[] = "MONF";
+  static char flare0Name[] = "FLR0";
+  static char flare1Name[] = "FLR1";
+  static char rainbowName[] = "RBOW";
   bool bVar1;
   shapetbl *shape;
   char *n;
   Draw_tPixMap *pDVar2;
   char *pcVar3;
+  const char *textureFileFormat;
   Draw_tPixMap *pmx;
   Draw_tPixMap **ppDVar4;
   int i;
@@ -54,16 +77,16 @@ void GenericPMX_LoadTexture(void)
   
   if ((GameSetup_gData.track & 0xfU) == 4) {
     if (GameSetup_gData.Weather == 0) {
-      pcVar3 = "%sSfx4.psh";
+      textureFileFormat = "%sSfx4.psh";
     }
     else {
-      pcVar3 = "%sSfx4w.psh";
+      textureFileFormat = "%sSfx4w.psh";
     }
   }
   else {
-    pcVar3 = "%sSfx.psh";
+    textureFileFormat = "%sSfx.psh";
   }
-  sprintf(name,pcVar3,Paths_Paths[0x19]);
+  sprintf(name,textureFileFormat,Paths_Paths[0x19]);
   pcVar3 = (char *)loadfileadr(name,0);
   Texture_ResetPaletteSharing();
   ppDVar4 = gDLPixmap;
@@ -75,48 +98,48 @@ void GenericPMX_LoadTexture(void)
     ppDVar4 = ppDVar4 + 1;
     iVar7 = iVar7 + 1;
   }
-  Texture_LoadPmx(pcVar3,"spik",0x40,0,0xa0,-1,-1,gPixmaps + iVar7);
+  Texture_LoadPmx(pcVar3,spikeName,0x40,0,0xa0,-1,-1,gPixmaps + iVar7);
   gSpikeBeltPixmap = gPixmaps + iVar7;
-  Texture_LoadPmx(pcVar3,"DEBG",0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 1);
+  Texture_LoadPmx(pcVar3,debugName,0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 1);
   gDPixmap = gPixmaps + iVar7 + 1;
-  Texture_LoadPmx(pcVar3,"SHAD",0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 2);
+  Texture_LoadPmx(pcVar3,shadowName,0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 2);
   gShadowPixmap[0] = gPixmaps + iVar7 + 2;
-  Texture_LoadPmx(pcVar3,"SKD0",0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 3);
+  Texture_LoadPmx(pcVar3,skid0Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 3);
   gSkidMarkPixmap[0] = gPixmaps + iVar7 + 3;
-  Texture_LoadPmx(pcVar3,"SKD1",0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 4);
+  Texture_LoadPmx(pcVar3,skid1Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 4);
   gSkidMarkPixmap[1] = gPixmaps + iVar7 + 4;
   ChangeTPage(&gSkidMarkPixmap[0]->tpage,2);
   ChangeTPage(&gSkidMarkPixmap[1]->tpage,2);
   iVar5 = iVar7 + 5;
   if (GameSetup_gData.Weather != 0) {
-    Texture_LoadPmx(pcVar3,"FLAK",0x40,0,0xa0,-1,-1,gPixmaps + iVar5);
+    Texture_LoadPmx(pcVar3,flakeName,0x40,0,0xa0,-1,-1,gPixmaps + iVar5);
     gWeatherPixmap[0] = gPixmaps + iVar5;
-    Texture_LoadPmx(pcVar3,"FLA1",0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 6);
+    Texture_LoadPmx(pcVar3,flakeAltName,0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 6);
     iVar5 = iVar7 + 8;
     gWeatherPixmap[1] = gPixmaps + iVar7 + 6;
-    Texture_LoadPmx(pcVar3,"SPLT",0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 7);
+    Texture_LoadPmx(pcVar3,splashName,0x40,0,0xa0,-1,-1,gPixmaps + iVar7 + 7);
     gWeatherPixmap[2] = gPixmaps + iVar7 + 7;
     ChangeTPage(&gWeatherPixmap[0]->tpage,1);
     ChangeTPage(&gWeatherPixmap[1]->tpage,1);
     ChangeTPage(&gWeatherPixmap[2]->tpage,1);
   }
-  Texture_LoadPmx(pcVar3,"SMX0",0x40,0,0xa0,-1,-1,gPixmaps + iVar5);
+  Texture_LoadPmx(pcVar3,smoke0Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar5);
   gSMokePixmap[0] = gPixmaps + iVar5;
-  Texture_LoadPmx(pcVar3,"SMX1",0x40,0,0xa0,-1,-1,gPixmaps + iVar5 + 1);
+  Texture_LoadPmx(pcVar3,smoke1Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar5 + 1);
   gSMokePixmap[1] = gPixmaps + iVar5 + 1;
-  Texture_LoadPmx(pcVar3,"SMOK",0,-1,-1,-1,-1,gPixmaps + iVar5 + 2);
+  Texture_LoadPmx(pcVar3,smokePaletteName,0,-1,-1,-1,-1,gPixmaps + iVar5 + 2);
   gSMokePalette = gPixmaps + iVar5 + 2;
-  Texture_LoadPmx(pcVar3,"DIRT",0,-1,-1,-1,-1,gPixmaps + iVar5 + 3);
+  Texture_LoadPmx(pcVar3,dirtPaletteName,0,-1,-1,-1,-1,gPixmaps + iVar5 + 3);
   gDirtPalette = gPixmaps + iVar5 + 3;
-  Texture_LoadPmx(pcVar3,"GRX0",0x40,0,0xa0,-1,-1,gPixmaps + iVar5 + 4);
+  Texture_LoadPmx(pcVar3,gravel0Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar5 + 4);
   gGravelPixmap[0] = gPixmaps + iVar5 + 4;
-  Texture_LoadPmx(pcVar3,"GRX1",0x40,0,0xa0,-1,-1,gPixmaps + iVar5 + 5);
+  Texture_LoadPmx(pcVar3,gravel1Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar5 + 5);
   gGravelPixmap[1] = gPixmaps + iVar5 + 5;
-  Texture_LoadPmx(pcVar3,"GRAV",0,-1,-1,-1,-1,gPixmaps + iVar5 + 6);
+  Texture_LoadPmx(pcVar3,gravelPaletteName,0,-1,-1,-1,-1,gPixmaps + iVar5 + 6);
   gGravelPalette = gPixmaps + iVar5 + 6;
-  Texture_LoadPmx(pcVar3,"GRAS",0,-1,-1,-1,-1,gPixmaps + iVar5 + 7);
+  Texture_LoadPmx(pcVar3,grassPaletteName,0,-1,-1,-1,-1,gPixmaps + iVar5 + 7);
   gGrassPalette = gPixmaps + iVar5 + 7;
-  Texture_LoadPmx(pcVar3,"SNOW",0,-1,-1,-1,-1,gPixmaps + iVar5 + 8);
+  Texture_LoadPmx(pcVar3,snowPaletteName,0,-1,-1,-1,-1,gPixmaps + iVar5 + 8);
   ppDVar4 = gSparkHPixmap;
   iVar7 = iVar5 + 9;
   gSnowPalette = gPixmaps + iVar5 + 8;
@@ -141,22 +164,22 @@ void GenericPMX_LoadTexture(void)
   gLeafPixmap = (Draw_tPixMap *)0x0;
 GenPMX_loadDamgPmx:
   pDVar2 = gPixmaps + iVar7;
-  Texture_LoadPmx(pcVar3,"DAMG",0x40,0,0xa0,-1,-1,pDVar2);
+  Texture_LoadPmx(pcVar3,damageName,0x40,0,0xa0,-1,-1,pDVar2);
   iVar5 = iVar7 + 1;
   gDamagePixmap = pDVar2;
   if (GameSetup_gData.Weather == 0) {
     iVar6 = iVar5;
     if ((TrackSpec_gSpec.skyspec.flags & 8U) != 0) {
       iVar6 = iVar7 + 2;
-      Texture_LoadPmx(pcVar3,"MONF",0x40,0,0xa0,-1,-1,gPixmaps + iVar5);
+      Texture_LoadPmx(pcVar3,moonFlareName,0x40,0,0xa0,-1,-1,gPixmaps + iVar5);
       gFlarePixmap[0] = gPixmaps + iVar5;
     }
     if ((TrackSpec_gSpec.skyspec.flags & 4U) != 0) {
-      Texture_LoadPmx(pcVar3,"FLR0",0x40,0,0xa0,-1,-1,gPixmaps + iVar6);
+      Texture_LoadPmx(pcVar3,flare0Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar6);
       gFlarePixmap[0] = gPixmaps + iVar6;
-      Texture_LoadPmx(pcVar3,"FLR1",0x40,0,0xa0,-1,-1,gPixmaps + iVar6 + 1);
+      Texture_LoadPmx(pcVar3,flare1Name,0x40,0,0xa0,-1,-1,gPixmaps + iVar6 + 1);
       gFlarePixmap[1] = gPixmaps + iVar6 + 1;
-      Texture_LoadPmx(pcVar3,"RBOW",0x40,0,0xa0,-1,-1,gPixmaps + iVar6 + 2);
+      Texture_LoadPmx(pcVar3,rainbowName,0x40,0,0xa0,-1,-1,gPixmaps + iVar6 + 2);
       gFlarePixmap[2] = gPixmaps + iVar6 + 2;
       ChangeTPage(&gFlarePixmap[0]->tpage,1);
       ChangeTPage(&gFlarePixmap[1]->tpage,1);

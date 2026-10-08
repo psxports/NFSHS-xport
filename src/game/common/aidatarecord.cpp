@@ -244,11 +244,8 @@ void AIDataRecord_t::StartUp2(void)
     pAVar1 = *ppAVar2;
 
     if (pAVar1 != (AIDataRecord_t *)0x0) {
-#ifdef AP_WIN
-      NFS4_VCALL0(pAVar1->_vf[0][2].pfn, pAVar1);
-#else
-      (**(int (**)(...))(pAVar1->_vf[6] + 2))(pAVar1->name_ + *(short *)(pAVar1->_vf[5] + 1) + -8);
-#endif
+      const __vtbl_ptr_type &entry = (*pAVar1->_vf)[2];
+      ((void (NFS4_THISCALL *)(void *))entry.pfn)((char *)pAVar1 + entry.delta);
 
     }
 
@@ -285,9 +282,8 @@ void AIDataRecord_t::CleanUp1(void)
 
     pa_Var1 = (AIDataRecord_BestLine->_base_AIDataRecord_t)._vf;
 
-    (**(int (**)(...))(pa_Var1 + 4))
-
-              ((AIDataRecord_BestLine->_base_AIDataRecord_t).name_ + *(short *)(pa_Var1[2] + 2) + -8,3);
+    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
+        ((char *)AIDataRecord_BestLine + (*pa_Var1)[1].delta,3);
 
     AIDataRecord_BestLine = (AIDataRecord_BestLine_t *)0x0;
 
@@ -297,9 +293,8 @@ void AIDataRecord_t::CleanUp1(void)
 
     pa_Var1 = (AIDataRecord_TrackCurve->_base_AIDataRecord_t)._vf;
 
-    (**(int (**)(...))(pa_Var1 + 4))
-
-              ((AIDataRecord_TrackCurve->_base_AIDataRecord_t).name_ + *(short *)(pa_Var1[2] + 2) + -8,3);
+    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
+        ((char *)AIDataRecord_TrackCurve + (*pa_Var1)[1].delta,3);
 
     AIDataRecord_TrackCurve = (AIDataRecord_TrackCurve_t *)0x0;
 
@@ -394,7 +389,7 @@ int AIDataRecord_t::Load()
 
   if (this->recordMethod_ == 0) {
 
-    pcVar1 = (char *)loadpackadrz(this->name_,(void *)0x0);
+    pcVar1 = (char *)loadpackadrz(this->name_,0x0);
 
     this->dataBuffer_ = pcVar1;
 

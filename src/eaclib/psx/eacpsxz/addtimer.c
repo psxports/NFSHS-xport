@@ -11,15 +11,15 @@
 /* owning-TU def (extern-declared, never defined; BSS) */
 extern "C"
 {
-    int (*gTimerSubs[8])(void);
+    void (*gTimerSubs[8])(void);
 }
 extern "C" int tmrsub;
 
-extern "C" int (*gTimerSubs[8])(void); /* @0x8012360C (data-mat pass owns) */
+extern "C" void (*gTimerSubs[8])(void); /* @0x8012360C (data-mat pass owns) */
 
-extern "C" void addtimer(int (*fn)(void)) /* @0x800EAFE8 */
+extern "C" void addtimer(void (*fn)(void)) /* @0x800EAFE8 */
 {
-    int (**timerSubs)(void) = (int (**)(void))&tmrsub;
+    void (**timerSubs)(void) = (void (**)(void))&tmrsub;
     int i;
     for (i = 0; i < 8; i++) /* already registered? -> done */
         if (timerSubs[i] == fn)
@@ -32,9 +32,9 @@ extern "C" void addtimer(int (*fn)(void)) /* @0x800EAFE8 */
         }
 }
 
-extern "C" void deltimer(int (*fn)(void)) /* @0x800EB048 */
+extern "C" void deltimer(void (*fn)(void)) /* @0x800EB048 */
 {
-    int (**timerSubs)(void) = (int (**)(void))&tmrsub;
+    void (**timerSubs)(void) = (void (**)(void))&tmrsub;
     int i;
     for (i = 0; i < 8; i++)
         if (timerSubs[i] == fn)

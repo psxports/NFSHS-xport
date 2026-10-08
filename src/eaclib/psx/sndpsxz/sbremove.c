@@ -5,10 +5,10 @@
  */
 
 extern "C" int sndgs[];
-extern "C" int iSNDvalidbank(int bankId);                           /* sbvalid  */
-extern "C" int SNDstop(unsigned int tag);                           /* sstop    */
-extern "C" void iSNDbankremovepat(int bank, int idx, int *scratch); /* sbirmpat */
-extern "C" void iSNDplatformfree(void *p);                          /* sdata    */
+extern "C" int iSNDvalidbank(int bankId);                          /* sbvalid  */
+extern "C" int SNDstop(unsigned int tag);                          /* sstop    */
+extern "C" int iSNDbankremovepat(int bank, int idx, int *scratch); /* sbirmpat */
+extern "C" void iSNDplatformfree(void *p);                         /* sdata    */
 
 extern "C" int iSNDremovepatches(int bank, int count); /* @0x800E65F8 */
 extern "C" void SNDbankremove(int bankId);             /* @0x800E6674 */

@@ -6,7 +6,14 @@
 /* ---- Feaudio.obj-OWNED globals -- DEFINED here (self-contained; real NFS4.EXE bytes / .bss zero) ---- */
 int          gStopCommentaryNow;   /* @0x800514c8  (bss(zero)) */
 char         gCurrentVIV = -1;   /* @0x800514cc */
-char *allLanguages[6] = {"zEngl","zGerm","zFren","zSpan","zItal","zSwed"};   /* @0x800514d0 .rodata prefixes */
+static char languageEnglish[] = "zEngl";
+static char languageGerman[] = "zGerm";
+static char languageFrench[] = "zFren";
+static char languageSpanish[] = "zSpan";
+static char languageItalian[] = "zItal";
+static char languageSwedish[] = "zSwed";
+char *allLanguages[6] = {languageEnglish,languageGerman,languageFrench,
+                         languageSpanish,languageItalian,languageSwedish}; /* @0x800514d0 */
 extern "C" { SPEECHINFO   ginfo; } /* @0x800514e8  (bss(zero)) */
 LUMPYHEAD    *speechfileHeader;   /* @0x8005150c  (bss(zero)) */
 char         currentSpeechViv[40];   /* @0x80051510  (bss(zero)) */
@@ -18,6 +25,7 @@ int          commentaryActualLevel;   /* @0x80051538  (bss(zero)) */
 int FEAudio_StartLoadPatch(SPEECHINFO *info)
 
 {
+  static char emptyFileName[] = "";
   int iVar1;
   char *pcVar2;
   int offset;
@@ -31,7 +39,7 @@ int FEAudio_StartLoadPatch(SPEECHINFO *info)
       purgememadr(info->sSpeechData);
       info->sSpeechData = (char *)0x0;
     }
-    pcVar2 = FeAudio_StartBigfileRead("",offset,length,&info->vivHandle);
+    pcVar2 = FeAudio_StartBigfileRead(emptyFileName,offset,length,&info->vivHandle);
     info->sSpeechData = pcVar2;
     iVar1 = 1;
     info->areLoading = '\x01';
@@ -57,7 +65,7 @@ void Feaudio_StartPatch(SPEECHINFO *info)
       iVar1 = SNDbankheadersize(info->nHandle);
       pcVar2 = (char *)reservememadr((char *)(bigBuf + 0x104),iVar1,0x10);
       info->pBankHeader = pcVar2;
-      SNDbankheadercopy(pcVar2,info->nHandle);
+      SNDbankheadercopy((unsigned char *)pcVar2,info->nHandle);
       if (info->sSpeechData != (char *)0x0) {
         purgememadr(info->sSpeechData);
         info->sSpeechData = (char *)0x0;
@@ -115,7 +123,7 @@ void FeAudio_systemtask(int x)
   }
   if ((ginfo.soundIsPlaying != '\0') &&
      (snd_over = SNDover(ginfo.nSoundHandle), snd_over != 0)) {
-    SNDautovol((void *)ginfo.nSoundHandle,0,-1);
+    SNDautovol(ginfo.nSoundHandle,0,-1);
     SNDbankremove(ginfo.nHandle);
     if (ginfo.lastSpeechData != (char *)0x0) {
       purgememadr(ginfo.lastSpeechData);
@@ -147,7 +155,7 @@ void FeAudio_systemtask(int x)
       }
     }
     if (ginfo.soundIsPlaying != '\0') {
-      SNDautovol((void *)ginfo.nSoundHandle,0,-1);
+      SNDautovol(ginfo.nSoundHandle,0,-1);
       SNDbankremove(ginfo.nHandle);
     }
     AudioMus_Volume(gMasterMusicLevel * 0x46 >> 7);
@@ -253,7 +261,7 @@ char * FeAudio_StartBigfileRead(char *fname,int offset,int length,int *vivHandle
   }
   else {
     setasyncfile(fname);
-    iVar1 = asyncloadsegment((char *)offset,streamBuffer,length);
+    iVar1 = asyncloadsegment(offset,streamBuffer,length);
     *vivHandle = iVar1;
   }
   return streamBuffer;
@@ -319,7 +327,7 @@ LUMPYHEAD * FeAudio_InitViv(char *fname)
   LUMPYHEAD lumpHead;
   
   setasyncfile(fname);
-  vivHandle = asyncloadsegment((char *)0x0,&lumpHead,0x10);
+  vivHandle = asyncloadsegment(0,&lumpHead,0x10);
   do {
     systemtask(0);
     iVar2 = getasyncreadstatus(vivHandle);
@@ -337,7 +345,7 @@ LUMPYHEAD * FeAudio_InitViv(char *fname)
     bigfileHeader = (LUMPYHEAD *)0x0;
   }
   else {
-    vivHandle = asyncloadsegment((char *)0x0,bigfileHeader,lumpHead.hlen + 0x20);
+    vivHandle = asyncloadsegment(0,bigfileHeader,lumpHead.hlen + 0x20);
     do {
       systemtask(0);
       iVar2 = getasyncreadstatus(vivHandle);

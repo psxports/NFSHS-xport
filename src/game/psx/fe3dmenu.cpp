@@ -76,8 +76,8 @@ void CameraLookAt(matrixtdef *mat,coorddef *camPoint)
   fwdVec.y = -camPoint->y;
   fwdVec.z = -camPoint->z;
   Math_NormalizeVector(&fwdVec);
-  crossproduct(&upVec,&fwdVec,&rightVec);
-  crossproduct(&fwdVec,&rightVec,&upVec);
+  crossproduct(&upVec.x,&fwdVec.x,&rightVec.x);
+  crossproduct(&fwdVec.x,&rightVec.x,&upVec.x);
   mat->m[0] = rightVec.x;
   mat->m[1] = rightVec.y;
   mat->m[2] = rightVec.z;
@@ -94,7 +94,7 @@ void CameraLookAt(matrixtdef *mat,coorddef *camPoint)
 
 /* ---- Draw_MenuRenderingView  [FE3DMENU.CPP:150-329] SLD-VERIFIED ---- */
 
-void Draw_MenuRenderingView(Car_tObj *carObj,DRender_tView *Vi,int posX,int posY,int player,u_long rotation,
+void Draw_MenuRenderingView(Car_tObj *carObj,DRender_tView *Vi,int posX,int posY,int player,uint32 rotation,
                int camRot,float camY,float camZ,int light,int reflection)
 
 {

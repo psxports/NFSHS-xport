@@ -127,7 +127,7 @@ void tScreenTournamentStandings::GetShapeInfo(short &numPermShapes,short &numSwa
   numSwapShapes = 0;
   *swapFileName = (char *)0x0;
   numPermShapes = 0x29;
-  *permFileName = "zTrnSt1";
+  *permFileName = NFS4_WRITABLE_LITERAL("zTrnSt1");
   return;
 }
 
@@ -141,7 +141,7 @@ void tScreenTournamentStandings3item::GetShapeInfo(short &numPermShapes,short &n
   numSwapShapes = 0;
   *swapFileName = (char *)0x0;
   numPermShapes = 0x29;
-  *permFileName = "zTrnStd";
+  *permFileName = NFS4_WRITABLE_LITERAL("zTrnStd");
   return;
 }
 
@@ -246,7 +246,7 @@ void tScreenTournamentStandings::DrawBackground()
         iVar6 = 0x31c;
       }
       str = TextSys_Word(iVar6);
-      sprintf(sBuildOutput,str);
+      sprintf(sBuildOutput,"%s",str);
     }
     iVar6 = TextSys_WordX(0x2fb);
     iVar3 = TextSys_WordY(iVar8);
@@ -409,7 +409,7 @@ void tScreenPinkSlipStandings::DrawBackground()
     else {
       str = PlayerName((int)frontEnd.pinkSlipsWinner[i]);
     }
-    sprintf(string,str);
+    sprintf(string,"%s",str);
     iVar1 = TextSys_WordX(0x2fb);
     iVar2 = TextSys_WordY(wwwww);
     FETextRender_FullTextFade(iVar7,string,(short)iVar1,(short)iVar2,textType_TrackRecords,textState,1);
@@ -425,7 +425,7 @@ void tScreenPinkSlipStandings::DrawBackground()
     index = &frontEnd;
     if (frontEnd.pinkSlipsWins[wwwww] == '\x01') {
       str = TextSys_Word(799);
-      sprintf(sBuildOutput,str);
+      sprintf(sBuildOutput,"%s",str);
     }
     else {
       str = TextSys_Word(0x31e);
@@ -482,7 +482,7 @@ int tScreenPinkSlipStandings::ProcessInput(tPlayer fromPlayer,tInputKeyType &key
 tScreenPinkSlipStandings::~tScreenPinkSlipStandings()
 
 {
-  (((tScreen*)((tScreen *)this))->~tScreen(), (tScreen*)((tScreen *)this));
+  ((tScreen*)((tScreen *)this))->~tScreen();
   return;
 }
 
@@ -492,7 +492,7 @@ tScreenPinkSlipStandings::~tScreenPinkSlipStandings()
 tScreenTournamentStandings3item::~tScreenTournamentStandings3item()
 
 {
-  (((tScreen*)((tScreen *)this))->~tScreen(), (tScreen*)((tScreen *)this));
+  ((tScreen*)((tScreen *)this))->~tScreen();
   return;
 }
 
@@ -511,7 +511,7 @@ tScreenTournamentStandings::~tScreenTournamentStandings()
   tTrackInformation trackInfo;
   char string [30];
   
-  (((tScreen*)(&this->_base_tScreen))->~tScreen(), (tScreen*)(&this->_base_tScreen));
+  ((tScreen*)(&this->_base_tScreen))->~tScreen();
   return;
 }
 

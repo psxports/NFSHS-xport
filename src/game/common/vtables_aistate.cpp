@@ -2,7 +2,7 @@
  * Real nfs4-f.exe bytes; __vtbl_ptr_type (size=_vf[4]); pfn VAs symbolicated. @0xVA breadcrumbs.
  * NOT original layout (the obj owned each in its rodata); self-contained + faithful + links. */
 #include "../../nfs4_types.h"
-extern "C" int __pure_virtual(...);   /* @0x800e4354 (eaclib cfront runtime) */
+extern "C" void __pure_virtual(void);   /* @0x800e4354 (eaclib cfront runtime) */
 
 static int NFS4_VT_THUNK _vtdtor_AIState_Base(AIState_Base *p){ p->~AIState_Base(); return 0; }
 static int NFS4_VT_THUNK _vtdtor_AIState_Chase(AIState_Chase *p){ p->~AIState_Chase(); return 0; }

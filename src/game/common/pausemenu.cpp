@@ -5,7 +5,7 @@
  */
 #include "../../nfs4_types.h"
 #include "pausemenu_externs.h"
-#include <stdarg.h>
+#include <stdlib.h>
 
 /* STAT data owned by PauseMenu.obj (gPause_CurrentY @0x8013ddc4, file-static int) */
 static int gPause_CurrentY;
@@ -422,7 +422,7 @@ int tPMenuItemLeftRightChoice::ProcessInput(tInputKeyType &keyval,tPMenuCommand 
 
 {
   short sVar1;
-  int (*pcVar2)(...);
+  nfs4_vtbl_pfn pcVar2;
   tPListIterator *ptVar3;
   
   if (keyval == kInput_KeyType_Left) {
@@ -438,7 +438,7 @@ int tPMenuItemLeftRightChoice::ProcessInput(tInputKeyType &keyval,tPMenuCommand 
     sVar1 = (*ptVar3->_vf)[4].delta;
     pcVar2 = (*ptVar3->_vf)[4].pfn;
   }
-  (*pcVar2)((int)&ptVar3->fSelectionList + (int)sVar1,0xffffffff);
+  NFS4_VCALL1(pcVar2,(char *)ptVar3 + sVar1,-1);
   keyval = kInput_KeyType_AlreadyProcessed;
   return 1;
 }
@@ -454,7 +454,7 @@ void tPMenuItemLeftRightChoice::Draw(bool selected)
   short index;
   short x;
   int labelStrId;
-  int vtable_p;
+  __vtbl_ptr_type *textValueEntry;
   int valueStrId;
   int labelText;
   int color;
@@ -471,10 +471,8 @@ void tPMenuItemLeftRightChoice::Draw(bool selected)
   selected_00 = (short)selected;
   PauseMenu_MenuTextPositioned((short)(this->_base_tPMenuItemInteractive)._base_tPMenuItem.fTextDescription,selected_00,
              (u_short)(this->_base_tPMenuItemInteractive)._base_tPMenuItem.fFlags & 1,(short)labelStrId);
-  vtable_p = (int)this->fData->_vf;
-  index = (**(int (**)(...))(vtable_p + 0x1c))
-                    ((int)&this->fData->fSelectionList + (int)*(short *)(vtable_p + 0x18),0xffffffff
-                    );
+  textValueEntry = &(*this->fData->_vf)[3];
+  index = NFS4_VCALL1(textValueEntry->pfn,(char *)this->fData + textValueEntry->delta,-1);
   valueStrId = TextSys_WordX((int)index);
   x = (short)valueStrId;
   PauseMenu_MenuTextPositioned(index,selected_00,(u_short)(this->_base_tPMenuItemInteractive)._base_tPMenuItem.fFlags & 1,x);
@@ -604,7 +602,7 @@ void tPMenuItemLeftRightSlider::Draw(bool selected)
   int tickX;
   int xacc;
   int fadeColor;
-  u_long col;
+  uint32 col;
   int tickColor;
   short y;
   int label_y_pack;
@@ -743,7 +741,7 @@ tPMenuItemGoToMenuButton::tPMenuItemGoToMenuButton(u_int textDescription,tPMenu 
   (this->_base_tPMenuItemInteractive)._base_tPMenuItem._vf =
        (__vtbl_ptr_type (*) [7])tPMenuItemGoToMenuButton_vtable;
   this->fNewMenu = newMenu;
-  this->fOnButtonPress = (u_char **)OnButtonPress;
+  this->fOnButtonPress = OnButtonPress;
   return;
 }
 
@@ -793,8 +791,8 @@ void tPMenuItemGoToMenuButton::ProcessInput(tInputKeyType &keyval,tPMenuCommand 
                           (int)(*pa_Var1)[2].delta);
       command.nextMenu = ptVar3;
     }
-    if (this->fOnButtonPress != (u_char **)0x0) {
-      (*(int (*)(...))this->fOnButtonPress)(command);
+    if (this->fOnButtonPress != nullptr) {
+      this->fOnButtonPress(command);
     }
     keyval = kInput_KeyType_AlreadyProcessed;
   }
@@ -846,22 +844,19 @@ void tPMenuItemCommandButton::ProcessInput(tInputKeyType &keyval,tPMenuCommand &
 
 /* ---- tPMenu::tPMenuConstructor  [PAUSEMENU.CPP:640-659] SLD-VERIFIED ---- */
 
-void tPMenu::tPMenuConstructor(tPMenuItem *firstItem,void *ap)
+void tPMenu::tPMenuConstructor(tPMenuItem *firstItem,std::initializer_list<tPMenuItem *> rest)
 
 {
-  va_list *args;
-  tPMenuItem *p;
-
-  args = (va_list *)ap;
+  if (rest.size() == 0 || rest.size() > 15 || *(rest.end() - 1) != nullptr)
+    abort();
   this->fItemList[0] = firstItem;
   this->fNumItems = 0;
-  do {
-    p = va_arg(*args,tPMenuItem *);
+  for (tPMenuItem *p : rest) {
     this->fItemList[this->fNumItems + 1] = p;
-    if (p != (tPMenuItem *)0x0) {
-      this->fNumItems = this->fNumItems + 1;
-    }
-  } while (p != (tPMenuItem *)0x0);
+    if (p == nullptr)
+      break;
+    this->fNumItems = this->fNumItems + 1;
+  }
   return;
 }
 
@@ -869,16 +864,12 @@ void tPMenu::tPMenuConstructor(tPMenuItem *firstItem,void *ap)
 
 /* ---- tPMenu::ctor  [PAUSEMENU.CPP:669-675] SLD-VERIFIED ---- */
 
-tPMenu::tPMenu(tPMenuItem *firstItem, ...)
+tPMenu::tPMenu(tPMenuItem *firstItem, std::initializer_list<tPMenuItem *> rest)
 
 {
-  va_list ap;
-
   this->_vf = (__vtbl_ptr_type (*) [5])tPMenu_vtable;
   this->fCurrentItem = 0;
-  va_start(ap,firstItem);
-  this->tPMenuConstructor(firstItem,&ap);
-  va_end(ap);
+  this->tPMenuConstructor(firstItem,rest);
   return;
 }
 

@@ -2,6 +2,7 @@
  *   15 MEMBER fns of tScreenMemcard : tScreen. Member-fn decls in nfs4_types.h. Bodies: Ghidra.
  */
 #include "screenmemcard.h"
+#include "../../mips_semantics.h"
 
 /* layout int globals owned by this TU (SYM EXT @0x800528xx; set in Initialize) */
 int GRIDMEMCARD_STARTX, GRIDMEMCARD_STARTY, MEMCARD_DELTAX, MEMCARD_DELTAY;
@@ -19,7 +20,7 @@ void tScreenMemcard::GetShapeInfo(short &numPermShapes,short &numSwapShapes,char
   numSwapShapes = 0;
   *swapFileName = (char *)0x0;
   numPermShapes = 0x3c;
-  *permFileName = "zmemcrd";
+  *permFileName = NFS4_WRITABLE_LITERAL("zmemcrd");
   return;
 }
 
@@ -277,9 +278,6 @@ void tScreenMemcard::PlaceIcons(int i,int fadeval)
     if (this->numicon[i] == 0) {
       trap(0x1c00);
     }
-    if ((this->numicon[i] == 0xffffffff) && (ticks >> 4 == -0x80000000)) {
-      trap(0x1800);
-    }
     icon = (shapetbl *)(*fMemIcon)[i][(ticks >> 4) % this->numicon[i]];
     if (i == this->theNFS4icon) {
       fFlags.tint[0] = 0xb55623;
@@ -421,7 +419,7 @@ DrawMC_getNewIconsCheck:
         if (CURRENTLYUSINGMEMCARD == 0) {
           if (this->goticon[fileIdx] != '\0') {
             if (this->fFadeIcon[fileIdx] == 0) {
-              idx = MCRD_fileexists(this->card,"NFS4");
+              idx = MCRD_fileexists(this->card,NFS4_WRITABLE_LITERAL("NFS4"));
               this->theNFS4icon = idx;
               if ((this->fMemCardMessageTextSys != 0x27f) && (this->fMemCardMessageTextSys != 0x27b)
                  ) {
@@ -432,7 +430,7 @@ DrawMC_getNewIconsCheck:
               }
               else {
                 this->fMemCardMessageTextSys = -1;
-                sprintf(this->fMemCardMessage,this->fMemTitle[this->theNFS4icon]);
+                sprintf(this->fMemCardMessage,"%s",this->fMemTitle[this->theNFS4icon]);
               }
             }
             goto DrawMC_iconActive;
@@ -636,7 +634,7 @@ DrawBg47470_calcFadeMessage:
   }
   if (this->fMemCardMessageTextSys != -1) {
     word = TextSys_Word(this->fMemCardMessageTextSys);
-    sprintf(this->fMemCardMessage,word);
+    sprintf(this->fMemCardMessage,"%s",word);
   }
   fScreenFade = (uint)(ushort)kMemCardMessageX;
   rr.w = 0xbe;
@@ -655,7 +653,8 @@ DrawBg47470_calcFadeMessage:
   boxY = GRIDMEMCARD_STARTY - GRIDMEMCARDGOURAUDBIT_Y - EXTRAYATTOP - 4;
   gray = ((uint)(ushort)GRIDMEMCARD_HEIGHT + (uint)(ushort)GRIDMEMCARDGOURAUDBIT_Y * 2 +
           (EXTRAYATTOP & 0xffffU) + 6) * 0x10000;
-  gray = (gray >> 0x10) - (gray >> 0x1f) >> 1;
+  gray = nfs4_mips_sra_s32(
+      nfs4_mips_subu_s32(nfs4_mips_sra_s32(gray,0x10),nfs4_mips_sra_s32(gray,0x1f)),1);
   SubtractiveBox
             (x,boxY,w,gray,0x505050,0x505050,0,0);
   SubtractiveBox
@@ -672,7 +671,10 @@ DrawBg47470_calcFadeMessage:
                      (short)((((GRIDMEMCARD_STARTY & 0xffffU) -
                               (uint)(ushort)GRIDMEMCARDGOURAUDBIT_Y) - (EXTRAYATTOP & 0xffffU)) *
                              0x10000 >> 0x10),gridpos,
-                     (short)((uint)((gray + (gray - ((i << 0x10) >> 0x1f) >> 1) * -2) *
+                     (short)((uint)((gray + nfs4_mips_sra_s32(
+                                                nfs4_mips_subu_s32(
+                                                    gray,nfs4_mips_sra_s32(
+                                                             nfs4_mips_sll_s32(i,0x10),0x1f)),1) * -2) *
                                    0x10000) >> 0x10));
     i = i + 1;
   } while (i * 0x10000 >> 0x10 < 4);
@@ -688,7 +690,10 @@ DrawBg47470_calcFadeMessage:
     this->DrawHorizontalLine((short)(((GRIDMEMCARD_STARTX & 0xffffU) -
                                     (uint)(ushort)GRIDMEMCARDGOURAUDBIT_X) * 0x10000 >> 0x10),
                        (short)gridY,(short)fScreenFade,
-                       (short)((uint)((i + (i - ((gray << 0x10) >> 0x1f) >> 1) * -2) *
+                       (short)((uint)((i + nfs4_mips_sra_s32(
+                                               nfs4_mips_subu_s32(
+                                                   i,nfs4_mips_sra_s32(
+                                                         nfs4_mips_sll_s32(gray,0x10),0x1f)),1) * -2) *
                                      0x10000) >> 0x10));
     gray = gray + 1;
     i = gray * 0x10000 >> 0x10;
@@ -699,7 +704,10 @@ DrawBg47470_calcFadeMessage:
                                   (uint)(ushort)GRIDMEMCARDGOURAUDBIT_X) * 0x10000 >> 0x10),
                      (short)((fScreenFade + ((kMemCardMessageH & 0xffffU) - (MEMCARD_DELTAY & 0xffffU))) *
                              0x10000 >> 0x10),(short)fScreenFade,
-                     (short)((uint)((i + (i - (gray * 0x10000 >> 0x1f) >> 1) * -2) *
+                     (short)((uint)((i + nfs4_mips_sra_s32(
+                                             nfs4_mips_subu_s32(
+                                                 i,nfs4_mips_sra_s32(
+                                                       nfs4_mips_sll_s32(gray,0x10),0x1f)),1) * -2) *
                                    0x10000) >> 0x10));
   gray = 0;
   do {

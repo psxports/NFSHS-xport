@@ -706,7 +706,7 @@ void Replay_LoadCameraFile(void)
   int *piVar5;
   int i;
   int iVar6;
-  char *fmt;
+  const char *fmt;
   int temp;
   int j;
   int tu7;
@@ -733,7 +733,7 @@ void Replay_LoadCameraFile(void)
     bigFile = 0;
     sprintf(fname,"%scamera.viv",Paths_Paths[8]);
     piVar5 = &bigFile;
-    FILE_addbigsync(fname,(void *)0x10,100,piVar5);
+    FILE_addbigsync(fname,0x10,100,piVar5);
     if (GameSetup_gData.reverseTrack == 0) {
       fmt = "tr%02d.rho";
     }
@@ -744,7 +744,7 @@ void Replay_LoadCameraFile(void)
     sprintf(fname,fmt,GameSetup_gData.track);
     addr = (int *)loadfileadrz(fname,0);
     numValidCams = 0;
-    FILE_delbigsync((char *)bigFile,(void *)0x64,iVar6,piVar5);
+    FILE_delbigsync(bigFile,0x64);
     iVar6 = 0;
     pCVar4 = gReplayCameraSlots;
     do {

@@ -3,6 +3,7 @@
  *   Bodies from Ghidra; namespaces stripped, phantom stack-args resolved vs disasm.
  */
 #include "screentrophyroom.h"
+#include "../../mips_semantics.h"
 
 
 /* ---- tScreenTrophyRoom::ctor  [SCREENTROPHYROOM.CPP:40-43] ---- */
@@ -25,7 +26,7 @@ tScreenTrophyRoom::~tScreenTrophyRoom()
 
 {
   (this->_base_tScreen)._vf = (__vtbl_ptr_type (*)[10])tScreenTrophyRoom_vtable;
-  (((tScreen*)(&this->_base_tScreen))->~tScreen(), (tScreen*)(&this->_base_tScreen));
+  ((tScreen*)(&this->_base_tScreen))->~tScreen();
   return;
 }
 
@@ -43,7 +44,7 @@ void tScreenTrophyRoom::GetShapeInfo(short &numPermShapes,short &numSwapShapes,
              (tournamentManager.fDefinition)->fTournaments +
              (uint)(tournamentManager.fDefinition)->fTiers[(byte)frontEnd.tier].fTournOffset +
              (uint)(byte)this->fRealCurrentTourn[(byte)frontEnd.tier],ts_Small,gSwapFileName,-1);
-  *permFileName = "zTrophy";
+  *permFileName = NFS4_WRITABLE_LITERAL("zTrophy");
   *swapFileName = gSwapFileName;
   return;
 }
@@ -72,7 +73,8 @@ void tScreenTrophyRoom::ProcessInput(tPlayer fromPlayer,tInputKeyType &keyval,
   goto TrophyRoomProc_keyLeftCheck;
   tierIdx = this->tier;
   half = (uint)(ushort)this->fNumTrophies << 0x10;
-  half = (half >> 0x10) - (half >> 0x1f) >> 1;
+  half = nfs4_mips_sra_s32(
+      nfs4_mips_subu_s32(nfs4_mips_sra_s32(half,0x10),nfs4_mips_sra_s32(half,0x1f)),1);
   step = (short)half;
   if (this->fRealCurrentTourn[tierIdx] < half) {
     this->fRealCurrentTourn[tierIdx] = this->fRealCurrentTourn[tierIdx] + step;
@@ -128,10 +130,10 @@ void tScreenTrophyRoom::PreLoad()
   (this->fTrophyShapes).fShapes = (tTexture_ShapeInfo *)0x0;
   InitializeShapes(&this->_base_tScreen,&this->fTrophyShapes,8);
   if (frontEnd.tier == '\0') {
-    name = "zCase";
+    name = NFS4_WRITABLE_LITERAL("zCase");
   }
   else {
-    name = "zCase2";
+    name = NFS4_WRITABLE_LITERAL("zCase2");
   }
   AsyncLoadShapeFile(&this->_base_tScreen,name,&this->fTrophyShapes);
   return;

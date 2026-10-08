@@ -53,7 +53,7 @@ extern "C" int Sched_ExecuteCheck(int staggered,int module,int distance,int carI
 
 /* ---- Sched_CreateNewSchedule__FPci  [SCHEDULE.CPP:89-109] SLD-VERIFIED ---- */
 Sched_tSchedule *
-Sched_CreateNewSchedule(char *scheduleName,int maxFunctions)
+Sched_CreateNewSchedule(const char *scheduleName,int maxFunctions)
 
 {
   int i;

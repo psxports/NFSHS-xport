@@ -16,27 +16,28 @@ extern "C" void iSNDplatformoutputcaps(void);          /* slib    */
 extern "C" void iSNDplatformoutputset(void);           /* slib    */
 extern "C" void iSNDinit(void);                        /* slib    */
 extern "C" void iSNDrestore(void);                     /* slib    */
-extern "C" void iSNDmeminit(int membase, int memsize); /* smemman */
+extern "C" int *iSNDmeminit(int membase, int memsize); /* smemman */
 extern "C" int iSNDmalloc(unsigned int size);          /* smemman */
-extern "C" void iSNDmemrestore(void);                  /* smemman */
+extern "C" unsigned int iSNDmemrestore(void);          /* smemman */
 extern "C" void iSND100hzserver(void);                 /* sserver */
 extern "C" void SNDI_mutexalloc(void);                 /* sdfx    */
 extern "C" void SNDI_mutexfree(void);                  /* sdfx    */
-extern "C" void SNDstopall(void);                      /* sstopall */
+extern "C" int SNDstopall(void);                       /* sstopall */
 #ifndef _MSC_VER
 extern "C" void *memset(void *dst, int c, int n); /* C43 (BIOS thunk) */
 #endif
 
-extern "C" void SNDSYS_getopts(int *opts);             /* @0x800F1D58 */
-extern "C" int SNDSYS_setopts(int opts);               /* @0x800F1E14 */
+extern "C" void SNDSYS_getopts(void *opts);            /* @0x800F1D58 */
+extern "C" int SNDSYS_setopts(void *opts);             /* @0x800F1E14 */
 extern "C" void SNDSYS_init(int membase, int memsize); /* @0x800F1F10 */
 extern "C" void SNDSYS_restore(void);                  /* @0x800F204C */
 
 /* SNDSYS_getopts @0x800F1D58 : copy the live option block sndgs[0..0xe] into the caller's struct (lazily
  *   publishing the platform output caps first, defaulting the reverb-channel count to 0x10). */
-extern "C" void SNDSYS_getopts(int *opts)
+extern "C" void SNDSYS_getopts(void *opts)
 {
     int i;
+    int *dst = (int *)opts;
     if (DAT_80134a68 == 0)
     {
         iSNDplatformoutputcaps();
@@ -45,16 +46,17 @@ extern "C" void SNDSYS_getopts(int *opts)
     if (((short *)sndgs)[6] == 0) /* sndgs[3]._0_2_ : reverb channels */
         ((short *)sndgs)[6] = 0x10;
     for (i = 0; i < 0xf; i++) /* sndgs[0..0xe] -> opts[0..0xe] */
-        opts[i] = sndgs[i];
+        dst[i] = sndgs[i];
 }
 
 /* SNDSYS_setopts @0x800F1E14 : apply the writable option fields opts[3..0xe] into sndgs (source may be
  *   unaligned), then re-derive the output configuration. */
-extern "C" int SNDSYS_setopts(int opts)
+extern "C" int SNDSYS_setopts(void *opts)
 {
     int i;
+    int *src = (int *)opts;
     for (i = 3; i <= 0xe; i++) /* opts[3..0xe] -> sndgs[3..0xe] (unaligned-safe source) */
-        sndgs[i] = *(int *)(opts + i * 4);
+        sndgs[i] = src[i];
     iSNDplatformoutputset();
     return 0;
 }
@@ -73,7 +75,7 @@ extern "C" void SNDSYS_init(int membase, int memsize)
         if (nchan == 0)
         { /* no caps yet -> defaults */
             SNDSYS_getopts(sndgs);
-            SNDSYS_setopts((int)sndgs);
+            SNDSYS_setopts(sndgs);
             nchan = (unsigned int)((unsigned char *)sndgs)[0x11];
         }
         sndgs[0x25] = iSNDmalloc(nchan * 100); /* channel pool */

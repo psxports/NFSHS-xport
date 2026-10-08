@@ -12,7 +12,7 @@ extern Car_tObj *AILife_IsCarInAnyVisibleArea(Car_tObj *carObj);
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gHumanRaceCarList[];
 extern Car_tObj *Cars_gTotalSortedList[];
-extern "C" extern GameSetup_tData GameSetup_gData;
+extern "C" GameSetup_tData GameSetup_gData;
 extern Group *Object_customObjInst;     /* 0x8013d2c8 */
 extern Group *Object_customSimObjs;     /* 0x8013d2cc */
 extern "C" Sim_tSimGlobalVar simGlobal; /* Sim.obj   (.gameTicks) */
@@ -22,7 +22,7 @@ extern int Cars_gNumTrafficCars;
 extern int AITune_driveSide;
 extern int Cars_gNumCars;
 extern int gNumSlices;
-extern "C" extern int Cars_gNumHumanRaceCars;
+extern "C" int Cars_gNumHumanRaceCars;
 extern int Cars_gNumAIRaceCars;
 extern int AIScript_DoReAction(AIScript_t *script, AIScript_tAIReaction testReaction);
 extern int AIScript_GetReactionTicksLeft(AIScript_t *script);

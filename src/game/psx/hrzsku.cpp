@@ -175,7 +175,7 @@ void Sky_InitStars(void)
         trap(0x1c00);
       }
       uVar1 = Sky_gTrackSpec->starBrightMin + uVar1 % uVar2;
-      (*(u_long *)&starColors[iVar8]) = uVar1 * 0x10000 | uVar1 * 0x100 | uVar1;
+      (*(uint32 *)&starColors[iVar8]) = uVar1 * 0x10000 | uVar1 * 0x100 | uVar1;
     }
     seedrandom(seed);
   }
@@ -503,24 +503,12 @@ void Hrz_CalculateLightning(void)
 void Hrz_TextureQuad(DVECTOR *pt,char type,char bright,Draw_DCache *sd)
 
 {
-  int pkt_addr24;
   POLY_FT4 *prim;
-  u_char *prev_pkt;
   Draw_tPixMap *pixmap;
   
   prim = (POLY_FT4 *)Render_gPacketPtr;
-  prev_pkt = (u_char *)Render_gPalettePtr;
-#ifdef AP_WIN
   AddPrim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
-#else
-  *(u_int *)Render_gPacketPtr =
-       *(u_int *)Render_gPacketPtr & 0xff000000 |
-       *(u_int *)(Render_gPalettePtr + sd->otz * 4) & 0xffffff;
-  pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
-  Render_gPacketPtr = Render_gPacketPtr + 0x28;
-  *(u_int *)(prev_pkt + sd->otz * 4) = *(u_int *)(prev_pkt + sd->otz * 4) & 0xff000000 | pkt_addr24;
-#endif
   ((u_char *)&prim->tag)[3] = 9;
   prim->code = 0x2e;
   prim->r0 = bright;
@@ -714,22 +702,14 @@ void Hrz_SetDitheringPrim(int dither,int otz)
 {
   DR_MODE *prim;
   u_int *prev_pkt_slot;
-  int pkt_addr24;
   int loc_10;
   int loc_8;
   u_char *p;
   
   p = (u_char *)Render_gPacketPtr;
   prev_pkt_slot = (u_int *)(Render_gPalettePtr + otz * 4);
-#ifdef AP_WIN
   AddPrim(prev_pkt_slot,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
-#else
-  *(u_int *)Render_gPacketPtr = *(u_int *)Render_gPacketPtr & 0xff000000 | *prev_pkt_slot & 0xffffff;
-  pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
-  Render_gPacketPtr = Render_gPacketPtr + 0xc;
-  *prev_pkt_slot = *prev_pkt_slot & 0xff000000 | pkt_addr24;
-#endif
   SetDrawMode((DR_MODE *)p,0,dither,0x100,(PSX_RECT *)0x0);
   return;
 }
@@ -748,7 +728,7 @@ void Hrz_BuildSky(void)
   int n, otz_old, pshift, i, temp;
   POLY_GT4 *prim;
   Draw_tPixMap *pmx;
-  int ti1, ti2, skyColIdx, skyRowIdx, tu7;
+  int ti1, ti2, skyColIdx, skyRowIdx;
   u_char *skyMesh_iter;
   u_char *tp2, *tp3;
   CSkySpec *tC4;
@@ -881,16 +861,8 @@ void Hrz_BuildSky(void)
             if ((Sky_gTrackSpec->flags & 0x20U) != 0) {
               pmx = gHorizonPixmap[*skyMesh_iter];
               if (pmx == (Draw_tPixMap *)0x0) goto HrzBuildSky_meshIterNext;
-#ifdef AP_WIN
               AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                                 Render_gPacketPtr);
-#else
-              *(u_int *)Render_gPacketPtr =
-                   *(u_int *)Render_gPacketPtr & 0xff000000 |
-                   *(u_int *)(Render_gPalettePtr + Draw_gViewOtSize * 4 + -8) & 0xffffff;
-              *(u_int *)(tp3 + ti1 * 4 + -8) =
-                   *(u_int *)(tp3 + ti1 * 4 + -8) & 0xff000000 | (u_int)Render_gPacketPtr & 0xffffff;
-#endif
               Render_gPacketPtr = Render_gPacketPtr + 0x34;
               *(CVECTOR *)(tp2 + 4) = gSkyColor[temp + 0x11];
               *(CVECTOR *)(tp2 + 0x10) = gSkyColor[temp + 0x12];
@@ -910,18 +882,9 @@ void Hrz_BuildSky(void)
             }
             pmx = gHorizonPixmap[*skyMesh_iter];
             if (pmx == (Draw_tPixMap *)0x0) goto HrzBuildSky_meshIterNext;
-#ifdef AP_WIN
             AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                               Render_gPacketPtr);
             Render_gPacketPtr = Render_gPacketPtr + 0x28;
-#else
-            *(u_int *)Render_gPacketPtr =
-                 *(u_int *)Render_gPacketPtr & 0xff000000 |
-                 *(u_int *)(Render_gPalettePtr + Draw_gViewOtSize * 4 + -8) & 0xffffff;
-            tu7 = (u_int)Render_gPacketPtr & 0xffffff;
-            Render_gPacketPtr = Render_gPacketPtr + 0x28;
-            *(u_int *)(tp3 + ti1 * 4 + -8) = *(u_int *)(tp3 + ti1 * 4 + -8) & 0xff000000 | tu7;
-#endif
             tp2[3] = 9;
             *(CVECTOR *)(tp2 + 4) = tC4->frontcolors[0];
             tp2[7] = 0x2c;
@@ -931,16 +894,8 @@ void Hrz_BuildSky(void)
             *(u_int *)(tp2 + 0x24) = ((u_int *)pmx)[3];
           }
           else {
-#ifdef AP_WIN
             AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                               Render_gPacketPtr);
-#else
-            *(u_int *)Render_gPacketPtr =
-                 *(u_int *)Render_gPacketPtr & 0xff000000 |
-                 *(u_int *)(Render_gPalettePtr + Draw_gViewOtSize * 4 + -8) & 0xffffff;
-            *(u_int *)(tp3 + ti1 * 4 + -8) =
-                 *(u_int *)(tp3 + ti1 * 4 + -8) & 0xff000000 | (u_int)Render_gPacketPtr & 0xffffff;
-#endif
             Render_gPacketPtr = Render_gPacketPtr + 0x24;
             *(CVECTOR *)(tp2 + 4) = gSkyColor[temp + 0x11];
             *(CVECTOR *)(tp2 + 0xc) = gSkyColor[temp + 0x12];
@@ -969,7 +924,7 @@ void Sky_RenderStars(Draw_SkyCache *sd,int otz)
 {
   int iVar1;
   u_int uVar2;
-  u_long uVar3;
+  uint32 uVar3;
   u_int *packetWords;
   TILE_1 *prim;
   u_int *puVar5;
@@ -1023,9 +978,9 @@ void Sky_RenderStars(Draw_SkyCache *sd,int otz)
           Render_gPacketPtr = Render_gPacketPtr + sizeof(TILE_1);
           *puVar5 = uVar2 & uVar8 | (u_int)packetWords & uVar7;
 #endif
-          uVar3 = (*(u_long *)&starColors[iVar6]);
+          uVar3 = (*(uint32 *)&starColors[iVar6]);
           ((u_char *)&prim->tag)[3] = 2;
-          *(u_long *)&prim->r0 = uVar3;
+          *(uint32 *)&prim->r0 = uVar3;
           prim->code = 0x68;
           prim->x0 = scnt.vx;
           prim->y0 = scnt.vy;
@@ -1217,17 +1172,8 @@ void Hrz_BuildHorizon(DRender_tView *Vi)
           prim = (POLY_GT4 *)p;
           pmx = gpPmx[iVar17];
           if (Hrz_gTrackSpec->ringPMX[iVar17] != '\x10') {
-#ifdef AP_WIN
             AddPrim(Render_gPalettePtr + Draw_gViewOtSize * 4 - 8,
                               Render_gPacketPtr);
-#else
-            *(u_int *)Render_gPacketPtr =
-                 *(u_int *)Render_gPacketPtr & 0xff000000 |
-                 *(u_int *)(Render_gPalettePtr + Draw_gViewOtSize * 4 + -8) & 0xffffff;
-            *(u_int *)(Render_gPalettePtr + Draw_gViewOtSize * 4 + -8) =
-                 *(u_int *)(Render_gPalettePtr + Draw_gViewOtSize * 4 + -8) & 0xff000000 |
-                 (u_int)Render_gPacketPtr & 0xffffff;
-#endif
             Render_gPacketPtr = Render_gPacketPtr + 0x34;
             *(u_int *)(p + 4) = *(u_int *)&gHrzRingColor[1][iVar17];
             *(u_int *)(p + 0x10) = *(u_int *)&gHrzRingColor[1][iVar17 + 1];

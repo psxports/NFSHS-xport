@@ -4,6 +4,7 @@
  *   icon shape/coords, CalcFadeVal arg) resolved via m2c oracle.
  */
 #include "fevideowall.h"
+#include "../../mips_semantics.h"
 
 
 /* ---- tVideoWall::Initialize  [FEVIDEOWALL.CPP:59-88] ---- */
@@ -145,7 +146,7 @@ void tVideoWall::UpdateTransition()
   int iVar3;
   short i;
   
-  sVar1 = (short)(ticks - this->fTVTicks >> 3);
+  sVar1 = (short)nfs4_mips_sra_s32(nfs4_mips_subu_s32(ticks,this->fTVTicks),3);
   if (this->fTransitionDirection < 1) {
     iVar3 = 0;
     if (0 < sVar1) {

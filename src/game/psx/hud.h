@@ -7,26 +7,26 @@ void Hud_CreateHudViews__Fv(void);                                              
 void Hud_GoTpage__Fi(int page);                                                                                                                      /* :380 */
 void Hud_DebugInfo__Fv(void);                                                                                                                        /* :479 */
 void Hud_DebugCrap__Fv(void);                                                                                                                        /* :536 */
-void Hud_BuildSprite__FP4SPRTiiiUli(SPRT *sprt, int shapeIdx, int x, int y, u_long color, int trans);                                                /* :556 */
+void Hud_BuildSprite__FP4SPRTiiiUli(SPRT *sprt, int shapeIdx, int x, int y, uint32 color, int trans);                                                /* :556 */
 void Hud_BuildSprite2__FP4SPRTiii(SPRT *sprt, int shapeIdx, int x, int y);                                                                           /* :573 */
-void Hud_FBuildSprite__FiiiUli(int shapeIdx, int x, int y, u_long color, int trans);                                                                 /* :579 */
+void Hud_FBuildSprite__FiiiUli(int shapeIdx, int x, int y, uint32 color, int trans);                                                                 /* :579 */
 void Hud_BuildSpriteFromFont__FP4SPRTcii(SPRT *sprt, char ch, int x, int y);                                                                         /* :586 */
-void Hud_BuildF3__FP7POLY_F3P13HudPmx_tShapeiiUl(POLY_F3 *prim, HudPmx_tShape *shape, int x, int y, u_long color);                                   /* :620 */
-void Hud_BuildGT4__FP8POLY_GT4P13HudPmx_tShapeiiUl(POLY_GT4 *prim, HudPmx_tShape *shape, int x, int y, u_long color);                                /* :629 */
-void Hud_BuildFT4__FP8POLY_FT4P13HudPmx_tShapeiiUli(POLY_FT4 *prim, HudPmx_tShape *shape, int x, int y, u_long color, int trans);                    /* :647 */
-void Hud_BuildMirrorFT4__FP8POLY_FT4P13HudPmx_tShapeiiUli(POLY_FT4 *prim, HudPmx_tShape *shape, int x, int y, u_long color, int trans);              /* :662 */
-void Hud_BuildMapMirrorFT4__FP8POLY_FT4P13HudPmx_tShapeiiUli(POLY_FT4 *prim, HudPmx_tShape *shape, int x, int y, u_long color, int trans);           /* :682 */
-void Hud_BuildF4__FP7POLY_F4iiiiiUl(POLY_F4 *prim, int trans, int x, int y, int w, int h, u_long color);                                             /* :712 */
-void Hud_BuildG4__FP7POLY_G4iiiiiUlUlUlUl(POLY_G4 *prim, int trans, int x, int y, int w, int h, u_long col1, u_long col2, u_long col3, u_long col4); /* :728 */
-void Hud_BuildF4o__FP7POLY_F4iiiiiUlScSc(POLY_F4 *prim, int trans, int x, int y, int w, int h, u_long color, int x0off, int x1off);                  /* :747 */
-void Hud_FBuildGT4__FP13HudPmx_tShapeiiUl(HudPmx_tShape *shape, int x, int y, u_long col1);                                                          /* :762 */
-void Hud_FBuildFT4__FP13HudPmx_tShapeiiUl(HudPmx_tShape *shape, int x, int y, u_long col1);                                                          /* :768 */
-void Hud_FBuildF4__FiiiiiUlcc(int transparent, int x, int y, int w, int h, u_long col1, int x0off, int x1off);                                       /* :776 */
+void Hud_BuildF3__FP7POLY_F3P13HudPmx_tShapeiiUl(POLY_F3 *prim, HudPmx_tShape *shape, int x, int y, uint32 color);                                   /* :620 */
+void Hud_BuildGT4__FP8POLY_GT4P13HudPmx_tShapeiiUl(POLY_GT4 *prim, HudPmx_tShape *shape, int x, int y, uint32 color);                                /* :629 */
+void Hud_BuildFT4__FP8POLY_FT4P13HudPmx_tShapeiiUli(POLY_FT4 *prim, HudPmx_tShape *shape, int x, int y, uint32 color, int trans);                    /* :647 */
+void Hud_BuildMirrorFT4__FP8POLY_FT4P13HudPmx_tShapeiiUli(POLY_FT4 *prim, HudPmx_tShape *shape, int x, int y, uint32 color, int trans);              /* :662 */
+void Hud_BuildMapMirrorFT4__FP8POLY_FT4P13HudPmx_tShapeiiUli(POLY_FT4 *prim, HudPmx_tShape *shape, int x, int y, uint32 color, int trans);           /* :682 */
+void Hud_BuildF4__FP7POLY_F4iiiiiUl(POLY_F4 *prim, int trans, int x, int y, int w, int h, uint32 color);                                             /* :712 */
+void Hud_BuildG4__FP7POLY_G4iiiiiUlUlUlUl(POLY_G4 *prim, int trans, int x, int y, int w, int h, uint32 col1, uint32 col2, uint32 col3, uint32 col4); /* :728 */
+void Hud_BuildF4o__FP7POLY_F4iiiiiUlScSc(POLY_F4 *prim, int trans, int x, int y, int w, int h, uint32 color, int x0off, int x1off);                  /* :747 */
+void Hud_FBuildGT4__FP13HudPmx_tShapeiiUl(HudPmx_tShape *shape, int x, int y, uint32 col1);                                                          /* :762 */
+void Hud_FBuildFT4__FP13HudPmx_tShapeiiUl(HudPmx_tShape *shape, int x, int y, uint32 col1);                                                          /* :768 */
+void Hud_FBuildF4__FiiiiiUlcc(int transparent, int x, int y, int w, int h, uint32 col1, int x0off, int x1off);                                       /* :776 */
 void uppercase__FPc(char *string);                                                                                                                   /* :790 */
 void Hud_Kill__Fv(void);                                                                                                                             /* :800 */
 void Hud_Init0__Fv(void);                                                                                                                            /* :813 */
 void Hud_InitMapFrame__Fii(int i, int mode);                                                                                                         /* :827 */
-void Hud_BuildTimeSprites__FP4SPRTPcii(SPRT *sprt, char *str, int x, int y);                                                                         /* :883 */
+void Hud_BuildTimeSprites__FP4SPRTPcii(SPRT *sprt, const char *str, int x, int y);                                                                   /* :883 */
 void Hud_Init__Fv(void);                                                                                                                             /* :930 */
 void Hud_InitTables__Fv(void);                                                                                                                       /* :1227 */
 void Hud_BuildETimeString__FP4SPRTi(SPRT *sprt, int time);                                                                                           /* :1232 */

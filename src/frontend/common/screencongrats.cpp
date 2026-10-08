@@ -15,6 +15,10 @@ tScreenBeTheCopCongrats *screenBeTheCopCongrats;   /* @0x8005294c  (bss(zero)) *
 tScreenTournamentCongrats *screenTournamentCongrats;   /* @0x80052950  (bss(zero)) */
 char         congratsSwapFileName[16];   /* @0x80052954  (bss(zero)) */
 char         fPermFileNameBuf[16];   /* @0x80052964  (bss(zero)) */
+static char congratsPrefix[] = "zcong";
+static char eliminatedPrefix[] = "zelim";
+static char congratsCardShapes[] = "congb";
+static char emptyShapeFile[] = "";
 
 /* ---- tScreenCongrats::Cleanup  (screencongrats.cpp:53) ---- */
 void tScreenCongrats::Cleanup()
@@ -53,10 +57,10 @@ void tScreenCongrats::GetShapeInfo(short &numPermShapes,short &numSwapShapes,cha
   }
   numPermShapes = numShapes;
   if (this->congratsMessage == kScreenCongrats_Congrats) {
-    prefix = "zcong";
+    prefix = congratsPrefix;
   }
   else {
-    prefix = "zelim";
+    prefix = eliminatedPrefix;
   }
   sprintf(fPermFileNameBuf,"%s%d",prefix,(uint)(byte)frontEnd.language);
   *permFileName = fPermFileNameBuf;
@@ -70,10 +74,10 @@ void tScreenCongrats::GetShapeInfo(short &numPermShapes,short &numSwapShapes,cha
     else if (this->smallSpinningThing == kSpinningMemCard) {
       numSwapShapes = 10;
       this->fNumSmallSpinShapes = 10;
-      *swapFileName = "congb";
+      *swapFileName = congratsCardShapes;
     }
     else {
-      *swapFileName = "";
+      *swapFileName = emptyShapeFile;
       numSwapShapes = 0;
     }
   }
@@ -113,7 +117,7 @@ int tScreenCongrats::GetCar(tCarInfo &carInfo)
 void tScreenCongrats::DrawBackground()
 
 {
-  static u_long carRotate;   /* [SYM] STAT (rotation accumulator, persists across calls) */
+  static uint32 carRotate;   /* [SYM] STAT (rotation accumulator, persists across calls) */
   bool bDrawSpin;
   int j;
   int wordX;
@@ -648,7 +652,7 @@ DrawCongrats_inlinedJoin084:
       word = TextSys_Word(secondmessage);
       word2 = buffer2;
     }
-    sprintf(word2,word);
+  sprintf(word2,"%s",word);
   }
   if (firstmessage != 0) {
     FETextRender_WordWrapTextFade(fade,buffer1,&r,textState_Selected,textType_PostGame);
