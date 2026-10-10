@@ -42,7 +42,6 @@ struct Audio_tFESFXTable
     unsigned char audioCounter;
 };
 extern struct Audio_tFESFXTable Audio_gFESFXTable;
-void trap(int code);
 extern "C"
 {
     void AudioMus_Volume(int);

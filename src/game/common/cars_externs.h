@@ -80,7 +80,6 @@ int Force_IsForceOn(Car_tObj *car);
 int Object_GetNumIMassObjects(void);
 int AIInit_IsNonStandardCarFile(int index);
 int AITune_GetOneWay(void);
-void trap(int code);
 void *PlayerNameExist(int);
 void AIInit_DeInitAICar(Car_tObj *carObj);
 void AIInit_InitAICar(Car_tObj *carObj, Udff_tInfo *handle);

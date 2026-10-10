@@ -6,6 +6,7 @@
  */
 #include "../../nfs4_types.h"
 #include "speech_externs.h"
+#include "../../mips_semantics.h"
 
 /* ---- speech.obj OWNED globals (EXT; SYM Globals.jsonl tu=Speech.obj, @0x80111a44+) ---- */
 Speech_tCarDescription      Speech_gCarDescription[15];
@@ -444,22 +445,22 @@ int LocationBank_Distance(LocationBank *pThis,int slice)
   iVar4 = pThis->fStartSlice;
   iVar2 = pThis->fEndSlice;
   if (iVar2 < iVar4) {
-    if ((iVar4 <= slice) || (iVar1 = slice - iVar2, slice <= iVar2)) {
+    if ((iVar4 <= slice) || (iVar1 = nfs4_mips_subu_s32(slice, iVar2), slice <= iVar2)) {
       return 0;
     }
   }
   else {
     if (iVar4 <= slice) {
-      iVar3 = slice - iVar2;
+      iVar3 = nfs4_mips_subu_s32(slice, iVar2);
       if (slice <= iVar2) {
         return 0;
       }
-      iVar1 = (iVar4 + gNumSlices) - slice;
+      iVar1 = nfs4_mips_subu_s32(nfs4_mips_addu_s32(iVar4, gNumSlices), slice);
       goto Distance_clampMin;
     }
-    iVar1 = (slice + gNumSlices) - iVar2;
+    iVar1 = nfs4_mips_subu_s32(nfs4_mips_addu_s32(slice, gNumSlices), iVar2);
   }
-  iVar3 = iVar4 - slice;
+  iVar3 = nfs4_mips_subu_s32(iVar4, slice);
 Distance_clampMin:
   if (iVar3 < iVar1) {
     iVar1 = iVar3;
@@ -504,50 +505,42 @@ void * Speech_FindClosestLocationTo(Speech *pThis,LocationBank *bank,int slice)
 void Speaker_FindLocation(Speaker *pThis,Car_tObj *car)
 
 {
-  int slice;
-  int actual;
-  int reg_zero;
   int carPos_x;
   int loc_x_diff;
   int best_dist;
   LocationBank *this_00;
   int carPos_z;
   int loc_idx;
-  int loc_x;
   int loc_z_diff;
-  int loc_z;
   int loc_radius;
-  int distance;
   int iVar1;
-  LocationBank *location;
-  double reg_f12_13;
-  double reg_f14_15;
   
   carPos_x = fixedmult(car->currentSpeed,0x50000);
   if (carPos_x / 0x60000 < 0) {
     iVar1 = fixedmult(car->currentSpeed,0x50000);
-    if (-1 < (int)(car->N).simRoadInfo.slice + iVar1 / 0x60000) goto FindLoc_noWrapCalc;
+    if (-1 < nfs4_mips_addu_s32((int)(car->N).simRoadInfo.slice, iVar1 / 0x60000)) goto FindLoc_noWrapCalc;
     iVar1 = fixedmult(car->currentSpeed,0x50000);
-    iVar1 = (int)(car->N).simRoadInfo.slice + iVar1 / 0x60000 + gNumSlices;
+    iVar1 = nfs4_mips_addu_s32(nfs4_mips_addu_s32((int)(car->N).simRoadInfo.slice, iVar1 / 0x60000), gNumSlices);
   }
   else {
     loc_x_diff = fixedmult(car->currentSpeed,0x50000);
-    if ((int)(car->N).simRoadInfo.slice + loc_x_diff / 0x60000 < gNumSlices) {
+    if (nfs4_mips_addu_s32((int)(car->N).simRoadInfo.slice, loc_x_diff / 0x60000) < gNumSlices) {
 FindLoc_noWrapCalc:
       iVar1 = fixedmult(car->currentSpeed,0x50000);
-      iVar1 = (int)(car->N).simRoadInfo.slice + iVar1 / 0x60000;
+      iVar1 = nfs4_mips_addu_s32((int)(car->N).simRoadInfo.slice, iVar1 / 0x60000);
     }
     else {
       best_dist = fixedmult(car->currentSpeed,0x50000);
-      iVar1 = ((int)(car->N).simRoadInfo.slice + best_dist / 0x60000) - gNumSlices;
+      iVar1 = nfs4_mips_subu_s32(nfs4_mips_addu_s32((int)(car->N).simRoadInfo.slice, best_dist / 0x60000), gNumSlices);
     }
   }
-  this_00 = (LocationBank *)
-            NFS4_VCALL_AUTO((*pThis->_vf)[0x1d].pfn, (int)&(pThis->fPosition).flags + (int)(*pThis->_vf)[0x1d].delta,iVar1);
+  typedef LocationBank *(NFS4_THISCALL *FindLocationCall)(void *, int);
+  this_00 = ((FindLocationCall)(*pThis->_vf)[0x1d].pfn)
+    ((char *)pThis + (*pThis->_vf)[0x1d].delta, iVar1);
   if (this_00 == (LocationBank *)0x0) {
     (pThis->fDistance).flags = 0;
     (pThis->fPosition).flags = 0;
-    pThis->fLocation = *(int *)(reg_zero + 8);
+    pThis->fLocation = nfs4_mips_bits_to_s32((unsigned int)PsyQ_readRam32(8));
     return;
   }
   carPos_z = LocationBank_Distance(this_00,(int)(car->N).simRoadInfo.slice);
@@ -557,14 +550,13 @@ FindLoc_noWrapCalc:
     (pThis->fDistance).flags = 0;
     goto FindLoc_assignIdx;
   }
-  __floatsidf(iVar1);
-  loc_z_diff = __ltdf2(reg_f12_13,reg_f14_15);
+  loc_z_diff = __ltdf2(__floatsidf(iVar1), psx_double_value(0x4040AAAAAAAAAAABULL));
   if (loc_z_diff < 0) {
     (pThis->fDistance).flags = 0;
-    if (iVar1 + 2 < carPos_z) {
+    if (nfs4_mips_addu_s32(iVar1, 2) < carPos_z) {
       (pThis->fPosition).flags = 9;
     }
-    if (iVar1 + -2 < carPos_z) {
+    if (nfs4_mips_addu_s32(iVar1, -2) < carPos_z) {
       (pThis->fPosition).flags = 8;
       goto FindLoc_assignAndReturn;
     }
@@ -575,7 +567,7 @@ FindLoc_setIdxDefault:
     if (GameSetup_gData.measurement == 1) {
       if (iVar1 < 0xa6) {
         (pThis->fDistance).flags = 8;
-        if (iVar1 + -2 < carPos_z) {
+        if (nfs4_mips_addu_s32(iVar1, -2) < carPos_z) {
           (pThis->fPosition).flags = 0x10;
           goto FindLoc_assignAndReturn;
         }
@@ -583,7 +575,7 @@ FindLoc_setIdxDefault:
       else {
         loc_radius = 0x10;
         (pThis->fDistance).flags = 0x10;
-        if (iVar1 + -2 < carPos_z) {
+        if (nfs4_mips_addu_s32(iVar1, -2) < carPos_z) {
 FindLoc_setRadiusReturn:
           (pThis->fPosition).flags = loc_radius;
           goto FindLoc_assignAndReturn;
@@ -593,20 +585,20 @@ FindLoc_setRadiusReturn:
     }
     if (iVar1 < 0x86) {
       (pThis->fDistance).flags = 1;
-      if (carPos_z <= iVar1 + -2) goto FindLoc_setIdxDefault;
+      if (carPos_z <= nfs4_mips_addu_s32(iVar1, -2)) goto FindLoc_setIdxDefault;
       loc_idx = 0x10;
     }
     else {
       loc_radius = 2;
       if (iVar1 < 0x10c) {
         (pThis->fDistance).flags = 2;
-        if (carPos_z <= iVar1 + -2) goto FindLoc_setRadiusReturn;
+        if (carPos_z <= nfs4_mips_addu_s32(iVar1, -2)) goto FindLoc_setRadiusReturn;
         loc_idx = 0x10;
       }
       else {
         (pThis->fDistance).flags = 4;
         loc_idx = 0x10;
-        if (carPos_z <= iVar1 + -2) goto FindLoc_setIdxDefault;
+        if (carPos_z <= nfs4_mips_addu_s32(iVar1, -2)) goto FindLoc_setIdxDefault;
       }
     }
   }
@@ -2738,10 +2730,10 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
       SNDstop(CopSpeak_gSpchHandle);
     }
     else {
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
       SNDstop(CopSpeak_gSpchHandle);
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 1;
     }
   }
@@ -2754,11 +2746,11 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
   }
   if (bVar1) {
     if (stackSpeedUpEnbabledFlag != 0) {
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
       AudioMus_StopSong(500);
       AudioMus_PlaySong((char *)0x0);
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 1;
       (pThis->_base_Speaker).fBlockade.flags = 0;
       goto Purge_resetSpeakerFields;

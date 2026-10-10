@@ -139,7 +139,7 @@ void TrackSpec_SetUp(void)
 }
 
 /* ---- read__FPPcPvi  [TRACKSPEC.CPP:127-139] SLD-VERIFIED ---- */
-void read(char **handle,void *buf,int bytes)
+static void TrackSpec_ReadBytes(char **handle,void *buf,int bytes)
 
 {
   char cVar1;
@@ -178,11 +178,11 @@ void TrackSpec_Read(int spec_num)
     TrackSpec_gPrevSpec = spec_num;
     TrackSpec_gCurrentSpec = spec_num;
     currentpos = startpos;
-    read(&currentpos,&header,8);
+    TrackSpec_ReadBytes(&currentpos,&header,8);
     if (spec_num < header.num_spec) {
       TrackSpec_gMaxSpec = header.num_spec + 1;
       currentpos = currentpos + spec_num * 0x108;
-      read(&currentpos,&TrackSpec_gSpec,0x108);
+      TrackSpec_ReadBytes(&currentpos,&TrackSpec_gSpec,0x108);
       TrackSpec_SetUp();
     }
     else {

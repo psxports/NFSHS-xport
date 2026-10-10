@@ -1450,19 +1450,19 @@ void Front_InitTrack(tFEStream *streamData)
     (streamData->track).fDifficulty = 0x10000;
   }
   if (1 < (streamData->track).fDirection) {
-    iVar1 = rand();
+    iVar1 = randPSX();
     (streamData->track).fDirection = (byte)iVar1 & 1;
   }
   if (1 < (streamData->track).fMirrored) {
-    iVar1 = rand();
+    iVar1 = randPSX();
     (streamData->track).fMirrored = (byte)iVar1 & 1;
   }
   if (1 < (streamData->track).fTimeOfDay) {
-    iVar1 = rand();
+    iVar1 = randPSX();
     (streamData->track).fTimeOfDay = (byte)iVar1 & 1;
   }
   if (1 < (streamData->track).fWeather) {
-    iVar1 = rand();
+    iVar1 = randPSX();
     (streamData->track).fWeather = (byte)iVar1 & 1;
   }
   return;

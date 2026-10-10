@@ -40,7 +40,6 @@ extern "C"
 /* ---- eaclib BIG archive ---- */
 
 /* ---- eaclib mem / sys / libc ---- */
-extern void trap(int code);
 
 /* ---- more cross-TU globals ---- */
 extern "C" int gMasterFENarrationLevel, gMasterAmbientLevel, gStereoMode; /* audiocmn.obj */

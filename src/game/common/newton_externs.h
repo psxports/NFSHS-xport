@@ -7,7 +7,6 @@
     #define NEWTON_EXTERNS_H
 
 /* ---- eaclib EACPSXZ fixed-point + matrix math ---- */
-extern void trap(int c);
 
 /* ---- Math (MathNfs.obj) ---- */
 extern void Math_fasttransmult(matrixtdef *a, matrixtdef *b, matrixtdef *out);

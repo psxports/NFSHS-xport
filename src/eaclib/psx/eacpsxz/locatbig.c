@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/eacpsxz/locatbig.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.
  *   Source obj : nfs4\eaclib\psx\locatbig.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col10)
  *   7 fns @ [0x800E5F1C, 0x800E62CC): typeofbigfile, sizeofbigfileheader, locatebigentryz,
@@ -17,7 +18,6 @@
 
 extern "C" unsigned getm(void *ptr, int nbytes);                             /* @0x800F3024 big-endian reader   */
 extern "C" int nfs4_stricmp(const unsigned char *a, const unsigned char *b); /* @0x800FE520 0 == match           */
-extern "C" unsigned strlen(const char *s);                                   /* eacpsxz @0x800E9F74              */
 
 /* intra-obj forward decls (C-linkage) */
 extern "C" int typeofbigfile(void *buf);

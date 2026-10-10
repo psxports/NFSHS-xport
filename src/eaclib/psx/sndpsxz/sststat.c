@@ -6,7 +6,6 @@ extern "C" SndStreamState *iSNDstreamgetstreamptr(int tag);    /* sst      */
 extern "C" int SNDPKTPLAY_unsafeframesoutstanding(int player); /* spktplay */
 extern "C" void iSNDenteraudio(void);                          /* sserver  */
 extern "C" void iSNDleaveaudio(void);
-extern "C" void trap(unsigned int code);
 extern "C" int SNDSTRM_status(int tag, SNDSTREAMSTATUS *status); /* @0x800E86D8 */
 
 /* SNDSTRM_status : fill the 3-int status block `s` (active, bytes, permille) for stream `tag`. */

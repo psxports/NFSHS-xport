@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/sndpsxz/ssysinit.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 4/4 ***
  *   Source obj : nfs4\eaclib\psx\ssysinit.obj ; archive C:\nfs4\EACLIB\PSX\SNDPSXZ.LIB (xlsx col11)
  *   4 fns @[0x800F1D58 .. 0x800F204C].  The SND public-API boot layer: read/write the option block, bring
@@ -23,9 +24,6 @@ extern "C" void iSND100hzserver(void);                 /* sserver */
 extern "C" void SNDI_mutexalloc(void);                 /* sdfx    */
 extern "C" void SNDI_mutexfree(void);                  /* sdfx    */
 extern "C" int SNDstopall(void);                       /* sstopall */
-#ifndef _MSC_VER
-extern "C" void *memset(void *dst, int c, int n); /* C43 (BIOS thunk) */
-#endif
 
 extern "C" void SNDSYS_getopts(void *opts);            /* @0x800F1D58 */
 extern "C" int SNDSYS_setopts(void *opts);             /* @0x800F1E14 */

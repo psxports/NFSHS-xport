@@ -17,12 +17,7 @@
             return storage; \
         }())
 
-#if defined(AP_WIN)
-    #include "psx.h"
-    #define NFS4_PSYQ_HEADERS 1
-#else
-    #include "xport.h"
-#endif
+#include "psx.h"
 
 #ifdef AP_WIN
     #include "host/diagnostics.h"
@@ -33,22 +28,6 @@
     #include <stddef.h>
 #endif
 
-/* ---- PsyQ 4.3 ccpsx (gcc 2.7): use the REAL PsyQ headers for the standard
- *  libgte/libgpu types + scalar aliases. Our self-contained equivalents are gated
- *  out (NFS4_PSYQ_HEADERS) here but kept for the modern-gcc self-containment pre-gate
- *  (x86 host has no PsyQ SDK). Our layouts are field-identical to PsyQ 4.3 (verified). ---- */
-#if defined(__GNUC__) && __GNUC__ < 3
-    #include <sys/types.h>
-    #include <libgte.h>
-    #include <libgpu.h>
-    #define NFS4_PSYQ_HEADERS 1
-#endif
-
-/* PsyQ GCC 2.7 predates <stdint.h>, but its long and pointers are both
- * 32-bit.  Keep the standard address-carrier name at source call sites. */
-#if defined(NFS4_PSYQ_HEADERS) && !defined(AP_WIN)
-typedef long intptr;
-#endif
 
 /* systask.obj slot: four 32-bit words on PSX.  Only the callback grows on a
  * wider native host; timing and reentrancy state retain MIPS int semantics. */
@@ -72,42 +51,6 @@ struct SPCHChosenSentence
     int valid;
     int eventArgs[12];
 };
-
-/* PsyQ scalar aliases */
-#ifndef NFS4_PSYQ_HEADERS
-typedef uint16 u_short;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef uint8 u_char;
-#endif
-
-/* PsyQ addPrim stores only bits 23:0 of a PSX address in the DMA tag.  Those
- * bits are not a unique host pointer, so native builds keep the same tag bytes
- * plus an exact side-band mapping.  Using one helper prevents recovered
- * direct-MIPS insertion sequences from silently losing primitives on Win32. */
-#ifdef AP_WIN
-extern "C" void AddPrim(void *ot, void *prim);
-
-static inline void nfs4_add_prim(void *ot, void *prim)
-{
-    AddPrim(ot, prim);
-}
-#else
-static inline void nfs4_add_prim(void *ot, void *prim)
-{
-    uint32 *tag = (uint32 *)prim;
-    uint32 *slot = (uint32 *)ot;
-    *tag = (*tag & 0xff000000UL) | (*slot & 0x00ffffffUL);
-    *slot = (*slot & 0xff000000UL) | ((uint32)prim & 0x00ffffffUL);
-}
-#endif
-
-/* PsyQ LIBETC scratchpad accessor.  Offsets are in 32-bit words, exactly as
- * in PsyQ's libetc.h.  Native builds back it with one shared 1 KiB array;
- * PSX builds retain the real hardware address.  Call sites therefore use the
- * same getScratchAddr() expression on both targets. */
-#ifdef AP_WIN
-    #define getScratchAddr(offset) (&SCRATCHPAD[(unsigned int)(offset)])
 
 /* The R3000A can read the low mirrored RAM page, including addresses formed
  * from a temporarily-null data pointer.  Win32 deliberately leaves its null
@@ -139,80 +82,17 @@ static inline uint32 PsyQ_readRam32(intptr address)
     }
     return *(volatile uint32 *)address;
 }
-#else
-    #if !defined(getScratchAddr)
-        #define getScratchAddr(offset) ((uint32 *)(0x1f800000 + (offset) * 4))
-    #endif
-static inline u_char PsyQ_readRam8(intptr address)
-{
-    return *(volatile u_char *)address;
-}
 
-static inline u_short PsyQ_readRam16(intptr address)
-{
-    return *(volatile u_short *)address;
-}
-
-static inline uint32 PsyQ_readRam32(intptr address)
-{
-    return *(volatile uint32 *)address;
-}
-#endif
 /* NFS4 boolean: cfront emitted these as 'type NULL' = implicit int. 4-byte storage,
    semantically boolean (f.., is.., got.., b.. flags). 76 struct members use this. */
 typedef int BOOL;
-#if !defined(NFS4_PSYQ_HEADERS) && !defined(AP_WIN)
-typedef unsigned int size_t;
-#endif
 /* Ghidra-ism scalar aliases (used in some recovered eaclib param hints) */
 typedef unsigned char byte;
 typedef unsigned int uint; /* PsyQ <sys/types.h> guards `uint` behind #ifndef __psx__ => NOT defined on PSX, keep ours */
-#ifndef NFS4_PSYQ_HEADERS  /* `ushort` (sysIII) IS defined unconditionally by PsyQ <sys/types.h> => gate ours off under ccpsx */
-typedef unsigned short ushort;
-#endif
 typedef unsigned char uchar;
 typedef unsigned char undefined;
 
 /* ---- forward declarations (pointer cycles) ---- */
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct MATRIX MATRIX;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct VECTOR VECTOR;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct SVECTOR SVECTOR;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct CVECTOR CVECTOR;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DVECTOR DVECTOR;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct RVECTOR RVECTOR;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct CRVECTOR3 CRVECTOR3;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct CRVECTOR4 CRVECTOR4;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct PSX_RECT PSX_RECT;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_ENV DR_ENV;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DRAWENV DRAWENV;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DISPENV DISPENV;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_MODE DR_MODE;
-#endif
 typedef struct shapetbl shapetbl;
 typedef struct coorddef coorddef;
 typedef struct matrixtdef matrixtdef;
@@ -333,9 +213,6 @@ typedef struct tCallSignBankPair tCallSignBankPair;
 typedef struct Speaker Speaker;
 typedef struct Trk_SFX Trk_SFX;
 typedef struct FLARE_PIECE_DEF FLARE_PIECE_DEF;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_GT4 POLY_GT4;
-#endif
 typedef struct Draw_SubdivStruct Draw_SubdivStruct;
 typedef struct Track_tArtresource Track_tArtresource;
 typedef struct Track_tMaterial Track_tMaterial;
@@ -406,9 +283,6 @@ typedef struct AudioMus_tSongList AudioMus_tSongList;
 typedef struct SNDREQUESTSTATUS SNDREQUESTSTATUS;
 typedef struct SNDSTREAMSTATUS SNDSTREAMSTATUS;
 typedef struct SNDLIMITS SNDLIMITS;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct CdlLOC CdlLOC;
-#endif
 typedef struct AudioMus_tMusicGlobals AudioMus_tMusicGlobals;
 typedef struct CAudioList CAudioList;
 typedef struct AudioEng_tEvent AudioEng_tEvent;
@@ -511,15 +385,6 @@ typedef struct Draw_tVertex Draw_tVertex;
 typedef struct Draw_CarCache Draw_CarCache;
 typedef struct Transformer_zScene Transformer_zScene;
 typedef struct R3DCar_tEnvMapInfo R3DCar_tEnvMapInfo;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_F4 POLY_F4;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_FT4 POLY_FT4;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_STP DR_STP;
-#endif
 typedef struct tControllerData tControllerData;
 typedef struct tReplayInterface tReplayInterface;
 typedef struct tReplayCameraModes tReplayCameraModes;
@@ -539,28 +404,12 @@ typedef struct Track_MultiPalette Track_MultiPalette;
 typedef struct Track_tMaterialController Track_tMaterialController;
 typedef struct tSkid tSkid;
 typedef struct SNDSYSOPTS SNDSYSOPTS;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct SpuVolume SpuVolume;
-typedef struct SpuExtAttr SpuExtAttr;
-#endif
 typedef struct SpuStVoiceAttr SpuStVoiceAttr;
 typedef struct CarIO_textureInfo CarIO_textureInfo;
 typedef struct Input_tDeviceList Input_tDeviceList;
 typedef struct dflip dflip;
 typedef struct Draw_tView Draw_tView;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_FT3 POLY_FT3;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_G3 POLY_G3;
-#endif
 typedef struct DrawC_tEnvMap DrawC_tEnvMap;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_GT3 POLY_GT3;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_TWIN DR_TWIN;
-#endif
 typedef struct Trk_Line Trk_Line;
 typedef struct Draw_tGiveShelbyMoreCache Draw_tGiveShelbyMoreCache;
 typedef struct Draw_tCtrlSkidmark Draw_tCtrlSkidmark;
@@ -607,29 +456,14 @@ struct CurrentFontState
 };
 
 extern "C" CurrentFontState currentfont;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct SPRT SPRT;
-#endif
 typedef struct cluttbl cluttbl;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_G4 POLY_G4;
-#endif
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct LINE_G2 LINE_G2;
-#endif
 typedef struct Draw_FlareCache Draw_FlareCache;
 typedef struct FLARE_DEF FLARE_DEF;
 typedef struct Flare_tInfo Flare_tInfo;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct TILE_1 TILE_1;
-#endif
 typedef struct Draw_HorizonCache Draw_HorizonCache;
 typedef struct Draw_SkyCache Draw_SkyCache;
 typedef struct tHrz_LightningFork tHrz_LightningFork;
 typedef struct tHrz_Lightning tHrz_Lightning;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct POLY_F3 POLY_F3;
-#endif
 typedef struct tSmallCoordXY tSmallCoordXY;
 typedef struct tBTCPerpInfo tBTCPerpInfo;
 typedef struct tCompRGB tCompRGB;
@@ -646,9 +480,6 @@ typedef struct CTrackSpecHeader CTrackSpecHeader;
 typedef struct CTrackSpec CTrackSpec;
 typedef struct Weather_tSys Weather_tSys;
 typedef struct Weather_tSplatInfo Weather_tSplatInfo;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_AREA DR_AREA;
-#endif
 typedef struct tMenuCommand tMenuCommand;
 typedef struct tListIteratorRangeIndexed tListIteratorRangeIndexed;
 typedef struct tMenuItemLeftRightChoice tMenuItemLeftRightChoice;
@@ -753,15 +584,9 @@ typedef struct tMemCardData tMemCardData;
 typedef struct MCRDOPTS_def MCRDOPTS_def;
 typedef struct tVideoWallConfig tVideoWallConfig;
 typedef struct tVertex tVertex;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct LINE_F2 LINE_F2;
-#endif
 typedef struct CdlFILE CdlFILE;
 typedef struct DECENV DECENV;
 typedef struct CDSECTOR CDSECTOR;
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_OFFSET DR_OFFSET;
-#endif
 typedef struct fMemCardInfo_def fMemCardInfo_def;
 typedef struct MDECSTRUCT MDECSTRUCT;
 typedef struct tMdecHandle tMdecHandle;
@@ -1698,122 +1523,19 @@ union tPadStdAnalog_u
     PAD_ANALOG analog;
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct MATRIX
-{                  /* 32 bytes (PsyQ libgte) */
-    short m[3][3]; /* +0x0 */
-    long t[3];     /* +0x14 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct VECTOR
-{                         /* 16 bytes (PsyQ libgte) */
-    long vx, vy, vz, pad; /* +0x0 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct SVECTOR
-{                          /* 8 bytes (PsyQ libgte) */
-    short vx, vy, vz, pad; /* +0x0 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct CVECTOR
-{                       /* 4 bytes (PsyQ libgte) */
-    u_char r, g, b, cd; /* +0x0 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DVECTOR
-{                 /* 4 bytes (PsyQ libgte) */
-    short vx, vy; /* +0x0 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct RVECTOR
-{                 /* 24 bytes (PsyQ libgte) */
-    SVECTOR v;    /* +0x0 */
-    u_char uv[2]; /* +0x8 */
-    u_short pad;  /* +0xA */
-    CVECTOR c;    /* +0xC */
-    DVECTOR sxy;  /* +0x10 */
-    uint32 sz;    /* +0x14 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct CRVECTOR3
-{                          /* 88 bytes (PsyQ libgte) */
-    RVECTOR r01, r12, r20; /* +0x0 */
-    RVECTOR *r0, *r1, *r2; /* +0x48 */
-    uint32 *rtn;           /* +0x54 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct CRVECTOR4
-{                                   /* 140 bytes (PsyQ libgte) */
-    RVECTOR r01, r02, r31, r32, rc; /* +0x0 */
-    RVECTOR *r0, *r1, *r2, *r3;     /* +0x78 */
-    uint32 *rtn;                    /* +0x88 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct PSX_RECT
-{                     /* 8 bytes (PsyQ libgpu) */
-    short x, y, w, h; /* +0x0 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DR_ENV
-{                    /* 64 bytes (PsyQ libgpu) */
-    uint32 tag;      /* +0x0 */
-    uint32 code[15]; /* +0x4 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DRAWENV
-{                                      /* 92 bytes (PsyQ libgpu) */
-    PSX_RECT clip;                     /* +0x0 */
-    short ofs[2];                      /* +0x8 */
-    PSX_RECT tw;                       /* +0xC */
-    u_short tpage;                     /* +0x14 */
-    u_char dtd, dfe, isbg, r0, g0, b0; /* +0x16 */
-    DR_ENV dr_env;                     /* +0x1C */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DISPENV
-{                                        /* 20 bytes (PsyQ libgpu) */
-    PSX_RECT disp, screen;               /* +0x0 */
-    u_char isinter, isrgb24, pad0, pad1; /* +0x10 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DR_MODE
-{                   /* 12 bytes (PsyQ libgpu) */
-    uint32 tag;     /* +0x0 */
-    uint32 code[2]; /* +0x4 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-typedef struct DR_TPAGE
-{                   /* 8 bytes (PsyQ libgpu draw-tpage prim) */
-    uint32 tag;     /* +0x0 */
-    uint32 code[1]; /* +0x4 */
-} DR_TPAGE;
-#endif
 
 struct shapetbl
 {                                          /* 20 bytes */
@@ -2829,28 +2551,6 @@ struct FLARE_PIECE_DEF
     char type;          /* +0xC */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_GT4
-{                            /* 52 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char u0, v0;           /* +0xC */
-    u_short clut;            /* +0xE */
-    u_char r1, g1, b1, p1;   /* +0x10 */
-    short x1, y1;            /* +0x14 */
-    u_char u1, v1;           /* +0x18 */
-    u_short tpage;           /* +0x1A */
-    u_char r2, g2, b2, p2;   /* +0x1C */
-    short x2, y2;            /* +0x20 */
-    u_char u2, v2;           /* +0x24 */
-    u_short pad2;            /* +0x26 */
-    u_char r3, g3, b3, p3;   /* +0x28 */
-    short x3, y3;            /* +0x2C */
-    u_char u3, v3;           /* +0x30 */
-    u_short pad3;            /* +0x32 */
-};
-#endif
 
 struct Draw_SubdivStruct
 {                       /* 240 bytes */
@@ -2965,14 +2665,6 @@ struct EXEC
     uint32 pc0, gp0, t_addr, t_size, d_addr, d_size, b_addr, b_size, s_addr, s_size, sp, fp, gp, ret, base; /* +0x0 */
 };
 
-struct DIRENTRY
-{                    /* 40 bytes (PsyQ kernel) */
-    char name[20];   /* +0x0 */
-    long attr, size; /* +0x14 */
-    DIRENTRY *next;  /* +0x1C */
-    long head;       /* +0x20 */
-    char system[4];  /* +0x24 */
-};
 
 struct Skidmark_Segment
 {                           /* 28 bytes */
@@ -3637,12 +3329,6 @@ struct SNDLIMITS
     int audiostreambufsize, packetbufsize;                                        /* +0xC */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct CdlLOC
-{                                         /* 4 bytes (PsyQ libcd) */
-    u_char minute, second, sector, track; /* +0x0 */
-};
-#endif
 
 struct AudioMus_tMusicGlobals
 {                                                                                                                                    /* 344 bytes */
@@ -4704,42 +4390,8 @@ struct R3DCar_tEnvMapInfo
     int eScaleX, eScaleY, rideHeight, upgradeHeight; /* +0x0 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_F4
-{                                         /* 24 bytes (PsyQ libgpu) */
-    uint32 tag;                           /* +0x0 */
-    u_char r0, g0, b0, code;              /* +0x4 */
-    short x0, y0, x1, y1, x2, y2, x3, y3; /* +0x8 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_FT4
-{                            /* 40 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char u0, v0;           /* +0xC */
-    u_short clut;            /* +0xE */
-    short x1, y1;            /* +0x10 */
-    u_char u1, v1;           /* +0x14 */
-    u_short tpage;           /* +0x16 */
-    short x2, y2;            /* +0x18 */
-    u_char u2, v2;           /* +0x1C */
-    u_short pad1;            /* +0x1E */
-    short x3, y3;            /* +0x20 */
-    u_char u3, v3;           /* +0x24 */
-    u_short pad2;            /* +0x26 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DR_STP
-{                   /* 12 bytes (PsyQ libgpu) */
-    uint32 tag;     /* +0x0 */
-    uint32 code[2]; /* +0x4 */
-};
-#endif
 
 struct tControllerData
 {                                          /* 128 bytes */
@@ -4868,18 +4520,6 @@ struct SNDSYSOPTS
     SNDSYSVEC vec; /* +0x38 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct SpuVolume
-{                      /* 4 bytes (PsyQ libspu) */
-    short left, right; /* +0x0 */
-};
-
-struct SpuExtAttr
-{                     /* 12 bytes (PsyQ libspu) */
-    SpuVolume volume; /* +0x0 */
-    long reverb, mix; /* +0x4 */
-};
-#endif
 
 struct SpuStVoiceAttr
 {                                  /* 16 bytes (PsyQ libspu) */
@@ -4914,67 +4554,14 @@ struct Draw_tView
     uint32 *ot[2];         /* +0xC0 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_FT3
-{                            /* 32 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char u0, v0;           /* +0xC */
-    u_short clut;            /* +0xE */
-    short x1, y1;            /* +0x10 */
-    u_char u1, v1;           /* +0x14 */
-    u_short tpage;           /* +0x16 */
-    short x2, y2;            /* +0x18 */
-    u_char u2, v2;           /* +0x1C */
-    u_short pad1;            /* +0x1E */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_G3
-{                            /* 28 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char r1, g1, b1, pad1; /* +0xC */
-    short x1, y1;            /* +0x10 */
-    u_char r2, g2, b2, pad2; /* +0x14 */
-    short x2, y2;            /* +0x18 */
-};
-#endif
 
 struct DrawC_tEnvMap
 {                            /* 6 bytes */
     short slice, tex, extra; /* +0x0 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_GT3
-{                            /* 40 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char u0, v0;           /* +0xC */
-    u_short clut;            /* +0xE */
-    u_char r1, g1, b1, p1;   /* +0x10 */
-    short x1, y1;            /* +0x14 */
-    u_char u1, v1;           /* +0x18 */
-    u_short tpage;           /* +0x1A */
-    u_char r2, g2, b2, p2;   /* +0x1C */
-    short x2, y2;            /* +0x20 */
-    u_char u2, v2;           /* +0x24 */
-    u_short pad2;            /* +0x26 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DR_TWIN
-{                   /* 12 bytes (PsyQ libgpu) */
-    uint32 tag;     /* +0x0 */
-    uint32 code[2]; /* +0x4 */
-};
-#endif
 
 struct Trk_Line
 {                                              /* 4 bytes */
@@ -5038,17 +4625,6 @@ struct charactertbl
     char advance, xoffset, yoffset; /* +0x8 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct SPRT
-{                            /* 20 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char u0, v0;           /* +0xC */
-    u_short clut;            /* +0xE */
-    short w, h;              /* +0x10 */
-};
-#endif
 
 struct cluttbl
 {                                                          /* 48 bytes */
@@ -5058,31 +4634,7 @@ struct cluttbl
     short data[16];                                        /* +0x10 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_G4
-{                            /* 36 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char r1, g1, b1, pad1; /* +0xC */
-    short x1, y1;            /* +0x10 */
-    u_char r2, g2, b2, pad2; /* +0x14 */
-    short x2, y2;            /* +0x18 */
-    u_char r3, g3, b3, pad3; /* +0x1C */
-    short x3, y3;            /* +0x20 */
-};
-#endif
 
-#ifndef NFS4_PSYQ_HEADERS
-struct LINE_G2
-{                            /* 20 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-    u_char r1, g1, b1, p1;   /* +0xC */
-    short x1, y1;            /* +0x10 */
-};
-#endif
 
 struct Draw_FlareCache
 {                           /* 20 bytes */
@@ -5104,14 +4656,6 @@ struct Flare_tInfo
     int scale, flags;    /* +0x8 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct TILE_1
-{                            /* 12 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0;            /* +0x8 */
-};
-#endif
 
 struct Draw_HorizonCache
 {                                                                           /* 364 bytes */
@@ -5140,14 +4684,6 @@ struct tHrz_Lightning
     char numForks;                /* +0x64 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct POLY_F3
-{                                 /* 20 bytes (PsyQ libgpu) */
-    uint32 tag;                   /* +0x0 */
-    u_char r0, g0, b0, code;      /* +0x4 */
-    short x0, y0, x1, y1, x2, y2; /* +0x8 */
-};
-#endif
 
 struct tSmallCoordXY
 {               /* 4 bytes */
@@ -5251,13 +4787,6 @@ struct Weather_tSplatInfo
     int startTick; /* +0x4 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DR_AREA
-{                   /* 12 bytes (PsyQ libgpu) */
-    uint32 tag;     /* +0x0 */
-    uint32 code[2]; /* +0x4 */
-};
-#endif
 
 struct tMenuCommand
 {                    /* 8 bytes */
@@ -6927,21 +6456,7 @@ struct tVertex
     short x, y; /* +0x0 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct LINE_F2
-{                            /* 16 bytes (PsyQ libgpu) */
-    uint32 tag;              /* +0x0 */
-    u_char r0, g0, b0, code; /* +0x4 */
-    short x0, y0, x1, y1;    /* +0x8 */
-};
-#endif
 
-struct CdlFILE
-{                  /* 24 bytes (PsyQ libcd) */
-    CdlLOC pos;    /* +0x0 */
-    uint32 size;   /* +0x4 */
-    char name[16]; /* +0x8 */
-};
 
 struct DECENV
 {                      /* 48 bytes */
@@ -6962,13 +6477,6 @@ struct CDSECTOR
     uint32 headm, headv;                  /* +0x14 */
 };
 
-#ifndef NFS4_PSYQ_HEADERS
-struct DR_OFFSET
-{                   /* 12 bytes (PsyQ libgpu) */
-    uint32 tag;     /* +0x0 */
-    uint32 code[2]; /* +0x4 */
-};
-#endif
 
 struct fMemCardInfo_def
 {                                                                                      /* 6108 bytes */
@@ -7072,19 +6580,14 @@ typedef COORD16 Transformer_zVertex;
 typedef void *va_list;
 #endif
 typedef unsigned int u_int;
-#ifndef NFS4_PSYQ_HEADERS
-typedef void *physadr;
-#endif
 #if !defined(__EMSCRIPTEN__)
 typedef long daddr_t;
 typedef char *caddr_t;
 typedef long *qaddr_t;
-typedef uint32 ino_t;
 typedef long swblk_t;
     #ifndef AP_WIN
 typedef long time_t;
     #endif
-typedef short dev_t;
 typedef long off_t;
 typedef u_short uid_t;
 typedef u_short gid_t;
@@ -7132,9 +6635,6 @@ typedef void (*adjustchar)();
 typedef tQuat Quatern_quat;
 typedef tMenuItem *tItemList[16];
 typedef tRecordBuffer tSaveRecords[187];
-#ifndef NFS4_PSYQ_HEADERS
-typedef void (*CdlCB)();
-#endif
 typedef u_char Night_tLightingTable[256][16];
 typedef u_char Night_tWeatherLightingTable[256];
 typedef u_char Night_tCopLightingTable[256][8];
@@ -7161,7 +6661,6 @@ typedef short tTextLocation[5];
 typedef int (*menuDrivers_t)();
 typedef MCRDFILE_def MCRDFILE;
 typedef MCRDOPTS_def MCRDOPTS;
-typedef void (*MemCB)();
 typedef long STREAMHANDLE;
 typedef long STREAMREQUESTID;
 typedef int FEVECTOR[4];

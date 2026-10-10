@@ -17,7 +17,6 @@ extern "C" short &DAT_80148784;          /* live allocation count    */
 extern "C" short &DAT_80148786;          /* pool size in words       */
 extern "C" int &DAT_80148788;            /* high-water mark (words)   */
 extern "C" unsigned short &DAT_8014878c; /* {block,size}[] entry table */
-extern "C" void trap(unsigned int code);
 
 extern "C" int iSNDmemconstrain(int *block, int *size); /* @0x801061A8 */
 extern "C" int *iSNDmeminit(int membase, int memsize);  /* @0x801061D4 */

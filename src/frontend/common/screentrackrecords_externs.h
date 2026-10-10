@@ -11,7 +11,6 @@ extern "C" char textDefinitions[14][6];
 extern "C" tTexture_ShapeInfo *gCurrentShapes;
 extern int NewRecords[8];
 extern int NewBestLap;
-void trap(int code);
 extern "C"
 {
     int textpixels(char *str);

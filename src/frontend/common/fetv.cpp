@@ -172,7 +172,7 @@ extern "C" void DrawTV(tTVConfig &tv)
   u_char *tp10;
   u_short tu4;
   
-  rng_word = rand();
+  rng_word = randPSX();
   noiseShape = gHelpShapes;
   noise_select = rng_word & 3;
   destBrightness = (int)tv.destBrightness;
@@ -532,10 +532,10 @@ extern "C" void InitTV(tTVConfig &tv,tTexture_ShapeInfo *textures,short index)
   tv.tpage = ((u_char)texture.type & 3) << 7 | (short)(uVar2 & 0x100) >> 4 |
               (u_short)(((u_short)texture.shapex & 0x3c0) >> 6) |
               (uVar2 & 0x200) << 2;
-  iVar4 = rand();
+  iVar4 = randPSX();
   iVar5 = tv.h * 0x30;
   tv.fxWide = (short)(iVar4 % iVar5);
-  iVar4 = rand();
+  iVar4 = randPSX();
   iVar5 = tv.h * 0x30;
   tv.flip_axis = 0;
   tv.transition = 0;

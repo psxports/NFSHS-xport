@@ -3,6 +3,8 @@
 #define _GAME_PSX_FORCE_H_
 #include "../../nfs4_types.h"
 
+extern u_char Force_gActAlign[6];
+
 void Force_Vbl__Fv(void);                        /* :61 */
 void Force_Update__FP8Car_tObj(Car_tObj *car);   /* :105 */
 void Force_StartUp__Fv(void);                    /* :230 */

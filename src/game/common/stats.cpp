@@ -189,10 +189,10 @@ void Stats_TrackStats(Car_tObj *carObj)
         (carObj->stats).topSpeed[(carObj->stats).lap] = (carObj->linearVel_ch).z;
       }
       else {
-        iVar2 = rand();
+        iVar2 = randPSX();
         iVar4 = (carObj->linearVel_ch).z;
         if (Cars_topSpeedCap[carObj->carInfo->carType] + iVar2 * -3 < iVar4) {
-          iVar2 = rand();
+          iVar2 = randPSX();
           iVar4 = Cars_topSpeedCap[carObj->carInfo->carType] + iVar2 * -3;
         }
         (carObj->stats).topSpeed[r2] = iVar4;
@@ -419,7 +419,7 @@ void Stats_ExtrapolateOpponentTimes(int type)
         ((*ppCVar10)->stats).lapTime = iVar11;
       }
       else {
-        iVar5 = rand();
+        iVar5 = randPSX();
         iVar5 = GameSetup_gData.numLaps * iVar5;
         if (iVar5 < 0) {
           iVar5 = iVar5 + 0x7f;
@@ -445,7 +445,7 @@ void Stats_ExtrapolateOpponentTimes(int type)
         iVar5 = iVar5 + 1;
       } while (iVar5 < GameSetup_gData.numLaps);
     }
-    iVar5 = rand();
+    iVar5 = randPSX();
     pCVar7 = *ppCVar10;
     iVar8 = (pCVar7->stats).finalTotalTime;
     if (GameSetup_gData.numLaps == 0) {

@@ -22,7 +22,6 @@ extern "C" unsigned int DAT_80123604; /* @0x80123604 word4 */
 extern "C" unsigned int DAT_80123608; /* @0x80123608 word5 */
 
 extern "C" intptr gEventDats[4]; /* @0x80148048 : four PSX pointer words; native pointers on host */
-extern "C" void trap(unsigned int code);
 
 extern "C" int iSPCH_EACrandom(void);                   /* @0x800EB9C4 */
 extern "C" int *iSPCH_EACseedrandom(unsigned int seed); /* @0x800EBAC4 */

@@ -1,3 +1,4 @@
+#include "psx.h"
 /* eaclib/psx/eacpsxz/primate.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.
  *   Source obj : nfs4\eaclib\psx\primate.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col11)
  *   3 fns: initlinkmode@0x800F05F4, waitdraw@0x800F06E0, settrans@0x800F070C.
@@ -15,8 +16,6 @@
 
 extern "C" void *reservememadr(const char *name, int size, int classid); /* eacpsxz @0x800E533C (memstd) */
 extern "C" int purgememadr(void *p);                                     /* eacpsxz @0x800E5540 (memstd) */
-extern "C" unsigned long *ClearOTagR(unsigned long *ot, int n);          /* PsyQ libgpu */
-extern "C" int DrawSync(int mode);                                       /* PsyQ libgpu */
 
 /* ---- shared GPU draw-list globals (data-materialization pass owns the definitions) ---- */
 extern "C" int maxot;        /* ordering-table length (set to 16 here)        */
@@ -52,7 +51,7 @@ extern "C" void *initlinkmode(void *unused, int maxprimArg, int linkmode) /* @0x
         primbuf = buf + maxot * 8;
         primbase = primbuf;
         primbuf2 = primbuf + 52 * maxprim; /* @0x8013DE88 second prim buffer        */
-        ClearOTagR((unsigned long *)otbl, maxot);
+        ClearOTagR((uint32 *)otbl, maxot);
         linkmodeflag = linkmode;
         oti = 0;
         otp = 0;

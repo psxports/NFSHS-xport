@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/eacpsxz/fileroot.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** WIP 7/9 ***
  *   Source obj : nfs4\eaclib\psx\fileroot.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col11)
  *   9 fns @[0x800F3A34 .. 0x800F4100].  The device backend that nfile's iFILE_ExecCommand dispatches into.
@@ -20,6 +21,8 @@
  */
 #include <stddef.h>
 #include "../../../nfs4_types.h"
+#include "cdfs.h"
+#include "fileroot.h"
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
 extern "C"
@@ -34,45 +37,12 @@ extern "C"
 #endif
 }
 
-/* ---- CD-ROM filesystem backend (fs 1) ---- */
-extern "C" int CD_Close(int dev);                               /* @0x800FA65C */
-extern "C" int CD_Read(int dev, int dest, int offset, int len); /* @0x800FA678 */
-extern "C" int CD_Stopread(int dev);                            /* @0x800FA904 */
-extern "C" int CD_Getinfo(int dev, int a1, int *outSize);       /* @0x800FA920 */
-
 /* ---- PC host (dev link) filesystem backend (fs 2) ---- */
-extern "C" int PCinit(void);                            /* @0x80106CC4 */
-extern "C" int PCread(int fd, int buf, int len);        /* @0x80106BE4 */
-extern "C" int PClseek(int fd, int offset, int whence); /* @0x80106D1C */
-extern "C" int PCwrite(int fd, int buf, int len);       /* @0x80106D50 */
-extern "C" int PCclose(int fd);                         /* @0x80106D40 */
 extern "C" int psxdevelopmentsystem(void);              /* @0x80106CF0 (dev link present?) */
-
-extern "C" int CD_Open(char *name, int flags, int *outp); /* @0x800FA554 */
-extern "C" int PCopen(char *name, int mode, int a2);      /* @0x80106CA4 */
-extern "C" int PCcreat(char *name, int a1);               /* @0x80106CD0 */
 
 /* ---- system glue + string helpers ---- */
 extern "C" int addsystemtask(intptr fn, int period, int delay); /* @0x800E6AF4 */
 extern "C" int iFILE_CommandCompleteCallback(int result);       /* @0x800ED020 (nfile) */
-extern "C" int readfile_systask(void);                          /* below */
-#ifndef _MSC_VER
-extern "C" char *strchr(const char *s, int c); /* @0x800F6214 */
-#endif
-#ifndef _MSC_VER
-extern "C" char *strncpy(char *d, const char *s, int n); /* @0x800F6104 */
-#endif
-extern "C" char *strcpy(char *d, const char *s); /* @0x800E5B28 */
-extern "C" char *strcat(char *d, const char *s); /* @0x800E78E8 */
-#ifndef _MSC_VER
-extern "C" int strncmp(const char *a, const char *b, int n); /* @0x800EB1D0 */
-#endif
-#ifndef _MSC_VER
-extern "C" int strlen(const char *s); /* @0x800E9F74 */
-#endif
-#ifndef _MSC_VER
-extern "C" void *memset(void *d, int c, int n); /* @0x800E4318 */
-#endif
 extern "C" char *fsprefix1;   /* @0x8013DD34 -> "cdrom:" (CD drive prefix, 6-char compare)  */
 extern "C" char *fsprefix2;   /* @0x8013DD40 -> "sim:"   (PC-host prefix, 4-char compare)   */
 extern "C" char currentdir[]; /* @0x80140414 cwd, prepended to relative PC paths     */
@@ -85,15 +55,7 @@ extern "C" int currentfilesystem;    /* the fs selected by initfileio/setdirecto
 /* the single-slot deferred PC-host read command (executed by readfile_systask).
  * @0x80140400 (.bss, 20B = 5 ints). The `extern` form below was only a DECLARATION
  * (a promise) -> the storage was never defined in any TU (surfaced by the link harness).
- * Defined here, its owning TU, since ReadCmd is a TU-local struct. Zero-init (BSS). */
-struct ReadCmd
-{
-    int pending; /* +0x00 nonzero == a command is queued */
-    int handle;  /* +0x04 dev descriptor (fs byte already masked off) */
-    int dest;    /* +0x08 destination address */
-    int offset;  /* +0x0C file offset */
-    int len;     /* +0x10 byte count */
-};
+ * The canonical ReadCmd layout is declared in fileroot.h */
 
 ReadCmd readcmd; /* definition (BSS zero) */
 
@@ -327,7 +289,7 @@ extern "C" int readfile(int handle, int dest, int offset, int len)
            Windows write path.  Besides avoiding needless latency, this keeps
            frontend streaming independent of the emulated 128 Hz scheduler. */
         PClseek(dev, offset, 0);
-        int n = PCread(dev, dest, len);
+        int n = PCread(dev, (char *)(intptr)dest, len);
         iFILE_CommandCompleteCallback(n == len);
         r = 1;
 #else
@@ -356,9 +318,9 @@ extern "C" int readfile_systask(void)
     {
         int n;
         PClseek(readcmd.handle, readcmd.offset, 0);
-        n = PCread(readcmd.handle, readcmd.dest, readcmd.len);
+        n = PCread(readcmd.handle, (char *)(intptr)readcmd.dest, readcmd.len);
         readcmd.pending = 0;
-        iFILE_CommandCompleteCallback(((n ^ readcmd.len) < 1) ? 1 : 0); /* n==len -> success */
+        iFILE_CommandCompleteCallback(n == readcmd.len);
     }
     FROOT_leaveCS();
     return 0;
@@ -373,8 +335,8 @@ extern "C" int writefile(int handle, int buf, int offset, int len)
     { /* only the PC host supports writing */
         int n;
         PClseek(dev, offset, 0);
-        n = PCwrite(dev, buf, len);
-        iFILE_CommandCompleteCallback(((n ^ len) < 1) ? 1 : 0);
+        n = PCwrite(dev, (char *)(intptr)buf, len);
+        iFILE_CommandCompleteCallback(n == len);
     }
     return 0;
 }

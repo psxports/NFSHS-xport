@@ -285,7 +285,7 @@ void AITrigger_TriggerManager::Sort()
   int *numTriggers;
   
   if (this->numTriggers_ != 0) {
-    qsort(this->triggers_,this->numTriggers_,4,(int (*)(const void *,const void *))AITrigger_Compare /* @0x80072e18 qsort comparator */);
+    qsortPSX(this->triggers_,this->numTriggers_,4,(int (*)(const void *,const void *))AITrigger_Compare /* @0x80072e18 qsort comparator */);
   }
   return;
 }

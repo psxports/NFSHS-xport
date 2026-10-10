@@ -141,7 +141,7 @@ void Sfx_AdditivePrim(Draw_tPixMap *pmx,SVECTOR *pt,int mode,int offset,Sfx_tCac
     }
     gte_stsxy3(&prim->x1,&prim->x3,&prim->x2);
     gte_avsz4();
-    gte_stsz(&sd->otz);
+    gte_stotz(&sd->otz);
     sd->otz = (sd->otz >> 1) + offset;
     if ((-1 < sd->otz) && (sd->otz <= Draw_gViewOtSize + -3)) {
       /* 0x800DD6B8: sb v0,3(s0) sets the DMA length, not code at +7. */
@@ -156,7 +156,7 @@ void Sfx_AdditivePrim(Draw_tPixMap *pmx,SVECTOR *pt,int mode,int offset,Sfx_tCac
       tpage = pmx->tpage;
       ChangeTPage(&tpage,(mode & 1U) == 0 ? 1 : 2);
       prim->tpage = tpage;
-      nfs4_add_prim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
+      AddPrim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x28;
     }
   }
@@ -291,7 +291,7 @@ SfxSouffle_billboard:
         *(int *)&prim->r0 = colorcode;
         gte_stsxy3(&prim->x0,&prim->x3,&prim->x2);
         gte_avsz4();
-        gte_stsz(&sd->otz);
+        gte_stotz(&sd->otz);
         sd->otz = (sd->otz >> 1) + otz;
         if ((sd->otz >= 0) && (sd->otz <= Draw_gViewOtSize + -3)) {
           /* 0x800DE308: sb v0,3(s0), preserving the FT4 GPU opcode. */
@@ -303,7 +303,7 @@ SfxSouffle_billboard:
           tpage = pmx->tpage;
           ChangeTPage(&tpage,(is->type == 8) ? 2 : 1);
           prim->tpage = tpage;
-          nfs4_add_prim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
+          AddPrim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
           sd->head.cprim.PrimPtr = (char *)((char *)sd->head.cprim.PrimPtr + 0x28);
         }
       }
@@ -327,7 +327,7 @@ SfxSouffle_billboard:
       *(int *)&prim->r0 = is->colour | 0x2c000000;
       gte_stsxy3(&prim->x1,&prim->x3,&prim->x2);
       gte_avsz4();
-      gte_stsz(&sd->otz);
+      gte_stotz(&sd->otz);
       sd->otz = (sd->otz >> 1) + 0xf;
       if ((sd->otz >= 0) && (sd->otz <= Draw_gViewOtSize + -3)) {
         /* 0x800DE590: sb v0,3(t0), preserving the FT4 GPU opcode. */
@@ -336,7 +336,7 @@ SfxSouffle_billboard:
         *(u_int *)&prim->u1 = *(u_int *)&gLeafPixmap->u1;
         *(u_int *)&prim->u2 = *(u_int *)&gLeafPixmap->u2;
         *(u_int *)&prim->u3 = *(u_int *)&gLeafPixmap->u3;
-        nfs4_add_prim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
+        AddPrim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
         sd->head.cprim.PrimPtr = (char *)((char *)sd->head.cprim.PrimPtr + 0x28);
       }
     }

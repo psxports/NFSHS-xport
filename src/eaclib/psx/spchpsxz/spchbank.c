@@ -19,7 +19,6 @@ extern "C" int gGameNum;      /* shared game global : current game/race number (
 extern "C" intptr iSPCH_MemAlloc(int numBytes, char *message); /* spchinit */
 extern "C" void iSPCH_MemFree(void *mem);                      /* spchinit */
 extern "C" intptr iSPCH_GetBankBits(intptr bank);              /* spchpick */
-extern "C" void trap(unsigned int code);
 
 extern "C" void iSPCH_InitBanks(void);                                    /* @0x800EB1E0 */
 extern "C" void iSPCH_DisposeBanks(void);                                 /* @0x800EB1F4 */

@@ -15,7 +15,6 @@
 
 extern "C" char *primptr;                                               /* primate : primitive write cursor */
 extern "C" char *nextprim;                                              /* primate : OT link target (prev prim) */
-extern "C" void SetDrawMove(void *prim, PSX_RECT *src, int dx, int dy); /* syslib P34 @0x8010C698 */
 
 extern "C" int DAT_801486e8; /* @0x801486E8 : draw-origin X (int view) */
 extern "C" int DAT_801486ec; /* @0x801486EC : draw-origin Y (int view) */
@@ -71,7 +70,7 @@ extern "C" intptr fastmovfxya(unsigned char *shape, int x, int y)
         src.w = (short)w;
         src.h = (short)h;
         primptr = primptr + 0x18;
-        SetDrawMove((void *)p, &src, DAT_801486e8 + x, DAT_801486ec + y);
+        SetDrawMove((DR_MOVE *)p, &src, DAT_801486e8 + x, DAT_801486ec + y);
 
         ret = (intptr)nextprim;
         /* OT-stitch: insert `p` after `nextprim` (24-bit P_TAG addr field at +0) */

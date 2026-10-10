@@ -41,7 +41,6 @@ extern void AudioClc_SetHorn(Car_tObj *car, int state);
 int BWorldSm_FindClosestSlice(coorddef *pt, BWorldSm_Pos *slicePos);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
 int AIWorld_SplineDistance(Car_tObj *a, Car_tObj *b);
-void trap(int code);
 void AudioClc_HonkHorn(Car_tObj *carObj, int a, int b, int c);
 
 #endif /* _GAME_COMMON_CAMERA_EXTERNS_H_ */

@@ -6,7 +6,6 @@
 #ifdef AP_WIN
 extern "C" int NFSHS_HostTestRaceRequested(void);
 extern "C" int NFSHS_HostTestRaceParam(const char *, int);
-extern "C" void srand(unsigned int);
 extern "C" int ticks;
 #endif
 
@@ -541,7 +540,7 @@ void xport_main(void)
          exact pre-BWorld state 0xF75EBDB5.  This opt-in replay input replaces
          only the menu's already-consumed BIOS RNG history. */
       int referenceCRTSeed=NFSHS_HostTestRaceParam("crtseed",0);
-      if (referenceCRTSeed!=0) srand((unsigned int)referenceCRTSeed);
+      if (referenceCRTSeed!=0) srandPSX((unsigned int)referenceCRTSeed);
     }
 #endif
     Nfs2_GameModuleStartUp(setup);

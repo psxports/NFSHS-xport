@@ -6,23 +6,8 @@
 #include "../../nfs4_types.h"
 #include "../../lib/libfns.h"
 
-/* GTE rotation/transform/perspective macros (PsyQ libgte). Reconstruction treats the GTE pipeline
-   as intrinsics: SetRotMatrix/SetTransMatrix load the cop2 regs, gte_rtps/rtpt do the projection. */
-extern void gte_rtps(void);               /* RotTransPers (1 vertex; results read from cop2 SXY/SZ) */
-extern void gte_rtpt(void);               /* RotTransPers3 (3 vertices) */
-extern void gte_lwc2(int reg, int data);  /* load word to cop2 data reg */
-extern void gte_swc2(int reg, void *ptr); /* store cop2 data reg to memory */
-/* GTE control-reg matrix loads (ctc2). Faithful symbolic intrinsics (no-op placeholders, matching
-   the convention in the sealed trsproj/weather modules) -- the matrix build is shown explicitly. */
-#ifdef AP_WIN
-extern void nfs4_gte_set_rot_matrix(const void *);
-extern void nfs4_gte_set_trans_matrix(const void *);
-    #define gte_SetRotMatrix(mp) nfs4_gte_set_rot_matrix(mp)
-    #define gte_SetTransMatrix(mp) nfs4_gte_set_trans_matrix(mp)
-#else
-    #define gte_SetRotMatrix(mp) ((void)(mp))   /* ctc2 R11R12..R33  (cop2 ctrl 0..5)  */
-    #define gte_SetTransMatrix(mp) ((void)(mp)) /* ctc2 TRX/TRY/TRZ  (cop2 ctrl 5..7)  */
-#endif
+#include "psx_gte.h"
+
 /* Ghidra renders raw GTE COP2 ops as calls through a code-ptr to a HW address: (*(code*)0xADDR)().
    Typedef makes them compile; the faithful gte_ macros are applied in the per-fn BODY pass. */
 typedef void(code)(void);
@@ -58,7 +43,6 @@ extern "C" GameSetup_tData GameSetup_gData; /* 0x801131ec */
 extern "C" CTrackSpec TrackSpec_gSpec;      /* 0x8012327c */
 // [owned->defined in hrzsku.cpp] extern CHorizonSpec  *Hrz_gTrackSpec;            /* horizon spec (angle/height/frontColor/ringPMX) */
 // [owned->defined in hrzsku.cpp] extern CSkySpec      *Sky_gTrackSpec;            /* sky spec (numStars/frontcolors/...) */
-extern void trap(int c);
 // [owned->defined in hrzsku.cpp] extern CVECTOR       *starColors;        /* reservememadr'd */
 // [owned->defined in hrzsku.cpp] extern SVECTOR       *starPosInSky;
 // [owned->defined in hrzsku.cpp] extern SVECTOR        sunPosInSky, moonPosInSky;   /* SVECTOR values */

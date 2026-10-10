@@ -6,7 +6,6 @@
 #ifndef PHYSICS_EXTERNS_H
     #define PHYSICS_EXTERNS_H
 
-extern void trap(int code); /* gcc MIPS div/overflow break helper */
 
 /* ---- cross-TU globals ---- */
 extern "C" GameSetup_tData GameSetup_gData;

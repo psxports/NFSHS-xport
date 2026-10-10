@@ -31,7 +31,6 @@ extern "C" intptr iSNDfreechan(int chan);                                       
 extern "C" int iSNDcalcpitch(int note);                                                                                             /* sclcptch */
 extern "C" void iSNDcalcvol(int chan);                                                                                              /* spatkey  */
 extern "C" int iSNDplatformplay(intptr stream, int voice, int level, int pitch, int sampleArg, int fx, int volAngle, int volDelta); /* sdplapat */
-extern "C" void trap(unsigned int code);                                                                                            /* compiler div-by-zero break */
 
 extern "C" void iSNDresetpatch(SndTimbre *patch);                                                                                                          /* @0x80101ABC */
 extern "C" unsigned char *iSNDresettimbre(SndTimbre *t, SndTimbre *buf);                                                                                   /* @0x80101AC4 */

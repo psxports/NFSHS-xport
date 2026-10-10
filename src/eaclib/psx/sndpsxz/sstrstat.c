@@ -8,7 +8,6 @@ extern "C" int *iSNDmulu64(int *out, unsigned int a, unsigned int b);           
 extern "C" int iSNDdivu64(unsigned int low, unsigned int high, unsigned int div); /* smath64 */
 extern "C" void iSNDenteraudio(void);                                             /* sserver */
 extern "C" void iSNDleaveaudio(void);
-extern "C" void trap(unsigned int code);
 extern "C" int SNDSTRM_requeststatus(unsigned int reqTag, SNDREQUESTSTATUS *status); /* @0x800E87D0 */
 
 /* SNDSTRM_requeststatus : fill the 4-int request-status block `s` (state, played, remaining, permille). */

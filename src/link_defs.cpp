@@ -42,13 +42,6 @@ char * primptr;                                            /* @8013de80 4B */
 int reentryflag;                                           /* @8013dec0 4B */
 unsigned char sndchanreserved[4];                          /* @80147914 4B */
 int sndgs[47];   /* @80147860 : sized to full SndState 0xBC=188B (47*4); SND casts this */
-/* gSndState: EA/engine semantic alias for the SndState block; SAME object as sndgs @0x80147860
- *   (snd.h: #define SND ((SndState*)gSndState)).  Aliased so both names resolve to one buffer.
- *   gcc2.7.2/ccpsx has no __attribute__((alias)); keep for the modern pre-gate, resolve the
- *   gSndState symbol bridge in the deferred linkage/hygiene pass. */
-#ifndef NFS4_PSYQ_HEADERS
-/* gSndState removed: snd.h SND macro now casts sndgs directly (ccpsx ignores alias attr). */
-#endif
 /* CF_DVLC @0x80123838-region NAME COLLISION NOTE: the game-side CF_DVLC is a 49096-byte BSS
  *   load/overlay buffer (asyncloadfileat target; speech-bank-pool overlay), NOT the MDEC table.
  *   psxfront/video/nfs3/draww take its address; zero-init BSS is faithful. */

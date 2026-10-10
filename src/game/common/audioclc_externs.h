@@ -40,7 +40,6 @@ extern void Speech_Server(void);
 extern intptr Speech_Dispatch(void);
 extern void UpdateSiren(int sirennum, int amp, int dop, int azimuth, int supercop);
 int AudioCmn_PlaySFX(int a, int b, int c, int d, int e, int f);
-void trap(int code);
 void Math_NormalizeVector(coorddef *v);
 void freeVoiceChannel(int sndPlayer);
 

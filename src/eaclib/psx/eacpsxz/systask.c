@@ -15,7 +15,6 @@ extern "C"
 }
 extern "C" int libticks; /* free-running tick counter */
 #ifdef AP_WIN            /* PORTABILITY-REVIEWED: native monotonic timer source */
-extern "C" int gTicks;   /* timer.cpp blocking-wait clock */
 extern "C" int ticks;    /* game/frontend frame clock */
 extern "C" void NFSHS_HostPumpTimers(void);
 #endif

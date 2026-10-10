@@ -1,25 +1,22 @@
 /* Native host replacement for the PsyQ surface used by NFSHS.
  *
  * The shared xport platform owns the OS boundary. Game/frontend code is left untouched;
- * STR/MDEC remain out of scope, while timing, input, host files, GPU commands
- * and SPU state have real semantics.
+ * Video decoding, GPU commands and SPU state belong to the shared runtime
  */
 #include "diagnostics.h"
 #include "psx.h"
 #include "psx_gpu.h"
+#include "psx_gte.h"
 #include "xport.h"
 #include "psx_spu.h"
-#include "psx.h"
+#include "psx_stream.h"
+#include "../frontend/psx/video.h"
+#include "../frontend/psx/movie.h"
+#include "../eaclib/psx/pad.h"
+#include "../eaclib/psx/eacpsxz/fileroot.h"
+#include "../lib/nfile.h"
+#include <vector>
 
-#undef SetDrawMode
-#undef SetPolyF3
-#undef SetPolyF4
-#undef SetPolyFT4
-#undef SetPolyG4
-#undef SetPolyGT4
-#undef SetSemiTrans
-#undef SetShadeTex
-#undef SetTexWindow
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(_MSC_VER)
@@ -173,20 +170,7 @@ static void host_check_linked_tags(intptr observer)
 #endif
 }
 
-typedef PSX_RECT PsxRect;
-typedef DISPENV PsxDispEnv;
-typedef DRAWENV PsxDrawEnv;
-typedef VECTOR PsxVector;
-typedef SVECTOR PsxSVector;
-typedef MATRIX PsxMatrix;
-struct PsxCdlLoc { unsigned char minute, second, sector, track; };
-struct PsxCdlFile { PsxCdlLoc pos; unsigned long size; char name[16]; };
-
 static int g_window;
-static void (*g_vsync_callback)(void);
-static int g_video_mode;
-static int g_geom_screen = 256;
-static PsxMatrix g_rotation;
 #if NFSHS_DIAGNOSTICS
 static int g_host_log_fd = -2;
 #endif
@@ -196,8 +180,6 @@ static int g_auto_initialized, g_auto_active, g_auto_index;
 static DWORD g_auto_stage_start;
 static int g_host_race_gas;
 static int g_host_race_started;
-static unsigned long long g_host_timer_ticks;
-static unsigned long long g_host_fast_vsync_count;
 static int g_host_fast_test = -1;
 static int g_host_test_verbose = -1;
 #if defined(AP_WIN) && NFSHS_DIAGNOSTICS
@@ -218,11 +200,9 @@ static int g_host_duck_replay_enabled;
 static int g_host_duck_replay_finished;
 static unsigned int g_host_duck_replay_run;
 #endif
-extern "C" unsigned int tmrint(void);
 extern "C" void NFSHS_HostPadPoll(void);
 extern "C" int NFSHS_HostCurrentGameTicks(void);
 extern "C" int libticks;
-extern "C" int gTicks;
 extern "C" void NFSHS_HostLog(const char *fmt);
 static void ensure_window(void);
 static void pump_messages(void);
@@ -309,13 +289,6 @@ extern "C" int NFSHS_HostShouldRenderTick(int gameTick)
 #else
 return 1;
 #endif
-}
-
-static DWORD host_automation_millis(void)
-{
-    if (host_fast_test_enabled())
-        return (DWORD)((g_host_timer_ticks * 1000ULL) / 128ULL);
-    return GetTickCount();
 }
 
 #ifdef AP_WIN
@@ -911,37 +884,11 @@ extern "C" void NFSHS_HostRaceStart(Car_tObj *playerCar)
 
 extern "C" void NFSHS_HostPumpTimers(void)
 {
-    static unsigned long long lastLogged = 0;
     ensure_window();
     pump_messages();
-    if (!host_fast_test_enabled())
-        host_pump_audio(0);
-    /* The PSX libpad ISR updates the two PadInitDirect buffers asynchronously.
-       The native backend owns that hardware boundary, so refresh the same
-       buffers here before original timer subscribers (including PAD_update)
-       consume them. */
     NFSHS_HostPadPoll();
-    unsigned long long wanted;
-    if (host_fast_test_enabled()) {
-        /* One systemtask pump represents one real PSX root-counter tick.  This
-           makes timedwait finish immediately in wall-clock time without
-           deleting the callbacks or changing the counter values they see. */
-        wanted = g_host_timer_ticks + 1;
-    } else {
-        wanted = (unsigned long long)(xport_timer_get() * 128u / 1000000u);
-    }
-    /* Avoid an unbounded catch-up burst after a debugger pause. */
-    if (wanted > g_host_timer_ticks + 16) g_host_timer_ticks = wanted - 16;
-    while (g_host_timer_ticks < wanted) {
-        ++g_host_timer_ticks;
-        ++gTicks;
-        tmrint();
-    }
-    if (g_host_timer_ticks >= lastLogged + 128) {
-        lastLogged = g_host_timer_ticks;
-        NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "host timer=%u libticks=%d gTicks=%d",
-                      (unsigned)g_host_timer_ticks,libticks,gTicks); NFSHS_HostLog(nfshsLogLine); }()));
-    }
+    psx_root_counter_poll();
+    (void)VSync(-1);
 }
 
 #define host_log NFSHS_HostLog
@@ -951,9 +898,6 @@ static void ensure_window(void)
     static int initialized;
     if (g_window || initialized) return;
     initialized=1;
-#if NFSHS_DIAGNOSTICS
-    g_host_collect_render_stats=!host_fast_test_enabled() || host_test_verbose_enabled();
-#endif
     xport_set_headless(getenv("NFSHS_HEADLESS") != 0);
     g_window = xport_window_init();
 }
@@ -1001,59 +945,7 @@ static void host_pump_audio(int forceFrame)
     }
 }
 
-static void set_packet(void *packet, unsigned char words, unsigned char opcode)
-{
-    if (!packet) return;
-    ((unsigned char *)packet)[3] = words;
-    ((unsigned char *)packet)[7] = opcode;
-}
-
 extern "C" {
-
-/* ---- Host lifecycle / timing ------------------------------------------------- */
-void FlushCache(void) {}
-int ResetCallback(void) { g_vsync_callback = 0; return 0; }
-void SetVideoMode(int mode) { g_video_mode = mode; }
-int GetVideoMode(void) { return g_video_mode; }
-int VSync(int mode)
-{
-    static int testExitVsyncs = -1;
-    ensure_window(); pump_messages();
-    if (mode >= 0) {
-        if (host_fast_test_enabled()) ++g_host_fast_vsync_count;
-        else xport_timer_wait_frame(60);
-    }
-    if (g_vsync_callback) g_vsync_callback();
-    if (mode >= 0)
-        host_pump_audio(host_fast_test_enabled());
-    if (mode >= 0) {
-        if (testExitVsyncs < 0) {
-            const char *value = getenv("NFSHS_TEST_EXIT_VSYNCS");
-            testExitVsyncs = value ? atoi(value) : 0;
-        }
-        if (testExitVsyncs && (int)g_host_fast_vsync_count >= testExitVsyncs) {
-            printf("audio_metrics submitted=%u nonzero=%u peak=%u overruns=%u\n",
-                   (unsigned)g_xport_audio_submitted_buffers,
-                   (unsigned)g_xport_audio_nonzero_buffers,
-                   (unsigned)g_xport_audio_peak,
-                   (unsigned)g_xport_audio_callback_overruns);
-            exit(g_xport_audio_nonzero_buffers && g_xport_audio_peak ? 0 : 97);
-        }
-    }
-    if (host_fast_test_enabled())
-        return (int)g_host_fast_vsync_count;
-    return (int)(xport_timer_get() * 60u / 1000000u);
-}
-void *VSyncCallback(void *cb) { void *old=(void *)g_vsync_callback; g_vsync_callback=(void(*)(void))cb; return old; }
-int GetRCnt(int) { return VSync(-1); }
-long StartRCnt(unsigned long) { return 1; }
-long OpenEvent(unsigned long, long, long, long (*)()) { return 1; }
-long EnableEvent(long) { return 1; }
-long DisableEvent(long) { return 1; }
-int EnterCriticalSection(void) { return 1; }
-void ExitCriticalSection(void) {}
-void *DMACallback(int, void *cb) { return cb; }
-void *InterruptCallback(int, void *cb) { return cb; }
 
 void NFSHS_HostBeginPacketArena(void *begin,void *end)
 {
@@ -1182,108 +1074,6 @@ void NFSHS_HostEndPacketArena(void *usedEnd)
     if(end>=g_host_packet_begin && end<=g_host_packet_end)
         g_host_packet_end=end;
 }
-void SetPolyF3(void *p)  { set_packet(p,4,0x20); }
-void SetPolyF4(void *p)  { set_packet(p,5,0x28); }
-void SetPolyFT4(void *p) { set_packet(p,9,0x2c); }
-void SetPolyG4(void *p)  { set_packet(p,8,0x38); }
-void SetPolyGT4(void *p) { set_packet(p,12,0x3c); }
-void SetSemiTrans(void *p,int on) { if(p) ((unsigned char*)p)[7]=(unsigned char)((((unsigned char*)p)[7]&~2)|(on?2:0)); }
-void SetShadeTex(void *p,int on) { if(p) ((unsigned char*)p)[7]=(unsigned char)((((unsigned char*)p)[7]&~1)|(on?1:0)); }
-void SetDrawMode(void *p,int dfe,int dtd,int tpage,PsxRect *tw)
-{
-    set_packet(p,2,0xe1);
-    if(!p)return;
-    ((unsigned long*)p)[1]=0xe1000000UL|(tpage&0x9ff)|((dtd&1)<<9)|((dfe&1)<<10);
-    if(tw) ((unsigned long*)p)[2]=0xe2000000UL|((tw->x>>3&31)<<10)|((tw->y>>3&31)<<15)|(((-tw->w)&255)>>3)|((((-tw->h)&255)>>3)<<5);
-    else ((unsigned long*)p)[2]=0;
-}
-static unsigned int host_draw_area_word(unsigned int command,int x,int y)
-{
-    /* PsyQ _set_clip_tl/br, 0x800EE898..0x800EE9C4: signed 16-bit
-       arguments saturated to the GPU's 1024x512 VRAM, not masked/wrapped. */
-    x=(short)x;y=(short)y;
-    if(x<0)x=0;if(x>=HOST_VRAM_W)x=HOST_VRAM_W-1;
-    if(y<0)y=0;if(y>=HOST_VRAM_H)y=HOST_VRAM_H-1;
-    return command|((unsigned int)y<<10)|(unsigned int)x;
-}
-void SetDrawMove(void *p,PsxRect *,int,int) { set_packet(p,5,0x80); }
-void SetTexWindow(void *p,PsxRect *tw)
-{
-    set_packet(p,2,0xe2);
-    if(!p)return;
-    ((unsigned long*)p)[1]=tw ? 0xe2000000UL|((tw->x>>3&31)<<10)|((tw->y>>3&31)<<15)|(((-tw->w)&255)>>3)|((((-tw->h)&255)>>3)<<5) : 0xe2000000UL;
-    ((unsigned long*)p)[2]=0;
-}
-
-/* ---- GTE helpers used by gameplay and packet generation --------------------- */
-void NFSHS_GTE_WriteControl(int,int);
-void NFSHS_GTE_SetGeomScreen(int);
-void NFSHS_HostInitGeom(void) {
-    memset(&g_rotation,0,sizeof(g_rotation));
-    g_rotation.m[0][0]=g_rotation.m[1][1]=g_rotation.m[2][2]=4096;
-    NFSHS_GTE_WriteControl(26,0x3e8);
-    NFSHS_GTE_WriteControl(27,-0x1062);
-    NFSHS_GTE_WriteControl(28,0x1400000);
-    NFSHS_GTE_WriteControl(24,0);
-    NFSHS_GTE_WriteControl(25,0);
-}
-void NFSHS_HostSetGeomScreen(int h) { g_geom_screen=h; NFSHS_GTE_SetGeomScreen(h); }
-void InitGeom(void) { NFSHS_HostInitGeom(); }
-void SetGeomScreen(int h) { NFSHS_HostSetGeomScreen(h); }
-extern void NFSHS_GTE_SetFarColor(int,int,int);
-void SetFarColor(int r,int g,int b) { NFSHS_GTE_SetFarColor(r,g,b); }
-void SetFogNear(int a,int dvpw) {
-    if(dvpw) NFSHS_GTE_WriteControl(27,-(a*320)/dvpw);
-    NFSHS_GTE_WriteControl(28,0x1400000);
-}
-extern "C" const int _rsincos[];
-static void host_psyq_sincos(int angle,int *s,int *c)
-{
-    int packed;
-    if(angle<0){packed=_rsincos[-angle&0xfff];*s=-(int)(short)packed;}
-    else {packed=_rsincos[angle&0xfff];*s=(int)(short)packed;}
-    *c=packed>>16;
-}
-PsxMatrix *NFSHS_HostRotMatrix(PsxSVector *r,PsxMatrix *m)
-{
-    int sx,cx,sy,cy,sz,cz;
-    host_psyq_sincos(r->vx,&sx,&cx); host_psyq_sincos(r->vy,&sy,&cy); host_psyq_sincos(r->vz,&sz,&cz);
-    int nsy=-sy;
-    m->m[0][2]=(short)sy;
-    m->m[1][2]=(short)(-(cy*sx)>>12);
-    m->m[2][2]=(short)(cy*cx>>12);
-    m->m[0][0]=(short)(cz*cy>>12);
-    m->m[0][1]=(short)(-(sz*cy)>>12);
-    int cz_nsy=cz*nsy>>12;
-    m->m[1][0]=(short)(sz*cx>>12)-(short)(cz_nsy*sx>>12);
-    m->m[2][0]=(short)(sz*sx>>12)+(short)(cz_nsy*cx>>12);
-    int sz_nsy=sz*nsy>>12;
-    m->m[1][1]=(short)(cz*cx>>12)+(short)(sz_nsy*sx>>12);
-    m->m[2][1]=(short)(cz*sx>>12)-(short)(sz_nsy*cx>>12);
-    return m;
-}
-PsxMatrix *RotMatrix(PsxSVector *r,PsxMatrix *m) { return NFSHS_HostRotMatrix(r,m); }
-PsxMatrix *MulMatrix2(PsxMatrix *source,PsxMatrix *destination)
-{
-    short output[3][3];
-    int row;
-    int column;
-    int inner;
-
-    if (!source || !destination)
-        return destination;
-    for (row = 0; row < 3; ++row) {
-        for (column = 0; column < 3; ++column) {
-            sint64 sum = 0;
-            for (inner = 0; inner < 3; ++inner)
-                sum += (sint64)source->m[row][inner] * destination->m[inner][column];
-            output[row][column] = (short)(sum >> 12);
-        }
-    }
-    memcpy(destination->m, output, sizeof(output));
-    return destination;
-}
-
 /* ---- Controller: keyboard mapped to a digital PSX pad ----------------------- */
 void NFSHS_HostPadPoll(void)
 {
@@ -1305,7 +1095,7 @@ void NFSHS_HostPadPoll(void)
     
 #if NFSHS_DIAGNOSTICS
 {
-        DWORD now=host_automation_millis();
+        DWORD now=GetTickCount();
         if (!g_auto_initialized) {
             GetEnvironmentVariableA("NFSHS_AUTOPILOT",g_auto_sequence,sizeof(g_auto_sequence));
             g_auto_stage_start=now;
@@ -1354,124 +1144,11 @@ void NFSHS_HostPadPoll(void)
     pad_publish(1,0,0xffff);
 }
 
-/* ---- Host file calls --------------------------------------------------------- */
-static void host_path(const char *input,char *out,int cap)
-{
-    while(*input=='\\' || *input=='/') ++input;
-    /* The native executable runs from bin while all extracted disc files live
-       below bin\\DATA.  Keep the original game filenames untouched above this
-       boundary and add the host data root only at the final file-system call. */
-#if defined(_MSC_VER)
-    _snprintf(out,cap,"DATA\\%s",input); out[cap-1]=0;
-    for(char *p=out;*p;p++){ if(*p=='/')*p='\\'; if(*p==';'){*p=0;break;} }
-#else
-    snprintf(out,cap,"DATA/%s",input); out[cap-1]=0;
-    for(char *p=out;*p;p++){ if(*p=='\\')*p='/'; if(*p==';'){*p=0;break;} }
-#endif
-    /* Extracted ISO filenames are uppercase, including on case-sensitive hosts */
-    for(char *p=out;*p;++p) {
-        if(*p>='a' && *p<='z') *p=(char)(*p-'a'+'A');
-    }
-}
-int PCinit(void) { return 0; }
-int PCopen(char *name,int mode,int)
-{
-    char path[520];
-    host_path(name,path,sizeof(path));
-    FILE *file = xport_fopen(path,mode ? "r+b" : "rb");
-    if (!file) return -1;
-    /* Retain a descriptor after releasing the unused buffered stream */
-    int descriptor = _dup(_fileno(file));
-    fclose(file);
-    NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "open fd=%d mode=%d path=%s",descriptor,mode,path); NFSHS_HostLog(nfshsLogLine); }()));
-    return descriptor;
-}
-int PCcreat(char *name,int) { char p[520];host_path(name,p,sizeof(p));return _open(p,_O_CREAT|_O_TRUNC|_O_RDWR|_O_BINARY,_S_IREAD|_S_IWRITE); }
-int PCclose(int fd) { return _close(fd); }
-int PCread(int fd,void *p,int n) { int r=_read(fd,p,n); NFSHS_DIAGNOSTIC_CALL(static int calls; if(calls++<200)([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "read fd=%d dst=%p want=%d got=%d",fd,p,n,r); NFSHS_HostLog(nfshsLogLine); }())); return r; }
-int PCwrite(int fd,const void *p,int n) { return _write(fd,p,n); }
-long PClseek(int fd,long off,int whence) { long r=_lseek(fd,off,whence); NFSHS_DIAGNOSTIC_CALL(static int calls; if(calls++<200)([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "seek fd=%d off=%ld whence=%d -> %ld",fd,off,whence,r); NFSHS_HostLog(nfshsLogLine); }())); return r; }
 
-/* ---- CD surface.  Synchronous command behavior is sufficient for extracted files. */
-int CdInit(void) { return 1; } int CdReset(int) { return 1; } int CdSetDebug(int) { return 0; }
-int CdSync(int,unsigned char *r) { if(r)memset(r,0,8);return 2; } int CdDataSync(int) { return 0; }
-int CdFlush(void) { return 1; } int CdGetDiskType(void) { return 2; }
-int CdGetSector(void *,int) { return 0; }
-int CdPosToInt(PsxCdlLoc *p) { return ((p->minute*60+p->second)*75+p->sector)-150; }
-PsxCdlLoc *CdIntToPos(int i,PsxCdlLoc *p) { i+=150;p->minute=(unsigned char)(i/4500);i%=4500;p->second=(unsigned char)(i/75);p->sector=(unsigned char)(i%75);p->track=0;return p; }
-PsxCdlFile *CdSearchFile(PsxCdlFile *,char *) { return 0; }
 
-/* No persistent memory-card image is configured on Windows.  Preserve PsyQ's
- * accepted-command/async-completion contract and let the game's CRC check
- * reject the deterministic blank medium through its normal no-save path. */
-static int g_host_memcard_pending;
-static long g_host_memcard_command;
-static long g_host_memcard_result;
-long MemCardInit(long) { g_host_memcard_pending=0; g_host_memcard_command=0; g_host_memcard_result=0; return 1; }
-long MemCardStart(void) { return 1; }
-long MemCardStop(void) { return 1; } void MemCardEnd(void) {}
-long MemCardExist(long) { g_host_memcard_command=1; g_host_memcard_result=0; g_host_memcard_pending=1; return 1; }
-long MemCardAccept(long) { return 0; }
-long MemCardSync(long mode,long *cmd,long *result)
-{
-    (void)mode;
-    if(!g_host_memcard_pending) return -1;
-    g_host_memcard_pending=0;
-    if(cmd) *cmd=g_host_memcard_command;
-    if(result) *result=g_host_memcard_result;
-    return 1;
-}
-long MemCardFormat(long) { return 0; }
-long MemCardCreateFile(long,char *,long) { return -1; } long MemCardDeleteFile(long,char *) { return -1; }
-long MemCardReadFile(long channel,char *name,void *data,long offset,long bytes)
-{
-    (void)channel; (void)name; (void)offset;
-    /* No persistent card image is configured yet.  Model a completed virtual
-     * read with deterministic blank media; the game's own CRC validation then
-     * follows its normal no-save path. */
-    if(data && bytes>0) memset(data,0,(size_t)bytes);
-    g_host_memcard_command=3; /* PsyQ file I/O command completion. */
-    g_host_memcard_result=0;
-    g_host_memcard_pending=1;
-    return 1;
-}
-long MemCardWriteFile(long,char *,void *,long,long) { return -1; }
-struct DIRENTRY;
-long MemCardGetDirentry(long,char *,DIRENTRY *,int *,long,long) { return 0; }
+/* The native compiler owns SP; this preserves the port's existing hint carrier */
+void *NFSHS_NativeStackHint(void *p) { return p; }
 
-/* ---- Explicitly disabled media ---------------------------------------------- */
-void DecDCTReset(int) {}
-void DecDCTin(uint32 *,int) {}
-int DecDCTinSync(int) { return 0; }
-void DecDCTout(uint32 *,int) {}
-int DecDCToutCallback(void (*)(void)) { return 0; }
-int DecDCTvlc(uint32 *,uint32 *) { return 0; }
-int DecDCTvlcSize(int) { return 0; }
-void StSetRing(uint32 *,uint32) {}
-void StUnSetRing(void) {}
-void StSetStream(uint32,uint32,uint32,void (*)(void),void (*)(void)) {}
-void StClearRing(void) {}
-uint32 StFreeRing(uint32 *) { return 0; }
-uint32 StGetNext(uint32 **,uint32 **) { return 0; }
-void StCdInterrupt(void) {}
-int StCdIntrFlag=0;
-uint32 *FntFlush(int) { return 0; }
-void *SetSp(void *p) { return p; }
-
-/* Explicit PSX libgcc calls present in the recovered source.  Native x86 can
- * implement them directly; these are not compiler-emitted helper calls. */
-double __adddf3(double a,double b) { return a+b; }
-double __divdf3(double a,double b) { return a/b; }
-float __divsf3(float a,float b) { return a/b; }
-double __extendsfdf2(float a) { return (double)a; }
-int __fixdfsi(double a) { return (int)a; }
-int __fixsfsi(float a) { return (int)a; }
-double __floatsidf(int a) { return (double)a; }
-float __floatsisf(int a) { return (float)a; }
-int __ltdf2(double a,double b) { return a<b ? -1 : (a>b ? 1 : 0); }
-double __muldf3(double a,double b) { return a*b; }
-float __mulsf3(float a,float b) { return a*b; }
-float __truncdfsf2(double a) { return (float)a; }
 }
 
 extern "C" { extern void Platform_InitMemory(void); }
@@ -1488,6 +1165,11 @@ static int host_platform_memory_self_test(void) {
     if (b - a != 4 || c - b != 8) return 2;
     if (peek != c) return 3;
     if (((intptr)a & 3U) || ((intptr)b & 3U) || ((intptr)c & 3U)) return 4;
+    if (getScratchAddr(0) != SCRATCHPAD || getScratchAddr(255) != SCRATCHPAD + 255) return 5;
+    if (getScratchAddr(256) != SCRATCHPAD + 256) return 6;
+    if (psx_addr(0x1F800000u, 1024) != getScratchAddr(0) ||
+        psx_addr(0x9F8003FCu, 4) != getScratchAddr(255)) return 7;
+    if (psx_addr(0x00000000u, 4) != DRAM || psx_addr(0xA0000000u, 4) != DRAM) return 8;
     return 0;
 }
 
@@ -1498,6 +1180,66 @@ extern "C" void *reservememadr(const char *,int,int);
 extern "C" int purgememadr(void *);
 void *__builtin_new(unsigned int);
 void __builtin_delete(void *);
+
+static int host_gpu_packet_self_test(void)
+{
+    uint32 *ram = (uint32 *)(DRAM + 0x12340u);
+    uint32 *scratch = SCRATCHPAD + 128;
+    uint32 native[4];
+    const uint32 links[3] = {0x00012344u, 0x00800204u, (uint32)(intptr)(native + 1) & 0x00ffffffu};
+    uint32 *locations[3] = {ram, scratch, native};
+    for (unsigned int index = 0; index < 3; ++index)
+    {
+        uint32 *ot = locations[index];
+        uint32 *packet = ot + 1;
+        *ot = 0x7fabcdefu;
+        *packet = 0x04fedcbau;
+        AddPrim(ot, packet);
+        if (*packet != 0x04abcdefu || *ot != (0x7f000000u | links[index])) return 1;
+        *ot = 0x6b123456u;
+        AddPrim(ot, ot);
+        uint32 selfLink = (links[index] - 4u) & 0x00ffffffu;
+        if (*ot != (0x6b000000u | selfLink)) return 2;
+    }
+    if (ClearOTagR(ram, 4) != ram || ram[0] != 0x00ffffffu) return 3;
+    if (ram[1] != 0x12340u || ram[2] != 0x12344u || ram[3] != 0x12348u) return 4;
+    if (ClearOTag(scratch, 4) != scratch || scratch[3] != 0x00ffffffu) return 5;
+    if (scratch[0] != 0x800204u || scratch[1] != 0x800208u || scratch[2] != 0x80020cu) return 6;
+    static uint32 registered[4];
+    if (!gpu_register_packet_range(registered, sizeof(registered))) return 7;
+    registered[0] = 0x2aabcdefu;
+    registered[1] = 0x03fedcbau;
+    AddPrim(registered, registered + 1);
+    uint32 registeredLink = registered[0] & 0x00ffffffu;
+    if (registeredLink < 0x200004u || registeredLink >= 0x800000u || registered[1] != 0x03abcdefu) return 8;
+    if ((registered[0] >> 24) != 0x2au) return 9;
+    if (!gpu_register_packet_range(registered, sizeof(registered))) return 10;
+    registered[0] = 0x00ffffffu;
+    AddPrim(registered, registered + 1);
+    if (registered[0] != registeredLink || registered[1] != 0x03ffffffu) return 11;
+    if (getenv("NFSHS_GPU_MIPS_FIXTURE"))
+    {
+        FILE *file = xport_fopen("../status/gpu-addprim-fixture.bin", "rb");
+        if (!file) return 12;
+        uint32 count = 0;
+        if (fread(&count, sizeof(count), 1, file) != 1 || !count || count > 4096) { fclose(file); return 13; }
+        for (uint32 index = 0; index < count; ++index)
+        {
+            uint32 record[5];
+            if (fread(record, sizeof(record), 1, file) != 1) { fclose(file); return 14; }
+            ram[0] = record[0];
+            if (!record[2]) ram[1] = record[1];
+            uint32 *packet = ram + (record[2] ? 0 : 1);
+            AddPrim(ram, packet);
+            if (ram[0] != record[3] || *packet != record[4]) { fclose(file); return 15; }
+        }
+        int extra = fgetc(file);
+        int failed = ferror(file);
+        fclose(file);
+        if (extra != EOF || failed) return 16;
+    }
+    return 0;
+}
 
 static int host_eac_allocator_self_test(void)
 {
@@ -1569,37 +1311,61 @@ static int host_gte_trig_self_test(void)
     return 0;
 }
 
-extern void nfs4_gte_set_rot_matrix(const void *);
-extern void nfs4_gte_set_trans_matrix(const void *);
-extern void nfs4_gte_rt(void);
-extern void nfs4_gte_mvmva_sf1(void);
-extern void gte_lwc2(int, int);
-extern void gte_swc2(int, void *);
 
 static int host_gte_mvmva_self_test(void)
 {
-    PsxMatrix matrix = {};
-    PsxSVector vector = {1, -2, 3, 0};
+    MATRIX matrix = {};
+    SVECTOR vector = {1, -2, 3, 0};
     int mac[3] = {};
 
     matrix.m[0][0] = 4096;
     matrix.m[1][1] = 4096;
     matrix.m[2][2] = 4096;
-    nfs4_gte_set_rot_matrix(&matrix);
-    nfs4_gte_set_trans_matrix(&matrix);
+    gte_SetRotMatrix(&matrix);
+    gte_SetTransMatrix(&matrix);
     gte_lwc2(0, (unsigned short)vector.vx | ((int)(unsigned short)vector.vy << 16));
     gte_lwc2(1, (unsigned short)vector.vz);
-    nfs4_gte_rt();
+    gte_rt();
     gte_swc2(25, &mac[0]);
     gte_swc2(26, &mac[1]);
     gte_swc2(27, &mac[2]);
     if (mac[0] != 1 || mac[1] != -2 || mac[2] != 3)
         return 1;
-    nfs4_gte_mvmva_sf1();
+    gte_rt();
     gte_swc2(25, &mac[0]);
     gte_swc2(26, &mac[1]);
     gte_swc2(27, &mac[2]);
     return mac[0] == 1 && mac[1] == -2 && mac[2] == 3 ? 0 : 2;
+}
+
+static int host_gte_normal_self_test(void)
+{
+    uint8 header[2048];
+    uint8 table[384];
+    uint32 base;
+    sint16 coefficient;
+    VECTOR input = {1, 0, 0, 0};
+    SVECTOR output = {};
+    FILE *image = xport_fopen("DATA/NFS4.EXE", "rb");
+    if (!image) return 1;
+    if (fread(header, 1, sizeof(header), image) != sizeof(header)) {
+        fclose(image);
+        return 2;
+    }
+    memcpy(&base, header + 24, sizeof(base));
+    if (base > 0x8013485Cu || fseek(image, 2048L + (long)(0x8013485Cu - base), SEEK_SET) ||
+        fread(table, 1, sizeof(table), image) != sizeof(table)) {
+        fclose(image);
+        return 3;
+    }
+    fclose(image);
+    memcpy(psx_addr(0x8013485Cu, sizeof(table)), table, sizeof(table));
+    memcpy(&coefficient, table, sizeof(coefficient));
+    InitGeom();
+    sint32 result = VectorNormalS(&input, &output);
+    printf("gte_normal result=%d xyz=%d,%d,%d expected=%d,0,0\n",
+           result, output.vx, output.vy, output.vz, coefficient);
+    return result == 1 && output.vx == coefficient && output.vy == 0 && output.vz == 0 ? 0 : 4;
 }
 
 static int host_pad_packet_self_test(void)
@@ -1607,9 +1373,18 @@ static int host_pad_packet_self_test(void)
     uint8 first[8];
     uint8 second[8];
     sint32 index;
+    memset(first, 0xA5, sizeof(first));
+    memset(second, 0x5A, sizeof(second));
     PadInitDirect(first, second);
+    if (first[0] != 0xFF || first[1] != 0 || second[0] != 0xFF || second[1] != 0)
+        return 3;
+    for (index = 2; index < (sint32)sizeof(first); ++index)
+        if (first[index] != 0xA5 || second[index] != 0x5A)
+            return 4;
     PadStartCom();
     pad_publish(0, 1, 0xb7de);
+    if (PadInfoMode(0, 1, 0) != 4 || PadInfoMode(0, 4, -1) != 0)
+        return 7;
     if (first[0] != 0 || first[1] != 0x41 || first[2] != 0xde || first[3] != 0xb7)
         return 1;
     pad_publish(1, 0, 0);
@@ -1618,10 +1393,718 @@ static int host_pad_packet_self_test(void)
         if (second[index] != 0xff)
             return 2;
     }
+    PadStopCom();
+    if (PadGetState(0) != 0 || PadGetState(0x10) != 0)
+        return 5;
+    PadStartCom();
+    if (PadGetState(0) != 6 || PadGetState(0x10) != 0)
+        return 6;
+    if (PadSetMainMode(0, 1, 1) != 0 || PadInfoMode(0, 3, 0) != 0)
+        return 11;
+    psx_pad_bind_owner_packets(0x80147600u, 0x801476F0u);
+    for (index = 0; index < 2; ++index)
+    {
+        uint32 owner = 0x80147600u + 0xF0u * (uint32)index;
+        memset(psx_addr(owner, 0xF0u), 0, 0xF0u);
+        w_u32(owner, 0x80148000u);
+        w_u16(0x80148000u, 4u);
+        w_u16(0x80148002u, 7u);
+        w_u8(owner + 0xE3u, 2u);
+        w_u8(owner + 0xE4u, 1u);
+        w_u16(owner + 0xE6u, 0x1234u);
+        w_u8(owner + 0xE8u, 7u);
+        w_u32(owner + 0x4Cu, 0x89ABCDEFu);
+    }
+    if (getenv("NFSHS_PAD_QUERY_FIXTURE"))
+    {
+        FILE *fixture = xport_fopen("../status/pad-query-fixture.bin", "rb");
+        uint32 count, record[4];
+        if (!fixture || fread(&count, sizeof(count), 1, fixture) != 1 || !count || count > 4096u)
+            return 8;
+        for (uint32 row = 0; row < count; ++row)
+        {
+            if (fread(record, sizeof(record), 1, fixture) != 1 ||
+                (uint32)PadInfoMode((sint32)record[0], (sint32)record[1], (sint32)record[2]) != record[3])
+            {
+                fclose(fixture);
+                return 9;
+            }
+        }
+        bool complete = fgetc(fixture) == EOF;
+        fclose(fixture);
+        if (!complete)
+            return 10;
+    }
+    if (getenv("NFSHS_PAD_COMMAND_FIXTURE"))
+    {
+        psx_pad_bind_main_mode_commands(0x80105DD8u, 0x80105E2Cu);
+        FILE *fixture = xport_fopen("../status/pad-command-fixture.bin", "rb");
+        uint32 count, record[6];
+        uint8 expected[0xF0];
+        if (!fixture || fread(&count, sizeof(count), 1, fixture) != 1 || !count || count > 4096u)
+            return 12;
+        for (uint32 row = 0; row < count; ++row)
+        {
+            if (fread(record, sizeof(record), 1, fixture) != 1 ||
+                fread(expected, sizeof(expected), 1, fixture) != 1)
+            {
+                fclose(fixture);
+                return 13;
+            }
+            uint32 owner = 0x80147600u + ((record[0] & 0xF0u) ? 0xF0u : 0u);
+            memset(psx_addr(owner, 0xF0u), 0xA5, 0xF0u);
+            w_u8(owner + 0x46u, (uint8)record[4]);
+            w_u8(owner + 0xE4u, 1u);
+            w_u16(owner + 0xE6u, (uint16)record[3]);
+            if ((uint32)PadSetMainMode((sint32)record[0], (sint32)record[1], (sint32)record[2]) != record[5] ||
+                memcmp(psx_addr(owner, 0xF0u), expected, 0xF0u) != 0)
+            {
+                fclose(fixture);
+                return 14;
+            }
+        }
+        bool complete = fgetc(fixture) == EOF;
+        fclose(fixture);
+        psx_pad_bind_main_mode_commands(0, 0);
+        if (!complete)
+            return 15;
+    }
+    if (getenv("NFSHS_PAD_CALLBACK_FIXTURE"))
+    {
+        psx_pad_bind_main_mode_commands(0x80105DD8u, 0x80105E2Cu);
+        FILE *fixture = xport_fopen("../status/pad-callback-fixture.bin", "rb");
+        uint32 count, record[5];
+        uint8 expected[0xF0];
+        if (!fixture || fread(&count, sizeof(count), 1, fixture) != 1 || !count || count > 4096u)
+            return 16;
+        for (uint32 row = 0; row < count; ++row)
+        {
+            if (fread(record, sizeof(record), 1, fixture) != 1 ||
+                fread(expected, sizeof(expected), 1, fixture) != 1 || record[0] > 1u)
+            {
+                fclose(fixture);
+                return 17;
+            }
+            uint32 owner = 0x80147600u;
+            memset(psx_addr(owner, 0xF0u), 0xA5, 0xF0u);
+            w_u8(owner + 0x46u, (uint8)record[1]);
+            w_u8(owner + 0x53u, (uint8)record[2]);
+            w_u8(owner + 0x49u, (uint8)record[3]);
+            uint32 target = record[0] ? 0x80105E2Cu : 0x80105DD8u;
+            if (xport_missing_pad_owner_callback(target, owner) != record[4] ||
+                memcmp(psx_addr(owner, 0xF0u), expected, 0xF0u) != 0)
+            {
+                fclose(fixture);
+                return 18;
+            }
+        }
+        bool complete = fgetc(fixture) == EOF;
+        fclose(fixture);
+        psx_pad_bind_main_mode_commands(0, 0);
+        if (!complete)
+            return 19;
+    }
+    if (getenv("NFSHS_PAD_STATE_FIXTURE"))
+    {
+        FILE *fixture = xport_fopen("../status/pad-state-fixture.bin", "rb");
+        uint32 count, record[7];
+        if (!fixture || fread(&count, sizeof(count), 1, fixture) != 1 || !count || count > 4096u)
+            return 20;
+        for (uint32 row = 0; row < count; ++row)
+        {
+            if (fread(record, sizeof(record), 1, fixture) != 1)
+            {
+                fclose(fixture);
+                return 21;
+            }
+            uint32 owner = 0x80147600u + ((record[0] & 0xF0u) ? 0xF0u : 0u);
+            memset(psx_addr(owner, 0xF0u), 0, 0xF0u);
+            w_u32(owner + 0x34u, record[1]);
+            w_u32(owner + 0x10u, owner + (record[2] ? 0u : 0xF0u));
+            w_u8(owner + 0x38u, (uint8)record[3]);
+            w_u32(owner + 0x30u, 0x80149000u);
+            w_u8(0x80149000u, (uint8)record[4]);
+            w_u8(owner + 0x49u, (uint8)record[5]);
+            first[0] = second[0] = (uint8)record[4];
+            printf("pad_state %u %u %u\n", row, (uint32)PadGetState((sint32)record[0]), record[6]);
+        }
+        bool complete = fgetc(fixture) == EOF;
+        fclose(fixture);
+        if (!complete)
+            return 22;
+    }
+    psx_pad_bind_owner_packets(0, 0);
     return 0;
 }
 
+extern "C" const uint32 xport_cd_status_address;
+
+static int host_cd_position_self_test(void)
+{
+    sint32 saved_debug = CdSetDebug(0), previous_debug = 0;
+    for (uint32 bit = 0; bit < 32u; ++bit)
+    {
+        sint32 level = bit == 31u ? (-2147483647 - 1) : (sint32)(1u << bit);
+        if (CdSetDebug(level) != previous_debug)
+        {
+            CdSetDebug(saved_debug);
+            return 9;
+        }
+        previous_debug = level;
+    }
+    bool debug_ok = CdSetDebug(-1) == previous_debug && CdSetDebug(2147483647) == -1;
+    sint32 last_debug = CdSetDebug(saved_debug);
+    if (!debug_ok || last_debug != 2147483647)
+        return 9;
+    uint32 status_word = r_u32(xport_cd_status_address - 1u);
+    for (uint32 status = 0; status < 256u; ++status)
+    {
+        uint32 expected = 0xC3D400A5u | (status << 8);
+        w_u32(xport_cd_status_address - 1u, expected);
+        if (CdStatus() != (sint32)status || r_u32(xport_cd_status_address - 1u) != expected)
+        {
+            w_u32(xport_cd_status_address - 1u, status_word);
+            return 8;
+        }
+    }
+    w_u32(xport_cd_status_address - 1u, status_word);
+    CdlLOC position;
+    memset(&position, 0xA5, sizeof(position));
+    if (CdIntToPos(0, &position) != &position || position.minute != 0 ||
+        position.second != 2 || position.sector != 0 || position.track != 0xA5)
+        return 1;
+    if (CdPosToInt(&position) != 0)
+        return 2;
+    if (getenv("NFSHS_CD_POSITION_FIXTURE"))
+    {
+        FILE *fixture = xport_fopen("../status/cd-position-fixture.bin", "rb");
+        uint32 count, record[4];
+        if (!fixture || fread(&count, sizeof(count), 1, fixture) != 1 || !count || count > 16384u)
+            return 3;
+        for (uint32 row = 0; row < count; ++row)
+        {
+            if (fread(record, sizeof(record), 1, fixture) != 1 || record[0] > 1u)
+            {
+                fclose(fixture);
+                return 4;
+            }
+            if (!record[0])
+            {
+                memcpy(&position, &record[2], sizeof(position));
+                if (CdIntToPos((sint32)record[1], &position) != &position ||
+                    memcmp(&position, &record[3], sizeof(position)) != 0)
+                {
+                    fclose(fixture);
+                    return 5;
+                }
+            }
+            else
+            {
+                memcpy(&position, &record[1], sizeof(position));
+                if ((uint32)CdPosToInt(&position) != record[3] ||
+                    memcmp(&position, &record[1], sizeof(position)) != 0)
+                {
+                    fclose(fixture);
+                    return 6;
+                }
+            }
+        }
+        bool complete = fgetc(fixture) == EOF;
+        fclose(fixture);
+        if (!complete)
+            return 7;
+    }
+    return 0;
+}
+
+static int host_memcard_self_test(void)
+{
+    static uint8 image[0x20000];
+    uint32 buffer[64], expected[64];
+    char name[] = "BASLUS-TEST";
+    char pattern[] = "BASLUS-*";
+    DIRENTRY directory[2] = {};
+    sint32 command = 99, result = 99, count = -1;
+    MemCardInit(1);
+    MemCardStart();
+    if (MemCardSync(1, &command, &result) != -1 || command != 99 || result != 99)
+        return 1;
+    for (unsigned i = 0; i < 64; ++i)
+        buffer[i] = expected[i] = 0xA5000000u + i;
+    if (!MemCardReadFile(0, name, buffer, 0, sizeof(buffer)) ||
+        MemCardSync(0, &command, &result) != 1 || command != 3 || result != 1 || memcmp(buffer, expected, sizeof(buffer)))
+        return 2;
+    memset(image, 0, sizeof(image));
+    if (!psx_memcard_mount(0, image, sizeof(image)) || !MemCardExist(0))
+        return 3;
+    if (MemCardSync(1, &command, &result) != 0 || command != 1 || result != 0)
+        return 4;
+    psx_vblank_signal();
+    if (MemCardSync(1, &command, &result) != 1 || result != 3 || MemCardFormat(0) != 0)
+        return 5;
+    if (MemCardCreateFile(0, name, 2) != 0 || MemCardCreateFile(0, name, 1) != 6)
+        return 6;
+    if (!MemCardWriteFile(0, name, buffer, 0x1F80, sizeof(buffer)) || MemCardCreateFile(0, name, 1) != -1)
+        return 7;
+    if (MemCardSync(0, &command, &result) != 1 || command != 4 || result != 0)
+        return 8;
+    memset(buffer, 0, sizeof(buffer));
+    if (!MemCardReadFile(0, name, buffer, 0x1F80, sizeof(buffer)) || MemCardSync(0, &command, &result) != 1 ||
+        result != 0 || memcmp(buffer, expected, sizeof(buffer)))
+        return 9;
+    if (MemCardGetDirentry(0, pattern, directory, &count, 0, 2) != 0 || count != 1 ||
+        strcmp(directory[0].name, name) || directory[0].size != 16384 || sizeof(DIRENTRY) != 40)
+        return 10;
+    if (MemCardDeleteFile(0, name) != 0 || MemCardDeleteFile(0, name) != 5 ||
+        MemCardGetDirentry(0, pattern, directory, &count, 0, 2) != 0 || count != 0)
+        return 11;
+    MemCardEnd();
+    return psx_memcard_mount(0, NULL, 0) ? 0 : 12;
+}
+
+static int host_irq_test_count;
+static int host_vsync_test_count;
+static void host_irq_test_callback(void) { ++host_irq_test_count; }
+static void host_vsync_test_callback(void) { ++host_vsync_test_count; }
+static sint32 host_event_test_callback(void) { ++host_irq_test_count; return 0; }
+
+static int host_events_self_test(void)
+{
+    const uint32 event_class = 0xf2000002u, specification = 2;
+    host_irq_test_count = 0;
+    sint32 callback = OpenEvent(event_class, specification, 0x1000, host_event_test_callback);
+    sint32 polling = OpenEvent(event_class, specification, 0x2000, NULL);
+    if (callback < 1 || polling < 1 || callback == polling) return 1;
+    DeliverEvent(event_class, specification);
+    if (host_irq_test_count || TestEvent(polling)) return 2;
+    if (!EnableEvent(callback) || !EnableEvent(polling)) return 3;
+    DeliverEvent(event_class + 1, specification);
+    DeliverEvent(event_class, specification + 1);
+    if (host_irq_test_count || TestEvent(polling)) return 4;
+    DeliverEvent(event_class, specification);
+    if (host_irq_test_count != 1 || TestEvent(callback) || TestEvent(polling) != 1 || TestEvent(polling)) return 5;
+    DeliverEvent(event_class, specification);
+    UnDeliverEvent(event_class, specification);
+    if (host_irq_test_count != 2 || TestEvent(polling)) return 6;
+    if (!DisableEvent(callback) || !DisableEvent(polling)) return 7;
+    DeliverEvent(event_class, specification);
+    if (host_irq_test_count != 2 || TestEvent(polling)) return 8;
+    if (!CloseEvent(callback) || !CloseEvent(polling) || CloseEvent(callback) || EnableEvent(polling)) return 9;
+    if (EnableEvent(0) || DisableEvent(0) || CloseEvent(0) || TestEvent(0) ||
+        EnableEvent(33) || DisableEvent(33) || CloseEvent(33) || TestEvent(33)) return 10;
+    sint32 handles[32];
+    for (int i = 0; i < 32; ++i) {
+        handles[i] = OpenEvent(event_class, specification, 0x2000, NULL);
+        if (handles[i] < 1 || handles[i] > 32) return 11;
+        for (int j = 0; j < i; ++j) if (handles[i] == handles[j]) return 12;
+        if (!EnableEvent(handles[i])) return 13;
+    }
+    if (OpenEvent(event_class, specification, 0x2000, NULL) != -1) return 14;
+    DeliverEvent(event_class, specification);
+    for (int i = 0; i < 32; ++i)
+        if (TestEvent(handles[i]) != 1 || TestEvent(handles[i]) || !CloseEvent(handles[i])) return 15;
+    callback = OpenEvent(event_class, specification, 0x1000, host_event_test_callback);
+    return callback > 0 && CloseEvent(callback) ? 0 : 16;
+}
+
+static int host_callbacks_self_test(void) {
+    ResetCallback();
+    host_irq_test_count = host_vsync_test_count = 0;
+    if (InterruptCallback(8, host_irq_test_callback) != NULL) return 1;
+    psx_interrupt_raise(8);
+    if (host_irq_test_count != 1) return 2;
+    if (EnterCriticalSectionPSX() != 1) return 15;
+    if (EnterCriticalSectionPSX() != 0) return 16;
+    psx_interrupt_raise(8);
+    if (host_irq_test_count != 1) return 3;
+    ExitCriticalSection();
+    if (host_irq_test_count != 2) return 4;
+    if (InterruptCallback(8, NULL) != host_irq_test_callback) return 5;
+    if (VSyncCallback(host_vsync_test_callback) != 0) return 6;
+    psx_vblank_signal();
+    if (host_vsync_test_count != 1) return 7;
+    if (VSyncCallback(NULL) != (sint32)(intptr)host_vsync_test_callback) return 8;
+    if (InterruptCallback(4, host_irq_test_callback) != NULL) return 9;
+    if (!SetRCnt(0, 1000, 0x1001) || !psx_timers_advance(1000, 0, 0)) return 10;
+    if (host_irq_test_count != 3) return 11;
+    InterruptCallback(4, NULL);
+    sint32 event = OpenEvent(0xF2000000u, 2u, 0x1000u, host_event_test_callback);
+    if (event < 1 || !EnableEvent(event) || !StartRCnt(0)) return 12;
+    if (!SetRCnt(0, 1000, 0x1001) || !psx_timers_advance(1000, 0, 0)) return 13;
+    if (host_irq_test_count != 4 || !CloseEvent(event)) return 14;
+    PsxInterruptCallback saved_dma[7];
+    for (uint32 channel = 0; channel < 7; ++channel)
+        saved_dma[channel] = DMACallback(channel, NULL);
+    for (uint32 channel = 0; channel < 7; ++channel)
+        if (DMACallback(channel, host_irq_test_callback) != NULL) return 17;
+    if (DMACallback(7, host_vsync_test_callback) != NULL ||
+        DMACallback(0xffffffffu, host_vsync_test_callback) != NULL) return 18;
+    if (CdDataCallback(host_vsync_test_callback) != host_irq_test_callback) return 19;
+    if (DMACallback(3, NULL) != host_vsync_test_callback) return 20;
+    if (CdDataCallback(host_irq_test_callback) != NULL ||
+        CdDataCallback(NULL) != host_irq_test_callback) return 21;
+    for (uint32 channel = 0; channel < 7; ++channel)
+        if (DMACallback(channel, saved_dma[channel]) !=
+            (channel == 3 ? NULL : host_irq_test_callback)) return 22;
+    if (host_irq_test_count != 4 || host_vsync_test_count != 1) return 23;
+    ResetCallback();
+    return 0;
+}
+
+struct HostSortTestRecord { int key, id; };
+static int host_sort_test_compare(const void *left, const void *right)
+{
+    const HostSortTestRecord *a = (const HostSortTestRecord *)left;
+    const HostSortTestRecord *b = (const HostSortTestRecord *)right;
+    return a->key < b->key ? -1 : a->key > b->key;
+}
+
+static int host_libc_self_test(void)
+{
+    HostSortTestRecord records[] = {{1,0}, {1,1}, {1,2}, {1,3}};
+    const int expected[] = {2,0,1,3};
+    const int random_values[] = {16838,5758,10113,17515,31051,5627};
+    qsortPSX(records, 4, sizeof(records[0]), host_sort_test_compare);
+    for (int i = 0; i < 4; ++i)
+        if (records[i].key != 1 || records[i].id != expected[i]) return 1;
+    records[0].key = 4; records[1].key = -2; records[2].key = 0; records[3].key = 4;
+    qsortPSX(records, 4, sizeof(records[0]), host_sort_test_compare);
+    if (records[0].key != -2 || records[1].key != 0 || records[2].key != 4 || records[3].key != 4)
+        return 2;
+    srandPSX(1);
+    for (int i = 0; i < 6; ++i)
+        if (randPSX() != random_values[i]) return 3;
+    srandPSX(1);
+    return 0;
+}
+
+static int host_single_math_self_test(void)
+{
+    FILE *fixture = xport_fopen("../status/softfloat-single-fixture.bin", "rb");
+    if (!fixture) return 1;
+    sint32 domain = OpenEvent(0xF4000002u, 0x301, 0x2000, NULL);
+    sint32 range = OpenEvent(0xF4000002u, 0x302, 0x2000, NULL);
+    if (domain < 1 || range < 1) { fclose(fixture); return 2; }
+    EnableEvent(domain);
+    EnableEvent(range);
+    unsigned char record[36];
+    size_t count = 0, bytes;
+    int failed = 0;
+    while ((bytes = fread(record, 1, sizeof(record), fixture)) == sizeof(record)) {
+        uint32 kind = xport_load_le32(record);
+        uint32 left_bits = xport_load_le32(record + 4);
+        float left, right, result;
+        memcpy(&left, record + 4, sizeof(left));
+        memcpy(&right, record + 8, sizeof(right));
+        math_errno = math_err_point = 0;
+        uint32 result_bits, result_high = 0;
+        if (kind == 0) {
+            result = __floatsisf((sint32)left_bits);
+            memcpy(&result_bits, &result, sizeof(result_bits));
+        } else if (kind == 1)
+            result_bits = (uint32)__fixsfsi(left);
+        else if (kind == 2) {
+            result = __divsf3(left, right);
+            memcpy(&result_bits, &result, sizeof(result_bits));
+        } else if (kind == 3) {
+            result_bits = (uint32)_err_math((sint32)left_bits, (sint32)xport_load_le32(record + 8));
+        } else if (kind == 4 || kind == 6) {
+            double converted = kind == 4 ? __extendsfdf2(left) : __floatsidf((sint32)left_bits);
+            uint64 encoded;
+            memcpy(&encoded, &converted, sizeof(encoded));
+            result_bits = (uint32)encoded;
+            result_high = (uint32)(encoded >> 32);
+        } else if (kind == 5) {
+            double input;
+            memcpy(&input, record + 4, sizeof(input));
+            result_bits = (uint32)__fixdfsi(input);
+        } else if (kind == 7) {
+            result_bits = __mulsf3PSX(left_bits, xport_load_le32(record + 8));
+        } else if (kind == 8) {
+            double input;
+            memcpy(&input, record + 4, sizeof(input));
+            result = __truncdfsf2(input);
+            memcpy(&result_bits, &result, sizeof(result_bits));
+        } else { failed = 3; break; }
+        uint32 expected = xport_load_le32(record + 12);
+        uint32 expected_high = xport_load_le32(record + 16);
+        sint32 error = (sint32)xport_load_le32(record + 20);
+        sint32 point = (sint32)xport_load_le32(record + 24);
+        uint32 event_class = xport_load_le32(record + 28);
+        uint32 event_spec = xport_load_le32(record + 32);
+        int domain_delivered = TestEvent(domain);
+        int range_delivered = TestEvent(range);
+        if (result_bits != expected || result_high != expected_high || math_errno != error || math_err_point != point ||
+            domain_delivered != (event_class == 0xF4000002u && event_spec == 0x301u) ||
+            range_delivered != (event_class == 0xF4000002u && event_spec == 0x302u)) {
+            FILE *failure = xport_fopen("../status/softfloat-single-native-mismatch.txt", "w");
+            if (failure) {
+                fprintf(failure, "Case %u kind %u: input %08X/%08X result %08X/%08X expected %08X/%08X errors %d/%d expected %d/%d events %d/%d\n",
+                        (unsigned)count, kind, left_bits, xport_load_le32(record + 8), result_bits, result_high, expected, expected_high,
+                        math_errno, math_err_point, error, point, domain_delivered, range_delivered);
+                fclose(failure);
+            }
+            failed = 4;
+            break;
+        }
+        ++count;
+    }
+    if (!failed && (bytes != 0 || ferror(fixture) || count != 10152)) failed = 5;
+    CloseEvent(domain);
+    CloseEvent(range);
+    fclose(fixture);
+    return failed;
+}
+
+static int host_double_arithmetic_self_test(void)
+{
+    FILE *fixture = xport_fopen("../status/softfloat-double-fixture.bin", "rb");
+    if (!fixture) return 1;
+    sint32 range = OpenEvent(0xF4000002u, 0x302, 0x2000, NULL);
+    if (range < 1) { fclose(fixture); return 2; }
+    EnableEvent(range);
+    unsigned char record[44];
+    size_t count = 0, bytes;
+    int failed = 0;
+    while ((bytes = fread(record, 1, sizeof(record), fixture)) == sizeof(record)) {
+        uint32 kind = xport_load_le32(record);
+        uint64 left = (uint64)xport_load_le32(record + 4) | ((uint64)xport_load_le32(record + 8) << 32);
+        uint64 right = (uint64)xport_load_le32(record + 12) | ((uint64)xport_load_le32(record + 16) << 32);
+        uint64 expected = (uint64)xport_load_le32(record + 20) | ((uint64)xport_load_le32(record + 24) << 32);
+        math_errno = math_err_point = 0;
+        uint64 result;
+        if (kind == 0) result = __adddf3PSX(left, right);
+        else if (kind == 1) result = __muldf3PSX(left, right);
+        else if (kind == 2) result = __divdf3PSX(left, right);
+        else { failed = 3; break; }
+        sint32 error = (sint32)xport_load_le32(record + 28);
+        sint32 point = (sint32)xport_load_le32(record + 32);
+        uint32 event_class = xport_load_le32(record + 36);
+        uint32 event_spec = xport_load_le32(record + 40);
+        int delivered = TestEvent(range);
+        if (result != expected || math_errno != error || math_err_point != point ||
+            delivered != (event_class == 0xF4000002u && event_spec == 0x302u)) {
+            FILE *failure = xport_fopen("../status/softfloat-double-native-mismatch.txt", "w");
+            if (failure) {
+                fprintf(failure,"Case %u kind %u: %08X%08X / %08X%08X result %08X%08X expected %08X%08X errors %d/%d expected %d/%d event %d\n",
+                    (unsigned)count,kind,(uint32)(left >> 32),(uint32)left,(uint32)(right >> 32),(uint32)right,
+                    (uint32)(result >> 32),(uint32)result,(uint32)(expected >> 32),(uint32)expected,
+                    math_errno,math_err_point,error,point,delivered);
+                fclose(failure);
+            }
+            failed = 4;
+            break;
+        }
+        ++count;
+    }
+    if (!failed && (bytes != 0 || ferror(fixture) || count == 0)) failed = 5;
+    CloseEvent(range);
+    fclose(fixture);
+    return failed;
+}
+
+static int host_double_compare_self_test(void)
+{
+    FILE *fixture = xport_fopen("../status/softfloat-compare-fixture.bin", "rb");
+    if (!fixture) return 1;
+    unsigned char record[20];
+    size_t count = 0;
+    size_t bytes;
+    while ((bytes = fread(record, 1, sizeof(record), fixture)) == sizeof(record)) {
+        double left, right;
+        memcpy(&left, record, sizeof(left));
+        memcpy(&right, record + 8, sizeof(right));
+        sint32 expected = (sint32)xport_load_le32(record + 16);
+        if (__ltdf2(left, right) != expected) {
+            fclose(fixture);
+            return 2;
+        }
+        ++count;
+    }
+    int failed = bytes != 0 || ferror(fixture) || count != 2624;
+    fclose(fixture);
+    return failed ? 3 : 0;
+}
+
 extern "C" void NFSHS_ConfigurePsyQHost(void);
+extern "C" int ticks, timerhz;
+
+static int host_pc_file_self_test(void)
+{
+    if (PCinit() != 0 || !psx_pc_set_root("../status", 0)) return 1;
+    char name[] = "pc-runtime-fixture.bin";
+    const int count = 70001;
+    std::vector<char> input((size_t)count), output((size_t)count + 16u, (char)0xa5);
+    for (int i = 0; i < count; ++i) input[i] = (char)(i * 73 + 19);
+    int file = PCcreat(name, 0);
+    if (file < 0) return 2;
+    if (PCwrite(file, input.data(), count) != count || PClseek(file, 0, 2) != count) return 3;
+    if (PClseek(file, -count, 1) != 0 || PCread(file, output.data() + 8, count) != count) return 4;
+    if (memcmp(input.data(), output.data() + 8, (size_t)count) != 0) return 5;
+    for (int i = 0; i < 8; ++i)
+        if ((uint8)output[i] != 0xa5u || (uint8)output[count + 8 + i] != 0xa5u) return 6;
+    if (PCread(file, output.data(), 1) != 0 || PCread(file, NULL, 0) != 0) return 7;
+    if (PCread(file, output.data(), -1) != -1 || PCwrite(file, input.data(), -1) != -1) return 8;
+    if (PCread(file, NULL, 1) != -1 || PCwrite(file, NULL, 1) != -1) return 9;
+    if (PClseek(file, 0, 3) != -1 || PCclose(file) != 0 || PCclose(file) != -1) return 10;
+    file = PCopen(name, 0, 0);
+    if (file < 0 || PCwrite(file, input.data(), 1) != -1 || PClseek(file, count - 3, 0) != count - 3) return 11;
+    memset(output.data(), 0x5a, output.size());
+    if (PCread(file, output.data() + 8, 10) != 3 || memcmp(output.data() + 8, input.data() + count - 3, 3)) return 12;
+    for (size_t i = 0; i < output.size(); ++i)
+        if ((i < 8u || i >= 11u) && (uint8)output[i] != 0x5au) return 13;
+    if (PCclose(file) != 0) return 14;
+    file = PCopen(name, 1, 0);
+    if (file < 0 || PCread(file, output.data(), 1) != -1 || PCwrite(file, input.data(), 1) != 1 || PCclose(file)) return 15;
+    file = PCopen(name, 2, 0);
+    if (file < 0 || PCread(file, output.data(), 1) != 1 || output[0] != input[0] || PCclose(file)) return 16;
+    if (PCopen(NULL, 0, 0) != -1 || PCopen(name, -1, 0) != -1 || PCopen(name, 3, 0) != -1) return 17;
+    int handles[64];
+    for (int i = 0; i < 64; ++i)
+        if ((handles[i] = PCopen(name, 0, 0)) < 0) return 18;
+    if (PCopen(name, 0, 0) != -1 || PCinit() != 0) return 19;
+    for (int i = 0; i < 64; ++i)
+        if (PCread(handles[i], output.data(), 1) != -1 || PCclose(handles[i]) != -1) return 20;
+    return psx_pc_set_root("DATA", 1) ? 0 : 21;
+}
+
+static int host_pc_completion_self_test(void)
+{
+    if (PCinit() || !psx_pc_set_root("../status", 0)) return 1;
+    char name[] = "pc-completion-fixture.bin", value = 'Q', output = 0;
+    int file = PCcreat(name, 0);
+    if (file < 0 || PCwrite(file, &value, 1) != 1 || PCclose(file)) return 2;
+    FileMgr saved = gFileMgr;
+    ReadCmd saved_read = readcmd;
+    FileOp operation = {};
+    gFileMgr = {};
+    gFileMgr.cbpending = 1;
+    file = PCopen(name, 0, 0);
+    if (file < 0) return 3;
+    gFileMgr.curop = &operation;
+    if (writefile(0x02000000 | file, (int)(intptr)&value, 0, 1) ||
+        operation.status != -2 || gFileMgr.curop) return 4;
+    for (int i = 0; i < 3; ++i)
+    {
+        operation = {};
+        gFileMgr.curop = &operation;
+        readcmd = {1, i == 2 ? 64 : file, (int)(intptr)&output, 0, i == 1 ? 2 : 1};
+        if (readfile_systask() || operation.status != (i == 0 ? 1 : -2) ||
+            readcmd.pending || gFileMgr.curop || (i == 0 && output != 'Q')) return 5 + i;
+    }
+    if (PCclose(file)) return 8;
+    file = PCopen(name, 2, 0);
+    if (file < 0) return 9;
+    operation = {};
+    gFileMgr.curop = &operation;
+    if (writefile(0x02000000 | file, (int)(intptr)&value, 0, 1) ||
+        operation.status != 1 || gFileMgr.curop || PCclose(file)) return 10;
+    gFileMgr = saved;
+    readcmd = saved_read;
+    return psx_pc_set_root("DATA", 1) ? 0 : 11;
+}
+
+static int host_video_self_test(void)
+{
+    NFSHS_ConfigurePsyQHost();
+    psx_pc_set_root("DATA", 1);
+    timerhz = 100;
+    char dct[] = "ZZZZVD00.DCT";
+    intptr video = VIDEO_create(80, 80, 15 << 16, 0x20000, 16);
+    if (!video) return 1;
+    VIDEO_spoolfile(video, dct);
+    VIDEO_startplayback(video);
+    if (VIDEO_state(video) != VIDEOSTATE_PLAYING) { VIDEO_destroy(video); return 2; }
+    unsigned changed = 0;
+    for (int i = 0; i < 20; ++i)
+    {
+        ticks = i * 7;
+        changed += VIDEO_updateframexy(video, 512, 0) != 0;
+    }
+    VIDEO_abortplayback(video);
+    int state = VIDEO_state(video);
+    VIDEO_destroy(video);
+    if (!changed || state != VIDEOSTATE_IDLE) return 3;
+    uint16 first = VRAM[512];
+    unsigned varied = 0;
+    for (int row = 0; row < 80; ++row)
+        for (int column = 0; column < 80; ++column)
+            varied += VRAM[row * 1024 + 512 + column] != first;
+    if (!varied) return 4;
+    FILE *pixels = xport_fopen("../status/video-menu.rgb", "wb");
+    if (!pixels) return 10;
+    for (int row = 0; row < 80; ++row)
+        for (int column = 0; column < 80; ++column) {
+            uint16 color = VRAM[row * 1024 + 512 + column];
+            uint8 rgb[3] = {(uint8)((color & 31u) * 255u / 31u),
+                            (uint8)(((color >> 5) & 31u) * 255u / 31u),
+                            (uint8)(((color >> 10) & 31u) * 255u / 31u)};
+            if (fwrite(rgb, 1, 3, pixels) != 3) { fclose(pixels); return 11; }
+        }
+    fclose(pixels);
+    char movies[][32] = {"MOVIES/NFS4TITL.XA", "MOVIES/DEMO1AV.XA",
+                         "MOVIES/DEMO2AV.XA", "MOVIES/DEMO3AV.XA", "MOVIES/EADOLBY.XA"};
+    const uint32 ends[] = {1358, 456, 444, 480, 120};
+    for (unsigned movie = 0; movie < 5; ++movie)
+    {
+        int file = PCopen(movies[movie], 0, 0);
+        if (file < 0) return 5;
+        std::vector<uint32> ring(16384);
+        StSetRing(ring.data(), 32);
+        StSetStream(1, 1, ends[movie], NULL, NULL);
+        uint32 sector[512], *frame = NULL, *header = NULL;
+        int frames = 0, failed = 0;
+        unsigned sector_number = 0;
+        while (frames < 4 && PCread(file, (char *)sector, sizeof(sector)) == sizeof(sector))
+        {
+            int fed = stream_feed_sector((uint8 *)sector, NULL);
+            if (fed == -2) {
+                FILE *log = xport_fopen("../status/video-str-failure.txt", "w");
+                if (log) {
+                    fprintf(log, "%s STR sector %u: result %d, part %u/%u, frame %u\n",
+                            movies[movie], sector_number, fed, sector[1] & 0xffffu,
+                            sector[1] >> 16, sector[2]);
+                    fclose(log);
+                }
+                failed = 6; break;
+            }
+            ++sector_number;
+            if (StNextStatus(NULL, NULL) != StCOMPLETE || StGetNext(&frame, &header)) continue;
+            StHEADER *info = (StHEADER *)header;
+            if (!NfshsVideoDecode(frame, info->width, info->height, true, 0, 256)) failed = 7;
+            StFreeRing(frame);
+            if (failed) break;
+            ++frames;
+        }
+        StUnSetRing();
+        PCclose(file);
+        if (failed || frames != 4) return failed ? failed : 8;
+    }
+    first = VRAM[256 * 1024];
+    varied = 0;
+    for (int row = 256; row < 496; ++row)
+        for (int column = 0; column < 384; ++column)
+            varied += VRAM[row * 1024 + column] != first;
+    if (!varied) return 9;
+    pixels = xport_fopen("../status/video-movie.rgb", "wb");
+    if (!pixels) return 12;
+    for (int row = 256; row < 496; ++row)
+        if (fwrite((uint8 *)(VRAM + row * 1024), 1, 256 * 3, pixels) != 256 * 3) {
+            fclose(pixels); return 13;
+        }
+    fclose(pixels);
+    PadInitDirect(&Padglobal[0].nopad, &Padglobal[1].nopad);
+    PadStartCom();
+    gPadinfo.initialized = 1;
+    xport_input_override(1, 0);
+    if (play_movie(4) != 0) return 14;
+    xport_input_override(1, 0x0800);
+    if (play_movie(4) != 1) return 15;
+    xport_input_override(0, 0);
+    PadStopCom();
+    gPadinfo.initialized = 0;
+    return 0;
+}
 
 extern "C" {
 #if defined(__EMSCRIPTEN__)
@@ -1629,8 +2112,13 @@ void NFSHS_HostMainInit(void) {
 #else
 void __main(void) {
 #endif
-#if NFSHS_DIAGNOSTICS
-
+    if (getenv("NFSHS_HEADLESS")) xport_set_headless(1);
+    if (getenv("NFSHS_VIDEO_SELFTEST"))
+        ExitProcess((UINT)host_video_self_test());
+    if (getenv("NFSHS_PC_FILE_SELFTEST"))
+        ExitProcess((UINT)host_pc_file_self_test());
+    if (getenv("NFSHS_PC_COMPLETION_SELFTEST"))
+        ExitProcess((UINT)host_pc_completion_self_test());
     char allocatorTest[2];
     if (GetEnvironmentVariableA("NFSHS_ALLOCATOR_SELFTEST",allocatorTest,sizeof(allocatorTest)))
         ExitProcess((UINT)host_eac_allocator_self_test());
@@ -1650,11 +2138,28 @@ void __main(void) {
     if (GetEnvironmentVariableA("NFSHS_PAD_PACKET_SELFTEST",padPacketTest,sizeof(padPacketTest)))
         ExitProcess((UINT)host_pad_packet_self_test());
 
-#else
-
-#endif
     if (getenv("NFSHS_GTE_MVMVA_SELFTEST"))
         ExitProcess((UINT)host_gte_mvmva_self_test());
+    if (getenv("NFSHS_GTE_NORMAL_SELFTEST"))
+        ExitProcess((UINT)host_gte_normal_self_test());
+    if (getenv("NFSHS_MEMCARD_SELFTEST"))
+        ExitProcess((UINT)host_memcard_self_test());
+    if (getenv("NFSHS_CD_POSITION_SELFTEST"))
+        ExitProcess((UINT)host_cd_position_self_test());
+    if (getenv("NFSHS_CALLBACKS_SELFTEST"))
+        ExitProcess((UINT)host_callbacks_self_test());
+    if (getenv("NFSHS_EVENTS_SELFTEST"))
+        ExitProcess((UINT)host_events_self_test());
+    if (getenv("NFSHS_LIBC_SELFTEST"))
+        ExitProcess((UINT)host_libc_self_test());
+    if (getenv("NFSHS_GPU_PACKET_SELFTEST"))
+        ExitProcess((UINT)host_gpu_packet_self_test());
+    if (getenv("NFSHS_DOUBLE_COMPARE_SELFTEST"))
+        ExitProcess((UINT)host_double_compare_self_test());
+    if (getenv("NFSHS_SINGLE_MATH_SELFTEST"))
+        ExitProcess((UINT)host_single_math_self_test());
+    if (getenv("NFSHS_DOUBLE_MATH_SELFTEST"))
+        ExitProcess((UINT)host_double_arithmetic_self_test());
     NFSHS_ConfigurePsyQHost();
 }
 void __pure_virtual(void) { ExitProcess(3); }

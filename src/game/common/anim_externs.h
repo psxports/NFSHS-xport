@@ -19,6 +19,5 @@ extern void Quatern_Interpolate(tQuat *q0, tQuat *q1, coorddef *cp0, coorddef *c
 extern void Quatern_VecInterpolate(coorddef *cp0, coorddef *cp1, int weight, coorddef *cp);
 extern void __builtin_vec_delete(void *deleteMe);
 void __builtin_delete(void *deleteMe);
-void trap(int code);
 
 #endif /* _GAME_COMMON_ANIM_EXTERNS_H_ */

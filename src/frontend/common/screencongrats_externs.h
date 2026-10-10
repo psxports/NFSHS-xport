@@ -96,6 +96,5 @@ extern "C"
 {
     int TextSys_WordY(int wordnum);
 }
-void trap(int code);
 
 #endif

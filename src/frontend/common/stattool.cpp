@@ -73,17 +73,15 @@ void Stattool_ParseTime(int nTime,char *sLapTime)
   int min;
   int sec;
   int remCenti;
-  float fTime;
-  float fDiv;
-  
-  __floatsisf(nTime);
-  __divsf3(fTime,fDiv);
+  // FRONT.BIN carries both helper results in v0 and the divisor as 0x3F23D70A
+  float fTime = __floatsisf(nTime);
+  fTime = __divsf3(fTime, 0.64f);
   centi = __fixsfsi(fTime);
-  min = (centi / 6000) * 0x10000 >> 0x10;
-  remCenti = centi + min * -6000;
-  sec = (remCenti / 100) * 0x10000 >> 0x10;
+  min = (sint16)(centi / 6000);
+  remCenti = (sint32)((uint32)centi - (uint32)(min * 6000));
+  sec = (sint16)(remCenti / 100);
   sprintf(sLapTime,"%02d%c%02d%c%02d",min,(uint)(byte)minChar[(byte)frontEnd.language],sec,
-             (uint)(byte)secChar[(byte)frontEnd.language],(remCenti + sec * -100) * 0x10000 >> 0x10);
+             (uint)(byte)secChar[(byte)frontEnd.language],(sint16)((uint32)remCenti - (uint32)(sec * 100)));
   return;
 }
 

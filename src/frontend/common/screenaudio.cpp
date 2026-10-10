@@ -60,7 +60,7 @@ void tScreenAudio::PlaySound()
   if (item == 2) {
 PlaySnd_engineRand:
     vol = (uint)volByte;
-    RepresentativeSound = rand();
+    RepresentativeSound = randPSX();
     RepresentativeSound = RepresentativeSound % 6 + 0x29;
   }
   else {

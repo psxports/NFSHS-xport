@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/eacpsxz/stream.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 32/32 ***
  *   Source obj : nfs4\eaclib\psx\stream.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col11)
  *   32 fns @[0x800FC2F8 .. 0x800FDCE0].  EA STREAMING ring-buffer manager, layered directly on the
@@ -46,17 +47,6 @@ extern "C" void freemutex(int mutex);
 extern "C" int iscurrentthread(int t); /* threads.obj */
 extern "C" void yieldthread(void);
 extern "C" unsigned int systemtask(int x);           /* systask.obj */
-extern "C" int strcmp(const char *a, const char *b); /* syslib C23 */
-extern "C" char *strcpy(char *d, const char *s);     /* syslib C25 */
-#ifndef _MSC_VER
-extern "C" char *strncpy(char *d, const char *s, int n); /* syslib C26 */
-#endif
-#ifndef _MSC_VER
-extern "C" void *memcpy(void *d, const void *s, int n); /* syslib C42 @0x800EAAC4 */
-#endif
-#ifndef _MSC_VER
-extern "C" void *memset(void *d, int c, int n); /* syslib C43 @0x800E4318 */
-#endif
 
 /* shared async request-id counter (also bumped by nasync; high 24 bits, low byte = slot) */
 

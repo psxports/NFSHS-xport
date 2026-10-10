@@ -47,9 +47,9 @@
     "inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
   },
   "source_index": {
-    "parser_version": "c-source-index-v5",
-    "source_files": 511,
-    "declarations": 9350,
+    "parser_version": "c-source-index-v7",
+    "source_files": 521,
+    "declarations": 9092,
     "mapped": 0,
     "ambiguous": 0,
     "unmapped": 0

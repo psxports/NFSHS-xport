@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/sndpsxz/sst.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 16/16 ***
  *   Source obj : nfs4\eaclib\psx\sst.obj ; archive C:\nfs4\EACLIB\PSX\SNDPSXZ.LIB (xlsx col11)
  *   16 fns @[0x800E8C14 .. 0x800E9970].  EA SCxl STREAMING-AUDIO decoder ("iSNDstream*").
@@ -58,16 +59,6 @@ extern "C" short *iSNDserveraddclient(int cb);            /* ssysserv  */
 extern "C" int SNDSTRM_setgreedylevel(int strm, int lvl); /* sstsetgl  */
 extern "C" int SNDSTRM_destroy(int s);                    /* spvoices  */
 extern "C" int SNDSTRM_purge(int s);
-#ifndef _MSC_VER
-    #ifndef _MSC_VER
-        #ifndef _MSC_VER
-extern "C" int memcmp(const void *a, const void *b, int n);
-        #endif
-    #endif
-#endif
-#ifndef _MSC_VER
-extern "C" void *memcpy(void *d, const void *s, int n);
-#endif
 
 /* ---- internal forward decls (mutually recursive) ---- */
 extern "C" void iSNDstreamdestroyall(void);                               /* @0x800E8C14 */

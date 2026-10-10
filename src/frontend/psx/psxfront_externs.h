@@ -139,7 +139,6 @@ extern "C"
     }
     int elapsedticks(void);
     extern "C++" int play_movie(char movie);
-    void trap(int code);
     /* eaclib timer proc (from pad.c) */
 
     /* --- external game globals (Ghidra-typed) --- */

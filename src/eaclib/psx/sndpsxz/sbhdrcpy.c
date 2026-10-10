@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/sndpsxz/sbhdrcpy.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 1/1 ***
  *   Source obj : nfs4\eaclib\psx\sbhdrcpy.obj ; archive C:\nfs4\EACLIB\PSX\SNDPSXZ.LIB (xlsx col11)
  *   1 fn @0x800E7BA8.  SNDbankheadercopy -- copy a loaded bank's header into `dst` and rebase its patch
@@ -9,9 +10,6 @@
 #include "../../../mips_semantics.h"
 
 extern "C" int SNDbankheadersize(int bankId); /* sbhdrsze */
-#ifndef _MSC_VER
-extern "C" void *memcpy(void *dst, const void *src, int n); /* C42 (BIOS thunk) */
-#endif
 
 extern "C" int SNDbankheadercopy(unsigned char *dst, int bankId); /* @0x800E7BA8 */
 

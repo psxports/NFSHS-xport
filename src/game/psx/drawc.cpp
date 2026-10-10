@@ -358,7 +358,7 @@ gte_SetTransMatrix(&DrawC_gScreenMat);
 gte_lwc2(0,*(int *)(center));
   gte_lwc2(1,*(int *)(((char *)center + 0x4)));
   gte_rtps();
-gte_stsz(&sd->sub_otz);
+sd->sub_otz = (sint32)xport_gte_read_data(19u) >> 2;
   shapeIdx = sd->sub_otz;
   sub_otz_h2 = nfs4_mips_sra_s32(shapeIdx,1);
   if (R3DCar_InMenu == 0) {
@@ -732,10 +732,8 @@ void DrawC_PrimStop(Car_tObj *carObj,Draw_CarCache *sd)
 {
   short sVar1;
   int iVar2;
-  int worldZ;
   int iVar3;
   Car_tObj *sort_carObj;
-  int sub_otSize;
   
   if ((carObj->render).sort_flag == 0) {
     sort_carObj = (Car_tObj *)(carObj->render).sort_carObj;
@@ -1041,18 +1039,18 @@ DrawC_Prim_envmap1MainLoop:
           gte_ldVZ2(&sd->tV[vert_c_idx].vt.z);
           gte_rtpt();
           gte_nclip();
-          gte_stMAC0();
+          gte_swc2(24u, &sd->bfct);
           iVar11 = sd->bfct;
           if ((sd->head).mirror != 0) {
             iVar11 = -iVar11;
           }
           uVar10 = facetIdx - 1;
         } while (iVar11 < 1);
-        gte_stSXY0();
-        gte_stSXY1();
-        gte_stSXY2();
+        gte_swc2(12u, &sd->dvx0);
+        gte_swc2(13u, &sd->dvx1);
+        gte_swc2(14u, &sd->dvx2);
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         iVar11 = sd->otz + sd->sub_otz;
         sd->otz = iVar11;
         if (iVar11 < 0) goto DrawC_Prim_envmap1MainLoop;
@@ -1215,7 +1213,7 @@ DrawC_Prim_envmap0AltPath:
               gte_ldVZ2(&facet_vertex2->vt.z);
               gte_rtpt();
               gte_nclip();
-              gte_stMAC0();
+              gte_swc2(24u, &sd->bfct);
               bfctResult_b = sd->bfct;
               if ((sd->head).mirror != 0) {
                 bfctResult_b = -bfctResult_b;
@@ -1223,7 +1221,7 @@ DrawC_Prim_envmap0AltPath:
               uVar10 = facetIdx - 1;
             } while (bfctResult_b < 1);
             gte_avsz3();
-            gte_stOTZ();
+            gte_swc2(7u, &sd->otz);
             ti34 = sd->otz + sd->sub_otz;
             sd->otz = ti34;
             if (ti34 < 0) goto DrawC_Prim_envmap0AltPath;
@@ -1302,7 +1300,7 @@ DrawC_Prim_envmap1AltGT3:
             gte_ldVZ2(&facet_vertex2->vt.z);
             gte_rtpt();
             gte_nclip();
-            gte_stMAC0();
+            gte_swc2(24u, &sd->bfct);
             bfctResult_c = sd->bfct;
             if ((sd->head).mirror != 0) {
               bfctResult_c = -bfctResult_c;
@@ -1310,7 +1308,7 @@ DrawC_Prim_envmap1AltGT3:
             uVar10 = facetIdx - 1;
           } while (bfctResult_c < 1);
           gte_avsz3();
-          gte_stOTZ();
+          gte_swc2(7u, &sd->otz);
           otz_check_b = sd->otz + sd->sub_otz;
           sd->otz = otz_check_b;
           if (otz_check_b < 0) goto DrawC_Prim_envmap1AltGT3;
@@ -1391,7 +1389,7 @@ DrawC_Prim_envmap8InnerLoop:
           gte_ldVZ2(&facet_vertex2->vt.z);
           gte_rtpt();
           gte_nclip();
-          gte_stMAC0();
+          gte_swc2(24u, &sd->bfct);
           iVar11 = sd->bfct;
           if ((sd->head).mirror != 0) {
             iVar11 = -iVar11;
@@ -1399,7 +1397,7 @@ DrawC_Prim_envmap8InnerLoop:
           uVar10 = facetIdx - 1;
         } while (iVar11 < 1);
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         iVar11 = (u_int)(u_short)DrawC_gOverlay[facet_p_v2->textureIndex] << 0x10;
         uVar9 = iVar11 >> 0x10;
         if (uVar9 == 0) break;
@@ -1450,18 +1448,18 @@ DrawC_Prim_envmap9InnerLoop:
           gte_ldVZ2(&sd->tV[vert_c_idx2].vt.z);
           gte_rtpt();
           gte_nclip();
-          gte_stMAC0();
+          gte_swc2(24u, &sd->bfct);
           bfctResult_a = sd->bfct;
           if ((sd->head).mirror != 0) {
             bfctResult_a = -bfctResult_a;
           }
           uVar10 = facetIdx - 1;
           if (0 < bfctResult_a) {
-            gte_stSXY0();
-            gte_stSXY1();
-            gte_stSXY2();
+            gte_swc2(12u, &sd->dvx0);
+            gte_swc2(13u, &sd->dvx1);
+            gte_swc2(14u, &sd->dvx2);
             gte_avsz3();
-            gte_stOTZ();
+            gte_swc2(7u, &sd->otz);
             ot_offs_byte = (int)((u_int)(u_short)DrawC_gOverlay[facet_p_v4->textureIndex] << 0x10) >> 0x10;
             if (ot_offs_byte == 0) {
               iVar11 = sd->otz + sd->sub_otz;
@@ -1780,15 +1778,15 @@ gte_lwc2(0,*(int *)(vt0));
     gte_lwc2(5,*(int *)(((char *)vt2 + 0x4)));
     gte_rtpt();
     gte_nclip();
-    gte_stMAC0();
+    gte_swc2(24u, &sd->bfct);
     iVar6 = sd->bfct;
     if ((sd->head).mirror != 0) {
       iVar6 = -iVar6;
     }
     if (0 < iVar6) {
-      gte_stSXY0();
-      gte_stSXY1();
-      gte_stSXY2();
+      gte_swc2(12u, &sd->dvx0);
+      gte_swc2(13u, &sd->dvx1);
+      gte_swc2(14u, &sd->dvx2);
       sVar1 = (sd->head).clipW;
       sVar2 = (sd->head).clipH;
       if (((((((sd->dvx0 <= sVar1) || (sd->dvx1 <= sVar1)) || (sd->dvx2 <= sVar1)) &&
@@ -1797,7 +1795,7 @@ gte_lwc2(0,*(int *)(vt0));
           (((-1 < sd->dvy0 || (-1 < sd->dvy1)) || (-1 < sd->dvy2)))) &&
          (((-1 < vt0->z || (-1 < vt1->z)) || (-1 < vt2->z)))) {
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         iVar6 = sd->otz + sd->sub_otz;
         sd->otz = iVar6;
         if ((-1 < iVar6) && (iVar6 <= sd->sub_otSize)) {
@@ -2150,16 +2148,16 @@ DrawC_PrimClip_envmap9Eq1Loop:
             gte_ldVZ2(&sd->tV[bVar3].vt.z);
             gte_rtpt();
             gte_nclip();
-            gte_stMAC0();
+            gte_swc2(24u, &sd->bfct);
             iVar20 = sd->bfct;
             if ((sd->head).mirror != 0) {
               iVar20 = -iVar20;
             }
             uVar9 = facetIdx - 1;
           } while (iVar20 < 1);
-          gte_stSXY0();
-          gte_stSXY1();
-          gte_stSXY2();
+          gte_swc2(12u, &sd->dvx0);
+          gte_swc2(13u, &sd->dvx1);
+          gte_swc2(14u, &sd->dvx2);
           sVar4 = sd->tV[vert_b_idx].vt.z;
           sVar5 = sd->tV[bVar3].vt.z;
           (sd->vt0).z = sd->tV[bVar18].vt.z;
@@ -2176,7 +2174,7 @@ DrawC_PrimClip_envmap9Eq1Loop:
                  ((((sd->vt0).z < 0 && ((sd->vt1).z < 0)) && (uVar9 = facetIdx - 1, (sd->vt2).z < 0)
                   )))));
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         iVar20 = sd->otz + sd->sub_otz;
         sd->otz = iVar20;
         if (iVar20 < 0) goto DrawC_PrimClip_envmap9Eq1Loop;
@@ -2326,16 +2324,16 @@ DrawC_PrimClip_envmap20Main:
                 gte_ldVZ2(&sd->tV[bVar1].vt.z);
                 gte_rtpt();
                 gte_nclip();
-                gte_stMAC0();
+                gte_swc2(24u, &sd->bfct);
                 bfctResult_b = sd->bfct;
                 if ((sd->head).mirror != 0) {
                   bfctResult_b = -bfctResult_b;
                 }
                 uVar9 = facetIdx - 1;
               } while (bfctResult_b < 1);
-              gte_stSXY0();
-              gte_stSXY1();
-              gte_stSXY2();
+              gte_swc2(12u, &sd->dvx0);
+              gte_swc2(13u, &sd->dvx1);
+              gte_swc2(14u, &sd->dvx2);
               clipW_or_vz = sd->tV[vert_b_idx2].vt.z;
               clipH_or_vz = sd->tV[bVar1].vt.z;
               (sd->vt0).z = sd->tV[vert_a_idx2].vt.z;
@@ -2352,7 +2350,7 @@ DrawC_PrimClip_envmap20Main:
                          || ((((sd->vt0).z < 0 && ((sd->vt1).z < 0)) &&
                              (uVar9 = facetIdx - 1, (sd->vt2).z < 0))))))));
             gte_avsz3();
-            gte_stOTZ();
+            gte_swc2(7u, &sd->otz);
             bfctResult_c = sd->otz + sd->sub_otz;
             sd->otz = bfctResult_c;
             if (bfctResult_c < 0) goto DrawC_PrimClip_envmap20Main;
@@ -2536,16 +2534,16 @@ DrawC_PrimClip_envmap9Eq8Inner:
             gte_ldVZ2(&sd->tV[vert_c_idx].vt.z);
             gte_rtpt();
             gte_nclip();
-            gte_stMAC0();
+            gte_swc2(24u, &sd->bfct);
             iVar20 = sd->bfct;
             if ((sd->head).mirror != 0) {
               iVar20 = -iVar20;
             }
             uVar9 = facetIdx - 1;
           } while (iVar20 < 1);
-          gte_stSXY0();
-          gte_stSXY1();
-          gte_stSXY2();
+          gte_swc2(12u, &sd->dvx0);
+          gte_swc2(13u, &sd->dvx1);
+          gte_swc2(14u, &sd->dvx2);
           sVar4 = sd->tV[bVar3].vt.z;
           sVar5 = sd->tV[vert_c_idx].vt.z;
           (sd->vt0).z = sd->tV[bVar18].vt.z;
@@ -2562,7 +2560,7 @@ DrawC_PrimClip_envmap9Eq8Inner:
                 ((((sd->vt0).z < 0 && ((sd->vt1).z < 0)) && (uVar9 = facetIdx - 1, (sd->vt2).z < 0))
                 ));
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         uVar26 = (int)((u_int)(u_short)DrawC_gOverlay[facet_p_v1->textureIndex] << 0x10) >> 0x10;
         if (uVar26 == 0) break;
         uVar15 = (u_int)(short)facet_p_v1->flag;
@@ -2620,16 +2618,16 @@ DrawC_PrimClip_envmap9Eq9Inner:
             gte_ldVZ2(&sd->tV[bVar8].vt.z);
             gte_rtpt();
             gte_nclip();
-            gte_stMAC0();
+            gte_swc2(24u, &sd->bfct);
             bfctResult_a = sd->bfct;
             if ((sd->head).mirror != 0) {
               bfctResult_a = -bfctResult_a;
             }
             uVar9 = facetIdx - 1;
           } while (bfctResult_a < 1);
-          gte_stSXY0();
-          gte_stSXY1();
-          gte_stSXY2();
+          gte_swc2(12u, &sd->dvx0);
+          gte_swc2(13u, &sd->dvx1);
+          gte_swc2(14u, &sd->dvx2);
           sVar4 = sd->tV[bVar3].vt.z;
           sVar5 = sd->tV[bVar8].vt.z;
           (sd->vt0).z = sd->tV[bVar18].vt.z;
@@ -2646,7 +2644,7 @@ DrawC_PrimClip_envmap9Eq9Inner:
                 ((((sd->vt0).z < 0 && ((sd->vt1).z < 0)) && (uVar9 = facetIdx - 1, (sd->vt2).z < 0))
                 ));
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         ot_offs_byte = (int)((u_int)(u_short)DrawC_gOverlay[puVar23->textureIndex] << 0x10) >> 0x10;
         if (ot_offs_byte == 0) {
           iVar20 = sd->otz + sd->sub_otz;
@@ -3112,18 +3110,18 @@ DrawCPrimMenu_facetLoopTop:
         gte_ldVZ2(&sd->tV[bVar3].vt.z);
         gte_rtpt();
         gte_nclip();
-        gte_stMAC0();
+        gte_swc2(24u, &sd->bfct);
         iVar19 = sd->bfct;
         if ((sd->head).mirror != 0) {
           iVar19 = -iVar19;
         }
         uVar33 = uVar26 - 1;
       } while (iVar19 < 1);
-      gte_stSXY0();
-      gte_stSXY1();
-      gte_stSXY2();
+      gte_swc2(12u, &sd->dvx0);
+      gte_swc2(13u, &sd->dvx1);
+      gte_swc2(14u, &sd->dvx2);
       gte_avsz3();
-      gte_stOTZ();
+      gte_swc2(7u, &sd->otz);
       iVar19 = sd->otz + sd->sub_otz;
       sd->otz = iVar19;
       if (iVar19 < 0) goto DrawCPrimMenu_facetLoopTop;
@@ -3375,7 +3373,7 @@ gte_lwc2(0,*(int *)(((char *)sd + 0xac)));
           gte_lwc2(5,*(int *)(((char *)sd + 0xc0)));
           gte_rtpt();
           gte_nclip();
-          gte_stMAC0();
+          gte_swc2(24u, &sd->bfct);
           iVar6 = sd->bfct;
           if ((sd->head).mirror != 0) {
             iVar6 = -iVar6;
@@ -3383,7 +3381,7 @@ gte_lwc2(0,*(int *)(((char *)sd + 0xac)));
           uVar8 = uVar12 - 1;
         } while (iVar6 < 1);
         gte_avsz3();
-        gte_stOTZ();
+        gte_swc2(7u, &sd->otz);
         iVar6 = sd->otz + sd->sub_otz;
         sd->otz = iVar6;
         if (iVar6 < 0) goto DrawCHalo_facetLoopTop;
@@ -3476,7 +3474,7 @@ gte_lwc2(0,*(int *)(((char *)shadowVT + 0x8)));
     gte_swc2(0xd,(char *)prim_pre_rtpt + 0x20);
     gte_swc2(0xe,(char *)prim_pre_rtpt + 0x18);
     gte_avsz4();
-    gte_stOTZ();
+    gte_swc2(7u, &sd->otz);
     iVar1 = (sd->otz >> 1) + 0x28;
     sd->otz = iVar1;
     if ((-1 < iVar1) && (iVar1 <= Draw_gViewOtSize + -3)) {
@@ -3484,7 +3482,7 @@ gte_lwc2(0,*(int *)(((char *)shadowVT + 0x8)));
       puVar3 = (sd->head).cprim.LastPrim;
       (sd->head).cprim.PrimPtr = (char *)(puVar7 + 10);
       puVar4 = (u_int *)(puVar3 + iVar1);
-      nfs4_add_prim(puVar4,puVar7);
+      AddPrim(puVar4,puVar7);
       uVar2 = sd->color;
       ((u_char *)puVar7)[3] = 9;
       puVar7[1] = uVar2;
@@ -3546,7 +3544,7 @@ gte_lwc2(0,*(int *)(vt1));
     gte_swc2(0xe,(char *)tp8 + 0x18);
     if (R3DCar_InMenu == 0) {
       gte_avsz4();
-      gte_stOTZ();
+      gte_swc2(7u, &sd->otz);
       iVar4 = (sd->otz >> 3) + 0x28;
       sd->otz = iVar4;
       if (iVar4 < 0) {
@@ -3564,7 +3562,7 @@ gte_lwc2(0,*(int *)(vt1));
       puVar6 = (sd->head).cprim.LastPrim;
       (sd->head).cprim.PrimPtr = (char *)(puVar8 + 10);
       puVar7 = (u_int *)(puVar6 + sd->otz);
-      nfs4_add_prim(puVar7,puVar8);
+      AddPrim(puVar7,puVar8);
       uVar5 = sd->color;
       ((u_char *)puVar8)[3] = 9;
       puVar8[1] = uVar5;
@@ -3802,7 +3800,7 @@ gte_SetTransMatrix(((char *)sd + 0x14));
   sd->otz = 0;
   (sd->head).cprim.PrimPtr = (char *)(pDVar7 + 1);
   puVar8 = (u_int *)(puVar10 + sd->otz);
-  nfs4_add_prim(puVar8,pDVar7);
+  AddPrim(puVar8,pDVar7);
   SetDrawMode(pDVar7,0,0,0x120,(PSX_RECT *)0x0);
   sVar1 = Fe3D_spotVertex[0x20].z;
   sVar2 = Fe3D_spotVertex[0x20].y;
@@ -3859,7 +3857,7 @@ gte_lwc2(0,*(int *)(((char *)sd + 0xac)));
   puVar10 = (sd->head).cprim.LastPrim;
   (sd->head).cprim.PrimPtr = (char *)(pDVar7 + 1);
   puVar8 = (u_int *)(puVar10 + sd->otz);
-  nfs4_add_prim(puVar8,pDVar7);
+  AddPrim(puVar8,pDVar7);
   SetDrawMode(pDVar7,0,1,0x120,(PSX_RECT *)0x0);
   return;
 }

@@ -45,7 +45,6 @@ extern void Cars_ResetCollidedCars(Car_tObj *carObj, int forceReset, int forcePa
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
 int AIWorld_ApxSplineDistance(Car_tObj *a, int slice);
 int AIWorld_ApxSplineDistance(int slice, Car_tObj *b);
-void trap(int code);
 /* AITrigger_TriggerManager::DescribeTrigger/CheckForTriggerAtSlice/GetTrigger now C++ members (aitriger.obj) -- flat externs removed */
 
 #endif /* _GAME_COMMON_CAMERA_EXTERNS_H_ */

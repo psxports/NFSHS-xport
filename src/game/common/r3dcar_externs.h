@@ -8,11 +8,6 @@
 
     /* ---- Ghidra-ism helpers (faithful value-level shims) ---- */
     #define INT_1f80008c (*(volatile int *)((u_char *)getScratchAddr(0) + 0x8c))
-extern void trap(int code); /* gcc MIPS div-by-zero/overflow break helper */
-#ifdef AP_WIN
-extern "C" int NFSHS_GTE_VectorNormalS(const void *, void *);
-#define VectorNormalS(input, output) NFSHS_GTE_VectorNormalS((input), (output))
-#endif
 
 /* ---- cross-TU globals ---- */
 extern AITune_tTrackInfo AITune_trackInfo[];

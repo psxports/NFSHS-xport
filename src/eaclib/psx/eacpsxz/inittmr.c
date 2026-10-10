@@ -1,3 +1,5 @@
+#include "psx.h"
+
 /* eaclib/psx/eacpsxz/inittmr.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 4/4 ***
  *   obj nfs4\eaclib\psx\inittmr.obj ; EACPSXZ.LIB.  4 fns @[0x800F4180 .. 0x800F4328].  Root-counter timer
  *   setup: open the RCnt event, install the per-tick handler list (tmrsub[8]), and tick libticks/ticks.
@@ -23,20 +25,12 @@ extern "C" void initgp(void);                   /* savegp */
 extern "C" void savegp(void *buf);              /* savegp */
 extern "C" void restoregp(int gp);              /* savegp */
 extern "C" void resettick(void);                /* timer */
-extern "C" void trap(unsigned int code);
 /* --- syslib (PsyQ libapi/libetc) --- */
-extern "C" int EnterCriticalSection(void);
-extern "C" void ExitCriticalSection(void);
-extern "C" long OpenEvent(unsigned long cls, long spec, long mode, long (*fn)());
-extern "C" long EnableEvent(long ev);
-extern "C" long DisableEvent(long ev);
-extern "C" long SetRCnt(unsigned long spec, unsigned short target, long mode);
-extern "C" long StartRCnt(unsigned long spec);
 
 extern "C" int initmemadr(int base, int size); /* @0x800F4180 */
 extern "C" void inittimer(int hz);             /* @0x800F41F0 */
 extern "C" void restoretimer(void);            /* @0x800F4304 */
-extern "C" unsigned int tmrint(void);          /* @0x800F4328 */
+extern "C" sint32 tmrint(void);          /* @0x800F4328 */
 
 /* initmemadr @0x800F4180 : create the timer's memory class from the static template. */
 extern "C" int initmemadr(int base, int size)
@@ -51,11 +45,11 @@ extern "C" void inittimer(int hz)
 {
     if (hz == 0)
         hz = 100;
-    EnterCriticalSection();
+    EnterCriticalSectionPSX();
     if (timerflag == 0)
     {
         blockclear((int)&tmrsub, 0x20);
-        timerevent = OpenEvent(0xf2000002, 2, 0x1000, (long (*)())tmrint);
+        timerevent = OpenEvent(0xf2000002, 2, 0x1000, tmrint);
         EnableEvent(timerevent);
         timerflag = 1;
         addexit(restoretimer);
@@ -80,7 +74,7 @@ extern "C" void restoretimer(void)
 }
 
 /* tmrint @0x800F4328 : the per-tick interrupt handler -- advance the tick counters and run tmrsub[0..7]. */
-extern "C" unsigned int tmrint(void)
+extern "C" sint32 tmrint(void)
 {
     unsigned int gpbuf[2];
     int i = 0;

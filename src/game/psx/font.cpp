@@ -89,7 +89,7 @@ void Font_Blit(int x,int y,void *src,int u,int v,charactertbl *ch,int arg6)
   fontShape = (shapetbl *)src;
   uv_x = ch->width;
   uv_y = ch->height;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x14;
   sprt[3] = 4;
   tu3 = font_tint;
@@ -386,7 +386,7 @@ void Font_TextXY(char *string,int x,int y)
     }
   }
   tpage = (int)font_currentTPage;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   SetDrawMode((DR_MODE *)p,0,0,tpage,(PSX_RECT *)0x0);
   return;

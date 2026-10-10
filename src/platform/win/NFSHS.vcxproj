@@ -20,7 +20,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
+    <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -64,13 +64,13 @@
       <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>AP_WIN=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=1;WND_TITLE=&quot;Need For Speed: High Stakes (xport)&quot;;WND_WIDTH=640;WND_HEIGHT=480;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>AP_WIN=1;_DEBUG;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=1;WND_TITLE=&quot;Need For Speed: High Stakes (xport)&quot;;WND_WIDTH=640;WND_HEIGHT=480;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ReconRoot);$(XportRoot)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ReconRoot)host\diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -144,7 +144,14 @@
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx_spu.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="$(XportRoot)src\psx_xa.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <ObjectFileName>$(IntDir)xport_psx_xa.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="$(XportRoot)src\xport_trace.c"><CompileAs>CompileAsC</CompileAs></ClCompile>
+    <ClCompile Include="$(XportRoot)src\psx_mdec.c;$(XportRoot)src\psx_press.c;$(XportRoot)src\psx_vlc.c;$(XportRoot)src\psx_stream.c">
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
     
     <ClCompile Include="$(XportRoot)src\psx_gpu.c">
       <CompileAs>CompileAsC</CompileAs>
@@ -154,8 +161,7 @@
     </ClCompile>
 <ClCompile Include="$(XportRoot)src\psx.c">
       <CompileAs>CompileAsC</CompileAs>
-      <ObjectFileName>$(IntDir)xport_psx_memory.obj</ObjectFileName>
-      <PreprocessorDefinitions>XPORT_PSX_MEMORY_ONLY=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)xport_psx.obj</ObjectFileName>
     </ClCompile>
 <ClCompile Update="$(ReconRoot)game\common\spchevnt.c">
       <ObjectFileName>$(IntDir)game_spchevnt.obj</ObjectFileName>

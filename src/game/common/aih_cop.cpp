@@ -771,12 +771,12 @@ void AIHigh_Cop::HighExecute()
 
           else {
 
-            gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+            gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 0;
 
             this->_base_AIHigh_BasicCop.SetupBlockadeElements(&(this->_base_AIHigh_BasicCop).blockade_);
 
-            gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+            gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 1;
 
           }

@@ -4,6 +4,7 @@
 #include "../nfs4_types.h"
 #include "libfns.h"
 #include "snd.h"
+#include "../eaclib/psx/eacpsxz/cdfs.h"
 
 /* -- EACPSXZ -- */
 /* fixdmult */
@@ -99,7 +100,7 @@ void iFILE_delbigclosecallback(int arg0);                                       
 void FILE_delbig(char *arg0);                                                                           /* nfile */
 intptr FILE_atomic(intptr fn, int idle, int retries, void *args);                                       /* nfile */
 void iFILE_ExecCommand(void *arg0);                                                                     /* nfile */
-void iFILE_CommandCompleteCallback(int arg0);                                                           /* nfile */
+extern "C" int iFILE_CommandCompleteCallback(int result);                                               /* nfile */
 void iFILE_perror();                                                                                    /* nfile */
 void reserveop(char *arg0);                                                                             /* nfile */
 void freeop(void *arg0);                                                                                /* nfile */
@@ -188,20 +189,6 @@ int vramimage(void *rect, void *data);                                          
                                                                                                         /* vramfxya */
 void getshapeclut(void *arg0);                                                                          /* shpclut */
                                                                                                         /* shpclut */
-void CD_systaskfunc();                                                                                  /* cdfs */
-void CD_timerfunc();                                                                                    /* cdfs */
-void CdReadyHandler(unsigned char intr, unsigned char *result);                                         /* cdfs */
-void readsectorB();                                                                                     /* cdfs */
-void loaddirinfo(int startSector, int numSectors, int maxEntries);                                      /* cdfs */
-void dircompare(void *arg0);                                                                            /* cdfs */
-void CD_Restore();                                                                                      /* cdfs */
-void CD_Init(int arg0);                                                                                 /* cdfs */
-void CD_Restart(int arg0);                                                                              /* cdfs */
-void CD_Open(void *arg0);                                                                               /* cdfs */
-void CD_Close(int arg0);                                                                                /* cdfs */
-void CD_Read(int arg0);                                                                                 /* cdfs */
-void CD_Stopread();                                                                                     /* cdfs */
-void CD_Getinfo(int arg0);                                                                              /* cdfs */
 void cluttype(int arg0);                                                                                /* cluttype */
 void shapetype(int arg0);                                                                               /* shptype */
 void validatehandle(void *arg0);                                                                        /* stream */

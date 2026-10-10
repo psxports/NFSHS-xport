@@ -139,12 +139,12 @@ void Render_RenderWorld(DRender_tView *Vi)
   void *pvVar1;
   int savesp;
   BWorld_OnyxBuildFacets(Vi);
-  pvVar1 = SetSp(getScratchAddr(0xff));
+  pvVar1 = NFSHS_NativeStackHint(getScratchAddr(0xff));
   Skidmark_OnyxBuildFacets(Vi);
-  SetSp(pvVar1);
-  pvVar1 = SetSp(getScratchAddr(0xff));
+  NFSHS_NativeStackHint(pvVar1);
+  pvVar1 = NFSHS_NativeStackHint(getScratchAddr(0xff));
   Souffle_InsertFacet(Vi);
-  SetSp(pvVar1);
+  NFSHS_NativeStackHint(pvVar1);
 #if NFSHS_WEB_RENDER_PROBE
   NFSHS_WebRenderProbe(Vi,0);
 #endif
@@ -153,9 +153,9 @@ void Render_RenderWorld(DRender_tView *Vi)
   NFSHS_WebRenderProbe(Vi,1);
 #endif
   Hrz_BuildHorizon(Vi);
-  pvVar1 = SetSp(getScratchAddr(0xff));
+  pvVar1 = NFSHS_NativeStackHint(getScratchAddr(0xff));
   Weather_BuildWeather(Vi);
-  SetSp(pvVar1);
+  NFSHS_NativeStackHint(pvVar1);
   Render_InsertDepthOfField();
   return;
 }
@@ -419,7 +419,7 @@ void StampImage(int xo,int depth)
   do {
     ft4_packet = Render_gPacketPtr;
     pal_link = (u_int *)(Render_gPalettePtr + depth * 4);
-    nfs4_add_prim(pal_link,Render_gPacketPtr);
+    AddPrim(pal_link,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x28;
     ft4_packet[3] = 9;
     ft4_packet[7] = 0x2e;
@@ -508,7 +508,7 @@ void Render_InsertDepthOfField(void)
     }
     cur_pkt_poly = Render_gPacketPtr;
     puVar1 = (u_int *)(Render_gPalettePtr + Render_gBlurEffectDepth1 * 4);
-    nfs4_add_prim(puVar1,Render_gPacketPtr);
+    AddPrim(puVar1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x18;
     cur_pkt_poly[3] = 5;
     cur_pkt_poly[7] = 0x2a;
@@ -525,12 +525,12 @@ void Render_InsertDepthOfField(void)
     *(u_short *)(cur_pkt_poly + 0x14) = 0x140;
     *(u_short *)(cur_pkt_poly + 0x16) = 0xf0;
     puVar1 = (u_int *)(Render_gPalettePtr + Render_gBlurEffectDepth1 * 4);
-    nfs4_add_prim(puVar1,Render_gPacketPtr);
+    AddPrim(puVar1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     SetDrawStp((DR_STP *)cur_pkt_stp,1);
     cur_pkt_drm = Render_gPacketPtr;
     puVar1 = (u_int *)(Render_gPalettePtr + Render_gBlurEffectDepth1 * 4);
-    nfs4_add_prim(puVar1,Render_gPacketPtr);
+    AddPrim(puVar1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     tpage = GetTPage(2,1,0,0x100);
     SetDrawMode((DR_MODE *)cur_pkt_drm,0,0,(u_int)(u_short)tpage,(PSX_RECT *)0x0);

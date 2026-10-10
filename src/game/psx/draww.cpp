@@ -22,7 +22,7 @@ ChunkObjectInfo gChunkObjInfo;   /* @0x8011f748  (bss(zero)) */
 CCOORD16     gVertex3d[160];   /* @0x8011f760  (bss(zero)) */
 extern "C" { int          stackSpeedUpEnbabledFlag; } /* @0x8013d81c  (bss(zero)) */
 char         goffsets[8] = { 125, 125, 50, 15, -1, 125, 0, 0 };   /* @0x8013d820 */
-intptr     gWSavePtr;   /* @0x8013d830  (bss(zero); native SetSp address) */
+intptr     gWSavePtr;   /* @0x8013d830  (bss(zero); native NFSHS_NativeStackHint address) */
 int          gSD_gt4counter;   /* @0x8013d834  (bss(zero)) */
 int          gSD_gt3counter;   /* @0x8013d838  (bss(zero)) */
 DRender_tView *gVi;   /* @0x8013d83c  (bss(zero)) */
@@ -1205,7 +1205,7 @@ gte_swc2(0x8,&depthcue);
       prim->x3 = (u_short)dvxy3;
       prim->y3 = (*(u_short *)((u_char *)&(dvxy3) + 2));
       if (sd->nightFlags == '\0') {
-        gte_ldIR0(depthcue);
+        gte_lddp(depthcue);
         if (sd->light == -1) {
           nfs4_mips_copy_bytes(&l2,Chunk_lightTable + vt2.light,4);
  gte_lwc2(6,(int)l2);
@@ -1289,11 +1289,11 @@ gte_SetTransMatrix(((char *)sd + 0x74));
           DrawW_SetUpSubdividFacet(facetIdx,sd);
         }
         else {
-          tu24 = (intptr)SetSp((void *)gWSavePtr);
+          tu24 = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
           stackSpeedUpEnbabledFlag = 0;
           gWSavePtr = tu24;
           DrawW_SetUpSubdividFacet(facetIdx,sd);
-          gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+          gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
           stackSpeedUpEnbabledFlag = 1;
         }
 gte_SetRotMatrix(((char *)sd + 0x14));
@@ -2326,10 +2326,10 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
         gChunkObjInfo.objInstanceBuf = Track_chunkList[sVar1].objInstanceBuf;
         gChunkObjInfo.doFrustumClip = (int)(geomRez == 4);
         gChunkObjInfo.simObjs = (Trk_SimObject *)(pGVar4 + 1);
-        gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+        gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
         stackSpeedUpEnbabledFlag = 1;
         DrawW_BuildChunkObjectFacets(gVi,&gChunkObjInfo);
-        gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+        gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
         stackSpeedUpEnbabledFlag = 0;
       }
       if (((GameSetup_gData.Time == 0) && (GameSetup_gData.Weather == 0)) &&
@@ -2360,10 +2360,10 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
       gChunkObjInfo.doFrustumClip = 1;
       gChunkObjInfo.zClipSq = gCurrContext->polyFarZClipSq;
       gChunkObjInfo.visList = (short *)0x0;
-      gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+      gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
       stackSpeedUpEnbabledFlag = 1;
       DrawW_BuildObjectFacets(gVi,&gChunkObjInfo);
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
     }
   }
@@ -2376,10 +2376,10 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
     /* 0x800C8F88: sll v1,s5,6; 0x800C8F90 adds the byte offset.
        The visibility row stride is 64 bytes = 32 shorts. */
     gChunkObjInfo.visList = Track_gInViewList + iVar6 * 32;
-    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     DrawW_BuildObjectFacets(gVi,&gChunkObjInfo);
-    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
   }
   if ((Object_customObjInst != (Group *)0x0) && (0 < Object_customObjInst->m_num_elements)) {
@@ -2864,14 +2864,14 @@ gte_swc2(0x8,&depthcue);
             if (sd->nightFlags == 0) {
               nfs4_mips_copy_bytes(&a,Chunk_lightTable + vt3.light,4);
               gte_lwc2(6,*(int *)&a);
-              gte_ldIR0(depthcue);
+              gte_lddp(depthcue);
               gte_dpcs();
               gte_swc2(0x16,&prim->r2);
               nfs4_mips_copy_bytes(&prim->r0,&prim->r2,4);
 
               nfs4_mips_copy_bytes(&a,Chunk_lightTable + vt2.light,4);
               gte_lwc2(6,*(int *)&a);
-              gte_ldIR0(depthcue);
+              gte_lddp(depthcue);
               gte_dpcs();
               gte_swc2(0x16,&prim->r3);
               nfs4_mips_copy_bytes(&prim->r1,&prim->r3,4);
@@ -2970,11 +2970,11 @@ gte_SetTransMatrix(((char *)sd + 0x74));
                 DrawW_SetUpSubdividFacet_Line(sd);
               }
               else {
-                previousStack = (intptr)SetSp((void *)gWSavePtr);
+                previousStack = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
                 stackSpeedUpEnbabledFlag = 0;
                 gWSavePtr = previousStack;
                 DrawW_SetUpSubdividFacet_Line(sd);
-                gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+                gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
                 stackSpeedUpEnbabledFlag = 1;
               }
 gte_SetRotMatrix(((char *)sd + 0x14));

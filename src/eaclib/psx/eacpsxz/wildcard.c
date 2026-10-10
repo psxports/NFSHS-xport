@@ -1,3 +1,5 @@
+#include <ctype.h>
+#include <string.h>
 /* eaclib/psx/eacpsxz/wildcard.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.
  *   Source obj : nfs4\eaclib\psx\wildcard.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col11)
  *   2 fns: strrstr@0x800E8940, wildcard@0x800E89BC.  FULL reconstruction (disasm-v3 MIPS); no stubs.
@@ -18,14 +20,6 @@
  *       '~' -> NOT (negate the match of the rest of pat)
  *       else -> case-insensitive literal (libc tolower); success as soon as pat is exhausted.
  */
-#ifndef _MSC_VER
-    #ifndef _MSC_VER
-        #ifndef _MSC_VER
-extern "C" char *strrchr(const char *s, int c);
-        #endif
-    #endif
-#endif                         /* libc C31.obj, BIOS A0:0x1F */
-extern "C" int tolower(int c); /* libc C38.obj, BIOS A0:0x26 */
 
 extern "C" char *strrstr(char *s, char *set);   /* @0x800E8940 */
 extern "C" int wildcard(char *text, char *pat); /* @0x800E89BC */

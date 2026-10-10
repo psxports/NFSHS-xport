@@ -1,436 +1,162 @@
-/* frontend/psx/video.cpp  --  RECONSTRUCTED  (PSX MDEC/STR video playback)
- *   Bodies      : Ghidra decompiler (nfs4-f.exe MIPS), full re-decompile (no truncation).
- *   Line numbers: PsyQ SLD per-instruction stream (C:\nfs4\FRONTEND\PSX\VIDEO.CPP).
- *   Field names : SYM-authentic VIDEOSTRUCT layout (id/bufferwidth/bufferheight/streambuffer/
- *                 mdechandle/frame/videotap/state/streamrequestid/reftime/displaytime/
- *                 displaytimefrac/displaytimeincr/framewidth/frameheight/droppedframes).
- *   Locals      : SYM-AUTHENTIC where present (vid/playopts/handle/fname/srs/chunk/
- *                 audiostatus/currenttime/dropped/timeout). Remaining decompiler temps
- *                 given SEMANTIC names by data-flow analysis (status/mem/requestid/
- *                 buffered/result/streamstate/endofstream/acc/done). Two were SYM-
- *                 authentic recoveries from dead decls: VIDEO_create iVar1->handle,
- *                 VIDEO_updateframexy bVar1->dropped. Two SSA register-reuse merges
- *                 collapsed to nested exprs (VIDEO_create timeincr, VIDEO_state ticks).
- *   state values: rendered as VIDEOSTATE enum (IDLE/SPOOLING/READY/PLAYING).
- *   Magic 0x57444956 = ASCII 'VIDW' (VIDEOSTRUCT.id validity tag).
- *   The 4 simple accessors have NO 'vid' SYM-local -> rendered as ((VIDEOSTRUCT*)handle)->.
- */
 #include "video.h"
-#include "video_externs.h"
+#include "psx_press.h"
+#include <new>
+#include <vector>
 
-#ifdef AP_WIN
-/* STR/MDEC is deliberately outside the native-port scope.  Keep the public
-   frontend video surface valid without allocating streams or touching a
-   synthetic handle, so screen transitions cannot wait on PSX movie I/O. */
-intptr VIDEO_create(int,int,int,int,int) { return 0; }
-void VIDEO_destroy(intptr) {}
-void VIDEO_spoolfile(intptr,char *) {}
-void VIDEO_startplayback(intptr) {}
-void VIDEO_abortplayback(intptr) {}
-extern "C" VIDEOSTATE VIDEO_state(intptr) { return VIDEOSTATE_IDLE; }
-int VIDEO_updateframexy(intptr,int,int) { return 0; }
-void videoupdatetime(VIDEOSTRUCT *) {}
-int videodecode(VIDEOSTRUCT *,STREAMCHUNKHDR *,int,int) { return 0; }
-#else
+extern "C" int ticks, timerhz;
 
-/* lines 1-61: file header, #includes, static data, macros (no symbols emitted) */
-
-/* ---- VIDEO_create  (video.cpp:62, code lines 62-102) ---- */
-intptr VIDEO_create(int width,int height,int fps,int streambuffersize,int memtype)
-
-
+struct NfshsVideo
 {
+    int file, width, height;
+    uint32 reference, display, fraction, increment;
+    VIDEOSTATE state;
+    std::vector<uint32> chunk;
+};
 
-
-  int status;
-
-  VIDEOSTRUCT *vid;
-
-  void *mem;
-
-  int handle;
-
-  SNDPLAYOPTS playopts;
-
-  char fname [60];
-
-  
-
-  Platform_ResetDCTBuffer();
-
-  sprintf(fname,"%sDCT.BIN",Paths_Paths[0x20]);
-
-  handle = asyncloadfileat(fname,CF_DVLC);
-
-  while (status = getasyncreadstatus(handle), status == 0) {
-
-    systemtask(0);
-
-  }
-
-  vid = (VIDEOSTRUCT *)reservememadr("Videostruct",0x40,memtype);
-
-  blockclear(vid,0x40);
-
-  vid->id = 0x57444956;   /* 'VIDW' */
-
-  vid->bufferwidth = width;
-
-  vid->bufferheight = height;
-
-  mem = reservememadr("streambuffer",streambuffersize,memtype);
-
-  vid->streambuffer = (char *)mem;
-
-  vid->videotap = STREAM_create(2,2,2,vid->streambuffer,streambuffersize);
-  STREAM_setfilter(vid->videotap,1,0xffff,0x4353,2);
-
-
-
-  vid->mdechandle = initmdec(width,height,screenbpp,memtype);
-
-
-
-  vid->displaytimeincr = fixeddiv(fixedmult(timerhz << 0x10,0xa0000),fps);
-
-  vid->state = VIDEOSTATE_IDLE;
-
-  return (intptr)vid;
-}
-
-/* lines 103-119: (static data / macros / comments - no emitted code) */
-
-/* ---- VIDEO_destroy  (video.cpp:120, code lines 120-136) ---- */
-void VIDEO_destroy(intptr handle)
-
-
+int NfshsVideoDecode(uint32 *bitstream, int width, int height, bool rgb24, int x, int y)
 {
-
-  
-
-  if (((VIDEOSTRUCT *)handle)->id == 0x57444956   /* 'VIDW' */) {
-
-    ((VIDEOSTRUCT *)handle)->id = 0;
-
-    restoremdec(((VIDEOSTRUCT *)handle)->mdechandle);
-
-    STREAM_destroy(((VIDEOSTRUCT *)handle)->videotap);
-
-    purgememadr(((VIDEOSTRUCT *)handle)->streambuffer);
-
-  }
-
-  return;
-
-}
-
-/* lines 137-138: (static data / macros / comments - no emitted code) */
-
-/* ---- VIDEO_spoolfile  (video.cpp:139, code lines 139-155) ---- */
-void VIDEO_spoolfile(intptr handle,char *fname)
-
-
-{
-
-  int requestid;
-
-  
-
-  if ((((VIDEOSTRUCT *)handle)->id == 0x57444956   /* 'VIDW' */) && (((VIDEOSTRUCT *)handle)->state == VIDEOSTATE_IDLE)) {
-
-    requestid = STREAM_queuefile(((VIDEOSTRUCT *)handle)->videotap,fname,0,0);
-
-    ((VIDEOSTRUCT *)handle)->streamrequestid = requestid;
-
-    ((VIDEOSTRUCT *)handle)->state = VIDEOSTATE_SPOOLING;
-
-  }
-
-  return;
-
-}
-
-/* lines 156-157: (static data / macros / comments - no emitted code) */
-
-/* ---- VIDEO_startplayback  (video.cpp:158, code lines 158-179) ---- */
-void VIDEO_startplayback(intptr handle)
-
-
-{
-
-  int buffered;
-
-  
-
-  if (((((VIDEOSTRUCT *)handle)->id == 0x57444956   /* 'VIDW' */) && (((VIDEOSTRUCT *)handle)->state != VIDEOSTATE_IDLE)) &&
-
-     (buffered = STREAM_bufferusage(((VIDEOSTRUCT *)handle)->videotap), 20000 < buffered)
-
-     ) {
-
-    ((VIDEOSTRUCT *)handle)->state = VIDEOSTATE_PLAYING;
-
-  }
-
-  return;
-
-}
-
-/* lines 180-181: (static data / macros / comments - no emitted code) */
-
-/* ---- VIDEO_abortplayback  (video.cpp:182, code lines 182-195) ---- */
-void VIDEO_abortplayback(intptr handle)
-
-
-{
-
-  
-
-  if (((VIDEOSTRUCT *)handle)->id == 0x57444956   /* 'VIDW' */) {
-
-    STREAM_kill(((VIDEOSTRUCT *)handle)->videotap);
-
-    ((VIDEOSTRUCT *)handle)->state = VIDEOSTATE_IDLE;
-
-  }
-
-  return;
-
-}
-
-/* lines 196-197: (static data / macros / comments - no emitted code) */
-
-/* ---- VIDEO_state  (video.cpp:198, code lines 198-247) ---- */
-extern "C" VIDEOSTATE VIDEO_state(intptr handle)
-
-
-{
-
-  int result;
-
-  int streamstate;
-
-  VIDEOSTRUCT *vid;
-
-  SNDREQUESTSTATUS srs;
-
-  vid = (VIDEOSTRUCT *)handle;
-  
-
-  result = 0;
-
-  if (vid->id == 0x57444956   /* 'VIDW' */) {
-
-    if (vid->state == VIDEOSTATE_SPOOLING) {
-
-      streamstate = STREAM_state(vid->videotap);
-
-
-      if (streamstate == 2) {
-
-        vid->state = VIDEOSTATE_PLAYING;
-
-        vid->displaytime = 0;
-
-        vid->displaytimefrac = 0;
-
-        vid->reftime = ticks * 10;
-
-      }
-
-    }
-
-    else if ((vid->state == VIDEOSTATE_PLAYING) &&
-
-            (result = STREAM_state(vid->videotap), result == 0))
-
+    if (!bitstream || width <= 0 || width > 640 || height <= 0 || height > 256)
+        return 0;
+    const int step = rgb24 ? 24 : 16;
+    const int rows = (height + 15) & ~15;
+    const int words = step * rows / 2;
+    std::vector<uint32> vlc(65536), strip((size_t)words);
+    DecDCTCallback previous = DecDCToutCallback(NULL);
+    DecDCTCallback previous_input = DecDCTinCallback(NULL);
+    DecDCTReset(0);
+    DecDCTvlcSize(0);
+    if (DecDCTvlc(bitstream, vlc.data()) != 0)
     {
-
-      vid->state = VIDEOSTATE_IDLE;
-
+        DecDCToutCallback(previous);
+        DecDCTinCallback(previous_input);
+        return 0;
     }
-
-    result = vid->state;
-
-  }
-
-  return (VIDEOSTATE)result;
-
-}
-
-/* lines 248-256: (static data / macros / comments - no emitted code) */
-
-/* ---- VIDEO_updateframexy  (video.cpp:257, code lines 257-335) ---- */
-int VIDEO_updateframexy(intptr handle,int x,int y)
-
-
-{
-
-
-  int result;
-
-  int endofstream;
-
-  STREAMCHUNKHDR *chunk;
-
-  VIDEOSTRUCT *vid;
-
-  int dropped;
-
-  int currenttime;
-
-  SNDREQUESTSTATUS audiostatus;
-
-  vid = (VIDEOSTRUCT *)handle;
-  
-
-  if (vid->id == 0x57444956   /* 'VIDW' */) {
-
-    result = 0;
-
-    if (vid->state == VIDEOSTATE_PLAYING) {
-
-      currenttime = ticks * 10 - vid->reftime;
-
-      result = 0;
-
-      if (vid->displaytime <= currenttime) {
-
-        endofstream = STREAM_isendofstream(vid->videotap);
-
-        result = 0;
-
-        while (endofstream == 0) {
-
-          chunk = (STREAMCHUNKHDR *)STREAM_get(vid->videotap,0,0);
-          if (chunk == (STREAMCHUNKHDR *)0x0) {
-
+    DecDCTin(vlc.data(), rgb24 ? 3 : 2);
+    for (int column = 0; column < width; column += 16)
+    {
+        DecDCTout(strip.data(), words);
+        if (DecDCToutSync(0) != 0)
+        {
+            DecDCTReset(1);
+            DecDCToutCallback(previous);
+            DecDCTinCallback(previous_input);
             return 0;
-
-          }
-
-          videoupdatetime(vid);
-
-          if (currenttime < vid->displaytime) {
-
-            result = videodecode(vid,chunk,x,y);
-
-            dropped = 0;
-
-            if (result == 0) goto VIDEOupdateFrame_incCounter;
-
-          }
-
-          else {
-
-VIDEOupdateFrame_incCounter:
-
-            dropped = 1;
-
-            vid->droppedframes = vid->droppedframes + 1;
-
-          }
-
-          STREAM_release(vid->videotap,(intptr)chunk);
-          if (!dropped) {
-
-            return 1;
-
-          }
-
-          endofstream = STREAM_isendofstream(vid->videotap);
-
-          result = 1;
-
         }
-
-      }
-
+        PSX_RECT rect = {(sint16)(x + column * step / 16), (sint16)y,
+                         (sint16)step, (sint16)height};
+        LoadImagePSX(&rect, strip.data());
     }
-
-  }
-
-  else {
-
-    result = 0;
-
-  }
-
-  return result;
-
+    DrawSync(0);
+    DecDCToutCallback(previous);
+    DecDCTinCallback(previous_input);
+    return 1;
 }
 
-/* lines 336-368: (static data / macros / comments - no emitted code) */
-
-/* ---- videoupdatetime  (video.cpp:369, code lines 369-371) ---- */
-void videoupdatetime(VIDEOSTRUCT *vid)
-
-
-
+intptr VIDEO_create(int width, int height, int fps, int streambuffersize, int)
 {
-
-  int acc;
-
-  
-
-  acc = vid->displaytimefrac + vid->displaytimeincr;
-
-  vid->displaytimefrac = acc;
-
-  vid->displaytime = vid->displaytime + (acc >> 0x10);
-
-  vid->displaytimefrac = (uint)(ushort)vid->displaytimefrac;
-
-  return;
-
+    if (width <= 0 || height <= 0 || fps <= 0 || streambuffersize <= 0)
+        return 0;
+    NfshsVideo *video = new (std::nothrow) NfshsVideo();
+    if (!video)
+        return 0;
+    video->file = -1;
+    video->width = width;
+    video->height = height;
+    video->increment = (uint32)(((uint64)(uint32)timerhz * 10u << 32) / (uint32)fps);
+    video->state = VIDEOSTATE_IDLE;
+    return (intptr)video;
 }
 
-/* lines 372-374: (static data / macros / comments - no emitted code) */
-
-/* ---- videodecode  (video.cpp:375, code lines 375-423) ---- */
-int videodecode(VIDEOSTRUCT *vid,STREAMCHUNKHDR *chunk,int x,int y)
-
-
-
+void VIDEO_abortplayback(intptr handle)
 {
+    NfshsVideo *video = (NfshsVideo *)handle;
+    if (!video)
+        return;
+    if (video->file >= 0)
+        PCclose(video->file);
+    video->file = -1;
+    video->state = VIDEOSTATE_IDLE;
+    video->chunk.clear();
+}
 
-  int done;
+void VIDEO_destroy(intptr handle)
+{
+    VIDEO_abortplayback(handle);
+    delete (NfshsVideo *)handle;
+}
 
-  int timeout;
+void VIDEO_spoolfile(intptr handle, char *name)
+{
+    NfshsVideo *video = (NfshsVideo *)handle;
+    if (!video || !name || video->state != VIDEOSTATE_IDLE)
+        return;
+    video->file = PCopen(name, 0, 0);
+    if (video->file < 0)
+        return;
+    video->state = VIDEOSTATE_SPOOLING;
+}
 
-  
+void VIDEO_startplayback(intptr handle)
+{
+    NfshsVideo *video = (NfshsVideo *)handle;
+    if (!video || video->state != VIDEOSTATE_SPOOLING)
+        return;
+    video->reference = (uint32)ticks * 10u;
+    video->display = video->fraction = 0;
+    video->state = VIDEOSTATE_PLAYING;
+}
 
-  if (chunk->type == 0x4443546d) {
+extern "C" VIDEOSTATE VIDEO_state(intptr handle)
+{
+    NfshsVideo *video = (NfshsVideo *)handle;
+    if (!video)
+        return VIDEOSTATE_IDLE;
+    if (video->state == VIDEOSTATE_SPOOLING)
+        VIDEO_startplayback(handle);
+    return video->state;
+}
 
-    vid->framewidth = (int)(short)chunk[1].size;
-
-    vid->frameheight = (int)*(short *)((int)&chunk[1].size + 2);
-
-    mdec(vid->mdechandle,(char *)(chunk + 1),x,y);
-
-    timeout = ticks + timerhz * 4;
-
-    do {
-
-      done = mdecdone(vid->mdechandle);
-
-      if (done != 0) {
-
+int VIDEO_updateframexy(intptr handle, int x, int y)
+{
+    NfshsVideo *video = (NfshsVideo *)handle;
+    if (!video || video->state != VIDEOSTATE_PLAYING)
+        return 0;
+    const uint32 current = (uint32)ticks * 10u - video->reference;
+    if (current < video->display)
+        return 0;
+    for (;;)
+    {
+        uint32 header[2];
+        if (PCread(video->file, (char *)header, sizeof(header)) != sizeof(header))
+        {
+            VIDEO_abortplayback(handle);
+            return 0;
+        }
+        const uint32 size = header[1] & 0x00ffffffu;
+        if (size < 8u || size > 0x100000u)
+        {
+            VIDEO_abortplayback(handle);
+            return 0;
+        }
+        video->chunk.assign((size + 3u) / 4u + 16u, 0);
+        if (PCread(video->file, (char *)video->chunk.data(), (sint32)size - 8) != (sint32)size - 8)
+        {
+            VIDEO_abortplayback(handle);
+            return 0;
+        }
+        const uint32 accumulated = video->fraction + video->increment;
+        video->display += accumulated >> 16;
+        video->fraction = accumulated & 0xffffu;
+        if (current >= video->display || header[0] != 0x4443546du)
+            continue;
+        uint32 *payload = video->chunk.data();
+        int width = (sint16)(payload[1] & 0xffffu), height = (sint16)(payload[1] >> 16);
+        if (size < 28u || width > video->width || height > video->height ||
+            !NfshsVideoDecode(payload + 2, width, height, false, x, y))
+        {
+            VIDEO_abortplayback(handle);
+            return 0;
+        }
         return 1;
-
-      }
-
-      systemtask(0);
-
-    } while (ticks <= timeout);
-
-    mdecreset();
-
-  }
-
-  return 0;
-
+    }
 }
-
-/* end of video.cpp */
-#endif

@@ -1448,12 +1448,12 @@ NewtonClosestPlr_simOptz:
       n->groundElevation = iVar3;
     }
     else {
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 0;
       iVar3 = Newton_FindGroundElevationAndNormal(n,&dummy_124);
       uVar2 = gWSavePtr;
       n->groundElevation = iVar3;
-      gWSavePtr = (intptr)SetSp((void *)uVar2);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)uVar2);
       stackSpeedUpEnbabledFlag = 1;
     }
     iVar3 = n->groundElevation;
@@ -1677,12 +1677,12 @@ void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coo
         n->groundElevation = iVar3;
       }
       else {
-        gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+        gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
         stackSpeedUpEnbabledFlag = 0;
         iVar3 = Newton_FindGroundElevationAndNormal(n,&dummy_133);
         uVar2 = gWSavePtr;
         n->groundElevation = iVar3;
-        gWSavePtr = (intptr)SetSp((void *)uVar2);
+        gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)uVar2);
         stackSpeedUpEnbabledFlag = 1;
       }
       (n->position).y = n->groundElevation + (n->dimension).y;

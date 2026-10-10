@@ -28,7 +28,6 @@ extern tFEApplication *FEApp;
 extern tGlobalMenuDefs *menuDefs;
 
 /* called game/FE/MCRD/PsyQ functions (Ghidra-dumped signatures) */
-void trap(int code);
 extern "C"
 {
     int garyMemCardGrabBlocks(int card, int filenum);

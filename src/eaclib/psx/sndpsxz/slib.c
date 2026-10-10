@@ -58,7 +58,6 @@ extern "C" unsigned int iSNDpsxfxinit(int mode);                                
 extern "C" void iSNDserver(void);                                                                       /* sserver */
 extern "C" void iSNDleaveaudio(void);                                                                   /* sserver */
 extern "C" int iSNDdmqueue(intptr srcRam, int dstSpu, int len, unsigned char prio, unsigned char flag); /* sdma */
-extern "C" void *DMACallback(int dma, void *callback);                                                  /* syslib INTR  */
 extern "C" void addtimer(void (*callback)(void));                                                       /* addtimer */
 extern "C" void deltimer(void (*callback)(void));                                                       /* addtimer */
 extern "C" void addexit(void (*handler)(void));                                                         /* exit     */

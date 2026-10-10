@@ -25,7 +25,6 @@ extern "C" int Replay_ReplayMode, ComingIntoTheFrontEndTheVeryFirstTime, CF_DVLC
 // [owned->defined in nfs3.cpp] extern tCarManager carManager; extern tTrackManager trackManager;
 // [owned->defined in nfs3.cpp] extern tTournamentManager tournamentManager; extern tMissionManager missionManager;
 extern "C" unsigned char bigBuf[];
-extern void trap(unsigned int);
 /* GCC global-ctor caller (crt0) */
 /* libc / eaclib / libgpu / libetc (unmangled) */
 extern void restoretextdraw(void);

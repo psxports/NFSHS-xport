@@ -1,4 +1,5 @@
 #include "../nfs4_types.h"
+#include "../eaclib/psx/eacpsxz/cdfs.h"
 
 extern "C" {
 u_char *&Render_gPalettePtr = *(u_char **)((u_char *)SCRATCHPAD + 0x000);
@@ -40,7 +41,7 @@ int &CD_curLen = *(int *)(CD_context + 0x20);
 int &CD_remLen = *(int *)(CD_context + 0x24);
 int &CD_curOff = *(int *)(CD_context + 0x28);
 void *&CD_curDst = *(void **)(CD_context + 0x2c);
-void (*&CD_completionCallback)(int) = *(void (**)(int))(CD_context + 0x30);
+NFSHS_CdCompletion &CD_completionCallback = *(NFSHS_CdCompletion *)(CD_context + 0x30);
 void **&CD_handleTable = *(void ***)(CD_context + 0x34);
 void *&CD_dirEntryArray = *(void **)(CD_context + 0x38);
 unsigned char (&CD_sectorCache)[0x800] = *(unsigned char (*)[0x800])(CD_context + 0x3c);

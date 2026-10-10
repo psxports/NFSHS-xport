@@ -13,7 +13,8 @@ extern "C"
     VIDEOSTATE VIDEO_state(intptr handle);
 }
 int VIDEO_updateframexy(intptr handle, int x, int y);
-void videoupdatetime(VIDEOSTRUCT *vid);
-int videodecode(VIDEOSTRUCT *vid, STREAMCHUNKHDR *chunk, int x, int y);
+
+/* Game containers share the toolset VLC and MDEC decoder */
+int NfshsVideoDecode(uint32 *bitstream, int width, int height, bool rgb24, int x, int y);
 
 #endif /* _FRONTEND_PSX_VIDEO_H_ */

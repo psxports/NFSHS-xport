@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/sndpsxz/spvoices.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 4/4 ***
  *   Source obj : nfs4\eaclib\psx\spvoices.obj ; archive C:\nfs4\EACLIB\PSX\SNDPSXZ.LIB (xlsx col11)
  *   4 fns @[0x800E9B44 .. 0x800E9C58].  The PUBLIC SNDSTRM_* streaming-voice API -- a thin wrapper over
@@ -17,9 +18,6 @@ extern "C" int SNDPKTPLAY_stop(int pktplay);
 extern "C" void STREAM_destroy(intptr strm); /* stream.obj */
 extern "C" void STREAM_kill(intptr strm);
 extern "C" int iSNDserverremoveclient(int cb); /* ssysserv */
-#ifndef _MSC_VER
-extern "C" void *memset(void *d, int c, int n);
-#endif
 
 extern "C" intptr (&sndss)[1];
 extern "C" int sndgs[]; /* (char)sndgs[0xf] = init flag, sndgs[0x22] = destroyall hook */

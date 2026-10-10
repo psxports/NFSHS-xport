@@ -30,8 +30,6 @@ static u_char sjis_k_table[88];   /* 0x80052ad0 */
 extern "C" void MCRD_init(int fMultitap)
 
 {
-    int i;
-
     int card;
 
     blockclear(&gMemCardInfo, 0x17dc);
@@ -111,7 +109,7 @@ extern "C" void MCRD_restore(void)
 {
     deltimer(iMCRD_timersub);
 
-    MemCardSync(0, (long *)0x0, (long *)0x0);
+    MemCardSync(0, (sint32 *)0x0, (sint32 *)0x0);
 
     MemCardStop();
 
@@ -245,19 +243,15 @@ int iMCRD_DoFileLoad(int card)
 {
     uchar ch;
 
-    int error;
-
-    long sync_done;
+    sint32 sync_done;
 
     int err_state;
 
     uint attr;
 
-    long sync;
+    sint32 sync;
 
     uchar *src;
-
-    shapetbl *s;
 
     uint *pIcon;
 
@@ -265,12 +259,10 @@ int iMCRD_DoFileLoad(int card)
 
     int iconNum;
 
-    MCRDFILEINFO_def *pMFI;
-
     u_short *titleCursor;
-    long cmd;
+    sint32 cmd;
 
-    long res;
+    sint32 res;
 
     titleCursor = gMemCardInfo.fileinfo.header.title;
     if ((gMemCardInfo.fileinfo.title != (char *)0x0) ||
@@ -576,21 +568,17 @@ extern "C" int MCRD_savefile(int card, MCRDFILE_def *pFILE)
 int iMCRD_DoFileWrite(int card)
 
 {
-    int error;
-
     int err_state;
 
-    long sync_done;
+    sint32 sync_done;
 
     int err;
 
-    long sync;
+    sint32 sync;
 
-    MCRDFILEINFO_def *pMFI;
+    sint32 cmd;
 
-    long cmd;
-
-    long res;
+    sint32 res;
 
     if ((gMemCardInfo.fileinfo.flags & 0x200) != 0)
     {
@@ -598,7 +586,7 @@ int iMCRD_DoFileWrite(int card)
 
             (gMemCardInfo.channel, gMemCardInfo.fileinfo.name,
 
-             (uint)gMemCardInfo.fileinfo.header.nslots);
+             gMemCardInfo.fileinfo.header.nslots);
 
         err_state = iMCRD_HandleError(2, res, card);
 
@@ -677,13 +665,9 @@ int iMCRD_DoFileWrite(int card)
 int iMCRD_DoFileDelete(int card)
 
 {
-    long del_res;
+    sint32 del_res;
 
     CARDINFO_def *pcard;
-
-    MCRDFILEINFO_def *pMFI;
-
-    int retval;
 
     int ret_state;
 
@@ -725,21 +709,19 @@ extern "C" int MCRD_handlecardevents(int card)
 {
     CARDINFO_def *pCI;
 
-    long sync;
+    sint32 sync;
 
     int ret;
 
-    int status;
+    sint32 cmd;
 
-    uint32 cmd;
-
-    uint32 res;
+    sint32 res;
 
     ret = 0x17;
 
     pCI = MCRD_getcard(card);
 
-    sync = MemCardSync(0, (long *)&cmd, (long *)&res);
+    sync = MemCardSync(0, &cmd, &res);
 
     if (sync == 0)
     {
@@ -1027,8 +1009,6 @@ extern "C" int garyMemCardGrabBlocks(int card, int filenum)
 
     int i;
 
-    DIRENTRY *pDir;
-
     DIRENTRY *dir;
 
     pCI = MCRD_getcard(card);
@@ -1066,25 +1046,19 @@ extern "C" int garyMemCardGrabBlocks(int card, int filenum)
 int iMCRD_LoadCard(int card)
 
 {
-    int error;
-
     CARDINFO_def *pcard;
 
     int i_or_size;
 
     int ret_state;
 
-    long opResult;
+    sint32 opResult;
 
     int size;
 
     int slot;
 
-    DIRENTRY *pDir;
-
     DIRENTRY *dir;
-
-    CARDINFO_def *pCI;
 
     pcard = MCRD_getcard(card);
 
@@ -1153,7 +1127,7 @@ int iMCRD_FormatCard(int card)
 {
     CARDINFO_def *pCI;
 
-    long fmtRes;
+    sint32 fmtRes;
 
     int result;
 
@@ -1197,7 +1171,7 @@ int iMCRD_HandleError(int func, int opResult, int card)
 {
     CARDINFO_def *pcard;
 
-    long accept;
+    sint32 accept;
 
     int confirm;
 
@@ -1205,13 +1179,7 @@ int iMCRD_HandleError(int func, int opResult, int card)
 
     int tmp_int;
 
-    int result;
-
     int numberoftries;
-
-    CARDINFO_def *pCI;
-
-    int code;
 
     int ret_state;
 

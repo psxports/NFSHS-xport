@@ -476,13 +476,13 @@ void BWorld_OnyxBuildFacets(DRender_tView *Vi)
   
   Chunk_UpdateSys(Vi);
   gVi2 = Vi;
-  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   sd = (Draw_DCache *)getScratchAddr(0);
   SetupBuildMatrices(gVi2,sd);
   DrawW_WorldSetUpMatrix(&gWorldMat,&Render_gWorldMat);
   BWorld_gChunkCount = SetupChunkBuildList(gVi2);
-  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
   stackSpeedUpEnbabledFlag = 0;
   Skid_gScratchPos1 = 0;
   Skid_gScratchPos2 = 0;
@@ -505,17 +505,17 @@ void BWorld_OnyxBuildFacets(DRender_tView *Vi)
     uVar1 = (u_short)Night_gZNear;
   }
   uVar2 = (uint32)uVar1;
-  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   DrawW_DoTrough(Vi,(tBuildEntry *)BWorld_gChunkBuildList);
-  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
   stackSpeedUpEnbabledFlag = 0;
   if ((GameSetup_gData.track != 0) ||
      (uVar2 = GameSetup_gData.Weather, GameSetup_gData.Weather != 1)) {
-    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     DrawW_DoLines(Vi,(tBuildEntry *)BWorld_gChunkBuildList,sd);
-    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
   }
   stackSpeedUpEnbabledFlag = 0;
   if ((gSpikeBelt != 0) && (iVar4 = 0, 0 < BWorld_gChunkCount)) {
@@ -658,12 +658,12 @@ extern "C" void BWorld_Init(void)
       GameSetup_gData.SceneEndLap = 99;
     }
     else {
-      iVar2 = rand();
+      iVar2 = randPSX();
       if (iVar2 < 0) {
         iVar2 = iVar2 + 0x3fff;
       }
       GameSetup_gData.SceneNumber = iVar2 >> 0xe;
-      iVar2 = rand();
+      iVar2 = randPSX();
       if (GameSetup_gData.numLaps < 2) {
         if (iVar2 < 0) {
           iVar2 = iVar2 + 0x3fff;
@@ -677,7 +677,7 @@ extern "C" void BWorld_Init(void)
         }
         GameSetup_gData.SceneStartLap = iVar2 >> 0xf;
       }
-      iVar2 = rand();
+      iVar2 = randPSX();
       iVar2 = iVar2 * GameSetup_gData.numLaps;
       if (iVar2 < 0) {
         iVar2 = iVar2 + 0x7fff;

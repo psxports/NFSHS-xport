@@ -1,3 +1,4 @@
+#include "psx.h"
 /* platform_externs.h -- externs for game/psx/platform.cpp (NFS4 PSX platform memory + system init) */
 #ifndef _GAME_PSX_PLATFORM_EXTERNS_H_
 #define _GAME_PSX_PLATFORM_EXTERNS_H_
@@ -27,7 +28,6 @@ extern char gDctBuffer[];       /* 0x80124038  DCT scratch buffer base */
 #endif
 
 /* ---- eaclib / syslib / sibling helpers ---- */
-extern "C" int ResetGraph(int mode); /* @0x800ED670 libgpu (real target of the old "Eac_vars") */
 extern void Draw_SetEnvironment(int w, int h, int a, int b, int c, int d, int e, int f);
 extern void Paths_StartUp(void);
 

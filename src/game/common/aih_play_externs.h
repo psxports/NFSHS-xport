@@ -39,6 +39,5 @@ extern void Hud_Perp_OverlayOn(int player, int level);
 extern void Stats_ExtrapolateOpponentTimes(int);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
 /* AITrigger_TriggerManager::CheckForClosestTriggerOfType/GetTrigger now C++ members (aitriger.obj) -- flat externs removed */
-void trap(int code);
 
 #endif /* _GAME_COMMON_CAMERA_EXTERNS_H_ */

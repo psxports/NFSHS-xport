@@ -17,12 +17,6 @@ const char *Track_gShapeNamePtrs[28] = {           /* @0x80055A54 : [0..27] */
     "t550","t911","tf50","tdsv","tclk","tmcf","t911","thsv","tvet","tbon",
     "tbon","tbon","tcap","thsv","ttm5","tvet","t911","tdsv" };
 const char *Track_gShapeNamePtrs_end[1] = { "tbon" }; /* @0x80055AC4 : [28] (loop-bound marker) */
-/* decompiler also references the value form _Track_gShapeNamePtrs_end -> same [28] datum.
- * gcc2.7.2/ccpsx has no __attribute__((alias)); keep the alias for the modern pre-gate, and
- * resolve the underscore-symbol bridge (hudpmx.cpp) in the deferred linkage/hygiene pass. */
-#ifndef NFS4_PSYQ_HEADERS
-/* _Track_gShapeNamePtrs_end removed: hudpmx.cpp now uses Track_gShapeNamePtrs_end directly. */
-#endif
 const char *Track_gTachNamePtrs[25] = {            /* @0x80055AC8 : [29..53] */
     "nslk","nbz3","nhsv","nfor","nz28","ntra","ndb7","nxkr","nnm5","nvet",
     "n550","n911","nf50","tdsv","tclk","nmcf","n911","nhsv","nvet","nbon",

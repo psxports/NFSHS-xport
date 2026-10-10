@@ -428,7 +428,7 @@ extern "C" void * SaveGame(short player)
   SaveTracks(&trackManager,&memCardData.trackInfo);
   SaveCars(&carManager, &memCardData.carInfo);
   blockmove(Stats_gTrackRecords,memCardData.records,0xe9c);
-  memCardData.pinkSlipsNoCheat = rand();
+  memCardData.pinkSlipsNoCheat = randPSX();
   FECheat_SaveBonus(&memCardData.bonus);
   sprintf(shapeFileName,"%szMem.psh",Paths_Paths[0x20]);
   bigfile = (void *)loadshapeadr(shapeFileName,0x0);

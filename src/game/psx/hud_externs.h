@@ -157,7 +157,6 @@ extern "C" int ticks; /* global frame tick */
 extern int trap_unused;
 // [owned->defined in hud.cpp] extern int keepup, trap_unused;
 extern int trap_unused;
-extern void trap(int code); /* HW/debug trap */
 // [owned->defined in hud.cpp] extern int            HudBustedOverlay, HudBustedOverlayPlayer;
 // [owned->defined in hud.cpp] extern int HudBustedOverlay, HudBustedOverlayPlayer;
 // [owned->defined in hud.cpp] extern int            HudMapOffsetY;

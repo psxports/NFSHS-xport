@@ -6,7 +6,6 @@
 #ifndef PAUSEMENU_EXTERNS_H
 #define PAUSEMENU_EXTERNS_H
 
-extern void trap(int code); /* gcc MIPS div/overflow break helper */
 
 /* ---- cross-TU globals ---- */
 extern "C" int gMPauseUpdateNextTime;                        /* mpause.obj */

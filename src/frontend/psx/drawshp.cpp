@@ -33,7 +33,7 @@ extern "C" void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect)
   x2 = (uint)(u_short)rect.x + ((int)((uint)(u_short)rect.w << 0x10) >> 0x13);
   do {
     prim = Render_gPacketPtr;
-    nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+    AddPrim(Render_gPalettePtr,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x24;
     *(uint32 *)(prim + 4) = 0x808080;
     prim[7] = 0x3a;
@@ -55,7 +55,7 @@ extern "C" void DrawShape_SubtractNFS4RectEdges(PSX_RECT &rect)
     x1 = (uint)(u_short)rect.x + (uint)(u_short)rect.w + -2;
     x2 = x1 - ((int)((uint)(u_short)rect.w << 0x10) >> 0x13);
   } while (i * 0x10000 >> 0x10 < 2);
-  nfs4_add_prim(prevDrm,Render_gPacketPtr);
+  AddPrim(prevDrm,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   tpage = GetTPage(2,2,0,0x100);
   SetDrawMode(dr_mode,0,0,(uint)(u_short)tpage,(PSX_RECT *)0x0);

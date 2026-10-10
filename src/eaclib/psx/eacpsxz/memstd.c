@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/eacpsxz/memstd.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.
  *   Source obj : nfs4\eaclib\psx\memstd.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col10)
  *   13 fns @ [0x800E4D4C, 0x800E5608) -- EA "memstd" standard heap allocator.
@@ -55,8 +56,6 @@ extern "C" int mb_default;               /* @0x8013DCC8       */
 
 /* ---- helpers defined in sibling eacpsxz / libc objs (called, not defined here) ---- */
 #include <stdio.h>
-extern "C" char *strcpy(char *, const char *); /* eacpsxz strcpy   */
-extern "C" unsigned strlen(const char *);      /* eacpsxz strlen   */
 extern "C" void blockclear(void *, int);       /* eacpsxz blockclear */
 extern "C" void putm(void *, unsigned, int);   /* guard-band writer  */
 extern "C" void puti(void *, unsigned, int);   /* guard-band writer  */

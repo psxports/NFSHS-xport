@@ -7,7 +7,7 @@
  *   the handler does:  savegp(&saved);  ...work...;  restoregp(saved);  and initgp() records the lib
  *   $gp once at boot.  asm:
  *     initgp()        : g_bootGP   = $gp                 (@0x801234E8)
- *     savegp(out)     : *out = $gp ; $gp = g_handlerGP   (@0x8013FA34, the lib small-data base)
+ *     savegp(out)     : *out = $gp ; $gp = g_bootGP      (loaded from @0x801234E8)
  *     restoregp(gp)   : $gp = gp
  *
  *   $gp is not a user-visible register in portable C++ (the PsyCross/PC target has no MIPS $gp), so the
@@ -20,11 +20,9 @@
 extern "C"
 {
     unsigned int g_bootGP;
-    unsigned int g_handlerGP;
 }
 
 extern "C" unsigned int g_bootGP;    /* @0x801234E8 (data-mat pass owns) */
-extern "C" unsigned int g_handlerGP; /* @0x8013FA34 lib small-data base  */
 unsigned int g_gpContext = 0;        /* models the live $gp register      */
 
 extern "C" void initgp(void) /* @0x800EB080 */
@@ -35,7 +33,7 @@ extern "C" void initgp(void) /* @0x800EB080 */
 extern "C" void savegp(unsigned int *out) /* @0x800EB090 */
 {
     *out = g_gpContext;
-    g_gpContext = g_handlerGP;
+    g_gpContext = g_bootGP;
 }
 
 extern "C" void restoregp(unsigned int gp) /* @0x800EB0A4 */

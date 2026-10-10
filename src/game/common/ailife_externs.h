@@ -33,7 +33,6 @@ extern void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n, int s
 extern void Physics_ResetCar(Car_tObj *carObj);
 extern void R3DCar_ChangeTrafficColor(Car_tObj *carObj, int newColorIndex);
 int AIWorld_ApxSplineDistance(Car_tObj *a, Car_tObj *b);
-void trap(int code);
 void AIInit_ClearAICar(Car_tObj *carObj);
 void AISpeeds_CalcDesiredSpeed(Car_tObj *carObj);
 void AI_ChooseNewLaneSlack(Car_tObj *carObj);

@@ -1,3 +1,4 @@
+#include "psx.h"
 /* game/psx/hrzsku.cpp -- RECONSTRUCTED (NFS4 PSX in-race HUD; C++ TU)
  *   62 fns: sprite/poly builders, tachometer, number rasterizer, mini-map + radar,
  *   CD player, wingman interface, render views (hud/tac/map/stats), 3-2-1-GO, BTC/busted.
@@ -7,7 +8,6 @@
 #include "../../mips_semantics.h"
 #include "hrzsku_externs.h"
 #ifdef AP_WIN
-extern "C" void AddPrim(void *,void *);
 extern "C" void NFSHS_HostTraceSkyProjection(void *);
 extern "C" void NFSHS_HostTraceHorizonCache(void *);
 #endif

@@ -26,7 +26,6 @@ int BWorldSm_FindClosestSlice(coorddef *pt, BWorldSm_Pos *slicePos);
 int AudioClc_CalcAzimuth(DRender_tCalcView *view, coorddef *object);
 int AudioClc_CalcDopplerShiftRatio(coorddef *objectPos, coorddef *objectVel);
 int AudioCmn_PlaySFX(int a, int b, int c, int d, int e, int f);
-void trap(int code);
 void freeVoiceChannel(int sndPlayer);
 
 #endif /* _GAME_COMMON_AUDIOTRK_EXTERNS_H_ */

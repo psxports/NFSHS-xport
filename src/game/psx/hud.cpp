@@ -186,7 +186,7 @@ void Hud_GoTpage(int page)
   u_char *p;
   
   p = Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
   SetDrawMode((DR_MODE *)p,0,0,(page * 0x40 + 0x80U & 0x3ff) >> 6,(PSX_RECT *)0x0);
   return;
@@ -271,7 +271,7 @@ void Hud_FBuildSprite(int shapeIdx,int x,int y,uint32 color,int trans)
   u_char *prim;
   
   prim = Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x14;
   Hud_BuildSprite((SPRT *)prim,shapeIdx,x,y,color,trans);
   return;
@@ -679,7 +679,7 @@ void Hud_FBuildGT4(HudPmx_tShape *shape, int x, int y, uint32 col1)
   POLY_GT4 *prim;
 
   prim     = (POLY_GT4 *)Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x34;
   Hud_BuildGT4(prim, shape, x, y, col1);
 }
@@ -690,7 +690,7 @@ void Hud_FBuildFT4(HudPmx_tShape *shape, int x, int y, uint32 col1)
   POLY_FT4 *prim;
 
   prim     = (POLY_FT4 *)Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
   Hud_BuildFT4(prim, shape, x, y, col1, 0);
 }
@@ -701,7 +701,7 @@ void Hud_FBuildF4(int transparent, int x, int y, int w, int h, uint32 col1, char
   POLY_F4 *prim;
 
   prim     = (POLY_F4 *)Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x18;
   Hud_BuildF4o(prim, transparent, x, y, w, h, col1, x0off, x1off);
 }
@@ -1404,8 +1404,8 @@ void Hud_BuildTach(int player)
   fangle_norm = fixedmult(sin,10);
   prim = Render_gPacketPtr;
   ti2 = fangle_norm + 0xe;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr + 0x14);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr + 0x14);
   Render_gPacketPtr = Render_gPacketPtr + 0x24;
   prim[0x17] = 3;
   *(short *)(prim + 0x1c) = 0xe - (short)needle_y;
@@ -1414,7 +1414,7 @@ void Hud_BuildTach(int player)
   *(short *)(prim + 0x22) = (short)ti2;
   *(u_short *)(prim + 0x20) = (u_short)cos1;
   prim2 = Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+  AddPrim(Render_gPalettePtr,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x14;
   Hud_BuildF3((POLY_F3 *)prim,HudPmx_gShapes + 0x82,cos1,ti2,color);
   Hud_BuildF3((POLY_F3 *)prim2,HudPmx_gShapes + 0x82,cos1,ti2,0);
@@ -1441,7 +1441,7 @@ void Hud_BuildTach(int player)
   *(short *)(prim2 + 10) = *(short *)(prim2 + 10) + 2;
   *(short *)(prim2 + 0x12) = -(short)ti2 + 0x10;
   *(short *)(prim2 + 0xe) = *(short *)(prim2 + 0xe) + 2;
-  nfs4_add_prim(tp3,gSprt1 + 2);
+  AddPrim(tp3,gSprt1 + 2);
   return;
 }
 
@@ -1649,7 +1649,7 @@ void Hud_BuildNumbers0(int player)
       digit_dst = pSprt + 0xf0;
       do {
         digit_count = digit_count + 1;
-        nfs4_add_prim(tp2,(void *)digit_dst);
+        AddPrim(tp2,(void *)digit_dst);
         digit_dst = digit_dst + 0x14;
       } while (digit_count < (int)(num + 0xcU));
     }
@@ -1658,12 +1658,12 @@ void Hud_BuildNumbers0(int player)
     digit_dst_b = (u_int *)(pSprt + 0x50);
     do {
       value_remain = value_remain + 1;
-      nfs4_add_prim(tp4,digit_dst_b);
+      AddPrim(tp4,digit_dst_b);
       tp3 = Render_gPalettePtr;
       digit_dst_b = digit_dst_b + 5;
     } while (value_remain < 6);
-    nfs4_add_prim(tp3,(void *)HudG4);
-    nfs4_add_prim(tp3,(void *)HudF4);
+    AddPrim(tp3,(void *)HudG4);
+    AddPrim(tp3,(void *)HudF4);
   }
   if (Hud_BeTheCop == 0) {
     sVar1 = g1Player[5].y + spritePos_y + g1Player[9].y;
@@ -1723,7 +1723,7 @@ void Hud_BuildNumbers0(int player)
       tp6 = Render_gPalettePtr;
       do {
         iVar3 = iVar3 + 1;
-        nfs4_add_prim(tp6,sprt);
+        AddPrim(tp6,sprt);
         sprt = sprt + 1;
       } while (iVar3 < 0x25);
       iVar3 = 10;
@@ -1733,11 +1733,11 @@ void Hud_BuildNumbers0(int player)
         if (iVar3 == 10) {
           Hud_GoTpage(0);
           tp6 = Render_gPalettePtr;
-          nfs4_add_prim(tp6,(void *)(pSprt + 200));
+          AddPrim(tp6,(void *)(pSprt + 200));
           Hud_GoTpage(1);
         }
         else {
-          nfs4_add_prim(tp6,digit_dst_b);
+          AddPrim(tp6,digit_dst_b);
         }
         digit_dst_b = digit_dst_b + 5;
         iVar3 = iVar3 + 1;
@@ -1759,7 +1759,7 @@ void Hud_BuildNumbers0(int player)
       sprt_dst_a = pSprt + 600;
       do {
         iVar3 = iVar3 + 1;
-        nfs4_add_prim(tp6,(void *)sprt_dst_a);
+        AddPrim(tp6,(void *)sprt_dst_a);
         sprt_dst_a = sprt_dst_a + 0x14;
       } while (iVar3 < 0x23);
       iVar3 = 10;
@@ -1769,11 +1769,11 @@ void Hud_BuildNumbers0(int player)
         if (iVar3 == 10) {
           Hud_GoTpage(0);
           tp6 = Render_gPalettePtr;
-          nfs4_add_prim(tp6,(void *)(pSprt + 200));
+          AddPrim(tp6,(void *)(pSprt + 200));
           Hud_GoTpage(1);
         }
         else {
-          nfs4_add_prim(tp6,digit_dst_b);
+          AddPrim(tp6,digit_dst_b);
         }
         digit_dst_b = digit_dst_b + 5;
         iVar3 = iVar3 + 1;
@@ -1795,7 +1795,7 @@ void Hud_BuildNumbers0(int player)
     iVar3 = 0x1e;
     do {
       iVar3 = iVar3 + 1;
-      nfs4_add_prim(tp1,(void *)sprt_iter);
+      AddPrim(tp1,(void *)sprt_iter);
       sprt_iter = sprt_iter + 0x14;
     } while (iVar3 < 0x22);
     iVar3 = 10;
@@ -1805,19 +1805,19 @@ void Hud_BuildNumbers0(int player)
       if (iVar3 == 10) {
         Hud_GoTpage(0);
         tp6 = Render_gPalettePtr;
-        nfs4_add_prim(tp6,(void *)(pSprt + 200));
+        AddPrim(tp6,(void *)(pSprt + 200));
         Hud_GoTpage(1);
       }
       else {
-        nfs4_add_prim(tp6,digit_dst_b);
+        AddPrim(tp6,digit_dst_b);
       }
       digit_dst_b = digit_dst_b + 5;
       iVar3 = iVar3 + 1;
     } while (iVar3 < 0xc);
   }
   tp6 = Render_gPalettePtr;
-  nfs4_add_prim(tp6,(void *)(HudG4 + 0x48));
-  nfs4_add_prim(tp6,(void *)(HudF4 + 0x48));
+  AddPrim(tp6,(void *)(HudG4 + 0x48));
+  AddPrim(tp6,(void *)(HudF4 + 0x48));
   return;
 }
 
@@ -1900,7 +1900,7 @@ void Hud_BuildNumbers(int player)
     tp7 = Render_gPalettePtr;
     do {
       value_remain = value_remain + 1;
-      nfs4_add_prim(tp7,tp1);
+      AddPrim(tp7,tp1);
       tp8 = Render_gPalettePtr;
       tp1 = tp1 + 5;
     } while (value_remain < 0x17);
@@ -1908,12 +1908,12 @@ void Hud_BuildNumbers(int player)
     tp1 = (u_int *)(pSprt + 0x78);
     do {
       digit_iter = digit_iter + 1;
-      nfs4_add_prim(tp8,tp1);
+      AddPrim(tp8,tp1);
       tp5 = Render_gPalettePtr;
       tp1 = tp1 + 5;
     } while (digit_iter < 8);
-    nfs4_add_prim(tp5,(void *)(HudG4 + 0x24));
-    nfs4_add_prim(tp5,(void *)(HudF4 + 0x18));
+    AddPrim(tp5,(void *)(HudG4 + 0x24));
+    AddPrim(tp5,(void *)(HudF4 + 0x18));
   }
   if ((((GameSetup_gData.carInfo[player].HudTime != 0) && (DashHUD_gInfo.record != 0)) &&
       ((DashHUD_gInfo.record < 0x9600 && ((Hud_BeTheCop == 0 && (Hud_gShowedCDPlayer == 0)))))) &&
@@ -1926,7 +1926,7 @@ void Hud_BuildNumbers(int player)
     tp1 = (u_int *)(pSprt + 0x1cc);
     do {
       digit_iter_b = digit_iter_b + 1;
-      nfs4_add_prim(tp3,tp1);
+      AddPrim(tp3,tp1);
       tp6 = Render_gPalettePtr;
       tp1 = tp1 + 5;
     } while (digit_iter_b < 0x1e);
@@ -1934,12 +1934,12 @@ void Hud_BuildNumbers(int player)
     tp1 = (u_int *)(pSprt + 0xa0);
     do {
       digit_iter_b = digit_iter_b + 1;
-      nfs4_add_prim(tp6,tp1);
+      AddPrim(tp6,tp1);
       tp2 = Render_gPalettePtr;
       tp1 = tp1 + 5;
     } while (digit_iter_b < 10);
-    nfs4_add_prim(tp2,(void *)(HudG4 + 0x6c));
-    nfs4_add_prim(tp2,(void *)(HudF4 + 0x30));
+    AddPrim(tp2,(void *)(HudG4 + 0x6c));
+    AddPrim(tp2,(void *)(HudF4 + 0x30));
   }
   if (((GameSetup_gData.carInfo[player].HudPosition != 0) && (Hud_BeTheCop == 0)) &&
      (1 < DashHUD_gInfo.opponents)) {
@@ -1957,13 +1957,13 @@ void Hud_BuildNumbers(int player)
     digit_value = 0x25;
     do {
       digit_value = digit_value + 1;
-      nfs4_add_prim(tp2,tp1);
+      AddPrim(tp2,tp1);
       tp1 = tp1 + 5;
     } while (digit_value < 0x28);
     if (GameSetup_gData.carInfo[digit_value + 1].HudMap != 0) {
       Hud_GoTpage(0);
       tp2 = Render_gPalettePtr;
-      nfs4_add_prim(tp2,(void *)(pSprt + 800));
+      AddPrim(tp2,(void *)(pSprt + 800));
       Hud_GoTpage(1);
     }
   }
@@ -1971,24 +1971,24 @@ void Hud_BuildNumbers(int player)
   tp2 = Render_gPalettePtr;
   if (GameSetup_gData.carInfo[player].HudTach == 0) goto HudNum_drawSpeedDigits;
   if (DashHUD_gInfo.gear == 0) {
-    nfs4_add_prim(tp2,(void *)(pSprt + 0x3c0));
+    AddPrim(tp2,(void *)(pSprt + 0x3c0));
 HudNum_setPaletteTpage:
     ;
   }
   else {
     if (DashHUD_gInfo.gear == 1) {
-      nfs4_add_prim(tp2,(void *)(pSprt + 0x3ac));
+      AddPrim(tp2,(void *)(pSprt + 0x3ac));
       goto HudNum_setPaletteTpage;
     }
     digit_iter_b = DashHUD_gInfo.gear * 0x14 + pSprt;
-    nfs4_add_prim(tp2,(void *)(intptr)(digit_iter_b + 0x30c));
+    AddPrim(tp2,(void *)(intptr)(digit_iter_b + 0x30c));
   }
   tp2 = Render_gPalettePtr;
   if (GameSetup_gData.carInfo[player].HudSpeed == 0) {
-    nfs4_add_prim(tp2,(void *)(pSprt + 1000));
+    AddPrim(tp2,(void *)(pSprt + 1000));
   }
   else {
-    nfs4_add_prim(tp2,(void *)(pSprt + 0x3d4));
+    AddPrim(tp2,(void *)(pSprt + 0x3d4));
   }
 HudNum_drawSpeedDigits:
   Hud_GoTpage(1);
@@ -2008,7 +2008,7 @@ HudNum_drawSpeedDigits:
     ts2 = g1Player[0xc].y;
     ts3 = g1Player[1].y;
     tp9 = Render_gPacketPtr + 0x34;
-    nfs4_add_prim(tp2,Render_gPacketPtr);
+    AddPrim(tp2,Render_gPacketPtr);
     Render_gPacketPtr = tp9;
     y_00 = (int)ts3 + (int)ts2 + splitY;
     iVar5 = nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar4, iVar1), 1);
@@ -2030,7 +2030,7 @@ HudNum_drawSpeedDigits:
       iVar3 = iVar3 - iVar4;
     }
     if ((iVar1 != 0) || (ti17 != 0)) {
-      nfs4_add_prim(tp2,Render_gPacketPtr);
+      AddPrim(tp2,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x34;
       Hud_BuildGT4((POLY_GT4 *)tp11,HudPmx_gShapes + ti17 + 0x2c,iVar3,y_00,0xc8c8c8);
       *(u_int *)(tp11 + 0x28) = 0x505050;
@@ -2043,7 +2043,7 @@ HudNum_drawSpeedDigits:
     }
     ts1 = HudPmx_gShapes[iVar1 + 0x2c].width;
     if (iVar1 != 0) {
-      nfs4_add_prim(tp2,Render_gPacketPtr);
+      AddPrim(tp2,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x34;
       Hud_BuildGT4((POLY_GT4 *)tp11,HudPmx_gShapes + iVar1 + 0x2c,(iVar3 + -1) - (int)ts1,y_00,
                  0xc8c8c8);
@@ -2053,7 +2053,7 @@ HudNum_drawSpeedDigits:
   }
   tp2 = Render_gPalettePtr;
   if ((DashHUD_gInfo.wrongway[player] != 0) && ((simGlobal.gameTicks >> 5 & 1U) != 0)) {
-    nfs4_add_prim(tp2,(void *)pSprt);
+    AddPrim(tp2,(void *)pSprt);
   }
   return;
 }
@@ -2181,7 +2181,7 @@ void Hud_BuildMapMarkers(int player)
       if (GameSetup_gData.mirrorTrack != 0) {
         world_x_off = -world_x_off;
       }
-      nfs4_add_prim(tp1,Render_gPacketPtr);
+      AddPrim(tp1,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x14;
       if ((*(u_int *)(*(int *)carInfo_iter + 0x570) & 2) == 0) {
         currentSpriteColor = *(long *)(Hud_gCopMarkerColor + marker_idx);
@@ -2235,7 +2235,7 @@ void Hud_BuildMapMarkers(int player)
       if (GameSetup_gData.mirrorTrack != 0) {
         ti8 = -ti8;
       }
-      nfs4_add_prim(tp3,Render_gPacketPtr);
+      AddPrim(tp3,Render_gPacketPtr);
       tu8 = *(int *)(*(int *)carInfo_alt + 0x260);
       Render_gPacketPtr = Render_gPacketPtr + 0x14;
       if ((tu8 & 0x200U) == 0) {
@@ -2345,7 +2345,7 @@ void Hud_BuildWingmanInterface(int player)
   tp2 = Render_gPacketPtr;
   tp1 = Render_gPalettePtr;
   if (0 < wingman_state) {
-    nfs4_add_prim(tp1,Render_gPacketPtr);
+    AddPrim(tp1,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x18;
     Hud_BuildF4((POLY_F4 *)tp2,0,wingman_glyph + -0x10,y_00 + ((u_char)""[player] + 1) * 9 + 2,0x3f,8,
                (wingman_state % 0x14) * 10);
@@ -2358,13 +2358,13 @@ void Hud_BuildWingmanInterface(int player)
     y_01 = y_00 + i;
     i = i + 9;
     request_type = request_type + 1;
-    nfs4_add_prim(tp3,Render_gPacketPtr);
+    AddPrim(tp3,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x18;
     Hud_BuildF4((POLY_F4 *)tp4,0,wingman_glyph + -0x1c,y_01,0x4b,7,0);
     poly = Render_gPacketPtr;
     tp5 = Render_gPalettePtr;
   } while (request_type < 5);
-  nfs4_add_prim(tp5,Render_gPacketPtr);
+  AddPrim(tp5,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x18;
   Hud_BuildF4((POLY_F4 *)poly,1,wingman_glyph + -0x1c,y_00,0x4b,0x30,0);
   return;
@@ -2790,7 +2790,7 @@ int Hud_BuildRadar(int player)
   for (iVar1 = 0; tp3 = Render_gPacketPtr, tp2 = Render_gPalettePtr, iVar1 < Cars_gNumCopCars;
       iVar1 = iVar1 + 1) {
     if (((*ppCVar6)->N).active != '\0') {
-      nfs4_add_prim(tp2,Render_gPacketPtr);
+      AddPrim(tp2,Render_gPacketPtr);
       bVar1 = gFlip != 0;
       Render_gPacketPtr = Render_gPacketPtr + 0x14;
       if (((bool)bVar1) || (currentSpriteColor = 0xff0000, simVar.quickPauseSim != 0)) {
@@ -2807,7 +2807,7 @@ int Hud_BuildRadar(int player)
   for (iVar1 = 0; sprt = Render_gPacketPtr, tp4 = Render_gPalettePtr, iVar1 < Cars_gNumRaceCars;
       iVar1 = iVar1 + 1) {
     if ((iVar1 != player) && (((*ppCVar6)->N).active != '\0')) {
-      nfs4_add_prim(tp4,Render_gPacketPtr);
+      AddPrim(tp4,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x14;
       if (((*ppCVar6)->carFlags & 4U) == 0) {
         iVar5 = *(int *)((int)&scr[0].z + iVar2);
@@ -2928,17 +2928,17 @@ void Hud_BuildReplay(void)
   pSVar3[0x39].code = (char)((u_int)tpage_pack >> 0x18);
   iVar5 = 0x33;
   sprt_iter = (int)(gSprite0 + 0x33);
-  nfs4_add_prim(tp4,tSs2 + 0x39);
+  AddPrim(tp4,tSs2 + 0x39);
   do {
     iVar5 = iVar5 + 1;
-    nfs4_add_prim(tp4,(void *)(intptr)sprt_iter);
+    AddPrim(tp4,(void *)(intptr)sprt_iter);
     pSVar3 = gSprite0;
     tp5 = Render_gPalettePtr;
     sprt_iter = sprt_iter + 0x14;
   } while (iVar5 < 0x38);
-  nfs4_add_prim(tp5,pSVar3 + 0x38);
-  nfs4_add_prim(tp5,&gTPage1[0][3]);
-  nfs4_add_prim(tp5,&gTPage0[0][3]);
+  AddPrim(tp5,pSVar3 + 0x38);
+  AddPrim(tp5,&gTPage1[0][3]);
+  AddPrim(tp5,&gTPage0[0][3]);
   return;
 }
 
@@ -3076,18 +3076,18 @@ void Hud_RenderMapView(void)
       if (GameSetup_gData.carInfo[player].HudMap == 1) {
         Hud_BuildMapMarkers(player);
         tp1 = Render_gPalettePtr;
-        nfs4_add_prim(tp1,(void *)HudFT4);
+        AddPrim(tp1,(void *)HudFT4);
       }
       else {
         tile_pmx_p = Hud_BuildRadar(player);
         tp2 = Render_gPalettePtr;
         if (tile_pmx_p == 1) {
-          nfs4_add_prim(tp2,(void *)(HudFT4 + 0x28));
-          nfs4_add_prim(tp2,(void *)(HudFT4 + 0x50));
+          AddPrim(tp2,(void *)(HudFT4 + 0x28));
+          AddPrim(tp2,(void *)(HudFT4 + 0x50));
         }
         else {
-          nfs4_add_prim(tp2,(void *)(HudFT4 + 0x78));
-          nfs4_add_prim(tp2,(void *)(HudFT4 + 0xa0));
+          AddPrim(tp2,(void *)(HudFT4 + 0x78));
+          AddPrim(tp2,(void *)(HudFT4 + 0xa0));
         }
       }
       tp3 = Render_gPalettePtr;
@@ -3095,7 +3095,7 @@ void Hud_RenderMapView(void)
          gTPage1[player][1].  Keep the typed native address instead of the
          absolute-image arithmetic emitted by the decompiler. */
       tile_dest_p = (intptr)&gTPage1[player][1];
-      nfs4_add_prim(tp3,(void *)tile_dest_p);
+      AddPrim(tp3,(void *)tile_dest_p);
       Draw_StopRenderingView(Hud_gMapView[player]);
     }
   }
@@ -3303,7 +3303,7 @@ void BigBTCTime(int secs)
     }
     tp3 = Render_gPacketPtr;
     tp2 = Render_gPalettePtr;
-    nfs4_add_prim(tp2,Render_gPacketPtr);
+    AddPrim(tp2,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x34;
     iVar2 = secs / 10;
     Hud_BuildGT4((POLY_GT4 *)tp3,HudPmx_gShapes + secs % 10 + 0x2c,x_00 + iVar4 + -1,y_00,
@@ -3317,7 +3317,7 @@ void BigBTCTime(int secs)
       if (iVar2 == 1) {
         iVar1 = iVar3 + 1;
       }
-      nfs4_add_prim(tp4,Render_gPacketPtr);
+      AddPrim(tp4,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x34;
       Hud_BuildGT4((POLY_GT4 *)prim_00,HudPmx_gShapes + iVar2 + 0x2c,(x_00 + iVar4) - iVar1,y_00,
                  Col);
@@ -3431,9 +3431,9 @@ void Hud_RenderHudView(void)
       Hud_BuildNumbers(j);
       puVar1 = Render_gPalettePtr;
       puVar5 = (u_int *)&gTPage0[j][0];
-      nfs4_add_prim(puVar1,puVar5);
+      AddPrim(puVar1,puVar5);
       if (GameSetup_gData.carInfo[j].HudTach != 0) {
-        nfs4_add_prim(puVar1,gSprt1 + 1);
+        AddPrim(puVar1,gSprt1 + 1);
       }
       if (GameSetup_gData.carInfo[j].HudMap != 0) {
         if (((GameSetup_gData.carInfo[j].HudOpponentID != 0) && (Hud_BeTheCop == 0)) &&
@@ -3474,7 +3474,7 @@ void Hud_RenderHudView(void)
         gSprt1 = gSprt1 + 0x3f;
         do {
           i = i + 1;
-          nfs4_add_prim(puVar1,gSprt1);
+          AddPrim(puVar1,gSprt1);
           gSprt1 = gSprt1 + 1;
         } while (i < 0x47);
       }
@@ -3484,7 +3484,7 @@ void Hud_RenderHudView(void)
     }
     puVar1 = Render_gPalettePtr;
     puVar5 = (u_int *)&gTPage1[j][0];
-    nfs4_add_prim(puVar1,puVar5);
+    AddPrim(puVar1,puVar5);
     if (((DashHUD_gInfo.showhud[j] != 0) &&
          (Hud_gWingmanInterface[j] != '\0')) && (Replay_ReplayMode < 2)) {
       Hud_BuildWingmanInterface(j);
@@ -3492,7 +3492,7 @@ void Hud_RenderHudView(void)
     puVar1 = Render_gPalettePtr;
     piVar7 = &Hud_gHudView[j];
     puVar5 = (u_int *)&gTPage0[j][1];
-    nfs4_add_prim(puVar1,puVar5);
+    AddPrim(puVar1,puVar5);
     Draw_StopRenderingView(*piVar7);
   }
 }

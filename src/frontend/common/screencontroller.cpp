@@ -2,6 +2,8 @@
  *   8 MEMBER fns of tScreenController : tScreen. Member-fn decls in nfs4_types.h. Bodies: Ghidra.
  */
 #include "screencontroller.h"
+#include "../../mips_semantics.h"
+#include "../../game/psx/force.h"
 
 /* ScreenController.obj-OWNED globals -- DEFINED here (self-contained; .data=real EXE bytes via
    gen_owned_defs: screenControllerConfig + max_fi/max_fidir + the 4 Arrow/Text/NumTexts/Controller
@@ -133,7 +135,7 @@ void tScreenControllerConfig::ShakeIt()
     if ((this->fShaker).active == '\0') {
       (this->fShaker).active = '\x01';
       PadSetAct(padnum,(this->fShaker).actuator,2);
-      PadSetActAlign(padnum,"");
+      PadSetActAlign(padnum,Force_gActAlign);
     }
   }
   else {
@@ -583,7 +585,7 @@ void tScreenControllerConfig::DrawController()
   this->ShakeIt();
   t = (int)maxshakex;
   if ((t != 0) || (maxshakey != 0)) {
-    fadelevel = rand();
+    fadelevel = randPSX();
     if (t == 0) {
       trap(0x1c00);
     }
@@ -591,7 +593,7 @@ void tScreenControllerConfig::DrawController()
       trap(0x1800);
     }
     shakex = (short)(fadelevel % t) - (maxshakex >> 1);
-    t = rand();
+    t = randPSX();
     fadelevel = (int)maxshakey;
     if (fadelevel == 0) {
       trap(0x1c00);
@@ -766,10 +768,11 @@ DrawCtrl_ticksUpdate:
       this->fGotTick = 1;
       this->fStartTick = t;
     }
-    t = (uint)(ushort)this->fAnimStart + ((ticks - this->fStartTick) / 6) * (int)this->fAnimStep
-    ;
+    t = nfs4_mips_addu_s32((int)(ushort)this->fAnimStart,
+        nfs4_mips_mult_s32(nfs4_mips_subu_s32(ticks, this->fStartTick) / 6,
+            (int)this->fAnimStep));
     this->fAnimFrame = (short)t;
-    t = t * 0x10000 >> 0x10;
+    t = nfs4_mips_sign_extend((unsigned int)t, 16);
     if (((this->fAnimStop < t) && (this->fAnimStep == 1)) ||
        ((t < this->fAnimStop && (this->fAnimStep == -1)))) {
       this->fAnim = 0;
@@ -777,12 +780,13 @@ DrawCtrl_ticksUpdate:
       this->fAnimFrame = this->fAnimStop;
     }
     t = this->fStartTick;
-    f12 = __floatsisf(ticks - t);
-    fadelevel = this->fAnimStep * 6;
-    f14 = __floatsisf(((int)this->fAnimStop - (int)this->fAnimStart) * fadelevel);
+    f12 = __floatsisf(nfs4_mips_subu_s32(ticks, t));
+    fadelevel = nfs4_mips_mult_s32((int)this->fAnimStep, 6);
+    f14 = __floatsisf(nfs4_mips_mult_s32(
+        nfs4_mips_subu_s32((int)this->fAnimStop, (int)this->fAnimStart), fadelevel));
     f12 = __divsf3(f12,f14);
     fd = __extendsfdf2(f12);
-    fd = __muldf3(fd,256.0);   /* 2nd operand (scale const) lost to decompiler -> inferred 0x100 */
+    fd = psx_double_value(__muldf3PSX(psx_double_bits(fd),psx_double_bits(256.0)));
     t = __fixdfsi(fd);
     fadelevel = t;
     if (0x100 < t) {

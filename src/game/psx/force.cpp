@@ -306,7 +306,7 @@ void Force_StartUp(void)
     force_walk = force_walk + 1;
     actuator_walk = actuator_walk + 8;
   } while (force_walk < (Force_tGlobal *)colourRGB);
-  VSyncCallback((void *)Force_Vbl);
+  VSyncCallback(Force_Vbl);
   Sched_AddFunction(simGlobal.schedule32Hz,(void *)Force_Update,Cars_gHumanRaceCarList[0],0x32);
   if (GameSetup_gData.commMode == 1) {
     Sched_AddFunction(simGlobal.schedule32Hz,(void *)Force_Update,Cars_gHumanRaceCarList[1],0x32);
@@ -332,7 +332,7 @@ void Force_Disable(void)
   } while (pFVar2 < (Force_tGlobal *)colourRGB);
   PadSetActAlign(0,Force_gOffAlign);
   PadSetActAlign(4,Force_gOffAlign);
-  VSyncCallback((void *)0x0);
+  VSyncCallback(0);
   return;
 }
 

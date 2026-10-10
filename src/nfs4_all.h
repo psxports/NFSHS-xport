@@ -46,7 +46,6 @@
 #include "frontend/common/stattool.h"
 #include "frontend/psx/drawshp.h"
 #include "frontend/psx/fetexture.h"
-#include "frontend/psx/mdec.h"
 #include "frontend/psx/memcard.h"
 #include "frontend/psx/mmeffect.h"
 #include "frontend/psx/movie.h"

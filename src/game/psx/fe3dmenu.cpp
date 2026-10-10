@@ -120,13 +120,18 @@ void Draw_MenuRenderingView(Car_tObj *carObj,DRender_tView *Vi,int posX,int posY
     fixedxformy(&temp,camRot << 6);
   }
   else {                                                  /* showroom camera (showRoomFlag != 0) */
+    uint32 cameraHalfHeight = __mulsf3PSX(psx_float_bits(camY), psx_float_bits(0.5f));
     targetPos.x = 0;
-    targetPos.y = __fixsfsi(__mulsf3(__mulsf3(camY,0.5f),65536.0f));
-    targetPos.z = __fixsfsi(__mulsf3(camZ,65536.0f));
+    targetPos.y = __fixsfsi(psx_float_value(__mulsf3PSX(cameraHalfHeight,psx_float_bits(65536.0f))));
+    targetPos.z = __fixsfsi(psx_float_value(__mulsf3PSX(psx_float_bits(camZ),psx_float_bits(65536.0f))));
     CameraLookAt(&temp1,&targetPos);
     fixedxformy(&temp2,camRot << 6);
     Math_fasttransmult(&temp1,&temp2,&temp);
-    camZ = __truncdfsf2(__adddf3(__extendsfdf2(camZ),__divdf3(__extendsfdf2(__mulsf3(camY,0.5f)),2.5)));
+    uint64 cameraDepthBase = psx_double_bits(__extendsfdf2(camZ));
+    uint64 cameraHeight = psx_double_bits(__extendsfdf2(psx_float_value(cameraHalfHeight)));
+    uint64 cameraHeightOffset = __divdf3PSX(cameraHeight,psx_double_bits(2.5));
+    uint64 cameraDepth = __adddf3PSX(cameraDepthBase,cameraHeightOffset);
+    camZ = __truncdfsf2(psx_double_value(cameraDepth));
     camY = 0.0f;
   }
   mr = &(Vi->cview).mrotation;
@@ -143,8 +148,8 @@ void Draw_MenuRenderingView(Car_tObj *carObj,DRender_tView *Vi,int posX,int posY
   m = &(Vi->cview).mrotationInv;
   transpose(mr,m);
   pos.x = 0;
-  pos.y = __fixsfsi(__mulsf3(camY,65536.0f));
-  pos.z = __fixsfsi(__mulsf3(camZ,65536.0f));
+  pos.y = __fixsfsi(psx_float_value(__mulsf3PSX(psx_float_bits(camY),psx_float_bits(65536.0f))));
+  pos.z = __fixsfsi(psx_float_value(__mulsf3PSX(psx_float_bits(camZ),psx_float_bits(65536.0f))));
   transform(&pos.x,mr->m,(int *)&Vi->cview);
   pos.x = -(Vi->cview).translation.x;
   pos.y = -(Vi->cview).translation.y;
@@ -180,10 +185,10 @@ void Draw_MenuRenderingView(Car_tObj *carObj,DRender_tView *Vi,int posX,int posY
     sd = (Draw_CarCache *)getScratchAddr(0);
     R3DCar_InMenu = R3DCar_InMenu | 0x80;
     Render_gMenuRenderFlag = Render_gMenuRenderFlag ^ 1;
-    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     R3DCar_InsertCarFacetMenu(carObj,Vi);
-    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     R3DCar_InsertCarFacetMenuII(carObj,light);
     R3DCar_InMenu = R3DCar_InMenu & 0x7f;

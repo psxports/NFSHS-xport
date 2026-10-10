@@ -5,7 +5,6 @@
 
 void TrackSpec_SetDefault__FP10CTrackSpec(CTrackSpec *spec); /* :44 */
 void TrackSpec_SetUp__Fv(void);                              /* :119 */
-void read__FPPcPvi(char **handle, void *buf, int bytes);     /* :127 */
 void TrackSpec_Read__Fi(int spec_num);                       /* :145 */
 void TrackSpec_Load__Fii(int weather, int night);            /* :205 */
 

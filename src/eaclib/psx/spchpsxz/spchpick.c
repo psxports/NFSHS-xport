@@ -48,7 +48,6 @@ extern "C" unsigned int iSPCH_CheckSentenceRules(int a, int b, intptr rulePtr); 
 extern "C" unsigned int iSPCH_GetRuleSettings(short *sentence, int *values, char *out); /* spchrule */
 extern "C" intptr iSPCH_FindEvent(unsigned int eventID);                                /* spchevnt */
 extern "C" int GetFilterLength(void);                                                   /* spchevnt */
-extern "C" void trap(unsigned int code);
 
 extern "C" int iSPCH_MatchSample(intptr bank, intptr sample, intptr phraseTemplate, int unused);                                             /* @0x8010077C */
 extern "C" unsigned int iSPCH_GetPhraseBank(short *phraseTemplate, intptr paramTable, short *outChoice);                                     /* @0x80100880 */

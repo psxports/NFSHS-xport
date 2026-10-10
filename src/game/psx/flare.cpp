@@ -98,7 +98,7 @@ void Flare_Tri(long *cp,long *p1,long *p2,int otz)
   
   prim = (u_char *)Render_gPacketPtr;
   prev_pkt_slot = (u_int *)(Render_gPalettePtr + otz * 4);
-  nfs4_add_prim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
+  AddPrim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
   pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
   Render_gPacketPtr = Render_gPacketPtr + 0x1c;
   *(u_int *)(prim + 4) = 0x32000000;
@@ -207,7 +207,7 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x2c));
     gfHexPt1_iter = gfHexPt1_iter + -2;
     if (vert_idx == -1) break;
     prev_pkt_slot = otz * 4 + (int)Render_gPalettePtr;
-    nfs4_add_prim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
+    AddPrim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
     pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0x1c;
     *(u_int *)(prim + 4) = 0x32000000;
@@ -312,7 +312,7 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x2c));
     ts2 = gfSpikePt1[vert_idx];
     ts3 = gfSpikePt2[vert_idx];
     puVar1 = (u_int *)(Render_gPalettePtr + otz * 4);
-    nfs4_add_prim(puVar1,Render_gPacketPtr);
+    AddPrim(puVar1,Render_gPacketPtr);
     pkt_addr24_b = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0x24;
     *(u_int *)(prim + 4) = 0x3a000000;
@@ -329,7 +329,7 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x2c));
     ts4 = gfOctPt1[vert_idx];
     ts5 = gfOctPt2[vert_idx];
     puVar1 = (u_int *)(Render_gPalettePtr + otz * 4);
-    nfs4_add_prim(puVar1,Render_gPacketPtr);
+    AddPrim(puVar1,Render_gPacketPtr);
     pkt_addr24_d = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0x1c;
     *(u_int *)(tp5 + 4) = 0x32000000;
@@ -419,7 +419,7 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x2c));
     gfHexPt1_iter = gfHexPt1_iter + -2;
     if (vert_idx == -1) break;
     cur_pkt = otz * 4 + (int)Render_gPalettePtr;
-    nfs4_add_prim((void *)(intptr)cur_pkt,Render_gPacketPtr);
+    AddPrim((void *)(intptr)cur_pkt,Render_gPacketPtr);
     pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0x24;
     *(u_int *)(prim + 4) = 0x3a000000;
@@ -486,7 +486,7 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x14));
     pSVar4 = pSVar4 + -2;
     if (vert_idx == -1) break;
     prev_pkt_slot = Render_gPalettePtr + otz * 4;
-    nfs4_add_prim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
+    AddPrim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
     pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0x1c;
     *(u_int *)(prim + 4) = 0x32000000;
@@ -542,7 +542,7 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x14));
   for (vert_idx = 5; vert_idx >= 0; --vert_idx) {
     prim = (u_char *)Render_gPacketPtr;
     prev_pkt_slot = Render_gPalettePtr + otz * 4;
-    nfs4_add_prim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
+    AddPrim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
     pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0x1c;
     *(u_int *)(prim + 4) = 0x32000000;
@@ -833,26 +833,26 @@ gte_SetTransVector(&diff);
         RotMatrixZ(outerRadius,&mtx2);
 /* 0x800CD23C..320: orientation (sp+0x70) times scale (sp+0x90), in place. */
 gte_SetRotMatrix(&mtx2);
-gte_ldsv(&scalemat);
+gte_ldclmv(&scalemat);
         gte_rtir();
-gte_stsv(&scalemat);
-gte_ldsv(((char *)&scalemat + 0x2));
+gte_stclmv(&scalemat);
+gte_ldclmv(((char *)&scalemat + 0x2));
         gte_rtir();
-gte_stsv(((char *)&scalemat + 0x2));
-gte_ldsv(((char *)&scalemat + 0x4));
+gte_stclmv(((char *)&scalemat + 0x2));
+gte_ldclmv(((char *)&scalemat + 0x4));
         gte_rtir();
-gte_stsv(((char *)&scalemat + 0x4));
+gte_stclmv(((char *)&scalemat + 0x4));
 /* 0x800CD324..454: resulting scale times rotation (sp+0x50), in place. */
 gte_SetRotMatrix(&scalemat);
-gte_ldsv(mtx);
+gte_ldclmv(mtx);
         gte_rtir();
-gte_stsv(mtx);
-gte_ldsv(((char *)mtx + 0x2));
+gte_stclmv(mtx);
+gte_ldclmv(((char *)mtx + 0x2));
         gte_rtir();
-gte_stsv(((char *)mtx + 0x2));
-gte_ldsv(((char *)mtx + 0x4));
+gte_stclmv(((char *)mtx + 0x2));
+gte_ldclmv(((char *)mtx + 0x4));
         gte_rtir();
-gte_stsv(((char *)mtx + 0x4));
+gte_stclmv(((char *)mtx + 0x4));
 gte_SetRotMatrix(mtx);
         if (diff.vz < 0xc80) {
           Flare_OctFlareSpikes((long *)&sp,otz);
@@ -882,15 +882,15 @@ gte_SetTransVector(&diff);
         RotMatrixZ(0x800,mtx);
 /* 0x800CD088..174: rotation times diagonal, storing into rotation. */
 gte_SetRotMatrix(mtx);
-gte_ldsv(&mtx2);
+gte_ldclmv(&mtx2);
         gte_rtir();
-gte_stsv(mtx);
-gte_ldsv(((char *)&mtx2 + 0x2));
+gte_stclmv(mtx);
+gte_ldclmv(((char *)&mtx2 + 0x2));
         gte_rtir();
-gte_stsv(((char *)mtx + 0x2));
-gte_ldsv(((char *)&mtx2 + 0x4));
+gte_stclmv(((char *)mtx + 0x2));
+gte_ldclmv(((char *)&mtx2 + 0x4));
         gte_rtir();
-gte_stsv(((char *)mtx + 0x4));
+gte_stclmv(((char *)mtx + 0x4));
 gte_SetRotMatrix(mtx);
         Flare_ReflectHexFlare((long *)&sp,otz);
         gfrgb.r = save.r;
@@ -900,7 +900,7 @@ gte_SetRotMatrix(mtx);
       }
       p = (u_char *)Render_gPacketPtr;
       primPtr = otz * 4 + (int)Render_gPalettePtr;
-      nfs4_add_prim((void *)(intptr)primPtr,Render_gPacketPtr);
+      AddPrim((void *)(intptr)primPtr,Render_gPacketPtr);
       tu14 = (u_int)Render_gPacketPtr & 0xffffff;
       pDVar13 = (DVECTOR *)(*(u_int *)primPtr & 0xff000000 | tu14);
       Render_gPacketPtr = Render_gPacketPtr + 0xc;
@@ -1076,7 +1076,7 @@ gte_stsz(&otz);
       gscale = scale;
       if ((halfHeight & 0x40U) != 0) {
         primPtr = otz_00 * 4 + (int)Render_gPalettePtr;
-        nfs4_add_prim((void *)(intptr)primPtr,Render_gPacketPtr);
+        AddPrim((void *)(intptr)primPtr,Render_gPacketPtr);
         color_pack = (u_int)Render_gPacketPtr & 0xffffff;
         Render_gPacketPtr = Render_gPacketPtr + 0xc;
         SetDrawMode((DR_MODE *)tp2,0,0,0x120,(PSX_RECT *)0x0);
@@ -1133,15 +1133,15 @@ gte_SetTransVector(&diff);
         /* MIPS 0x800CDC8C..0x800CDDA0: rotate each column of mtx2
            through mtx, store the result into mtx, then install mtx. */
 gte_SetRotMatrix(&mtx);
-gte_ldsv(&mtx2);
+gte_ldclmv(&mtx2);
         gte_rtir();
-gte_stsv(&mtx);
-gte_ldsv(((char *)&mtx2 + 0x2));
+gte_stclmv(&mtx);
+gte_ldclmv(((char *)&mtx2 + 0x2));
         gte_rtir();
-gte_stsv(((char *)&mtx + 0x2));
-gte_ldsv(((char *)&mtx2 + 0x4));
+gte_stclmv(((char *)&mtx + 0x2));
+gte_ldclmv(((char *)&mtx2 + 0x4));
         gte_rtir();
-gte_stsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x4));
 gte_SetRotMatrix(&mtx);
       }
       else {
@@ -1160,25 +1160,25 @@ gte_SetTransVector(&diff);
            then scalemat transforms mtx; every load/store addresses the
            three MATRIX columns at byte offsets 0, 2 and 4. */
 gte_SetRotMatrix(&mtx2);
-gte_ldsv(&scalemat);
+gte_ldclmv(&scalemat);
         gte_rtir();
-gte_stsv(&scalemat);
-gte_ldsv(((char *)&scalemat + 0x2));
+gte_stclmv(&scalemat);
+gte_ldclmv(((char *)&scalemat + 0x2));
         gte_rtir();
-gte_stsv(((char *)&scalemat + 0x2));
-gte_ldsv(((char *)&scalemat + 0x4));
+gte_stclmv(((char *)&scalemat + 0x2));
+gte_ldclmv(((char *)&scalemat + 0x4));
         gte_rtir();
-gte_stsv(((char *)&scalemat + 0x4));
+gte_stclmv(((char *)&scalemat + 0x4));
 gte_SetRotMatrix(&scalemat);
-gte_ldsv(&mtx);
+gte_ldclmv(&mtx);
         gte_rtir();
-gte_stsv(&mtx);
-gte_ldsv(((char *)&mtx + 0x2));
+gte_stclmv(&mtx);
+gte_ldclmv(((char *)&mtx + 0x2));
         gte_rtir();
-gte_stsv(((char *)&mtx + 0x2));
-gte_ldsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x2));
+gte_ldclmv(((char *)&mtx + 0x4));
         gte_rtir();
-gte_stsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x4));
 gte_SetRotMatrix(&mtx);
       }
       if (diff.vz < 0xc80) {
@@ -1193,7 +1193,7 @@ gte_SetRotMatrix(&mtx);
       }
       p = (u_char *)Render_gPacketPtr;
       tp7 = otz_00 * 4 + (int)Render_gPalettePtr;
-      nfs4_add_prim((void *)(intptr)tp7,Render_gPacketPtr);
+      AddPrim((void *)(intptr)tp7,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0xc;
       SetDrawMode((DR_MODE *)p,0,(u_int)((halfHeight & 0x40U) != 0),0x120,(PSX_RECT *)0x0);
     }
@@ -1225,7 +1225,7 @@ void Flare_2DSpike(long *center,long *end,int otz)
   tl2 = *center;
   tl3 = *end;
   prev_pkt_slot = (u_int *)(Render_gPalettePtr + otz * 4);
-  nfs4_add_prim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
+  AddPrim((void *)(intptr)prev_pkt_slot,Render_gPacketPtr);
   CVar1 = gfrgb2;
   tp1 = Render_gPacketPtr + 3;
   Render_gPacketPtr = Render_gPacketPtr + 0x14;
@@ -1273,7 +1273,7 @@ void Flare_2DHalo(int x,int y,int scalex,int scaley,int type)
   if (Render_gPacketPtr < Render_gPacketEnd + -0x1000) {
     gfrgb = (*(CVECTOR *)&(Flare_gType[type & 0xffU].chalo));
     gfrgb2 = (*(CVECTOR *)&(Flare_gType[type & 0xffU].cbeam));
-    nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+    AddPrim(Render_gPalettePtr,Render_gPacketPtr);
     pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     pt2.vx = ts9;
@@ -1350,7 +1350,7 @@ void Flare_2DHalo(int x,int y,int scalex,int scaley,int type)
     Flare_2DSpike((long *)&pt2,(long *)&save1,0);
     p = (u_char *)Render_gPacketPtr;
     tp3 = (u_char *)Render_gPalettePtr;
-    nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+    AddPrim(Render_gPalettePtr,Render_gPacketPtr);
     pkt_addr24_b = (u_int)Render_gPacketPtr & 0xffffff;
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
     SetDrawMode((DR_MODE *)p,0,1,0x120,(PSX_RECT *)0x0);
@@ -1389,7 +1389,7 @@ gte_lwc2(0,*(int *)(&Flare_gOct[iVar7]));
     gte_lwc2(1,*(int *)(((char *)&Flare_gOct[iVar7] + 0x4)));
     prim = *(u_int **)ppuVar8;
     puVar5 = (u_int *)(iVar9 + *(int *)ppuVar11);
-    nfs4_add_prim(puVar5,prim);
+    AddPrim(puVar5,prim);
     uVar3 = *puVar5;
     *(u_int **)ppuVar8 = prim + 5;
     CVar1 = gfrgb2;
@@ -1416,7 +1416,7 @@ void Flare_Quad(long *pt,CVECTOR *color,int otz)
   
   prim = (u_char *)Render_gPacketPtr;
   puVar1 = (u_int *)(Render_gPalettePtr + otz * 4);
-  nfs4_add_prim(puVar1,Render_gPacketPtr);
+  AddPrim(puVar1,Render_gPacketPtr);
   pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
   Render_gPacketPtr = Render_gPacketPtr + 0x18;
   color_word = *(int *)color;
@@ -1441,7 +1441,7 @@ void Flare_QuadNotTransparent(long *pt,CVECTOR *color,int otz)
   
   prim = (u_char *)Render_gPacketPtr;
   puVar1 = (u_int *)(Render_gPalettePtr + otz * 4);
-  nfs4_add_prim(puVar1,Render_gPacketPtr);
+  AddPrim(puVar1,Render_gPacketPtr);
   pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
   Render_gPacketPtr = Render_gPacketPtr + 0x18;
   color_word = *(int *)color;
@@ -1467,7 +1467,7 @@ void Flare_QuadRing(long *pt,CVECTOR *color,int otz)
   
   prim = (u_char *)Render_gPacketPtr;
   puVar1 = (u_int *)(Render_gPalettePtr + otz * 4);
-  nfs4_add_prim(puVar1,Render_gPacketPtr);
+  AddPrim(puVar1,Render_gPacketPtr);
   innerColor = *(int *)color;
   prev_pkt_slot = Render_gPacketPtr + 0xc;
   Render_gPacketPtr = Render_gPacketPtr + 0x24;
@@ -1504,7 +1504,7 @@ void Flare_TextureQuad(long *pt,CVECTOR *color,char type,int otz)
   
   prim = (u_char *)Render_gPacketPtr;
   puVar3 = (u_int *)(Render_gPalettePtr + otz * 4);
-  nfs4_add_prim(puVar3,Render_gPacketPtr);
+  AddPrim(puVar3,Render_gPacketPtr);
   pkt_addr24 = (u_int)Render_gPacketPtr & 0xffffff;
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
   color_word = *(int *)color;
@@ -1790,15 +1790,15 @@ void Flare_LensFlare(DVECTOR *screenPos,Draw_FlareCache *sd)
       scalemat.m[2][1] = 0;
       scalemat.m[2][2] = 0;
 gte_SetRotMatrix(&scalemat);
-gte_ldsv(&mtx);
+gte_ldclmv(&mtx);
       gte_rtir();
-gte_stsv(&mtx);
-gte_ldsv(((char *)&mtx + 0x2));
+gte_stclmv(&mtx);
+gte_ldclmv(((char *)&mtx + 0x2));
       gte_rtir();
-gte_stsv(((char *)&mtx + 0x2));
-gte_ldsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x2));
+gte_ldclmv(((char *)&mtx + 0x4));
       gte_rtir();
-gte_stsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x4));
 gte_SetRotMatrix(&mtx);
       Flare_Spikes((long *)screenPos,0);
       Flare_IdentMatrix(&mtx);
@@ -1810,15 +1810,15 @@ gte_SetRotMatrix(&mtx);
       RotMatrixZ(angleZ2,&mtx);
       scalemat.m[0][0] = (short)nfs4_mips_sll_s32(piece_color,6);
 gte_SetRotMatrix(&scalemat);
-gte_ldsv(&mtx);
+gte_ldclmv(&mtx);
       gte_rtir();
-gte_stsv(&mtx);
-gte_ldsv(((char *)&mtx + 0x2));
+gte_stclmv(&mtx);
+gte_ldclmv(((char *)&mtx + 0x2));
       gte_rtir();
-gte_stsv(((char *)&mtx + 0x2));
-gte_ldsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x2));
+gte_ldclmv(((char *)&mtx + 0x4));
       gte_rtir();
-gte_stsv(((char *)&mtx + 0x4));
+gte_stclmv(((char *)&mtx + 0x4));
 gte_SetRotMatrix(&mtx);
       Flare_Spikes((long *)screenPos,0);
       piece_idx = 0;
@@ -1870,7 +1870,7 @@ switchD_800cf0c0_default:
           piece_idx = piece_idx + 1;
         }
       }
-      nfs4_add_prim(Render_gPalettePtr,Render_gPacketPtr);
+      AddPrim(Render_gPalettePtr,Render_gPacketPtr);
       tu1 = (u_int)Render_gPacketPtr & 0xffffff;
       Render_gPacketPtr = Render_gPacketPtr + 0xc;
       SetDrawMode((DR_MODE *)p,0,0,0x120,(PSX_RECT *)0x0);
@@ -1950,7 +1950,7 @@ gte_SetTransVector(&diff);
       gfrgb = color;
       otz_00 = Draw_gViewOtSize + -2;
       cur_pkt_a = otz_00 * 4 + (int)Render_gPalettePtr;
-      nfs4_add_prim((void *)(intptr)cur_pkt_a,Render_gPacketPtr);
+      AddPrim((void *)(intptr)cur_pkt_a,Render_gPacketPtr);
       pkt_addr24_a = (u_int)Render_gPacketPtr & 0xffffff;
       Render_gPacketPtr = Render_gPacketPtr + 0xc;
       SetDrawMode((DR_MODE *)puVar1,0,0,0x120,(PSX_RECT *)0x0);
@@ -1968,7 +1968,7 @@ gte_SetRotMatrix(&scalemat);
       }
       puVar1 = (u_char *)Render_gPacketPtr;
       cur_pkt_b = otz_00 * 4 + (int)Render_gPalettePtr;
-      nfs4_add_prim((void *)(intptr)cur_pkt_b,Render_gPacketPtr);
+      AddPrim((void *)(intptr)cur_pkt_b,Render_gPacketPtr);
       pkt_addr24_b = (u_int)Render_gPacketPtr & 0xffffff;
       Render_gPacketPtr = Render_gPacketPtr + 0xc;
       SetDrawMode((DR_MODE *)puVar1,0,0,0x120,(PSX_RECT *)0x0);

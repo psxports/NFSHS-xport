@@ -66,7 +66,6 @@ extern "C" int iSNDpsxmalloc(int size);                                         
 extern "C" void iSNDpsxfree(int spuAddr);                                                                   /* sdmemman */
 extern "C" int iSNDpsxdisablespuirq(void);                                                                  /* sdspuirq */
 extern "C" int iSNDpsxenablespuirq(void);                                                                   /* sdspuirq */
-extern "C" void *InterruptCallback(int interrupt, void *callback);                                          /* syslib INTR */
 extern "C" intptr iSNDpacketget(int p, int chanIdx, int *frameSizeOut);                                     /* spktplay */
 extern "C" unsigned int iSNDpacketfreeframes(int p, int chanIdx, int bytes);                                /* spktplay */
 extern "C" void iSNDstreamhotroddatachunks(void);                                                           /* sst */
@@ -74,7 +73,6 @@ extern "C" int iSNDdmqueue(intptr srcRam, int dstSpu, int len, unsigned char pri
 extern "C" int iSNDdmcomplete(int dmaHandle);                                                               /* sdma */
 extern "C" void blockmove(int *dst, int *src, unsigned int len);                                            /* blkmov */
 extern "C" int iSNDplatformpitch(int chan, int pitch);                                                      /* sdriver */
-extern "C" void trap(unsigned int code);                                                                    /* compiler div-by-zero break */
 
 /* forward decls (mutually referential within this obj) */
 extern "C" void iSNDpacketgetirq(void);
@@ -165,7 +163,7 @@ extern "C" void iSNDpacketsetirq(void)
 #if !defined(AP_WIN)
                 *(short *)(DAT_80147e2c + 0x1a4) = (short)((ctx->spuAddr + 8) >> 3);
 #endif
-                InterruptCallback(9, (void *)iSNDpacketirqcallback);
+                InterruptCallback(9, iSNDpacketirqcallback);
                 iSNDpsxenablespuirq();
                 return;
             }

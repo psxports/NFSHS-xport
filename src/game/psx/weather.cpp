@@ -429,7 +429,7 @@ void Weather_TransformVertex(matrixtdef *m,int n,SVECTOR *s)
 
   Weather_SetMatrix(m);
   gte_ldv0(s);
-  gte_mvmva();
+  gte_rt();
   i = n + -1;
   gte_stlvnl(&tv);
   while (true) {
@@ -437,7 +437,7 @@ void Weather_TransformVertex(matrixtdef *m,int n,SVECTOR *s)
     next = s + 1;
     if (i == -1) break;
     gte_ldv0(next);
-    gte_mvmva();
+    gte_rt();
     s->vx = (short)tv.vx;
     s->vy = (short)tv.vy;
     s->vz = (short)tv.vz;
@@ -663,7 +663,7 @@ void Weather_ProcessParticles(DRender_tView *Vi,int num,SVECTOR *wpt,char *wd)
   temp_vector.vy = (short)((Vi->cview.translation.y - cp->y) / 0x400);
   temp_vector.vz = (short)((Vi->cview.translation.z - cp->z) / 0x400);
   gte_ldv0(&temp_vector);
-  gte_mvmva();
+  gte_rt();
   cp->x = Vi->cview.translation.x;
   cp->y = Vi->cview.translation.y;
   cp->z = Vi->cview.translation.z;
@@ -677,7 +677,7 @@ void Weather_ProcessParticles(DRender_tView *Vi,int num,SVECTOR *wpt,char *wd)
   temp_vector.vy = Weather_gSys.velocity.vy;
   temp_vector.vz = Weather_gSys.velocity.vz;
   gte_ldv0(&temp_vector);
-  gte_mvmva();
+  gte_rt();
   gte_stlvnl(&result);
   total_vector_change.vx = total_vector_change.vx + (short)result.vx;
   velocity_vector_change.vx = (short)result.vx;
@@ -693,7 +693,7 @@ void Weather_ProcessParticles(DRender_tView *Vi,int num,SVECTOR *wpt,char *wd)
     temp_vector.vy = vel[1];
     temp_vector.vz = vel[2];
     gte_ldv0(&temp_vector);
-    gte_mvmva();
+    gte_rt();
     gte_stlvnl(&result);
     Weather_gTransformedRandomVelocityVectors[n].vx = (short)result.vx;
     Weather_gTransformedRandomVelocityVectors[n].vy = (short)result.vy;
@@ -742,7 +742,7 @@ void Weather_CreateSnow(SVECTOR *pt)
   gte_ldv3(&gv[0],&gv[1],&gv[2]);
   gte_rtpt();
   prim = (POLY_FT4 *)Render_gPacketPtr;
-  nfs4_add_prim(Render_gPalettePtr,prim);
+  AddPrim(Render_gPalettePtr,prim);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
   *((char *)prim + 3) = 9;                                  /* OT tag length (9 words) */
   gte_stsxy3(&prim->x0,&prim->x1,&prim->x2);
@@ -779,7 +779,7 @@ void Weather_CreateRain(SVECTOR *pt0,DVECTOR *pt1,char *wd)
     gte_ldv0(&gv);
     gte_rtps();
     prim = (LINE_G2 *)Render_gPacketPtr;
-    nfs4_add_prim(Render_gPalettePtr,prim);
+    AddPrim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x14;
     *((char *)prim + 3) = 4;                       /* OT tag length (4 words) */
     *(u_int *)&prim->r0 = 0x52000000;              /* rgb0=0, code=0x52 (LINE_G2) */
@@ -793,7 +793,7 @@ void Weather_CreateRain(SVECTOR *pt0,DVECTOR *pt1,char *wd)
     gte_ldv0(&gv);
     gte_rtps();
     prim = (LINE_G2 *)Render_gPacketPtr;
-    nfs4_add_prim(Render_gPalettePtr,prim);
+    AddPrim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x14;
     *((char *)prim + 3) = 4;
     *(u_int *)&prim->r0 = 0x52000000;
@@ -837,7 +837,7 @@ void Weather_CreateSplat
   tp3 = (u_char *)Render_gPalettePtr;
   ts3 = (splat->pos).vx;
   ts1 = (splat->pos).vy;
-  nfs4_add_prim(tp3,Render_gPacketPtr);
+  AddPrim(tp3,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
   prim[3] = 9;
   prim[7] = 0x2e;

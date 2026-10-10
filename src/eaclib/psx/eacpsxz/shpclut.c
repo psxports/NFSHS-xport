@@ -1,3 +1,4 @@
+#include "psx.h"
 /* eaclib/psx/eacpsxz/shpclut.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** 2/2 ***
  *   obj nfs4\eaclib\psx\shpclut.obj ; EACPSXZ.LIB.  2 fns @[0x800F6C3C .. 0x800F6C94].  Walk a shape's
  *   sub-chunk list to its CLUT chunk and resolve the GPU clut id.  Ghidra nfs4-f.exe.c (shpclut) + IDA sigs.
@@ -5,9 +6,6 @@
 #include "../../../nfs4_types.h"
 #include "../../../mips_semantics.h"
 
-#ifndef AP_WIN
-extern "C" short GetClut(int x, int y); /* syslib P01 */
-#endif
 
 extern "C" u_char *getshapeclut(shapetbl *shape);    /* @0x800F6C3C */
 extern "C" int shapetoclutid(const void *shapeData); /* @0x800F6C94 */

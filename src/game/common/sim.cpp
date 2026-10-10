@@ -174,33 +174,33 @@ void Sim_ProcessSimSchedules(void)
   }
   if ((simGlobal.gameTicks & 1U) == 0) {
     systemtask(0);
-    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     Stats_ClearPosition();
     Collide_ClearCollisionRegistry();
     Sched_Execute(simGlobal.schedule32Hz);
     Cars_ManageBureaucracy();
-    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     Cars_CheckForAccidentScenes();
   }
-  gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+  gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
   stackSpeedUpEnbabledFlag = 1;
   Sched_Execute(simGlobal.schedule64Hz);
-  gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+  gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
   stackSpeedUpEnbabledFlag = 0;
   if ((simGlobal.gameTicks & 1U) != 0) {
-    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     AIHigh_Execute();
-    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
-    gWSavePtr = (intptr)SetSp(getScratchAddr(0xff));
+    gWSavePtr = (intptr)NFSHS_NativeStackHint(getScratchAddr(0xff));
     stackSpeedUpEnbabledFlag = 1;
     Sched_Execute(simGlobal.schedule32Hz2);
     Stats_TrackEndGame();
     Stats_DoPlayerGlue();
-    gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+    gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
     stackSpeedUpEnbabledFlag = 0;
     AudioClc_SoundCars();
   }

@@ -3,71 +3,9 @@
 #ifndef DRAWW_EXTERNS_H
     #define DRAWW_EXTERNS_H
 
-/* ---- GTE intrinsics (no-op symbolic; faithful cop2 source) ---- */
-extern void gte_rtps(void);
-extern void gte_rtpt(void);
-extern void gte_lwc2(int reg, int data);
-extern void gte_swc2(int reg, void *ptr);
-    #ifdef AP_WIN
-extern void nfs4_gte_set_rot_matrix(const void *);
-extern void nfs4_gte_set_trans_matrix(const void *);
-extern void nfs4_gte_nclip(void);
-extern void nfs4_gte_avsz4(void);
-extern void nfs4_gte_ldsxy3(int, int, int);
-extern void nfs4_gte_stflg(void *);
-extern void nfs4_gte_ldir0(int);
-extern void nfs4_gte_rt(void);
-extern void nfs4_gte_dpcs(void);
-extern void nfs4_gte_dpct(void);
+#include "psx_gte.h"
 extern "C" void NFSHS_GTE_DebugState(int *, int *, int *);
 extern "C" void NFSHS_HostTraceDrawQuadCandidate(const void *, const void *, const void *, long, long, long, long);
-        #define gte_SetRotMatrix(mp) nfs4_gte_set_rot_matrix(mp)
-        #define gte_SetTransMatrix(mp) nfs4_gte_set_trans_matrix(mp)
-    #else
-        #define gte_SetRotMatrix(mp) ((void)(mp))
-        #define gte_SetTransMatrix(mp) ((void)(mp))
-    #endif
-    #define gte_ldsv(p) ((void)(p))
-    #define gte_stsv(p) ((void)(p))
-    #define gte_stsxy(p) ((void)(p))
-    #define gte_stsz(p) ((void)(p))
-    #ifdef AP_WIN
-        #define gte_stflg(p) nfs4_gte_stflg(p)
-    #else
-        #define gte_stflg(p) ((void)(p))
-    #endif
-    #define gte_rtir() ((void)0)
-    #define gte_ldtr(arg0, arg1, arg2) ((void)0)
-    #ifdef AP_WIN
-        #define gte_rtps_b() gte_rtps()
-    #else
-        #define gte_rtps_b() ((void)0)
-    #endif
-    /* GTE ops Ghidra inlines as macro CALLS in draww (nclip/avsz/depth-cue/ldsxy3/ldIR0/rt) */
-    #ifdef AP_WIN
-        #define gte_nclip() nfs4_gte_nclip()
-        #define gte_nclip_b() nfs4_gte_nclip()
-        #define gte_avsz4() nfs4_gte_avsz4()
-        #define gte_avsz4_b() nfs4_gte_avsz4()
-    #else
-        #define gte_nclip() ((void)0)
-        #define gte_nclip_b() ((void)0)
-        #define gte_avsz4() ((void)0)
-        #define gte_avsz4_b() ((void)0)
-    #endif
-    #ifdef AP_WIN
-        #define gte_dpcs() nfs4_gte_dpcs()
-        #define gte_dpct() nfs4_gte_dpct()
-        #define gte_ldsxy3(a, b, c) nfs4_gte_ldsxy3((int)(a), (int)(b), (int)(c))
-        #define gte_ldIR0(p) nfs4_gte_ldir0((int)(p))
-        #define gte_rt() nfs4_gte_rt()
-    #else
-        #define gte_dpcs() ((void)0)
-        #define gte_dpct() ((void)0)
-        #define gte_ldsxy3(a, b, c) ((void)0)
-        #define gte_ldIR0(p) ((void)(p))
-        #define gte_rt() ((void)0)
-    #endif
 
 extern "C" char *&Render_gPacketPtr;
 extern "C" char *&Render_gPalettePtr;

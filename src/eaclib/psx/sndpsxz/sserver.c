@@ -29,7 +29,6 @@ extern "C" int iSNDplatformpitch(int chan, int pitch); /* sdriver */
 extern "C" int iSNDvol(int chan, int level);           /* sdriver */
 extern "C" void iSNDcalcvol(int chan);                 /* spatkey */
 extern "C" int SNDstop(unsigned int tag);              /* sstop   */
-extern "C" void trap(unsigned int code);
 
 extern "C" void iSNDserver(void);      /* @0x800EA138 */
 extern "C" void iSND100hzserver(void); /* @0x800EA254 */

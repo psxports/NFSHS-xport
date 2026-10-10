@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/eacpsxz/nfile.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** WIP ***
  *   Source obj : nfs4\eaclib\psx\nfile.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col11)
  *   27 fns @[0x800EBBF4 .. 0x800ED334].  EA async file-operation layer (op queue + handle table).
@@ -41,6 +42,7 @@
  */
 #include "../../../lib/nfile.h"
 #include "../../../nfs4_types.h"
+#include "cdfs.h"
 
 #ifdef AP_WIN
 /* Platform_InitMemory resets the emulated PSX game heap between frontend and
@@ -214,12 +216,6 @@ extern "C" void FILE_callbackop(unsigned int id, void (*callback)(int id, int st
 }
 
 /* ---- the user-facing file ops ---- */
-#ifndef _MSC_VER
-extern "C" int strlen(const char *s); /* libc C27 */
-#endif
-#ifndef _MSC_VER
-extern "C" char *strncpy(char *d, const char *s, int n); /* libc */
-#endif
 extern "C" void iFILE_perror(void);          /* @0x800ED0D4 (below) */
 extern "C" int iFILE_ExecCommand(void *cmd); /* @0x800ECB98 (below, todo) */
 extern "C" unsigned int systemtask(int);     /* @0x800E6C04 vsync/idle pump */
@@ -419,7 +415,6 @@ extern "C" void FILE_priorityop(unsigned int id, int priority)
 }
 
 /* FILE device backend (other objs) + the manager init's CD/file-io bring-up. */
-extern "C" int CD_Init(int handlecount, int memsize, void *iomem, void (*cb)(void)); /* @0x800FA394 */
 extern "C" int initfileio(void);                                                     /* @0x800F3A34 */
 extern "C" int iFILE_CommandCompleteCallback(int result);                            /* @0x800ED020 (below) */
 extern "C" int disablecd;                                                            /* global: nonzero == CD backend off */
@@ -447,8 +442,8 @@ extern "C" int FILE_initwithmem(int handlecount, int memsize, int opcount, void 
     if (disablecd == 0)
     {                                                                    /* CD backend enabled */
         char *iomem = (char *)gFileMgr.handlearray + handlecount * 0x4C; /* io mem after handles */
-        int r = CD_Init(handlecount, memsize, iomem, (void (*)(void))iFILE_CommandCompleteCallback);
-        disablecd = (r < 1) ? 1 : 0; /* disable CD if init failed */
+        int r = CD_Init(handlecount, memsize, iomem, iFILE_CommandCompleteCallback);
+        disablecd = ((unsigned int)r < 1u) ? 1 : 0;
     }
     initfileio();
     return 1;
@@ -594,9 +589,6 @@ extern "C" int sizeofbigfileheader(void *hdr);          /* eacpsxz @0x800E5F84 :
 extern "C" int getblocksize(void *hdr);                 /* eacpsxz @0x800E52D4 : bytes valid in the buffer  */
 extern "C" void blockmove(void *src, void *dst, int n); /* eacpsxz @0x800E62DC : memmove(dst,src,n)          */
 extern "C" int iscurrentthread(int);                    /* eacpsxz @0x800FE408 : (called for side-effect)   */
-#ifndef _MSC_VER
-extern "C" int strncmp(const char *, const char *, int); /* libc C24 @0x800EB1D0                          */
-#endif
 
 /* iFILE_addbigreadcallback @0x800EC660 : completion of a header read.  Records the handle, finalizes the
  *   read op, and if the header spans more than the block already read, grows the buffer and re-reads the
@@ -777,11 +769,6 @@ extern "C" int readfile(int dev, int dest, int offset, int len);                
 extern "C" int writefile(int dev, int buf, int offset, int len);                                          /* @0x800F4020 (async) */
 extern "C" int getfilesize(int dev);                                                                      /* @0x800F409C */
 extern "C" int locatebigentryz(void *bighdr, const char *entry, int flags, int *outOffset, int *outSize); /* @0x800E5FFC */
-#ifndef _MSC_VER
-extern "C" char *strchr(const char *s, int c); /* @0x800F6214 */
-#endif
-extern "C" char *strcpy(char *d, const char *s);     /* @0x800E5B28 */
-extern "C" int strcmp(const char *a, const char *b); /* @0x800E5D7C */
 extern "C" void freehandle(FileHandle *h);           /* @0x800ED2F0 (above) */
 
 #define OPI(op, off) (*(int *)((char *)(op) + (off))) /* multipurpose op field at byte offset */

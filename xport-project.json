@@ -45,6 +45,17 @@
       "reason": "NFSHS trace hooks, capture layout, native continuation ABI and stage adapter are not yet evidence-backed"
     }
   },
+  "stage_pipeline": {
+    "supervisor_protocol": {
+      "schema": 1,
+      "enabled": true,
+      "mode": "enforced",
+      "one_launch": true,
+      "notify_on_revision_only": true,
+      "batch_limits": {"functions": 5, "instructions": 2048, "modules": 2},
+      "acceptance": {"unchanged_model_calls": 0, "interventions_per_failure": 1, "submissions_per_batch": 1, "fast_refreshes_per_batch": 1, "provisional_replays_per_batch": 1, "full_gate_after_provisional_match": true, "max_control_responses": 5, "max_compactions": 2, "deterministic_call_reduction_percent": 90}
+    }
+  },
   "code_refresh": {
     "report": "status/code-refresh-latest.json",
     "log": "status/code-refresh-latest.log",

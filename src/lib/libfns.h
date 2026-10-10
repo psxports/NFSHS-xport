@@ -1,16 +1,5 @@
-/* lib/libfns.h -- AUTHORITATIVE extern "C" interface for eaclib/syslib functions.
- *   Platform/runtime boundary: same decls satisfied by PSX(PsyQ+eaclib), PC(PsyCross+eaclib), etc.
- *   Canonical signatures harvested from the best existing tree decl per fn (typed > varargs);
- *   the 5 reconstructed defs are pinned. C linkage => stable symbol, no mangling.
- *   NOTE: for syslib/PsyQ SDK fns the REAL header is libgpu.h/libgte.h/... (see disasm-v3 // proto).
- *
- *   PsyQ-SDK split (B-integration): under ccpsx (NFS4_PSYQ_HEADERS, set in nfs4_types.h),
- *   the PsyQ standard-library functions (libgpu/libgte/libetc/libapi/libpad) are supplied by the
- *   REAL PsyQ headers � declaring them here too would clash (return-type / macro / linkage), so they
- *   are gated OFF. Under the modern-gcc pre-gate they stay ON as the varargs boundary decls.
- *   EA eaclib/syslib (FILE_*, SND*, fixed-point, loaders) + libc + libgcc soft-float are ALWAYS on
- *   (no PsyQ header declares them, so no conflict in either toolchain).
- */
+#include "psx.h"
+/* Game-owned EA interfaces; standard PsyQ declarations come from psx.h */
 #ifndef _LIB_LIBFNS_H_
 #define _LIB_LIBFNS_H_
 #include "../nfs4_types.h"
@@ -21,71 +10,11 @@
 
 extern "C"
 {
-/* =====================================================================
- *  PsyQ SDK functions -- libgpu / libgte / libetc / libapi / libpad.
- *  Gated OFF under ccpsx (real PsyQ headers provide these).
- * ===================================================================== */
-#ifndef NFS4_PSYQ_HEADERS
-    /* ---- libgpu (graphics) ---- */
-    void AddPrim(void *ot, void *p);
-    sint32 ClearImage(PSX_RECT *rectangle, uint8 red, uint8 green, uint8 blue);
-    uint32 *ClearOTagR(uint32 *ot, sint32 count);
-    void DrawOTag(uint32 *ot);
-    sint32 DrawSync(sint32 mode);
-    uint16 GetClut(sint32 x, sint32 y);
-    uint16 GetTPage(sint32 depth, sint32 abr, sint32 x, sint32 y);
-    sint32 LoadImagePSX(PSX_RECT *rectangle, uint32 *pixels);
-    uint16 LoadTPage(uint32 *pixels, sint32 depth, sint32 abr, sint32 x, sint32 y, sint32 width, sint32 height);
-    sint32 MoveImage(PSX_RECT *rectangle, sint32 x, sint32 y);
-    DISPENV *PutDispEnv(DISPENV *environment);
-    DRAWENV *PutDrawEnv(DRAWENV *environment);
-    DISPENV *SetDefDispEnv(DISPENV *environment, sint32 x, sint32 y, sint32 width, sint32 height);
-    DRAWENV *SetDefDrawEnv(DRAWENV *environment, sint32 x, sint32 y, sint32 width, sint32 height);
-    void SetDispMask(sint32 enabled);
-    void SetDrawArea(void *packet, PSX_RECT *rectangle);
-    void SetDrawEnv(void *packet, DRAWENV *environment);
-    void SetDrawMode(void *packet, int dfe, int dtd, int tpage, PSX_RECT *texture_window);
-    void SetDrawStp(void *packet, sint32 enabled);
-    void SetPolyF3(void *packet);
-    void SetPolyF4(void *packet);
-    void SetPolyFT4(void *packet);
-    void SetPolyG4(void *packet);
-    void SetPolyGT4(void *packet);
-    void SetSemiTrans(void *packet, int enabled);
-    void SetShadeTex(void *packet, int raw_texture);
-    void SetTexWindow(void *packet, PSX_RECT *texture_window);
-    sint32 StoreImage(PSX_RECT *rectangle, uint32 *pixels);
-    /* ---- libgte (geometry) ---- */
-    void InitGeom(void);
-    MATRIX *RotMatrix(SVECTOR *rotation, MATRIX *matrix);
-    MATRIX *RotMatrixZ(sint32 rotation, MATRIX *matrix);
-    void SetFarColor(sint32 red, sint32 green, sint32 blue);
-    void SetFogNear(sint32 distance, sint32 projection);
-    void SetGeomScreen(sint32 distance);
-    sint32 VectorNormal(VECTOR *input, VECTOR *output);
-    sint32 VectorNormalS(VECTOR *input, SVECTOR *output);
-    /* ---- libetc (callback / vsync / rcnt / video) ---- */
-    sint32 GetRCnt(sint32 counter);
-    void ResetCallback(void);
-    void SetVideoMode(sint32 mode);
-    sint32 VSync(sint32 mode);
-    void *VSyncCallback(void *callback);
-    /* ---- libapi (kernel) ---- */
-    void FlushCache(void);
-    /* ---- libpad ---- */
-    sint32 PadGetState(sint32 port);
-    sint32 PadInfoMode(sint32 port, sint32 term, sint32 offset);
-    void PadSetAct(sint32 port, const void *actuator, sint32 length);
-    sint32 PadSetActAlign(sint32 port, const void *alignment);
-    void PadSetMainMode(sint32 port, sint32 mode, sint32 lock);
-    void PadStartCom(void);
-#endif /* !NFS4_PSYQ_HEADERS */
 
     /* =====================================================================
  *  EA eaclib / syslib  +  libc  +  libgcc soft-float -- ALWAYS declared.
  *  (No PsyQ header declares these; safe under both toolchains.)
  * ===================================================================== */
-    int CdDiskReady(int mode);
     int FILE_addbigsync(char *name, int flags, int priority, int *handle);
     int FILE_closesync(int fd, int priority);
     int FILE_completeop(unsigned int id);
@@ -139,25 +68,13 @@ extern "C"
     int SNDstop(unsigned int tag);                         /* (int handle) */
     int SNDtimeremaining(unsigned int tag);                /* (int handle) */
     int SNDvol(int handle, int vol);                       /* (int handle, int vol) */
-    void *SetSp(void *p);                                  /* (void *sp) -- EA, not PsyQ */
-    double __adddf3(double a, double b);
-    double __divdf3(double a, double b);
-    float __divsf3(float a, float b);
-    // Explicit single-precision libgcc calls must not use ellipsis: it promotes
-    // their operands to double (FRONT.BIN 80012DCC..80012DF8 passes single words).
-    double __extendsfdf2(float);
-    int __fixsfsi(float a);
-    double __floatsidf(int a);
-    float __floatsisf(int a);
-    int __ltdf2(double a, double b);
+    void *NFSHS_NativeStackHint(void *p);
 #if defined(__EMSCRIPTEN__)
     void NFSHS_HostMainInit(void);
     #define __main NFSHS_HostMainInit
 #else
     void __main(void); /* (void) */
 #endif
-    float __mulsf3(float, float);
-    float __truncdfsf2(double a);
     int addsystemtask(intptr taskFn, int period, int delay);
     void addtimer(void (*proc)(void));
     int asyncidle(void); /* nullfunc.asm @0x800F6114: delay slot clears v0 */
@@ -169,10 +86,8 @@ extern "C"
     void blockfill(void *dst, int size, unsigned char val);
     void blockmove(void *src, void *dst, int size);
     int cancelasyncload(int requestId);
-    sint32 ccos(sint32 angle);
     unsigned int crc16(const void *data, int length);
     void crossproduct(int *a, int *b, int *out); /* (coorddef *, coorddef *, coorddef *) */
-    sint32 csin(sint32 angle);
     intptr delsystemtask(intptr taskFn);
     void deltimer(void (*proc)(void));
     int fastintcos(int angle); /* (int angle) */

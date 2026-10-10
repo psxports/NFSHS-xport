@@ -128,7 +128,7 @@ void TrsProj_TransPt(coorddef *s,coorddef *d)
   pt.vy = (short)((int)s->y >> 0xa);
   pt.vz = (short)((int)s->z >> 0xa);
   gte_ldv0(&pt);
-  gte_mvmva();
+  gte_rt();
   gte_stlvnl(&tv);
   d->x = tv.vx << 0xa;
   d->y = tv.vy << 0xa;
@@ -149,7 +149,7 @@ void TrsProj_TransPtN16(RelCoord16 *s,coorddef *d,int n)
       pt.vx = s->x;
       pt.vz = s->z;
       gte_ldv0(&pt);
-      gte_mvmva();
+      gte_rt();
       gte_stlvnl(&tv);
       s = s + 1;
       d->x = tv.vx;

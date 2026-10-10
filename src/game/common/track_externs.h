@@ -3,7 +3,6 @@
 #ifndef TRACK_EXTERNS_H
     #define TRACK_EXTERNS_H
 
-extern void trap(int); /* MIPS break (gcc div-guard) */
 
 /* ---- libc ---- */
 

@@ -1,3 +1,4 @@
+#include "psx.h"
 /* eaclib/psx/pad_externs.h - reconstructed extern decls (libpad + eaclib prototypes)
  * referenced by PAD.C. NOT an original source header; added so the reconstructed
  * translation unit compiles standalone as C++. Signatures inferred from call sites
@@ -13,8 +14,6 @@ extern "C"
 #endif
 
     /* --- PsyQ libpad (direct mode) --- */
-    void PadInitDirect(unsigned char *pad1, unsigned char *pad2);
-    void PadStopCom(void);
 
     /* --- eaclib (EACPSXZ) --- */
     /* EAC_timerproc = void(*)(void) */

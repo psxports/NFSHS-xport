@@ -246,25 +246,25 @@ void tTournamentManager::StartNewTournament(byte tier,byte tournament)
       bVar1 = ptVar6->fTracks[iVar5].fDirection;
       this->fDirection[iVar3] = bVar1;
       if (1 < bVar1) {
-        iVar4 = rand();
+        iVar4 = randPSX();
         this->fDirection[iVar3] = (byte)iVar4 & 1;
       }
       bVar1 = ptVar6->fTracks[iVar5].fMirrored;
       this->fMirror[iVar3] = bVar1;
       if (1 < bVar1) {
-        iVar4 = rand();
+        iVar4 = randPSX();
         this->fMirror[iVar3] = (byte)iVar4 & 1;
       }
       bVar1 = ptVar6->fTracks[iVar5].fTimeOfDay;
       this->fTimeOfDay[iVar3] = bVar1;
       if (1 < bVar1) {
-        iVar4 = rand();
+        iVar4 = randPSX();
         this->fTimeOfDay[iVar3] = (byte)iVar4 & 1;
       }
       bVar1 = ptVar6->fTracks[iVar5].fWeather;
       this->fWeather[iVar3] = bVar1;
       if (1 < bVar1) {
-        iVar5 = rand();
+        iVar5 = randPSX();
         this->fWeather[iVar3] = (byte)iVar5 & 1;
       }
       iVar9 = iVar9 + 1;
@@ -463,7 +463,7 @@ void tTournamentManager::UpdateTrackFinishPoints()
       this->fRanking[iVar5] = (uchar)iVar5;
       iVar5 = iVar5 + -1;
     } while (-1 < iVar5);
-    qsort(this->fRanking,(int)sVar1,1,
+    qsortPSX(this->fRanking,(int)sVar1,1,
                (int (*)(const void *,const void *))tournPointsCompare);
     iVar5 = 0;
     do {

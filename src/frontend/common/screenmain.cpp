@@ -85,7 +85,7 @@ void tScreenMain::SwapBackground(int num)
      (this->fVideoShapes[1 - iVar1].fFile == 0)) {
     if (num == -1) {
       do {
-        iVar1 = rand();
+        iVar1 = randPSX();
         this->fCurrentBG[this->fCurrentSlot] = iVar1 % 0x1c;
       } while (this->fCurrentBG[this->fCurrentSlot] ==
                this->fCurrentBG[1 - this->fCurrentSlot]);
@@ -243,7 +243,7 @@ void tScreenMain::InitDynamicImages()
   int iVar12;
   int videoWallConfig;
   
-  iVar4 = rand();
+  iVar4 = randPSX();
   iVar4 = iVar4 % 0x18;
   iVar7 = 0;
   if (0 < videoWallConfigs[iVar4].numVideos) {
@@ -536,7 +536,7 @@ DrawBg_tvConfigsLoop:
       ClearImage(&r,'\0','\0','\0');
       DrawSync(0);
       do {
-        iVar7 = rand();
+        iVar7 = randPSX();
         sVar3 = (short)(iVar7 % 0x14);
         this->fCurrentMovie = sVar3;
       } while ((iVar7 % 0x14) * 0x10000 >> 0x10 == (int)this->fPreviousMovie);
@@ -561,7 +561,7 @@ DrawBg_tvConfigsLoop:
     this->fAnimationUploaded = 0;
     if (uVar6 == 0) {
       do {
-        iVar7 = rand();
+        iVar7 = randPSX();
         randomAnim = (short)(iVar7 % 0x19);
       } while (randomAnim == this->fPreviousAnim);
       this->fPreviousAnim = randomAnim;
@@ -697,7 +697,7 @@ void tScreenMain::PreLoad()
   
   sprintf(gPermBuffer,"zMain%d",(uint)(byte)frontEnd.language);
   i_int = 0;
-  rnd = rand();
+  rnd = randPSX();
   this->fPreviousAnim = (short)(rnd % 0x19);
   sprintf(gNameBuffer,"yVda%02d",(rnd % 0x19) * 0x10000 >> 0x10);
   this->_base_tScreen.PreLoad();
@@ -708,9 +708,9 @@ void tScreenMain::PreLoad()
     i_int = i_int + 1;
     iVar1 = i_int * 0x10000;
   } while (i_int * 0x10000 >> 0x10 < 2);
-  iVar1 = rand();
+  iVar1 = randPSX();
   this->fCurrentBG[0] = iVar1 % 0x1c;
-  iVar1 = rand();
+  iVar1 = randPSX();
   local_s2_356 = 0;
   this->fCurrentBG[1] = (this->fCurrentBG[0] + iVar1 % 0x1b + 1) % 0x1c;
   do {
@@ -781,7 +781,7 @@ void tScreenMain::Initialize()
   } while (iVar3 * 0x10000 >> 0x10 < 0x10);
   iVar2 = 0;
   do {
-    iVar3 = rand();
+    iVar3 = randPSX();
     numberValues[(short)iVar2] = (char)iVar3;
     iVar2 = iVar2 + 1;
   } while (iVar2 * 0x10000 >> 0x10 < 0x19);

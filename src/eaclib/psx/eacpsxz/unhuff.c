@@ -1,3 +1,4 @@
+#include <string.h>
 /* eaclib/psx/eacpsxz/unhuff.c -- RECONSTRUCTED from nfs4-f.exe. NOT original source.  *** COMPLETE ***
  *   obj nfs4\eaclib\psx\unhuff.obj ; EACPSXZ.LIB (xlsx col12 / SYM v3).  4 fns:
  *     unhuff  @0x800F459C (3108 B) -- EA "Huff" canonical-Huffman decompressor (the heaviest fn in the lib)
@@ -22,7 +23,6 @@
  */
 extern "C" unsigned int geti(void *p, char nbits);                 /* getm */
 extern "C" void puti(unsigned char *buf, unsigned int val, int n); /* textcrnt */
-extern "C" void *memset(void *s, int c, unsigned int n);           /* syslib C43 */
 
 extern "C" int unhuff(unsigned char *comp, unsigned char *out, int doDecode);     /* @0x800F459C */
 extern "C" char *memcpyl(char *dst, char *src, int n);                            /* @0x800F51C0 */

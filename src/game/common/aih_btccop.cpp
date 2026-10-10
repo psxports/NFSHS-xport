@@ -3000,12 +3000,12 @@ LAB_8005f268:
 
     else {
 
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 0;
 
       ((AIHigh_BasicCop *)this)->SetupBlockadeElements(&(this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop.blockade_);
 
-      gWSavePtr = (intptr)SetSp((void *)gWSavePtr);
+      gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
             stackSpeedUpEnbabledFlag = 1;
 
     }

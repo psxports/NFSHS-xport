@@ -11,7 +11,6 @@ extern int kRGBVals[28];
 extern "C" char textDefinitions[14][6];
 int CalcFadeVal(int col1, int amount);               /* 2-arg overload */
 int CalcFadeVal(int col1, int col2, int f1, int f2); /* 4-arg overload */
-void trap(int code);
 extern "C"
 {
     int textpixels(char *str);
@@ -22,13 +21,6 @@ extern "C" int mappings[3][13][3];   /* PSX->FE key mappings */
 /* menu helpers + Pad actuator (dumped overloads wrong-class/const; real call types per this TU) */
 void SetMenu(tMenuItemSlidingMenu *thisobj, short i, void *menu);
 void *TransitionIsFinished(tOptionsMenu *thisobj);
-/* libmath soft-float runtime (REAL SYM fns @0x800f####; variadic: Ghidra splits doubles into int pairs) */
-extern "C"
-{
-    double __muldf3(double, double);
-    int __fixdfsi(double);
-}
-
 /* called game/FE/audio/PsyQ functions (Ghidra-dumped signatures) */
 extern "C"
 {

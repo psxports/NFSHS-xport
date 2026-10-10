@@ -3,7 +3,6 @@
 #ifndef STATS_EXTERNS_H
     #define STATS_EXTERNS_H
 
-extern void trap(int); /* MIPS break (gcc div-guard) */
 
 /* ---- libc + harvested + SYM ---- */
 extern Car_tObj *Cars_gRaceCarList[]; /* 0x8010fa00 */
