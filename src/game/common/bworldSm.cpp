@@ -76,11 +76,6 @@ void BWorldSm_DeInit(void)
 /* ---- FindAbsClosestSliceCrude__FP8coorddefP12BWorldSm_Pos  [@0x8007e970] ---- */
 void FindAbsClosestSliceCrude(coorddef *pt,BWorldSm_Pos *slicePos)
 {
-  int numSlices;
-  int currDist;
-  int currInd;
-  int dist;
-  int i;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -111,7 +106,6 @@ void FindAbsClosestSliceCrude(coorddef *pt,BWorldSm_Pos *slicePos)
 /* ---- BWorldSm_FindClosestSlice__FP8coorddefP12BWorldSm_Pos  [@0x8007ea14] ---- */
 int BWorldSm_FindClosestSlice(coorddef *pt,BWorldSm_Pos *slicePos)
 {
-  int startSlice;
   u_char uVar1;
   short sVar2;
   bool bVar3;
@@ -134,13 +128,6 @@ int BWorldSm_FindClosestSlice(coorddef *pt,BWorldSm_Pos *slicePos)
 /* ---- RawFindClosestSlice__FP8coorddefP12BWorldSm_Pos  [@0x8007eab0] ---- */
 void RawFindClosestSlice(coorddef *pt,BWorldSm_Pos *slicePos)
 {
-  int lastind;
-  int maxind;
-  int index;
-  int distcurr;
-  int distnext;
-  int distprev;
-  Trk_NewSlice*slices;
   bool bVar1;
   int iVar2;
   int iVar3;
@@ -165,7 +152,7 @@ void RawFindClosestSlice(coorddef *pt,BWorldSm_Pos *slicePos)
         if (gNumSlices == 0) {
           trap(0x1c00);
         }
-        if ((gNumSlices == -1) && (iVar8 == -0x80000000)) {
+        if ((gNumSlices == -1) && (iVar8 == 0x80000000)) {
           trap(0x1800);
         }
         iVar2 = pt->x;
@@ -189,7 +176,7 @@ LAB_8007ec3c:
             if (gNumSlices == 0) {
               trap(0x1c00);
             }
-            if ((gNumSlices == -1) && (iVar6 == -0x80000000)) {
+            if ((gNumSlices == -1) && (iVar6 == 0x80000000)) {
               trap(0x1800);
             }
             piVar5 = (int *)(BWorldSm_slices + (iVar6 % gNumSlices));
@@ -203,7 +190,7 @@ LAB_8007ec3c:
             if (gNumSlices == 0) {
               trap(0x1c00);
             }
-            if ((gNumSlices == -1) && (iVar2 == -0x80000000)) {
+            if ((gNumSlices == -1) && (iVar2 == 0x80000000)) {
               trap(0x1800);
             }
           }
@@ -223,7 +210,7 @@ LAB_8007ec3c:
         if (gNumSlices == 0) {
           trap(0x1c00);
         }
-        if ((gNumSlices == -1) && (iVar8 + 1 == -0x80000000)) {
+        if ((gNumSlices == -1) && (iVar8 + 1 == 0x80000000)) {
           trap(0x1800);
         }
         piVar5 = (int *)(BWorldSm_slices + iVar7);
@@ -243,7 +230,6 @@ LAB_8007ec3c:
 void BWorldSm_SetSlice(int slice,BWorldSm_Pos *slicePos)
 {
   u_char uVar1;
-  int iVar2;
   
   slicePos->slice = (short)slice;
   slicePos->sliceChanged = '\0';
@@ -269,16 +255,6 @@ void BWorldSm_SetSlice(int slice,BWorldSm_Pos *slicePos)
 /* ---- GetStmQuadPts__FP12BWorldSm_PosP8coorddef  [@0x8007edb8] ---- */
 void GetStmQuadPts(BWorldSm_Pos *slicePos,coorddef *cp)
 {
-  Trk_NewStrip*pStrip;
-  coorddef*pts;
-  int cx;
-  int cy;
-  int cz;
-  int topInd;
-  int botInd;
-  int x;
-  int y;
-  int z;
   CCOORD16 *topPts;
   CCOORD16 *botPts;
   int iVar5;
@@ -310,9 +286,6 @@ void GetStmQuadPts(BWorldSm_Pos *slicePos,coorddef *cp)
 /* ---- SetStrip__FP12BWorldSm_Pos  [@0x8007eee0] ---- */
 void SetStrip(BWorldSm_Pos *slicePos)
 {
-  int i;
-  int maxIndex;
-  int quadCount;
   bool bVar1;
   Trk_NewStrip *pTVar2;
   int iVar3;
@@ -349,12 +322,6 @@ void SetStrip(BWorldSm_Pos *slicePos)
 /* ---- GetFirstStmQuadPts__FP12BWorldSm_PosP8CCOORD16  [@0x8007ef98] ---- */
 void GetFirstStmQuadPts(BWorldSm_Pos *slicePos,CCOORD16 *vertices)
 {
-  CCOORD16*pts;
-  Trk_NewStrip*pStrip;
-  int topInd;
-  int botInd;
-  short x;
-  short z;
   u_char bVar1;
   short sVar2;
   short sVar3;
@@ -384,8 +351,6 @@ void GetFirstStmQuadPts(BWorldSm_Pos *slicePos,CCOORD16 *vertices)
 /* ---- BWorld_SetSimSlice__FP12BWorldSm_Pos  [@0x8007f034] ---- */
 void BWorld_SetSimSlice(BWorldSm_Pos *slicePos)
 {
-  Trk_NewSimSlice*simSlices;
-  int chunkSliceInd;
   u_char bVar1;
   
   bVar1 = *(u_char *)((char *)BWorldSm_slices + slicePos->slice * 0x20 + 0x1c);
@@ -400,8 +365,6 @@ void BWorld_SetSimSlice(BWorldSm_Pos *slicePos)
 /* ---- BworldSm_UpdateSimQuad__FP12BWorldSm_Pos  [@0x8007f094] ---- */
 void BworldSm_UpdateSimQuad(BWorldSm_Pos *slicePos)
 {
-  int simIndex;
-  Trk_NewSimQuad*startsimquad;
   Group *pGVar1;
   Trk_NewSimSlice *pTVar2;
   int iVar3;
@@ -430,19 +393,10 @@ int BworldSm_IsSimQuadValid(BWorldSm_Pos *slicePos)
 /* ---- RawFindClosestQuad__FP8coorddefP12BWorldSm_Pos  [@0x8007f14c] ---- */
 int RawFindClosestQuad(coorddef *pt,BWorldSm_Pos *slicePos)
 {
-  int attempt;
-  int startQuadInd;
   /* Original .data at 0x8010f07c.  Ghidra rendered references as
      BWorld_gChunkBuildList[36 + attempt], crossing a TU/global boundary.
      They actually target this function-static search pattern. */
   static int sliceOffs[12] = { 1,-2,3,-4,5,-6,7,-8,9,-10,11,-12 };
-  int sliceVariance;
-  CCOORD16 pt16;
-  int dist;
-  int lastDist;
-  int firstSliceOffEdge;
-  int newSlice;
-  int numSlices;
   u_char bVar1;
   u_char uVar2;
   short sVar3;
@@ -705,11 +659,7 @@ LAB_8007f1dc:
 /* ---- FindClosestQuad__FP8coorddefP12BWorldSm_Pos  [@0x8007f8f8] ---- */
 int FindClosestQuad(coorddef *pt,BWorldSm_Pos *slicePos)
 {
-  int startSlice;
-  int startQuad;
-  int foundSlice;
   static coorddef corrPt;
-  int rCount;
   char cVar1;
   short sVar2;
   short sVar3;
@@ -840,9 +790,6 @@ int PointDirection(coorddef *p1,coorddef *p2,coorddef *p3)
 /* ---- BWorldSm_FindEdgeOff__FP8coorddefP12BWorldSm_PosT1Pi  [@0x8007fd28] ---- */
 int BWorldSm_FindEdgeOff(coorddef *pt,BWorldSm_Pos *slicePos1,BWorldSm_Pos *slicePos2,int *heightDiff)
 {
-  int ret;
-  coorddef*pts;
-  int y;
   int iVar1;
   u_int uVar2;
   
@@ -904,7 +851,6 @@ extern "C" int BWorldSm_QuadLight(BWorldSm_Pos *slicePos)
 /* ---- BWorldSm_TunnelFlagSm__FP12BWorldSm_Pos  [@0x8007ffd4] ---- */
 void * BWorldSm_TunnelFlagSm(BWorldSm_Pos *slicePos)
 {
-  int surf;
   u_char bVar1;
   
   if ((*(u_char *)((char *)BWorldSm_slices + slicePos->slice * 0x20 + 0x15) & 0x44) == 0) {
@@ -922,10 +868,6 @@ void * BWorldSm_TunnelFlagSm(BWorldSm_Pos *slicePos)
 /* ---- NormalCache_AddEntry__FP12BWorldSm_Pos  [@0x8008002c] ---- */
 void NormalCache_AddEntry(BWorldSm_Pos *slicePos)
 {
-  uint32 oldestTime;
-  int oldestInd;
-  tNormalCacheEntry*ce;
-  int i;
   tNormalCacheEntry *ptVar1;
   int iVar2;
   u_int uVar3;
@@ -965,10 +907,6 @@ void NormalCache_AddEntry(BWorldSm_Pos *slicePos)
 /* ---- NormalCache_FindEntry__FP12BWorldSm_Pos  [@0x800800e8] ---- */
 void * NormalCache_FindEntry(BWorldSm_Pos *slicePos)
 {
-  tNormalCacheEntry*ce;
-  int slice;
-  int quad;
-  int i;
   u_char *puVar1;
   tNormalCacheEntry *ptVar2;
   int iVar3;
@@ -1008,7 +946,6 @@ LAB_80080154:
 /* ---- NormalCache_Init__Fv  [@0x800801ac] ---- */
 void NormalCache_Init(void)
 {
-  int i;
   tNormalCacheEntry *ptVar1;
   int iVar2;
   
@@ -1031,8 +968,6 @@ void Check_Rot(BWorldSm_Pos *slicePos)
 {
   coorddef vecX;
   coorddef vecZ;
-  coorddef*forward;
-  coorddef*normal;
   void *pvVar1;
   int iVar2;
   int local_30;
@@ -1133,28 +1068,10 @@ extern "C" coorddef * BWorldSm_UForward(BWorldSm_Pos *slicePos)
 /* ---- BWorldSm_FindClosestTriangleRez__FP8coorddefP12BWorldSm_Posi  [@0x80080570] ---- */
 int BWorldSm_FindClosestTriangleRez(coorddef *pt,BWorldSm_Pos *slicePos,int hiRezFlag)
 {
-  int ret;
   char cVar1;
-  int z;
   int iVar2;
   int iVar3;
   int iVar4;
-  Trk_NewSimQuad *startsimquad;
-  Group *pThis;
-  Trk_NewSimSlice *simSlices;
-  int simIndex;
-  int botInd;
-  int cz;
-  int cy;
-  int cx;
-  Trk_NewSlice *slices;
-  int y;
-  int x;
-  int i;
-  int currDist;
-  int startSlice;
-  int attempt;
-  int startQuadInd;
   
   iVar2 = BWorldSm_FindClosestQuadRez(pt,slicePos,hiRezFlag);
   if (slicePos->simQuad != (Trk_NewSimQuad *)0x0) {

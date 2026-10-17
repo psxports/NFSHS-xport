@@ -253,7 +253,7 @@ void tScreenCongrats::DrawBackground()
         if (this->fNumSmallSpinShapes == 0) {
           trap(0x1c00);
         }
-        if ((this->fNumSmallSpinShapes == -1) && (ticks >> 3 == -0x80000000)) {
+        if ((this->fNumSmallSpinShapes == -1) && (ticks >> 3 == 0x80000000)) {
           trap(0x1800);
         }
         ScaleShapeExtended    /* @0x800486c0 idx=(ticks>>3)%fNumSmallSpinShapes flags=0x610 x=0x29 y=0xBE */
@@ -264,7 +264,7 @@ void tScreenCongrats::DrawBackground()
         if (this->fNumSmallSpinShapes == 0) {
           trap(0x1c00);
         }
-        if ((this->fNumSmallSpinShapes == -1) && (ticks / 0x14 == -0x80000000)) {
+        if ((this->fNumSmallSpinShapes == -1) && (ticks / 0x14 == 0x80000000)) {
           trap(0x1800);
         }
         DrawShapeExtended     /* @0x80048744 idx=(ticks/20)%fNumSmallSpinShapes flags=0x610 x=-0xC1 y=0x56 */
@@ -356,7 +356,7 @@ void tScreenCongrats::CalculatePrizes()
   this->fCarX = 0x116;
   this->congratsMessage = kScreenCongrats_Congrats;
   this->fCarY = 0x3f;
-  this->fCarCY = -7.4;
+  this->fCarCY = -7.4f;
   this->smallSpinningThing = kSpinningNone;
   this->fCarPlayer = 0;
   this->TotalCash = 0;
@@ -366,7 +366,7 @@ void tScreenCongrats::CalculatePrizes()
   if (this->congratsMessage == kScreenCongrats_Eliminated) {
     this->fCarX = 0x120;
     this->fCarY = 0x49;
-    this->fCarCY = -8.2;
+    this->fCarCY = -8.2f;
   }
   return;
 }
@@ -512,7 +512,7 @@ void tScreenPinkSlipCongrats::CalculatePrizes()
   (this->_base_tScreenCongrats).fCarX = 0x116;
   (this->_base_tScreenCongrats).fCarY = 0x4b;
   (this->_base_tScreenCongrats).fCarCX = 4.0;
-  (this->_base_tScreenCongrats).fCarCY = -7.4;
+  (this->_base_tScreenCongrats).fCarCY = -7.4f;
   return;
 }
 
@@ -757,12 +757,12 @@ void tScreenTournamentTrophy::CalculatePrizes()
   (this->_base_tScreenCongrats).CashAwarded = tInfo.fTournMoney;
   (this->_base_tScreenCongrats).fCarX = 0x116;
   (this->_base_tScreenCongrats).fCarY = 0x3f;
-  (this->_base_tScreenCongrats).fCarCY = -7.4;
+  (this->_base_tScreenCongrats).fCarCY = -7.4f;
   (this->_base_tScreenCongrats).fCarCX = 4.0;
   if ((this->_base_tScreenCongrats).congratsMessage == kScreenCongrats_Eliminated) {
     (this->_base_tScreenCongrats).fCarX = 0x120;
     (this->_base_tScreenCongrats).fCarY = 0x49;
-    (this->_base_tScreenCongrats).fCarCY = -8.2;
+    (this->_base_tScreenCongrats).fCarCY = -8.2f;
   }
   return;
 }
@@ -796,7 +796,7 @@ void tScreenBeTheCopCongrats::CalculatePrizes()
   (this->_base_tScreenCongrats).fCarX = 0x116;
   (this->_base_tScreenCongrats).fCarY = 0x4b;
   (this->_base_tScreenCongrats).fCarCX = 4.0;
-  (this->_base_tScreenCongrats).fCarCY = -7.4;
+  (this->_base_tScreenCongrats).fCarCY = -7.4f;
   return;
 }
 
@@ -865,7 +865,7 @@ void tScreenTournamentCongrats::CalculatePrizes()
   (this->_base_tScreenCongrats).fCarX = 0x116;
   (this->_base_tScreenCongrats).fCarY = 0x4b;
   (this->_base_tScreenCongrats).fCarCX = 4.0;
-  (this->_base_tScreenCongrats).fCarCY = -7.4;
+  (this->_base_tScreenCongrats).fCarCY = -7.4f;
   return;
 }
 

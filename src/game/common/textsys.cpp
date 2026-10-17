@@ -24,9 +24,6 @@ void TextSys_LoadWordsGeneric(int language,char *path)
 
   if (language < 7) {
     if (wordFile != (char *)0x0) {
-#ifndef AP_WIN
-      purgememadr(wordFile);
-#endif
     }
     /* @0x800B91B0 sprintf(string,"%s%s",path,langFileName[language]) -- return discarded;
      * @0x800B91BC/C4 wordFile = loadfileadr(string,0) ($v0). The reconstruction captured
@@ -88,12 +85,8 @@ extern "C" int TextSys_WordY(int wordnum)
 extern "C" void TextSys_UnloadWords(void)
 
 {
-  char fullpath [80];
   
   if (wordFile != (char *)0x0) {
-#ifndef AP_WIN
-    purgememadr(wordFile);
-#endif
   }
   wordFile = (char *)0x0;
   return;

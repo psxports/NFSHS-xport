@@ -8,11 +8,9 @@
 #include "draw_externs.h"
 #include "psx_gpu.h"
 
-#ifdef AP_WIN
 extern "C" void NFSHS_HostBeginPacketArena(void *,void *);
 extern "C" void NFSHS_HostEndPacketArena(void *);
 extern "C" void NFSHS_HostBeginDMAFrame(void);
-#endif
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 extern "C" { int Draw_SetView(int x0,int y0,int x1,int y1,int w,int h,int dtd,int isbg,int otsize); }
@@ -48,10 +46,7 @@ extern "C" int Draw_SetView(int x0,int y0,int x1,int y1,int w,int h,int dtd,int 
 {
   int iVar1;
   int iVar2;
-  Draw_tView *newview;
   Draw_tView *pDVar3;
-  DRAWENV *e10;
-  DRAWENV *e00;
   
   iVar1 = Draw_gNumView;
   pDVar3 = Draw_gView + Draw_gNumView;
@@ -88,7 +83,6 @@ extern "C" void Draw_InitViewOT(void)
 {
   uint32 *puVar1;
   Draw_tView *pDVar2;
-  int i;
   int iVar3;
   
   pDVar2 = Draw_gView;
@@ -108,7 +102,6 @@ void Draw_InitViewOTInGame(void)
 {
   uint32 *puVar1;
   Draw_tView *pDVar2;
-  int i;
   int iVar3;
   
   pDVar2 = Draw_gView;
@@ -127,7 +120,6 @@ void Draw_DeInitViews(void)
 
 {
   Draw_tView *pDVar1;
-  int i;
   int iVar2;
   
   pDVar1 = Draw_gView;
@@ -153,7 +145,6 @@ void Draw_DeInitViewsInGame(void)
   int iVar2;
   Draw_tView *pDVar3;
   int iVar4;
-  int i;
   
   iVar2 = Draw_gNumView;
   iVar4 = 0;
@@ -185,7 +176,6 @@ extern "C" void Draw_SetViewMemBudget(int viewid,int totalmem)
 void Draw_SetViewColor(int viewid,int r,int g,int b)
 
 {
-  Draw_tView *view;
   
   if (Draw_gView[viewid].drawenv[0].isbg != '\0') {
     Draw_gView[viewid].drawenv[0].r0 = (u_char)r;
@@ -204,9 +194,6 @@ void Draw_SetViewColor(int viewid,int r,int g,int b)
 void AllocatePrimitivesBuffer(void)
 
 {
-  Draw_tView * view0;
-  Draw_tView * view1;
-  Draw_tView *view;
   int iVar1;
   int iVar2;
   
@@ -276,7 +263,6 @@ void Draw_StartRenderingView(int viewid)
 {
   int iVar1;
   Draw_tView *view;
-  Draw_DCache *sd;
   
   view = Draw_gView + viewid;
   iVar1 = view->otsize * 7;
@@ -338,13 +324,10 @@ void Draw_StartFrameRender(void)
   int *piVar2;
   uint32 **ppuVar3;
   Draw_tView *pDVar4;
-  int i;
   int iVar5;
   
   iVar5 = 0;
-#ifdef AP_WIN
   NFSHS_HostBeginDMAFrame();
-#endif
   pDVar4 = Draw_gView;
   while (bVar1 = iVar5 < Draw_gNumView, iVar5 = iVar5 + 1, bVar1) {
     piVar2 = &pDVar4->otsize;
@@ -354,9 +337,7 @@ void Draw_StartFrameRender(void)
   }
   Render_gPacketPtr = (u_char *)gEnviro[gFlip].server;
   Draw_gMaxPrim = (int)(intptr)gEnviro[gFlip].server + gTotalMem;
-#ifdef AP_WIN
   NFSHS_HostBeginPacketArena(Render_gPacketPtr,(void *)(intptr)Draw_gMaxPrim);
-#endif
   return;
 }
 
@@ -375,7 +356,6 @@ void Draw_StopFrameRender(void)
 {
   bool bVar1;
   Draw_tView *pDVar2;
-  int i;
   int iVar3;
   
   DrawSync(0);
@@ -388,9 +368,7 @@ void Draw_StopFrameRender(void)
   }
   iVar3 = 0;
   PutDispEnv(&gEnviro[gFlip].disp);
-#ifdef AP_WIN
   NFSHS_HostEndPacketArena(Render_gPacketPtr);
-#endif
   pDVar2 = Draw_gView;
   while (bVar1 = iVar3 < Draw_gNumView, iVar3 = iVar3 + 1, bVar1) {
     DrawOTag(pDVar2->ot[gFlip] + pDVar2->otsize + -1);
@@ -477,9 +455,6 @@ void Draw_DeInitRenderEngine(void)
 void Draw_InitLibRender(void)
 
 {
-  int i;
-  DRAWENV *e00;
-  DRAWENV e;
   
   gLoop = 1;
   InitGeom();

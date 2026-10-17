@@ -182,7 +182,7 @@ static int g_host_race_gas;
 static int g_host_race_started;
 static int g_host_fast_test = -1;
 static int g_host_test_verbose = -1;
-#if defined(AP_WIN) && NFSHS_DIAGNOSTICS
+#if NFSHS_DIAGNOSTICS
 /* Temporary deterministic-input harness.  The table is generated from the
  * raw digital-pad packets captured from DuckStation, not reconstructed from
  * steering/throttle observations. */
@@ -291,7 +291,6 @@ return 1;
 #endif
 }
 
-#ifdef AP_WIN
 static int host_duck_replay_keys(int gameTick, unsigned short *keys)
 {
 #if NFSHS_DIAGNOSTICS
@@ -351,7 +350,6 @@ static int host_duck_replay_keys(int gameTick, unsigned short *keys)
 return 0;
 #endif
 }
-#endif
 
 extern "C" int NFSHS_HostTestRaceRequested(void)
 {
@@ -851,10 +849,8 @@ extern "C" void NFSHS_HostRaceStart(Car_tObj *playerCar)
 {
 #if NFSHS_DIAGNOSTICS
 
-#ifdef AP_WIN
     g_host_duck_replay_run=0;
     g_host_duck_replay_finished=0;
-#endif
     /* Test-only placement uses the game's own complete placement routine so
        Newton, road slice/quad, orientation, wheel and collision state remain
        synchronized.  With no startSlice parameter this boundary is inert. */
@@ -1129,12 +1125,10 @@ void NFSHS_HostPadPoll(void)
     }
 #endif
 
-#ifdef AP_WIN
     /* Replay overrides only the emulated hardware packet.  With the opt-in
        environment variable absent this branch is inert and keyboard handling
        above remains byte-for-byte the normal native-port path. */
     NFSHS_DIAGNOSTIC_CALL(host_duck_replay_keys(NFSHS_HostCurrentGameTicks(),&keys));
-#endif
     static unsigned short last_keys=0xffff;
     if(keys!=last_keys){NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "pad keys=%04x",keys); NFSHS_HostLog(nfshsLogLine); }()));last_keys=keys;}
     pad_publish(0,1,keys);
@@ -1180,6 +1174,8 @@ extern "C" void *reservememadr(const char *,int,int);
 extern "C" int purgememadr(void *);
 void *__builtin_new(unsigned int);
 void __builtin_delete(void *);
+void FeDraw_SetABRMode(int);
+extern "C" u_char *&Render_gPacketPtr, *&Render_gPalettePtr;
 
 static int host_gpu_packet_self_test(void)
 {
@@ -1238,6 +1234,18 @@ static int host_gpu_packet_self_test(void)
         fclose(file);
         if (extra != EOF || failed) return 16;
     }
+    u_char *saved_packet = Render_gPacketPtr;
+    u_char *saved_palette = Render_gPalettePtr;
+    ram[0] = 0x00ffffff;
+    ram[4] = 0;
+    Render_gPalettePtr = (u_char *)ram;
+    Render_gPacketPtr = (u_char *)(ram + 4);
+    FeDraw_SetABRMode(2);
+    bool menu_link_valid = ram[0] == 0x12350 && ram[4] == 0x02ffffff &&
+        Render_gPacketPtr == (u_char *)(ram + 7);
+    Render_gPacketPtr = saved_packet;
+    Render_gPalettePtr = saved_palette;
+    if (!menu_link_valid) return 17;
     return 0;
 }
 
@@ -1370,6 +1378,8 @@ static int host_gte_normal_self_test(void)
 
 static int host_pad_packet_self_test(void)
 {
+    // Keep the digital fixture independent of connected physical controllers
+    xport_input_override(1, 0);
     uint8 first[8];
     uint8 second[8];
     sint32 index;
@@ -1383,7 +1393,8 @@ static int host_pad_packet_self_test(void)
             return 4;
     PadStartCom();
     pad_publish(0, 1, 0xb7de);
-    if (PadInfoMode(0, 1, 0) != 4 || PadInfoMode(0, 4, -1) != 0)
+    if (PadInfoMode(0, 1, 0) != 4 || PadInfoMode(0, 4, -1) != 1 ||
+        PadInfoMode(0, 4, 0) != 4 || PadInfoMode(0, 4, 1) != 0)
         return 7;
     if (first[0] != 0 || first[1] != 0x41 || first[2] != 0xde || first[3] != 0xb7)
         return 1;
@@ -1401,7 +1412,7 @@ static int host_pad_packet_self_test(void)
         return 6;
     if (PadSetMainMode(0, 1, 1) != 0 || PadInfoMode(0, 3, 0) != 0)
         return 11;
-    psx_pad_bind_owner_packets(0x80147600u, 0x801476F0u);
+    psx_pad_bind_owner_packets(0x80147600u, 0x801476F0u, 0, 0, 0, 0);
     for (index = 0; index < 2; ++index)
     {
         uint32 owner = 0x80147600u + 0xF0u * (uint32)index;
@@ -1533,7 +1544,7 @@ static int host_pad_packet_self_test(void)
         if (!complete)
             return 22;
     }
-    psx_pad_bind_owner_packets(0, 0);
+    psx_pad_bind_owner_packets(0, 0, 0, 0, 0, 0);
     return 0;
 }
 
@@ -1989,7 +2000,7 @@ static int host_pc_completion_self_test(void)
         operation = {};
         gFileMgr.curop = &operation;
         readcmd = {1, i == 2 ? 64 : file, (int)(intptr)&output, 0, i == 1 ? 2 : 1};
-        if (readfile_systask() || operation.status != (i == 0 ? 1 : -2) ||
+        if (readfile_systask(0, 0) || operation.status != (i == 0 ? 1 : -2) ||
             readcmd.pending || gFileMgr.curop || (i == 0 && output != 'Q')) return 5 + i;
     }
     if (PCclose(file)) return 8;
@@ -2009,12 +2020,18 @@ static int host_video_self_test(void)
     NFSHS_ConfigurePsyQHost();
     psx_pc_set_root("DATA", 1);
     timerhz = 100;
+    initmemadr((int)(intptr)(DRAM + 0x148b0c),PSX_DRAM_SIZE - 0x148b0c);
+    int free_before = largestunused();
     char dct[] = "ZZZZVD00.DCT";
     intptr video = VIDEO_create(80, 80, 15 << 16, 0x20000, 16);
     if (!video) return 1;
     VIDEO_spoolfile(video, dct);
     VIDEO_startplayback(video);
-    if (VIDEO_state(video) != VIDEOSTATE_PLAYING) { VIDEO_destroy(video); return 2; }
+    if (VIDEO_state(video) != VIDEOSTATE_PLAYING) {
+        VIDEO_destroy(video);
+        purgememadr((void *)video);
+        return 2;
+    }
     unsigned changed = 0;
     for (int i = 0; i < 20; ++i)
     {
@@ -2024,6 +2041,7 @@ static int host_video_self_test(void)
     VIDEO_abortplayback(video);
     int state = VIDEO_state(video);
     VIDEO_destroy(video);
+    if (!purgememadr((void *)video) || largestunused() != free_before) return 5;
     if (!changed || state != VIDEOSTATE_IDLE) return 3;
     uint16 first = VRAM[512];
     unsigned varied = 0;
@@ -2108,10 +2126,11 @@ static int host_video_self_test(void)
 
 extern "C" {
 #if defined(__EMSCRIPTEN__)
-void NFSHS_HostMainInit(void) {
+void NFSHS_HostMainInit(void)
 #else
-void __main(void) {
+void __main(void)
 #endif
+{
     if (getenv("NFSHS_HEADLESS")) xport_set_headless(1);
     if (getenv("NFSHS_VIDEO_SELFTEST"))
         ExitProcess((UINT)host_video_self_test());
@@ -2160,6 +2179,7 @@ void __main(void) {
         ExitProcess((UINT)host_single_math_self_test());
     if (getenv("NFSHS_DOUBLE_MATH_SELFTEST"))
         ExitProcess((UINT)host_double_arithmetic_self_test());
+    ensure_window();
     NFSHS_ConfigurePsyQHost();
 }
 void __pure_virtual(void) { ExitProcess(3); }

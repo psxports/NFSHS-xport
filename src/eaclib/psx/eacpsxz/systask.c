@@ -14,25 +14,19 @@ extern "C"
     int gSysTaskLastTick;
 }
 extern "C" int libticks; /* free-running tick counter */
-#ifdef AP_WIN            /* PORTABILITY-REVIEWED: native monotonic timer source */
 extern "C" int ticks;    /* game/frontend frame clock */
 extern "C" void NFSHS_HostPumpTimers(void);
-#endif
 extern "C" int gSysTaskCount;    /* live task count */
 extern "C" int gSysTaskLastTick; /* last tick the task list ran */
 extern "C" SystemTaskSlot systemtasksubs[16];
 
-extern "C" int addsystemtask(intptr taskFn, int period, int delay); /* @0x800E6AF4 */
-extern "C" intptr delsystemtask(intptr fn);                         /* @0x800E6BA8 */
-extern "C" unsigned int systemtask(int arg1);                       /* @0x800E6C04 */
 
 /* addsystemtask @0x800E6AF4 : register a periodic task (or update its slot); returns the running count. */
-extern "C" int addsystemtask(intptr taskFn, int period, int delay)
+extern "C" int addsystemtask(NFSHS_SystemTask taskFn, int period, int delay)
 {
-    int tick = libticks;
     int activeAdds = gSysTaskCount;
     int selected = -1;
-    gSysTaskCount = activeAdds + 1;
+    gSysTaskCount = (int)((uint32)activeAdds + 1u);
     for (int i = 0; i < 0x10; ++i)
     {
         SystemTaskSlot *slot = &systemtasksubs[i];
@@ -45,7 +39,7 @@ extern "C" int addsystemtask(intptr taskFn, int period, int delay)
             if (activeAdds == 0)
                 selected = i;
             else
-                activeAdds = activeAdds - 1;
+                activeAdds = (int)((uint32)activeAdds - 1u);
         }
     }
     if (selected != -1)
@@ -54,37 +48,33 @@ extern "C" int addsystemtask(intptr taskFn, int period, int delay)
         slot->callback = taskFn;
         slot->period = period;
         slot->busy = 0;
-        slot->deadline = tick + delay;
+        slot->deadline = (int)((uint32)libticks + (uint32)delay);
     }
-    gSysTaskCount = gSysTaskCount - 1;
+    gSysTaskCount = (int)((uint32)gSysTaskCount - 1u);
     return gSysTaskCount;
 }
 
 /* delsystemtask @0x800E6BA8 : remove the task whose fn matches; returns the cleared fn (or end-marker). */
-extern "C" intptr delsystemtask(intptr fn)
+extern "C" intptr delsystemtask(NFSHS_SystemTask fn)
 {
     for (int i = 0; i < 0x10; ++i)
     {
         if (systemtasksubs[i].callback == fn)
         {
-            intptr ret = systemtasksubs[i].callback;
-            if (ret == fn)
-                systemtasksubs[i].callback = 0;
-            return ret;
+            systemtasksubs[i].callback = 0;
+            return (intptr)fn;
         }
     }
-    return 0;
+    return 0x100;
 }
 
 /* systemtask @0x800E6C04 : once per tick, run every due task (fn(arg1, elapsed)) and re-arm it; OR of returns. */
 extern "C" unsigned int systemtask(int arg1)
 {
     unsigned int result = 0;
-#ifdef AP_WIN /* PORTABILITY-REVIEWED: pump the native timer boundary */
     /* The native runtime is single-threaded. Pump the reconstructed 128 Hz
        root counter from the host monotonic clock. */
     NFSHS_HostPumpTimers();
-#endif
     if (gSysTaskLastTick != libticks)
     {
         gSysTaskLastTick = libticks;
@@ -96,11 +86,11 @@ extern "C" unsigned int systemtask(int arg1)
                 unsigned int r;
                 int t;
                 slot->busy = 1;
-                r = ((unsigned int (*)(int, int))slot->callback)(arg1, libticks - slot->deadline);
+                r = (unsigned int)slot->callback(arg1, (int)((uint32)libticks - (uint32)slot->deadline));
                 t = libticks;
                 result |= r;
                 slot->busy = 0;
-                slot->deadline = t + slot->period;
+                slot->deadline = (int)((uint32)t + (uint32)slot->period);
             }
         }
     }

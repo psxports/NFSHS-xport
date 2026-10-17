@@ -4,6 +4,7 @@
 #include "../../nfs4_types.h" /* VIDEOSTRUCT(64B), STREAMCHUNKHDR(8B), VIDEOSTATE - video.obj-owned */
 
 intptr VIDEO_create(int width, int height, int fps, int streambuffersize, int memtype);
+// Destroy contents before the caller frees the handle with purgememadr
 void VIDEO_destroy(intptr handle);
 void VIDEO_spoolfile(intptr handle, char *fname);
 void VIDEO_startplayback(intptr handle);

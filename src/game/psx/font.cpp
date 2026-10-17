@@ -74,11 +74,6 @@ void Font_Blit(int x,int y,void *src,int u,int v,charactertbl *ch,int arg6)
 {
   int fontClut;
   u_int uVar1;
-  int dv;
-  int iVar2;
-  int height;
-  int width;
-  int loc_8;
   u_char uv_x;
   u_char uv_y;
   uint32 tu3;
@@ -108,28 +103,16 @@ void Font_ComputeColors(int colour,int forecolour,int backcolour,char in_game)
 
 {
   u_int uVar1;
-  int fg1;
   cluttbl *pcVar2;
   u_int uVar3;
   u_int uVar4;
-  int fr1;
   u_int uVar5;
   int bb;
   int iVar6;
-  int bg;
-  int br;
   int fb;
-  int i;
   int iVar7;
-  int fg;
-  int fb1;
-  int opaque;
-  int fr;
   CVECTOR fclr;
-  CVECTOR bclr;
   int r;
-  int g;
-  int b;
   int rgb;
   
   iVar7 = 0;
@@ -194,11 +177,8 @@ charactertbl *
 Font_textbsearch(int key,char *base,uint32 nmemb,uint32 size)
 
 {
-  int cmp;
   int iVar1;
-  charactertbl *ch;
   charactertbl *p;
-  int lim;
   
   while( true ) {
     if (nmemb == 0) {
@@ -221,9 +201,7 @@ extern "C" charactertbl * Font_Getcharacter(int targetindex)
 
 {
   int probe_idx;
-  charactertbl *ch;
   charactertbl *p;
-  char *base;
   
   p = (charactertbl *)((u_char *)currentfont.glyphTable + (targetindex + -0x20) * 0xb);
   probe_idx = geti(p,2);
@@ -295,9 +273,7 @@ extern "C" int Font_LoadFont(char *f1,int x,int y,char in_game)
 {
   unsigned char *shp_00;
   int iVar1;
-  int i;
   int iVar2;
-  int l;
   int iVar3;
   long *plVar4;
   shapetbl *shp;
@@ -357,13 +333,8 @@ void Font_TextXY(char *string,int x,int y)
   charactertbl *ch_entry_p;
   int char_w;
   int char_h;
-  DR_MODE *dr_mode;
   int tpage;
-  int u;
-  charactertbl *ch;
-  int code;
   int ch_byte;
-  char *str;
   u_char *p;
   
   ch_byte = -1;
@@ -396,20 +367,8 @@ void Font_TextXY(char *string,int x,int y)
 extern "C" void Font_GetUVWH(char code,int *u,int *v,int *w,int *h,int *yoff)
 
 {
-  int cmp;
   charactertbl *pcVar1;
   int iVar2;
-  int fr1;
-  int height;
-  int i;
-  int fg;
-  int width;
-  charactertbl *ch;
-  char *str;
-  int opaque;
-  int fr;
-  CVECTOR fclr;
-  CVECTOR bclr;
   
   pcVar1 = Font_Getcharacter((u_int)(u_char)code);
   iVar2 = geti(pcVar1->u,2);

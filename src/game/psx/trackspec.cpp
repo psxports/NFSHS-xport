@@ -15,7 +15,6 @@ void TrackSpec_SetDefault(CTrackSpec *spec)
   short sVar2;
   int iVar3;
   int j;
-  CTrackSpec *local_a0__1;
   CTrackSpec *pCVar5;
   int i;
   int iVar7;

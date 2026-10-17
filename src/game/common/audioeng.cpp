@@ -109,15 +109,7 @@ void AudioEng_Set(int player,int vol,int esp,int gas,int cam,int dop,int azi,int
 /* ---- AudioEng_Update__Fv  [@0x8007b824] ---- */
 void AudioEng_Update(void)
 {
-  int player;
-  AudioEng_t*g;
-  int n;
-  AudioEng_tState*s;
-  int tick;
-  uint32 vol;
   SNDPLAYOPTS playopts;
-  u_short leftazim;
-  u_short rightazim;
   short sVar1;
   short sVar2;
   bool bVar3;
@@ -349,22 +341,6 @@ void AudioEng_LoadDef(char *filename,char *name,int handle,long offset,long size
 /* ---- AudioEng_StartUp__FiPc  [@0x8007be54] ---- */
 int AudioEng_StartUp(int player,char *carname)
 {
-  AudioEng_tDef*cruisedef;
-  AudioEng_tDef*loaddef;
-  int tablesize;
-  int i;
-  int bankloaded;
-  int spu;
-  char filename[64];
-  AudioEng_t*g;
-  char*header;
-  int handle;
-  long size;
-  long offset;
-  char*current;
-  int c;
-  AudioEng_tChanAttr*chan;
-  int j;
   bool bVar1;
   int iVar2;
   AudioEng_t *pAVar3;
@@ -608,9 +584,6 @@ void AudioEng_StopServer(void)
 /* ---- AudioEng_Pause__Fv  [@0x8007c47c] ---- */
 void AudioEng_Pause(void)
 {
-  int player;
-  AudioEng_t*g;
-  AudioEng_tState*s;
   AudioEng_tState *pAVar1;
   AudioEng_t *pAVar2;
   AudioEng_t **ppAVar3;
@@ -644,25 +617,11 @@ void AudioEng_Resume(void)
 /* ---- AudioEng_CleanUp__Fv  [@0x8007c534] ---- */
 void AudioEng_CleanUp(void)
 {
-  AudioEng_t*g;
-  int j;
-  AudioEng_tChanAttr *chan;
   u_int uVar1;
-  int c;
-  char *pdata;
   AudioEng_t *pAVar2;
-  int i;
   int iVar3;
-  u_short leftazim;
   AudioEng_t *ptr;
-  char *current;
-  char *header;
-  int tablesize;
   AudioEng_t **ppAVar4;
-  int bankloaded;
-  SNDPLAYOPTS playopts;
-  AudioEng_tDef *loaddef;
-  AudioEng_tDef *cruisedef;
   
   ppAVar4 = AudioEng_g;
   while( true ) {

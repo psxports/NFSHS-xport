@@ -8,7 +8,6 @@
 /* cross-TU globals + unmangled lib fns referenced by nfs3.obj */
 extern Speaker *_6Speech_fgUndefined;    /* Speech::fgUndefined */
 extern Speech *_6Speech_fgSpeech;        /* Speech::fgSpeech */
-extern __vtbl_ptr_type Speaker_vtable[]; /* @0x80055dc4  Speech::Speaker vtable (defined in speech.cpp); Ghidra fabricated the name "Speech_Speaker_vtable" for this same VA */
 // [owned->defined in nfs3.cpp] extern char befuddleExtensions[][4];
 extern "C" char *Paths_Paths[];
 extern "C" GameSetup_tData GameSetup_gData;
@@ -234,7 +233,7 @@ extern "C"
 {
     extern void Sim_StartUp(void);
 }
-extern Speech *Speech_ct(Speech *);
+
 extern int Stats_GetNumOpponents(void);
 extern "C"
 {
@@ -249,6 +248,6 @@ extern "C"
     extern void Weather_Restart(void);
 }
 extern void Speech_Reset();
-extern void Speech_dt(Speech *, u_int);
+
 
 #endif

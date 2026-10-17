@@ -5,6 +5,10 @@
 #include "libfns.h"
 #include "snd.h"
 #include "../eaclib/psx/eacpsxz/cdfs.h"
+#include "../eaclib/psx/eacpsxz/nfile_atomic.h"
+#include "../eaclib/psx/eacpsxz/nfile_completion.h"
+#include "../eaclib/psx/spchpsxz/spch_callbacks.h"
+#include "../eaclib/psx/spchpsxz/spchsamp.h"
 
 /* -- EACPSXZ -- */
 /* fixdmult */
@@ -23,15 +27,11 @@ void getblocksize(void *arg0);                                                  
 void getblockname(void *arg0);                                                                          /* memstd */
                                                                                                         /* memstd */
                                                                                                         /* memstd */
-void filesizeatomic(int arg0);                                                                          /* nsync */
-                                                                                                        /* nsync */
-intptr loadfileadratomic(int retry, void *args);                                                        /* nsync */
                                                                                                         /* nsync */
                                                                                                         /* nsync */
-intptr loadfileatadratomic(int retry, void *args);                                                      /* nsync */
                                                                                                         /* nsync */
                                                                                                         /* nsync */
-intptr loadbigfileheaderatomic(int retry, void *args);                                                  /* nsync */
+                                                                                                        /* nsync */
                                                                                                         /* nsync */
                                                                                                         /* xform */
                                                                                                         /* atanfunc */
@@ -84,7 +84,6 @@ void FILE_initwithmem(int arg0);                                                
 void FILE_overhead(int arg0);                                                                           /* nfile */
                                                                                                         /* nfile */
                                                                                                         /* nfile */
-void FILE_callbackop(int arg0);                                                                         /* nfile */
 void FILE_priorityop(int arg0);                                                                         /* nfile */
 void FILE_cancelop(int arg0);                                                                           /* nfile */
 int FILE_waitop(unsigned int id);                                                                       /* nfile */
@@ -98,7 +97,6 @@ void iFILE_addbigopencallback(int arg0);                                        
 void FILE_addbig(char *arg0);                                                                           /* nfile */
 void iFILE_delbigclosecallback(int arg0);                                                               /* nfile */
 void FILE_delbig(char *arg0);                                                                           /* nfile */
-intptr FILE_atomic(intptr fn, int idle, int retries, void *args);                                       /* nfile */
 void iFILE_ExecCommand(void *arg0);                                                                     /* nfile */
 extern "C" int iFILE_CommandCompleteCallback(int result);                                               /* nfile */
 void iFILE_perror();                                                                                    /* nfile */
@@ -131,7 +129,6 @@ void loadfilereadcallback(int arg0);                                            
 void loadfilesizecallback(int arg0);                                                                    /* nasync */
 void loadfileopencallback(int arg0);                                                                    /* nasync */
 void loadsegreadcallback(int arg0);                                                                     /* nasync */
-void asyncsystemtask();                                                                                 /* nasync */
                                                                                                         /* nasync */
 void asyncloadfilecallback(char *arg0);                                                                 /* nasync */
                                                                                                         /* nasync */
@@ -163,7 +160,6 @@ int initfileio(void);                                                           
 void openfile(char *arg0);                                                                              /* fileroot */
 void closefile(int arg0);                                                                               /* fileroot */
 void readfile(int arg0);                                                                                /* fileroot */
-void readfile_systask();                                                                                /* fileroot */
 void writefile(int arg0);                                                                               /* fileroot */
 void getfilesize(int arg0);                                                                             /* fileroot */
 int stopreadfile(int arg0);                                                                             /* fileroot */
@@ -216,7 +212,7 @@ void STREAM_queuefile(void *arg0);                      /* stream */
 void STREAM_queuemem(void *arg0);                       /* stream */
 void STREAM_cancelrequest(void *arg0);                  /* stream */
 void STREAM_kill(void *arg0);                           /* stream */
-void STREAM_get(int arg0);                              /* stream */
+extern "C" intptr STREAM_get(intptr consumer);          /* stream */
 void STREAM_release(void *arg0);                        /* stream */
 void STREAM_gettable(void *arg0);                       /* stream */
 void STREAM_state(void *arg0);                          /* stream */
@@ -305,7 +301,6 @@ void iSNDleaveaudio();                                                          
                                                                                                                                                                /* ssysinit */
                                                                                                                                                                /* ssysinit */
                                                                                                                                                                /* ssysinit */
-void iSNDsystemtaskreal();                                                                                                                                     /* ssysreal */
                                                                                                                                                                /* ssysreal */
 int SNDcdvol(int vol);                                                                                                                                         /* scdvol */
 void iSNDplatformfree(void *arg0);                                                                                                                             /* sdata */
@@ -449,8 +444,6 @@ void iSPCH_MemFree(void *arg0);                                             /* s
 void SPCH_Deinit(void);                                                     /* spchinit */
 void iSPCH_InitInGame();                                                    /* spchinit */
 void SPCH_GetSampleDataRate(int arg0);                                      /* spchinit */
-intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks); /* spchinit */
-int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate);  /* spchinit */
 int iSPCH_EACrandom();                                                      /* spchrand */
 int *iSPCH_EACseedrandom(unsigned int seed);                                /* spchrand */
 int iSPCH_Rand(int n);                                                      /* spchrand */
@@ -498,7 +491,5 @@ unsigned int iSPCH_GetRuleID(intptr sentence, int index);                       
 void iSPCH_RuleSet(short *sentence, int rule, int *values);                        /* spchrule */
 unsigned int iSPCH_GetRuleSettings(short *sentence, int *values, char *out);       /* spchrule */
 unsigned int iSPCH_CheckSentenceRules(int testVal, int clearMask, intptr rulePtr); /* spchrule */
-void iSPCH_InitSample(void *arg0);                                                 /* spchsamp */
-int iSPCH_UnPackSample(intptr bank, unsigned int sampleIdx, int *out);             /* spchsamp */
 
 #endif

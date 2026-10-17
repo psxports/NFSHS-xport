@@ -96,8 +96,6 @@ int AIHigh_BTC_Cop::GetCheckChasePosition(coorddef *pos)
 
 
 {
-  int newPosition;
-  int changed;
 
   bool bVar1;
 
@@ -151,14 +149,6 @@ int AIHigh_BTC_Cop::CheckForNewTarget()
 
 
 {
-  AIHigh_BTC_Perp*newTarget;
-  int newTargetDistance;
-  int perpLoop;
-  AIHigh_BTC_Perp*old;
-  Car_tObj*testPerpCarObj;
-  int thisPerpCarIndex;
-  AIHigh_BTC_Perp*thisPerpHigh;
-  int copToTargetDistanceMeters;
 
   int iVar1;
 
@@ -276,8 +266,8 @@ void AIHigh_BTC_Cop::StartArrest(AIHigh_BTC_Perp *arrestMe)
       pSVar1 = (Speaker *)Speech_Mobile(carObj);
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[9];
-        ((void (*)(MobileSpeaker *, int))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta), 1);
+
+        (pSVar1)->Catch(1);
       }
 
     }
@@ -407,11 +397,6 @@ AIHigh_BTC_HumanCop::AIHigh_BTC_HumanCop(Car_tObj *carObj,int copIndex)
 
 
 {
-  int startDirection;
-  int startMovement;
-  int startSlice;
-  int addToSlice;
-  int bend;
 
   int iVar1;
 
@@ -513,12 +498,6 @@ int AIHigh_BTC_HumanCop::FindRandomBarrierFreeArea(int startSlice,int safetyZone
 
 
 {
-  int newOffset;
-  int newSlice;
-  int maxRuns;
-  int startCheckSlice;
-  int leftLaneFree;
-  int rightLaneFree;
 
   int iVar1;
 
@@ -679,10 +658,6 @@ void AIHigh_BTC_HumanCop::FreezeAndEndChase()
 
 
 {
-  int startDirection;
-  int startSlice;
-  int startMovement;
-  int addToSlice;
 
   int iVar1;
 
@@ -788,11 +763,6 @@ void AIHigh_BTC_HumanCop::CheckConditionWithCop0()
 
 
 {
-  AIHigh_BTC_HumanCop*leadCop;
-  int startDirection;
-  int startSlice;
-  int startMovement;
-  int addToSlice;
 
   AIHigh_Base *pAVar1;
 
@@ -878,13 +848,6 @@ void AIHigh_BTC_HumanCop::NewStage(int copSlice,int direction,int movement)
 
 
 {
-  int nextStageTime;
-  int newLatPos;
-  int throwAway;
-  int initialDirection;
-  int initialMovement;
-  int rightPos;
-  int leftPos;
 
   Car_tObj *pCVar1;
 
@@ -1157,8 +1120,8 @@ void AIHigh_BTC_HumanCop::UpdateAndCheckTimeLeft()
       pSVar2 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar2->_vf)[7];
-        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+
+        (pSVar2)->Lose();
       }
 
       AIH_BTCCop_freezeToggle_8013c564 = 0;
@@ -1296,7 +1259,6 @@ void AIHigh_BTC_HumanCop::RequestWingman()
 
 
 {
-  int wingmanActivationTime;
 
   Speaker *pSVar1;
 
@@ -1313,8 +1275,8 @@ void AIHigh_BTC_HumanCop::RequestWingman()
     pSVar1 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
     {
-      const __vtbl_ptr_type &entry = (*pSVar1->_vf)[12];
-      ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta));
+
+      (pSVar1)->Backup();
     }
 
     if ((((this->chaseStartTime_ == 0) || (iVar2 == 0)) ||
@@ -1324,8 +1286,8 @@ void AIHigh_BTC_HumanCop::RequestWingman()
       pSVar1 = (Speaker *)Speech_Dispatch();
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[3];
-        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta));
+
+        (pSVar1)->Deny();
       }
 
     }
@@ -1356,7 +1318,6 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
 
 
 {
-  int availableTime;
 
   Speaker *pSVar1;
 
@@ -1373,8 +1334,8 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
       pSVar1 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[10];
-        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta));
+
+        (pSVar1)->RoadBlock();
       }
 
       iVar3 = GameSetup_gData.perpInfo[this->currentStage_].BlockadeCopTime;
@@ -1388,8 +1349,8 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
       pSVar1 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[11];
-        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta));
+
+        (pSVar1)->SpikeBelt();
       }
 
       iVar3 = GameSetup_gData.perpInfo[this->currentStage_].SpikeBeltTime;
@@ -1407,8 +1368,8 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
       pSVar1 = (Speaker *)Speech_Dispatch();
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[3];
-        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta));
+
+        (pSVar1)->Deny();
       }
 
     }
@@ -1418,8 +1379,8 @@ void AIHigh_BTC_HumanCop::RequestBlockader(int spikeBeltRequest)
       pSVar1 = (Speaker *)Speech_Dispatch();
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar1->_vf)[4];
-        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta));
+
+        (pSVar1)->Grant();
       }
 
       if (spikeBeltRequest == 0) {
@@ -1565,9 +1526,6 @@ void AIHigh_BTC_HumanCop::ClearTrafficToPurgatory()
 
 
 {
-  int trafficLoop;
-  Car_tObj*testTrafficCarObj;
-  AIHigh_Traffic*testTrafficHigh;
 
   bool bVar1;
 
@@ -1615,9 +1573,6 @@ void AIHigh_BTC_HumanCop::ResetClearTrafficToPurgatory()
 
 
 {
-  int trafficLoop;
-  Car_tObj*testTrafficCarObj;
-  AIHigh_Traffic*testTrafficHigh;
 
   bool bVar1;
 
@@ -1665,7 +1620,6 @@ void AIHigh_BTC_HumanCop::SetDesiredSpeed()
 
 
 {
-  int curveSpeed;
 
   int iVar1;
 
@@ -1707,7 +1661,6 @@ void AIHigh_BTC_HumanCop::HighExecute()
 
 
 {
-  coorddef notUsed;
 
   Car_tObj *pCVar1;
 
@@ -1829,7 +1782,6 @@ void AIHigh_BTC_HumanCop::HudOn(AIHigh_BTC_Perp *arrestMe,int gameOver,
 
 
 {
-  Car_tObj*arrestingHumanCop;
 
   if ((arrestingCop->carFlags & 2U) != 0) {
 
@@ -1901,19 +1853,6 @@ void AIHigh_BTC_Wingman::HighExecute()
 
 
 {
-  Car_tObj*carObj;
-  coorddef trafficOffset;
-  coorddef pos;
-  AIState_Base*newState;
-  coorddef newPos;
-  AIState_Chase*chaseState;
-  int endSlice;
-  int rbDistanceMeters;
-  int rbAbsDistanceMeters;
-  int release;
-  int timeNow;
-  int timeToRB;
-  AIState_GotoSlice*gotoState;
 
   bool bVar1;
 
@@ -2040,8 +1979,8 @@ void AIHigh_BTC_Wingman::HighExecute()
         pSVar2 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
         {
-          const __vtbl_ptr_type &entry = (*pSVar2->_vf)[16];
-          ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+
+          (pSVar2)->Purge();
         }
 
         this->currentRole_ = this->newRole_;
@@ -2393,8 +2332,8 @@ LAB_8005ea9c:
       pSVar2 = (Speaker *)Speech_Mobile(pCVar9);
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar2->_vf)[7];
-        ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+
+        (pSVar2)->Lose();
       }
 
     }
@@ -2551,10 +2490,6 @@ int AIHigh_BTC_Wingman::CheckForActivation()
 
 
 {
-  int spikeBeltRequest;
-  int carLoop;
-  Car_tObj*otherCarObj;
-  AIHigh_BTC_HumanCop*copHigh;
 
   int iVar1;
 
@@ -2679,9 +2614,6 @@ void AIHigh_BTC_Wingman::SetupWingman(AIHigh_BTC_HumanCop *humanCop)
 
 
 {
-  Car_tObj*otherCarObj;
-  int side;
-  int perpSide;
 
   Speaker *pSVar1;
 
@@ -2748,8 +2680,8 @@ void AIHigh_BTC_Wingman::SetupWingman(AIHigh_BTC_HumanCop *humanCop)
   pSVar1 = (Speaker *)Speech_Dispatch();
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar1->_vf)[5];
-    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar1 + entry.delta), (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
+
+    (pSVar1)->Ready((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
   }
 
   return;
@@ -2770,19 +2702,6 @@ void AIHigh_BTC_Wingman::SetupBlockader(AIHigh_BTC_HumanCop *humanCop,int spikeB
 
 
 {
-  int initSlice;
-  Car_tObj*copObj;
-  int blockadeType;
-  int perpToHumanDistance;
-  int side;
-  int initializationDistance;
-  Car_tObj*perpObj;
-  int spikeBeltSide;
-  int left;
-  int right;
-  int slice;
-  int rightLatPos;
-  int timeNow;
 
   u_char bVar1;
 
@@ -2790,7 +2709,6 @@ void AIHigh_BTC_Wingman::SetupBlockader(AIHigh_BTC_HumanCop *humanCop,int spikeB
 
   int iVar3;
 
-  uint32 uVar4;
 
   Speaker *pSVar5;
 
@@ -3099,8 +3017,8 @@ LAB_8005f268:
   pSVar5 = (Speaker *)Speech_Dispatch();
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar5->_vf)[5];
-    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar5 + entry.delta), (this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
+
+    (pSVar5)->Ready((this->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
   }
 
   return;

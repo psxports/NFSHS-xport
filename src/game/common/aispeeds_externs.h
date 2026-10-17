@@ -10,7 +10,7 @@ extern "C"
 {
     CARDINFO_def *MCRD_getcard(int card);
 }
-extern AIDataRecord_TrackCurve_t AIDataRecord_TrackCurve[];
+extern AIDataRecord_TrackCurve_t *AIDataRecord_TrackCurve;
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern Car_tObj *Cars_gList[];
 extern Car_tObj *Cars_gAIRaceCarList[9];

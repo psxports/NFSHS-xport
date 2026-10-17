@@ -16,7 +16,7 @@ extern "C"
 int Speech_Dispatch(void);              /* speech.obj flat (was Dispatch__6Speech; cast result to Speaker*) */
 intptr Speech_Mobile(Car_tObj *carObj); /* pointer-width address; cast result to Speaker* */
 extern AICop_spikeBelt_t AICop_spikeBelt;
-extern AIDataRecord_TrackCurve_t AIDataRecord_TrackCurve[];
+extern AIDataRecord_TrackCurve_t *AIDataRecord_TrackCurve;
 extern "C" AIHigh_Base *highLevelAIObjs[];
 extern "C" AIHigh_CopGameType_t AIHigh_CopGameType; /* @0x8013c55c */
 extern AITune_BTC_t AITune_BTC[];

@@ -946,29 +946,6 @@ void Collide_DoObjectFixedObjectCollision(BO_tNewtonObj *o,coorddef *p,coorddef 
 
 
 {
-  coorddef normal;
-  int impulse;
-  coorddef deltaV;
-  coorddef impulseV;
-  int temp0;
-  int temp1;
-  int temp2;
-  int temp3;
-  coorddef r;
-  coorddef RCrossN;
-  int velocityLength;
-  coorddef velocity;
-  int frictionalImpulse;
-  coorddef deltaVFromFriction;
-  coorddef temp;
-  int frictionalImpulseOverMoment;
-  int deltaSpeedInFrictionDirection;
-  int scale;
-  int lengthInverse;
-  coorddef upVec;
-  int dotx;
-  int doty;
-  int dotz;
 
   int iVar1;
 
@@ -1849,24 +1826,6 @@ extern "C" void Collide_TestWithPlane(BO_tNewtonObj *o,coorddef *normal,coorddef
 
 
 {
-  int raiseUp;
-  int basisDots[3];
-  int relativeDot;
-  coorddef relativePos;
-  int xDir;
-  int Y_DIR;
-  int zDir;
-  int height;
-  coorddef Raise;
-  coorddef vertexVelocity;
-  coorddef r;
-  coorddef spot;
-  int correction;
-  int v2;
-  int impulse;
-  int right;
-  int top;
-  int front;
 
   bool bVar1;
 
@@ -2720,20 +2679,6 @@ int Collide_DoObjectObjectCollision(BO_tNewtonObj *o0,BO_tNewtonObj *o1,coorddef
 
 
 {
-  int impulse;
-  int impulseWST;
-  coorddef impulseV;
-  coorddef R0CrossN;
-  coorddef R1CrossN;
-  coorddef Rt0;
-  coorddef Rt1;
-  int numerator;
-  coorddef deltaV;
-  coorddef damageVector;
-  int zone;
-  int right;
-  int top;
-  int front;
 
   bool bVar1;
 
@@ -3525,20 +3470,6 @@ int Collide_DoActualObjectCollisionCheck(BO_tNewtonObj *o0,BO_tNewtonObj *o1,coo
 
 
 {
-  int maxv;
-  int vx;
-  int vy;
-  int vz;
-  coorddef normalx;
-  coorddef normaly;
-  coorddef normalz;
-  int dotx;
-  int doty;
-  int dotz;
-  coorddef vel;
-  int xDiff;
-  int yDiff;
-  int zDiff;
 
   int iVar1;
 
@@ -4478,25 +4409,6 @@ int Collide_TestObjectVertices(BO_tNewtonObj *o0,BO_tNewtonObj *o1,coorddef *p,c
 
 
 {
-  int collisionHappened;
-  int ctr;
-  int numbackoffsteps;
-  coorddef backoff0;
-  coorddef backoff1;
-  coorddef relativePosition;
-  coorddef relativeVelocity;
-  int useVelocity;
-  coorddef relativeUnit;
-  int maxrv;
-  int maxrp;
-  int inverseRelativeVelocityLength;
-  int temp;
-  int dot;
-  coorddef velocityUnit;
-  coorddef positionUnit;
-  int totalMass;
-  int r0;
-  int r1;
 
   bool bVar1;
 
@@ -5994,9 +5906,6 @@ int Collide_CheckForCollisionBetween(BO_tNewtonObj *o0,BO_tNewtonObj *o1)
 
 
 {
-  coorddef p;
-  coorddef normal;
-  int count;
 
   bool bVar1;
 
@@ -6136,7 +6045,6 @@ int Collide_CheckAccuratePointRadiusCollision(BO_tNewtonObj *newObj,coorddef *po
 
 
 {
-  coorddef d;
   int temp;
 
   int iVar1;
@@ -6241,55 +6149,39 @@ void Collide_CheckMeForCollisions(BO_tNewtonObj *newObj)
 
 
 {
-  int i;
-  BO_tNewtonObj*otherObj;
   coorddef normal;
   coorddef samplePoint;
-  int impulse;
 
   bool bVar1;
 
-  int maxrp;
 
   int iVar2;
 
   int iVar3;
 
-  int slice;
 
-  int r0;
 
   BO_tNewtonObj **ppBVar4;
 
-  int dist;
 
-  int dotx;
 
-  int xDir;
 
-  int zDir;
 
-  int j;
 
   int iVar5;
 
   BO_tNewtonObj *o1;
 
-  int signCase;
 
   coorddef *a;
 
-  int numerator;
 
-  int closestPoint;
 
   int iVar6;
 
-  int closestDist;
 
   int iVar7;
 
-  int ctr;
 
   Object_tSimObjList objList;
 
@@ -6303,7 +6195,6 @@ void Collide_CheckMeForCollisions(BO_tNewtonObj *newObj)
 
   int numPoints;
 
-  coorddef d;
 
   
 

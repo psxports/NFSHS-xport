@@ -114,9 +114,7 @@ void tPauseMenuDefs_dt(tPauseMenuDefs *pThis, u_int __in_chrg)
 void MPause_MusicLogic(char active)
 
 {
-  tPMenu *pThis;  /* folded receiver temp (SYM REG `this`) */
-  int sndover;
-  int samp;
+    /* folded receiver temp (SYM REG `this`) */
   bool bVar1;
   u_int uVar2;
   int iVar3;
@@ -234,18 +232,12 @@ void MPause_ControllerLogic(void)
 extern "C" u_int MPause_Logic(void)
 
 {
-  tPMenu *pThis;  /* folded receiver temp (SYM REG `this`) */
-  tPMenuCommand command;
-  int keyVal;
-  int debounce;
-  int start;
-  int finish;
+    /* folded receiver temp (SYM REG `this`) */
   int iVar1;
   int iVar2;
   int iVar3;
   __vtbl_ptr_type *entry;
-  u_int local_20;
-  tPMenu *local_1c;
+  tPMenuCommand command;
   int local_18 [2];
   
   local_18[0] = 0;
@@ -276,13 +268,13 @@ extern "C" u_int MPause_Logic(void)
 MPauseLogic_keyValJoin:
     local_18[0] = iVar3;
   }
-  local_20 = 0;
+  command.type = 0;
   if (kMovingHighlight == 0) {
     if (local_18[0] != 0) {
       gMPauseUpdate = 1;
       iVar1 = gPauseCurrentMenu->fCurrentItem;
       entry = &(*gPauseCurrentMenu->_vf)[3];
-      NFS4_VCALL_P2(entry->pfn,(u_char *)gPauseCurrentMenu + entry->delta,local_18,&local_20);
+      NFS4_VCALL_P2(entry->pfn,(u_char *)gPauseCurrentMenu + entry->delta,local_18,&command);
       iVar2 = (int)(short)gPauseCurrentMenu->fCurrentItem;
       if ((short)iVar1 != iVar2) {
         iVar1 = ItemEnabledNum(gPauseCurrentMenu,(short)iVar1);
@@ -307,23 +299,23 @@ MPauseLogic_keyValJoin:
   }
   gMPauseUpdate = 1;
 MPauseLogic_cmdProcess:
-  if (local_20 != 0) {
-    if ((local_20 & 0x100) != 0) {
+  if (command.type != 0) {
+    if ((command.type & 0x100) != 0) {
       gPauseMenuDefs->itemConfirmTitle._base_tPMenuItem.fTextDescription =
           gPauseCurrentMenu->fItemList[gPauseCurrentMenu->fCurrentItem]->fTextDescription;
       gPauseMenuDefs->menuConfirmYesNo.fCurrentItem = 0;
-      gPauseMenuDefs->itemConfirmYes.fCommand = local_20 & 0xff;
-      local_1c = &gPauseMenuDefs->menuConfirmYesNo;
-      local_20 = 6;
+      gPauseMenuDefs->itemConfirmYes.fCommand = command.type & 0xff;
+      command.nextMenu = &gPauseMenuDefs->menuConfirmYesNo;
+      command.type = 6;
     }
-    if (local_20 == 6) {
+    if (command.type == 6) {
       gBackList[gBackDepth] = gPauseCurrentMenu;
       iVar1 = gBackDepth + 1;
-      gPauseCurrentMenu = local_1c;
+      gPauseCurrentMenu = command.nextMenu;
     }
     else {
-      if (local_20 != 7) {
-        return local_20;
+      if (command.type != 7) {
+        return command.type;
       }
       iVar1 = gBackDepth + -1;
       if (gBackDepth < 1) {
@@ -345,8 +337,6 @@ void MPause_Render(void)
 
 {
   __vtbl_ptr_type *entry;
-  int numItems;
-  int currentItem;
   int iVar1;
   int iVar2;
   

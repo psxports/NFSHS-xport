@@ -47,7 +47,6 @@ void tVideoWall::UpdateImages()
 {
   int tv_i;
   int iVar1;
-  short i;
   int i_2;
   
   i_2 = 0;
@@ -142,9 +141,7 @@ void tVideoWall::UpdateTransition()
 {
   short sVar1;
   int iVar2;
-  short j;
   int iVar3;
-  short i;
   
   sVar1 = (short)nfs4_mips_sra_s32(nfs4_mips_subu_s32(ticks,this->fTVTicks),3);
   if (this->fTransitionDirection < 1) {
@@ -278,7 +275,6 @@ void tVideoWall::TurnOffInstant()
 
 {
   int tv_i;
-  short i;
   int i_2;
   
   this->TurnOff();
@@ -301,9 +297,6 @@ void tVideoWall::TurnOn()
 
 {
   int iVar1;
-  short i;
-  int textColor;
-  tDrawShapeExtended drawFlags;
   
   iVar1 = ticks;
   if (this->fTransitionDirection != 1) {

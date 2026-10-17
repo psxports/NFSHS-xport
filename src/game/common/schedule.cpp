@@ -18,9 +18,6 @@ extern "C" int Sched_ExecuteCheck(int staggered,int module,int distance,int carI
 
 {
   u_char bVar1;
-  int mask;
-  int index;
-  int distanceIndex;
   int iVar2;
   
   if (0xf < simGlobal.gameTicks) {
@@ -111,7 +108,6 @@ extern "C" void Sched_AddFunction(Sched_tSchedule *schedule,void *function,void 
 extern "C" void Sched_DeleteFunction(Sched_tSchedule *schedule,void *function,void *var1)
 
 {
-  int i;
   int iVar1;
   int j;
   int iVar3;
@@ -146,11 +142,6 @@ void Sched_Execute(Sched_tSchedule *schedule)
 
 {
   void *function;
-  int mask;
-  int distanceIndex;
-  int j;
-  int n;
-  int i;
   int iVar2;
   
   iVar2 = 0;

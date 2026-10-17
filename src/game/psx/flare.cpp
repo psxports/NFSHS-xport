@@ -6,7 +6,6 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "flare_externs.h"
-#ifdef AP_WIN
 extern "C" void NFSHS_HostReplayFlareReadback(void *);
 extern "C" void NFSHS_HostTraceOtProducerSpan(const char *,const void *,const void *);
 /* Diagnostic provenance only: keep early-return paths covered without
@@ -19,7 +18,6 @@ struct NFSHS_FlarePacketScope {
     NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceOtProducerSpan(domain,begin,Render_gPacketPtr));
   }
 };
-#endif
 
 /* ---- Flare.obj-OWNED globals -- DEFINED here (self-contained; SYM-typed via gen_owned_defs:
    .data = real NFS4.EXE bytes, .bss = zero) ---- */
@@ -115,7 +113,6 @@ void Flare_Tri(long *cp,long *p1,long *p2,int otz)
 /* ---- Flare_SetMatrix__FP10matrixtdef  [FLARE.CPP:184-192] SLD-VERIFIED ---- */
 void Flare_SetMatrix(matrixtdef *m)
 {
-  int r0, r1, r2;
   MATRIX mpsx;
   int *mm = (int *)m;
 
@@ -157,9 +154,7 @@ void Flare_OctFlare(long *center,int otz)
   int prev_pkt_slot;
   int gfHexPt1_iter;
   int gfOctPt2_iter;
-  int i;
   int vert_idx;
-  long rgb1;
   int CVar6;
   long flare_dvxy [13];
   u_char *prim;
@@ -225,22 +220,13 @@ gte_swc2(0xe,((char *)&flare_dvxy + 0x2c));
 void Flare_OctFlareSpikes(long *center,int otz)
 
 {
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceFlareEmit("OctSpikes",center,otz,__builtin_return_address(0)));
-#endif
   int pkt_addr24_b;
   int pkt_addr24_c;
   int pkt_addr24_d;
   int pkt_addr24;
   u_int *puVar1;
-  int id2;
-  int id0;
-  int id1;
-  int i;
   int vert_idx;
-  long rgb2;
-  long rgb1;
-  long cent;
   int center_word;
   long flare_dvxy [13];
   short ts2;
@@ -353,7 +339,6 @@ void Flare_Spikes(long *center,int otz)
   int gfHexPt1_iter;
   int gfOctPt2_iter;
   int gfHexPt2_iter;
-  int i;
   int vert_idx;
   long flare_dvxy [13];
   CVECTOR spikeColor;
@@ -444,7 +429,6 @@ void Flare_HexFlare(long *center,int otz)
   void *prev_pkt_slot;
   int pSVar4;
   int gfHexPt2_iter;
-  int i;
   int vert_idx;
   long flare_dvxy [7];
   u_char *prim;
@@ -507,7 +491,6 @@ void Flare_ReflectHexFlare(long *center,int otz)
 {
   int pkt_addr24;
   void *prev_pkt_slot;
-  int i;
   int vert_idx;
   long flare_dvxy [7];
   CVECTOR CVar1;
@@ -596,9 +579,7 @@ short * Flare_CarShapedHalo(int type,COORD16 *ptCenter,COORD16 *pt1,COORD16 *pt2
                   Draw_FlareCache *sd)
 
 {
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_FlarePacketScope traceScope("car_halo"));
-#endif
   VECTOR diff2;
   DVECTOR sp2;
   VECTOR tvec1;
@@ -614,7 +595,6 @@ short * Flare_CarShapedHalo(int type,COORD16 *ptCenter,COORD16 *pt1,COORD16 *pt2
   short sVar10;
   bool bVar11;
   short sVar12;
-  long result;
   int CVar3;
   int CVar4;
   DVECTOR *pDVar13;
@@ -622,32 +602,21 @@ short * Flare_CarShapedHalo(int type,COORD16 *ptCenter,COORD16 *pt1,COORD16 *pt2
   int pkt_addr24;
   int iVar14;
   int haloShape_p;
-  int z;
   int iVar12_alt;
   int iVar6_emit;
   int tu14;
-  DR_MODE *aprim;
   VECTOR *v0;
   int haloColor;
-  COORD16 *ptEdge;
   int primPtr;
-  long difx;
   int diff_x;
   MATRIX *mtx;
-  long dify;
   int diff_y;
-  long sizeOuter;
   int innerRadius;
-  int scale;
   int scaledFactor;
-  int flags;
   int flagsMasked;
-  long angleOuter;
   int outerRadius;
-  long angleZ;
   int haloRadius;
   int lerp_q16;
-  int loc_d8;
   VECTOR diff;
   CVECTOR color [2];
   DVECTOR sp;
@@ -659,25 +628,12 @@ short * Flare_CarShapedHalo(int type,COORD16 *ptCenter,COORD16 *pt1,COORD16 *pt2
   MATRIX mtx2;
   VECTOR tvec2;
   MATRIX scalemat;
-  short loc_30;
-  int loc_28;
-  int loc_24;
-  int loc_20;
-  int loc_1c;
-  int loc_18;
-  int loc_14;
-  int loc_10;
-  int loc_c;
-  int loc_8;
-  int loc_4;
-  int pbVar1;
   u_char tu2;
   u_char *p;
   CVECTOR CVar5;
   u_char bVar1;
   u_char bVar2;
   u_char bVar3;
-  u_int tu1;
   
   sVar12 = flag;
   u_int _flag = (u_int)(u_short)flag;
@@ -915,12 +871,9 @@ void Flare_Halo2(DRender_tView *Vi,int scale,int type,coorddef *fpt,coorddef *fp
               Draw_FlareCache *arg5)
 
 {
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_FlarePacketScope traceScope("world_halo"));
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceFlareHaloEntry(Vi,scale,type,fpt,fpt2,arg5));
-#endif
   u_char u0_byte;
-  long result;
   int pkt_addr24;
   int CVar3;
   int CVar4;
@@ -933,7 +886,6 @@ void Flare_Halo2(DRender_tView *Vi,int scale,int type,coorddef *fpt,coorddef *fp
   int otz_00;
   u_int color_pack;
   int iVar2;
-  DR_MODE *aprim;
   int dy;
   int dz;
   int tz;
@@ -942,15 +894,10 @@ void Flare_Halo2(DRender_tView *Vi,int scale,int type,coorddef *fpt,coorddef *fp
   int tp7;
   int tx;
   int difx;
-  long dify;
   int flare_type;
   int y;
-  int flags;
   int halfHeight;
-  int z;
-  long angleZ;
   long r;
-  int loc_e0;
   VECTOR diff;
   SVECTOR sdiff;
   VECTOR tvec;
@@ -964,15 +911,6 @@ void Flare_Halo2(DRender_tView *Vi,int scale,int type,coorddef *fpt,coorddef *fp
   MATRIX mtx2;
   MATRIX scalemat;
   int otz;
-  int loc_28;
-  int loc_24;
-  int loc_20;
-  int loc_1c;
-  int loc_18;
-  int loc_14;
-  int loc_10;
-  int loc_c;
-  int loc_8;
   u_char tc1;
   u_char *p;
   u_char *tp2;
@@ -1027,9 +965,7 @@ gte_lwc2(0,*(int *)(&sdiff));
 gte_swc2(0x19,&diff);
   gte_swc2(0x1a,((char *)&diff + 0x4));
   gte_swc2(0x1b,((char *)&diff + 0x8));
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceFlareHaloRTPS(&diff,&sp,halfHeight,scale));
-#endif
   pDVar1 = (DVECTOR *)-diff.vx;
   if (((diff.vx <= diff.vz) &&
       (pDVar1 = (DVECTOR *)(u_int)(diff.vz < 0x80), (int)-diff.vx <= diff.vz)) &&
@@ -1216,7 +1152,6 @@ void Flare_2DSpike(long *center,long *end,int otz)
   int tl2;
   int tl3;
   u_int *prev_pkt_slot;
-  long pt [2];
   u_char *prim;
   void *tp1;
   CVECTOR CVar1;
@@ -1242,21 +1177,14 @@ void Flare_2DSpike(long *center,long *end,int otz)
 void Flare_2DHalo(int x,int y,int scalex,int scaley,int type)
 
 {
-  int flare_type;
   int drawResult;
   int haloShape_p;
   int pkt_addr24;
   short ts9;
   int pkt_addr24_b;
-  DR_MODE *aprim;
   DVECTOR *pDVar1;
-  int i;
   int iVar2;
-  Draw_FlareCache *sd;
-  DVECTOR *pt;
-  int otz;
   short ts10;
-  int loc_60;
   DVECTOR pt2;
   DVECTOR npt [2];
   DVECTOR save1;
@@ -1368,7 +1296,6 @@ void Flare_PreCalcHexLightBeam(long *center,int otz)
   u_int *prim;
   u_int *puVar5;
   u_int uVar6;
-  long i;
   int iVar7;
   void *ppuVar8;
   u_int uVar8;
@@ -1489,14 +1416,10 @@ void Flare_QuadRing(long *pt,CVECTOR *color,int otz)
 void Flare_TextureQuad(long *pt,CVECTOR *color,char type,int otz)
 
 {
-  uint32 l3;
   int shape_p;
   int pkt_addr24_b;
-  uint32 l0;
   int color_word;
-  uint32 l1;
   u_int uVar1;
-  uint32 l2;
   u_int uVar2;
   u_int *puVar3;
   int pkt_addr24;
@@ -1591,7 +1514,6 @@ void Flare_SingleColorOct(DVECTOR *xy,CVECTOR *color,int width,int height,int ot
   int iVar1;
   SVECTOR *pSVar2;
   DVECTOR *pDVar3;
-  int i;
   int iVar4;
   DVECTOR pt [8];
   
@@ -1623,14 +1545,10 @@ void Flare_SingleColorOct(DVECTOR *xy,CVECTOR *color,int width,int height,int ot
 void Flare_SingleColorOctRing(DVECTOR *xy,CVECTOR *color,int width,int height,int otz)
 
 {
-  char i2;
   int iVar1;
   u_int uVar2;
   int i;
-  char index;
   u_int uVar3;
-  int height2;
-  int width2;
   DVECTOR pt [18];
   
   i = 0;
@@ -1694,25 +1612,16 @@ void Flare_LensFlare(DVECTOR *screenPos,Draw_FlareCache *sd)
   int screen_y_pos;
   int piece_y;
   int piece_x;
-  long result;
   int screen_x_pos;
   u_int tu1;
-  DR_MODE *aprim;
-  int width;
-  int height;
   int ti7;
   FLARE_PIECE_DEF *piece;
   int i;
   int pieceCount;
   int piece_idx;
   long angleZ;
-  char flareVis;
   int flareVis_long;
   int piece_color;
-  int sy;
-  int sx;
-  int loc_a8;
-  int loc_a4;
   DVECTOR pxy;
   DVECTOR pt [4];
   CVECTOR col;
@@ -1721,19 +1630,13 @@ void Flare_LensFlare(DVECTOR *screenPos,Draw_FlareCache *sd)
   int dx;
   int dy;
   long angleZ2;
-  int loc_28;
-  int loc_24;
-  int loc_20;
-  int tF1;
   short ts1;
   short ts2;
   u_char *p;
   u_char *tp3;
 
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(const void *lensPackets = Render_gPacketPtr);
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostReplayFlareReadback(gFlare_LensFlare.screenData[0]));
-#endif
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceFlareEmit(
       "LensEntry",screenPos,
       (int)((sd->head).cprim.MPrimPtr-(sd->head).cprim.PrimPtr),
@@ -1876,9 +1779,7 @@ switchD_800cf0c0_default:
       SetDrawMode((DR_MODE *)p,0,0,0x120,(PSX_RECT *)0x0);
     }
   }
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceOtProducerSpan("lens_flare",lensPackets,Render_gPacketPtr));
-#endif
   return;
 }
 
@@ -1890,7 +1791,6 @@ void Flare_Sun(SVECTOR *worldPos,Draw_FlareCache *sd)
   int dvz;
   int pkt_addr24_a;
   int pkt_addr24_b;
-  DR_MODE *aprim;
   DVECTOR *screenPos;
   short vertRezBy2;
   int pshift;
@@ -1900,14 +1800,11 @@ void Flare_Sun(SVECTOR *worldPos,Draw_FlareCache *sd)
   int cur_pkt_a;
   int cur_pkt_b;
   int vis_test;
-  int otz;
   int otz_00;
   VECTOR diff;
   CVECTOR color;
   DVECTOR posOnScreen;
   MATRIX scalemat;
-  void *tp1;
-  void *p;
   
   shape_p = (int)&GameSetup_gData;
   vis_test = 1;
@@ -1981,30 +1878,8 @@ gte_SetRotMatrix(&scalemat);
 void Flare_Moon(SVECTOR *worldPos,Draw_FlareCache *sd)
 
 {
-  char i2;
-  int dvz;
   DVECTOR *xy;
   int pshift;
-  int dz;
-  char index;
-  int height2;
-  int width2;
-  int difx;
-  int flare_type;
-  int sizeOuter;
-  int flags;
-  char flareVis;
-  int angleZ;
-  int sy;
-  int cent;
-  SVECTOR sdiff;
-  SVECTOR sdiff2;
-  DVECTOR sp;
-  DVECTOR pxy;
-  CVECTOR save;
-  CVECTOR col;
-  MATRIX mtx2;
-  DVECTOR npt [2];
   VECTOR diff;
   CVECTOR color;
   DVECTOR posOnScreen;

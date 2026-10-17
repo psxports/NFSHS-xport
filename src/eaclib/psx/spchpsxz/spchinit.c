@@ -9,18 +9,11 @@
  */
 
 #include "../../../nfs4_types.h"
+#include "spch_callbacks.h"
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
-#ifndef AP_WIN
-extern "C" int &gRepeatCount;
-#endif
 
-extern "C" intptr gMemAlloc;         /* user alloc callback pointer carrier */
-extern "C" intptr gMemFree;          /* user free callback pointer carrier */
 extern "C" int gSPCH_Initialized;    /* 0x1789a34 when initialised */
-extern "C" intptr gSampleRequest;    /* sample-request callback */
-extern "C" intptr gSentenceRuleTest; /* sentence rule-test callback */
-extern "C" intptr gSentenceRuleSet;  /* sentence rule-set callback */
 extern "C" int &gVoxInGame;          /* in-game speech enable (-1 = on) */
 extern "C" int &gRepeatCount;        /* repeated-event counter */
 extern "C" int gGameNum;             /* current game/race number (shared w/ spchbank cycle-bit hash) */
@@ -41,14 +34,12 @@ extern "C" void iSPCH_MemFree(void *mem);                                       
 extern "C" void SPCH_Deinit(void);                                                     /* @0x800EB600 */
 extern "C" void iSPCH_InitInGame(void);                                                /* @0x800EB654 */
 extern "C" int SPCH_GetSampleDataRate(int numSamples, int rate, int channels);         /* @0x800EB66C */
-extern "C" intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks); /* @0x800EB6F0 */
-extern "C" int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate);  /* @0x800EB748 */
 
 /* iSPCH_MemAlloc @0x800EB5A4 : forward a0/a1 to the user's allocator and preserve v0. */
 extern "C" intptr iSPCH_MemAlloc(int numBytes, char *message)
 {
     if (gMemAlloc != 0)
-        return (intptr)((void *(*)(int, char *))gMemAlloc)(numBytes, message);
+        return (intptr)gMemAlloc(numBytes, message);
     return 0;
 }
 
@@ -56,7 +47,7 @@ extern "C" intptr iSPCH_MemAlloc(int numBytes, char *message)
 extern "C" void iSPCH_MemFree(void *mem)
 {
     if (gMemFree != 0)
-        ((void (*)(void *))gMemFree)(mem);
+        gMemFree(mem);
 }
 
 /* SPCH_Deinit @0x800EB600 : tear down the speech system (only if it was initialised). */
@@ -97,7 +88,7 @@ extern "C" int SPCH_GetSampleDataRate(int numSamples, int rate, int channels)
 
 /* SPCH_InitBankMem @0x800EB6F0 : register the alloc/free callbacks and allocate `numBanks` bank slots.
  *   Returns the bank array (gVoxBanks) or 0 if not initialised / no alloc callback. */
-extern "C" intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks)
+extern "C" intptr SPCH_InitBankMem(NFSHS_SpeechAllocator memAllocFn, NFSHS_SpeechFree memFreeFn, int numBanks)
 {
     intptr result = 0;
     if (gSPCH_Initialized == 0x1789a34 && memAllocFn != 0 && memFreeFn != 0)
@@ -111,15 +102,15 @@ extern "C" intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numB
 
 /* SPCH_Init @0x800EB748 : initialise the speech system for game `gameNum` -- seed the PRNG, clear the
  *   pick/event/bank state, and mark it live.  Returns 1. */
-extern "C" int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate)
+extern "C" int SPCH_Init(NFSHS_SpeechSampleRequest sampleRequestCb, unsigned int gameNum, int dataRate)
 {
+    gSampleRequest = sampleRequestCb;
+    gGameNum = (int)gameNum;
+    gDataRate = dataRate;
     gMemAlloc = 0;
     gMemFree = 0;
     gSentenceRuleTest = 0;
     gSentenceRuleSet = 0;
-    gSampleRequest = sampleRequestCb;
-    gGameNum = (int)gameNum;
-    gDataRate = dataRate;
     iSPCH_EACseedrandom(gameNum);
     iSPCH_ClearChosen();
     SPCH_SetPreLoadTicks(0);

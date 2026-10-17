@@ -156,34 +156,8 @@ extern "C" void iSNDinit(void)
     extern unsigned short snd_spu_engine_ver; /* sdmemman */
     extern unsigned short snd_spu_block_total;
     snd_spu_engine_ver = 0x41;
-#if defined(AP_WIN)
     snd_spu_block_total = 0x2000;
     SpuInit();
-#else
-    DPCR = DPCR | 0xb0000;
-    SPU_MAIN_VOL_L = 0;
-    SPU_MAIN_VOL_R = 0;
-    snd_spu_block_total = 0x2000;
-    DAT_80147e14 = (unsigned int *)&SPU_DELAY;
-    DAT_80147e18 = (unsigned int *)&D4_MADR;
-    DAT_80147e1c = (unsigned int *)&D4_BCR;
-    DAT_80147e20 = (unsigned int *)&D4_CHCR;
-    DAT_80147e24 = (unsigned int *)&DPCR;
-    while ((SPUSTAT & 0x7ff) != 0)
-    {
-    }
-    SOUND_RAM_DATA_TRANSTER_CTRL = 4;
-    SPU_VOICE_CHN_FM_MODE = 0;
-    SPU_VOICE_CHN_NOISE_MODE = 0;
-    CD_VOL_L = 0;
-    CD_VOL_R = 0;
-    EXT_VOL_L = 0;
-    wr_sr(rd_sr() & 0xfffffbfe);
-    EXT_VOL_R = 0;
-    *((unsigned short *)&SPU_ADDR + 1) = 0xc000;
-    DMACallback(4, 0);
-    wr_sr(sr);
-#endif
     iSNDdmqueue((intptr)&DAT_80136df0, 0x1000, 0x10, 1, 0); /* clear first SPU page */
 
     i = 0;
@@ -191,29 +165,17 @@ extern "C" void iSNDinit(void)
     {
         do
         {
-#if defined(AP_WIN)
             SpuVoiceAttr attr = {};
             attr.voice = SPU_KEYCH(i);
             attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR | SPU_VOICE_PITCH | SPU_VOICE_WDSA | SPU_VOICE_LSAX | SPU_VOICE_ADSR_ADSR1 | SPU_VOICE_ADSR_ADSR2;
             attr.addr = 0x1000;
             attr.loop_addr = 0x1000;
             SpuSetVoiceAttr(&attr);
-#else
-            int vr = DAT_80147e28 + i * 0x10; /* zero SPU voice regs */
-            *(short *)(vr + 0) = 0;
-            *(short *)(vr + 2) = 0;
-            *(short *)(vr + 4) = 0;
-            *(short *)(vr + 6) = 0x200;
-            *(short *)(vr + 0xe) = 0x200;
-            *(short *)(vr + 8) = 0;
-            *(short *)(vr + 0xa) = 0;
-#endif
             (&sndpd)[i * 0x2c + 0xff] = 0xff; /* mark voice done */
             i++;
         } while (i < (int)(unsigned)SUB(0x11));
     }
     iSNDpsxkeyon(0xffffff);
-#if defined(AP_WIN)
     {
         SpuCommonAttr attr = {};
         attr.mask = SPU_COMMON_MVOLL | SPU_COMMON_MVOLR;
@@ -221,12 +183,6 @@ extern "C" void iSNDinit(void)
         attr.mvol.right = 0x3fff;
         SpuSetCommonAttr(&attr);
     }
-#else
-    *(short *)(DAT_80147e2c + 0x1a2) = (short)0xfffe; /* reverb work-area base */
-    *(short *)(DAT_80147e2c + 0x180) = 0x3fff;        /* SPU master vol L (Ghidra mis-decompiled +0x60) */
-    *(short *)(DAT_80147e2c + 0x182) = 0x3fff;        /* SPU master vol R */
-    *(unsigned short *)(DAT_80147e2c + 0x1aa) = *(unsigned short *)(DAT_80147e2c + 0x1aa) | 1;
-#endif
     iSNDpsxfxinit(DAT_8014791c);
     DAT_80147919 = 0;
     addtimer(iSNDserver);
@@ -281,9 +237,7 @@ extern "C" void iSNDrestore(void)
     wr_sr(rd_sr() & 0xfffffbfe);
     DMACallback(4, 0);
     wr_sr(sr);
-#if defined(AP_WIN)
     SpuQuit();
-#endif
 }
 
 /* iSNDserve @0x800FFAF4 : the per-frame SPU voice driver -- run the user serve hook, advance every voice's
@@ -293,11 +247,8 @@ extern "C" void iSNDserve(void)
 {
     unsigned int koff = 0; /* local_30 : key-off mask deferred until DMA settles */
     unsigned int kon = 0;  /* mask     : key-on mask */
-    int chan, vt, i, n, lvt;
+    int chan, vt, n;
     unsigned char *vp;
-#if !defined(AP_WIN)
-    short *vreg;
-#endif
 
     if (snd_user_serve_hook != 0)
         (*(void (*)(void))snd_user_serve_hook)();
@@ -309,21 +260,13 @@ extern "C" void iSNDserve(void)
         do
         {
             vp = &DAT_801479f0 + vt;
-#if defined(AP_WIN)
             SpuVoiceAttr voice_attr = {};
             voice_attr.voice = SPU_KEYCH(chan);
             SpuGetVoiceAttr(&voice_attr);
-#else
-            vreg = (short *)(DAT_80147e28 + chan * 0x10);
-#endif
             if ((&DAT_80147a0d)[vt] == 2)
             { /* voice stopping */
                 if (
-#if defined(AP_WIN)
                     voice_attr.envx == 0
-#else
-                    vreg[6] == 0
-#endif
                 )
                 { /* SPU ADSR reached 0 */
                     if ((&DAT_80147a16)[vt] != 0 && (&DAT_80147a11)[vt] == 0 && (int)((unsigned)(&DAT_80147a17)[vt] << 0x18) < 0)
@@ -342,16 +285,8 @@ extern "C" void iSNDserve(void)
                             (&DAT_80147a0c)[cvt] = 0;
                             n--;
                             iSNDfreechan(c);
-#if defined(AP_WIN)
                             SpuSetVoiceStartAddr(c, 0x1000);
                             SpuSetVoiceVolume(c, 0, 0);
-#else
-                            vreg = (short *)(c * 0x10 + DAT_80147e28);
-                            vreg[3] = 0x200; /* ADSR -> 0, then key-on to force silence */
-                            kon = kon | (1u << (c & 0x1f));
-                            vreg[0] = 0;
-                            vreg[1] = 0;
-#endif
                         } while (0 < n);
                     }
                 }
@@ -361,12 +296,7 @@ extern "C" void iSNDserve(void)
                 }
                 if (vp[0x28] != 0)
                 { /* pitch dirty -> reprogram */
-#if defined(AP_WIN)
                     SpuSetVoicePitch(chan, (uint16)(*(unsigned int *)(vp + 8) / 0x1b9));
-#else
-                    vreg = (short *)(DAT_80147e28 + chan * 0x10);
-                    vreg[2] = (short)(*(unsigned int *)(vp + 8) / 0x1b9);
-#endif
                     vp[0x28] = 0;
                 }
                 if (*(int *)(vp + 0x10) < 1)
@@ -388,23 +318,13 @@ extern "C" void iSNDserve(void)
             else if ((&DAT_80147a0d)[vt] == 3)
             { /* voice fully stopped */
                 if (
-#if defined(AP_WIN)
                     voice_attr.envx == 0
-#else
-                    vreg[6] == 0
-#endif
                 )
                 {
                     kon = kon | (1u << (chan & 0x1f)); /* (Ghidra `mask`) */
                     (&DAT_80147a0d)[vt] = 0;
-#if defined(AP_WIN)
                     SpuSetVoiceStartAddr(chan, 0x1000);
                     SpuSetVoiceVolume(chan, 0, 0);
-#else
-                    vreg[3] = 0x200;
-                    vreg[0] = 0;
-                    vreg[1] = 0;
-#endif
                 }
                 else
                 {

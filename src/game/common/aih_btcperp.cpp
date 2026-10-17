@@ -24,8 +24,6 @@ void AIHigh_BTC_Perp::ReleaseCops()
 
 
 {
-  int carLoop;
-  Car_tObj*otherCarObj;
 
   Car_tObj *pCVar1;
 
@@ -92,12 +90,6 @@ int AIHigh_BTC_Perp::IsFalseArrest()
 
 
 {
-  int randNum1000;
-  int carLoop;
-  Car_tObj*cop;
-  int xDot;
-  int zDot;
-  coorddef carCopVector;
 
   int iVar1;
 
@@ -209,8 +201,6 @@ int AIHigh_BTC_Perp::CheckForControlsPressed()
 
 
 {
-  int pressed;
-  Car_tControl*control;
 
   int iVar1;
 
@@ -251,7 +241,6 @@ void AIHigh_BTC_Perp::HandlePullOver()
 
 
 {
-  int userReadyToContinue;
 
   bool bVar1;
 
@@ -326,8 +315,8 @@ void AIHigh_BTC_Perp::HandlePullOver()
         pSVar3 = (Speaker *)Speech_Mobile((Car_tObj *)0x0);
 
         {
-          const __vtbl_ptr_type &entry = (*pSVar3->_vf)[7];
-          ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar3 + entry.delta));
+
+          (pSVar3)->Lose();
         }
 
       }
@@ -380,8 +369,6 @@ void AIHigh_BTC_Perp::NotifyCopsOfArrest()
 
 
 {
-  int carLoop;
-  Car_tObj*otherCarObj;
 
   Car_tObj *pCVar1;
 
@@ -425,8 +412,6 @@ void AIHigh_BTC_Perp::NotifyCopsOfArrestComplete()
 
 
 {
-  int carLoop;
-  Car_tObj*otherCarObj;
 
   Car_tObj *pCVar1;
 
@@ -470,8 +455,6 @@ void AIHigh_BTC_Perp::NotifyCopsOfFalseArrest()
 
 
 {
-  int carLoop;
-  Car_tObj*otherCarObj;
 
   Car_tObj *pCVar1;
 
@@ -515,8 +498,6 @@ void AIHigh_BTC_Perp::NotifyHumanCopsOfArrestHud()
 
 
 {
-  int carLoop;
-  Car_tObj*otherCarObj;
 
   Car_tObj *pCVar1;
 
@@ -606,10 +587,6 @@ AIHigh_BTC_Perp::CheckForActivation()
 
 
 {
-  int carLoop;
-  Car_tObj*humanCopCarObj;
-  AIHigh_BTC_HumanCop*carHigh;
-  int carType;
 
   Car_tObj *pCVar1;
 
@@ -683,11 +660,6 @@ void AIHigh_BTC_HumanPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
 
 
 {
-  int placementSide;
-  int placementDirection;
-  int humanDirection;
-  int newLatPos;
-  int throwAway;
 
   short sVar1;
 
@@ -792,29 +764,29 @@ void AIHigh_BTC_HumanPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
   pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[16];
-    ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta));
+
+    (pSVar4)->Purge();
   }
 
   pSVar4 = (Speaker *)Speech_Dispatch();
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[1];
-    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar4 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+    (pSVar4)->Report((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
   }
 
   pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[1];
-    ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+    (pSVar4)->Report((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
   }
 
   pSVar4 = (Speaker *)Speech_Mobile((chaserCop->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar4->_vf)[6];
-    ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+    (pSVar4)->Engage((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
   }
 
   TrgSfx_RestartTrgSfx();
@@ -982,11 +954,6 @@ void AIHigh_BTC_AIPerp::AvoidCops()
 
 
 {
-  int doBrake;
-  int xPosition;
-  int zPosition;
-  int xPositionIndex;
-  int zPositionIndex;
 
   bool bVar1;
 
@@ -1144,8 +1111,6 @@ void AIHigh_BTC_AIPerp::CalculateTimeTillContact()
 
 
 {
-  int distance;
-  int relVel;
 
   int iVar1;
 
@@ -1205,12 +1170,6 @@ void AIHigh_BTC_AIPerp::FindClosestCop()
 
 
 {
-  int closestCopInMeters;
-  int closestCopInMetersAbs;
-  int closestCarIndex;
-  int copLoop;
-  int longMetersBetween;
-  int absLongMetersBetween;
 
   int iVar1;
 
@@ -1302,9 +1261,6 @@ void AIHigh_BTC_AIPerp::HighExecute()
 
 
 {
-  Car_tObj*carObj;
-  coorddef trafficOffset;
-  AIState_Base*newState;
 
   int iVar1;
 
@@ -1363,8 +1319,8 @@ void AIHigh_BTC_AIPerp::HighExecute()
           pSVar2 = (Speaker *)Speech_Mobile((((this->_base_AIHigh_BTC_Perp).originalActivationCop_)->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
           {
-            const __vtbl_ptr_type &entry = (*pSVar2->_vf)[1];
-            ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+            (pSVar2)->Report((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
           }
 
         }
@@ -1410,8 +1366,8 @@ void AIHigh_BTC_AIPerp::HighExecute()
           pSVar2 = (Speaker *)Speech_Mobile((((this->_base_AIHigh_BTC_Perp).originalActivationCop_)->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
           {
-            const __vtbl_ptr_type &entry = (*pSVar2->_vf)[6];
-            ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+            (pSVar2)->Engage((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
           }
 
           Camera_ResetRelPos(3);
@@ -1549,8 +1505,8 @@ switchD_8006094c_default:
         pSVar2 = (Speaker *)Speech_Mobile((((this->_base_AIHigh_BTC_Perp).originalActivationCop_)->_base_AIHigh_BTC_Cop)._base_AIHigh_BasicCop._base_AIHigh_Base.carObj_);
 
         {
-          const __vtbl_ptr_type &entry = (*pSVar2->_vf)[1];
-          ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+          (pSVar2)->Report((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
         }
 
       }
@@ -1615,19 +1571,6 @@ void AIHigh_BTC_AIPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
 
 
 {
-  int stage;
-  Car_tObj*humanCopCarObj;
-  int placementDistance;
-  int placementSide;
-  int placementDirection;
-  int placementSpeed;
-  int randPlacement;
-  int humanDirection;
-  int humanMovement;
-  int newLatPos;
-  int throwAway;
-  int i;
-  AIState_Base*newState;
 
   bool bVar1;
 
@@ -1968,15 +1911,15 @@ void AIHigh_BTC_AIPerp::NewStage(AIHigh_BTC_HumanCop *chaserCop)
   pSVar6 = (Speaker *)Speech_Mobile(carObj);
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar6->_vf)[16];
-    ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar6 + entry.delta));
+
+    (pSVar6)->Purge();
   }
 
   pSVar6 = (Speaker *)Speech_Dispatch();
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar6->_vf)[1];
-    ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar6 + entry.delta), (this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
+
+    (pSVar6)->Report((this->_base_AIHigh_BTC_Perp)._base_AIHigh_BasicPerp._base_AIHigh_Base.carObj_);
   }
 
   TrgSfx_RestartTrgSfx();

@@ -17,9 +17,6 @@ int          gMaxSChunk;   /* @0x8013dad4  (bss(zero)) */
    defined here in the owning Skidmark.obj TU; BSS zero -- runtime spline work area). */
 int          Skid_gCtrlPoint_0, Skid_gCtrlPoint_1, Skid_gCtrlPoint_2, Skid_gCtrlPoint_3;
 int          Skid_gCtrlPoint_4, Skid_gCtrlPoint_5, Skid_gCtrlPoint_6;
-#ifndef AP_WIN
-int          Skid_gCtrlScratch_94, Skid_gCtrlScratch_98;
-#endif
 extern "C" { int Skid_gScratchPos1, Skid_gScratchPos2; }
 
 static int Skidmark_OffsetCoordinate(int point,int offset,int center)
@@ -82,7 +79,6 @@ Skidmark_Chunk *
 Skidmark_CheckChunk(coorddef *skidpt,int newsegs,int slice)
 
 {
-  int NewChunk;
   bool needNew;
   int dist;
   Skidmark_Chunk *returnsm;

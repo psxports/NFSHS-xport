@@ -19,8 +19,6 @@ extern "C"
 {
     char *TextSys_Word(int wordnum);
 }
-extern "C"
-{
-}
+
 
 #endif

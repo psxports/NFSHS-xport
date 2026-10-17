@@ -19,12 +19,10 @@ extern "C" long random(void) /* @0x800E77A8 */
 extern "C" int random(void) /* @0x800E77A8 */
 #endif
 {
-#ifdef AP_WIN
     /* Opt-in test boundary for omitted audio's shared-RNG consumption.
        The original generator below is unchanged and produces every result. */
     extern void NFSHS_HostEacAudioReplay(unsigned *);
     NFSHS_DIAGNOSTIC_CALL(NFSHS_HostEacAudioReplay(g_rngstate));
-#endif
     unsigned t0 = g_rngstate[0], t1 = g_rngstate[1], t2 = g_rngstate[2];
     unsigned t3 = g_rngstate[3], t4 = g_rngstate[4], t5 = g_rngstate[5];
     unsigned a1, a2;

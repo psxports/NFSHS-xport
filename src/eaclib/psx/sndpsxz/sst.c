@@ -33,7 +33,7 @@ extern "C" signed char (&sndStreamMap)[4];
 
 /* ---- stream.obj ring (the layer below; already reconstructed) ---- */
 extern "C" void STREAM_release(intptr strm, intptr chunk);
-extern "C" intptr STREAM_get(intptr consumer, void *buf, int len);
+extern "C" intptr STREAM_get(intptr consumer);
 extern "C" int STREAM_gettable(intptr strm);
 extern "C" int STREAM_state(intptr strm);
 extern "C" int STREAM_buffersize(intptr strm);
@@ -339,7 +339,7 @@ extern "C" void iSNDstreamhotroddatachunks(void)
                     do
                     {
                         n--;
-                        intptr chunk = STREAM_get(S->streamHandle, 0, 0);
+                        intptr chunk = STREAM_get(S->streamHandle);
                         if (chunk != 0)
                         {
                             total += *(int *)(chunk + 4);
@@ -392,7 +392,7 @@ extern "C" void iSNDstreamservice(void)
                 do
                 {
                     n--;
-                    intptr chunk = STREAM_get(S->streamHandle, 0, 0);
+                    intptr chunk = STREAM_get(S->streamHandle);
                     if (chunk != 0)
                         r = iSNDstreamparsechunk(S, chunk);
                     if (r == 0)

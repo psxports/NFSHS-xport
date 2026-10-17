@@ -4,7 +4,7 @@
  *   (unrefpack / unhuff / unbtree / getm). unpack & unpacksize are thin public wrappers.
  */
 #include "../../nfs4_types.h"
-#include "unpack_externs.h"
+#include "../../lib/libfns.h"
 
 /* ---- unpackz  [UNPACK.C:59-101] SLD-VERIFIED ---- */
 extern "C" long unpackz(void *src, void *dst)

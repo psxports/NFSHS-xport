@@ -62,7 +62,6 @@ void CopSpeak_Debug(void);
 void CopSpeak_RadioStaticInit(void)
 
 {
-  int i;
   char *pcVar1;
   int iVar2;
   int *piVar3;
@@ -83,9 +82,6 @@ void CopSpeak_RadioStaticInit(void)
 void CopSpeak_RadioStaticActive(int noise)
 
 {
-  int numpatches;
-  int i;
-  int bhandle;
   SNDPLAYOPTS playopts;
   bool bVar1;
   u_int uVar2;
@@ -148,7 +144,6 @@ CopSpkRadioStatic_returnLoop:
 void CopSpeak_RadioStaticSquelch(void)
 
 {
-  int i;
   int *piVar1;
   int iVar2;
   
@@ -252,10 +247,6 @@ void CopSpeak_Free(intptr r)
 void CopSpeak_ReadyNextRequest(void)
 
 {
-  CopSpeak_tRequest * r;
-  int ok;
-  int status;
-  CopSpeak_tBankHeader * bnk;
   char cVar1;
   bool bVar2;
   int iVar3;
@@ -373,7 +364,6 @@ void CopSpeak_Stop(void)
 void CopSpeak_CleanUp(void)
 
 {
-  int i;
   CopSpeak_tBank *pCVar1;
   int iVar2;
   
@@ -402,7 +392,6 @@ void CopSpeak_CleanUp(void)
 void CopSpeak_InitVars(void)
 
 {
-  int i;
   CopSpeak_tBank *pCVar1;
   int iVar2;
   
@@ -433,7 +422,6 @@ void CopSpeak_InitVars(void)
 extern "C" void CopSpeak_DirectRequest(int filehandle,long offset,long size,Car_tObj *car,char *name)
 
 {
-  int next;
   int iVar1;
   CopSpeak_tRequest *r;
   int iVar2;
@@ -460,7 +448,6 @@ extern "C" void CopSpeak_DirectRequest(int filehandle,long offset,long size,Car_
 extern "C" void CopSpeak_GenericBankRequest(int patch,Car_tObj *car)
 
 {
-  int next;
   int iVar1;
   CopSpeak_tRequest *r;
   int iVar2;
@@ -490,20 +477,6 @@ void CopSpeak_StartUp(void)
   char loadEngineName[] = "lden";
   char loadExhaustName[] = "ldex";
   char oneShotsName[] = "oneshots.txt";
-  long offset;
-  long size;
-  int filename;
-  char * header;
-  char * SpeechLanguage;
-  CopSpeak_tBank * bank;
-  int Generic;
-  int i;
-  int bankname;
-  int timbre;
-  char * list;
-  char * p;
-  int quoted;
-  char * name;
   bool bVar1;
   void *pvVar2;
   int iVar3;
@@ -659,7 +632,6 @@ CopSpeakStart_langSwitch:
 int CopSpeak_GetEnginePatch(int type,int timbre)
 
 {
-  int patch;
   int iVar1;
   
   iVar1 = type * 2 + timbre + 1;
@@ -674,9 +646,6 @@ int CopSpeak_Play(CopSpeak_tRequest *r,int handle)
 
 {
   SNDPLAYOPTS playopts;
-  int vol;
-  int azimuth;
-  int noise;
   int iVar1;
   int iVar2;
   
@@ -728,7 +697,6 @@ int CopSpeak_Play(CopSpeak_tRequest *r,int handle)
 void CopSpeak_Skip(void)
 
 {
-  CopSpeak_tRequest * r;
   char cVar1;
   int iVar2;
   
@@ -756,9 +724,7 @@ int CopSpeak_Request(CopSpeak_tRequest *r)
   char cVar4;
   char cVar5;
   int iVar6;
-  int next;
   int iVar7;
-  CopSpeak_tBank *bank;
   int iVar8;
   int iVar9;
   
@@ -824,8 +790,6 @@ int CopSpeak_BankVolume(intptr r)
 void CopSpeak_LoadNextRequest(void)
 
 {
-  CopSpeak_tRequest * r;
-  CopSpeak_tBankHeader * bnk;
   int iVar1;
   char cVar2;
   int iVar3;
@@ -916,7 +880,6 @@ CopSpeak_advanceLoad: /* @0x8009a7f8 */
 void CopSpeak_PlayNextRequest(void)
 
 {
-  int handle;
   char cVar1;
   CopSpeak_tRequest *pCVar2;
   int iVar3;
@@ -969,7 +932,6 @@ void CopSpeak_PlayNextRequest(void)
 extern "C" void CopSpeak_Flush(void)
 
 {
-  int i;
   int iVar1;
   int iVar2;
   
@@ -991,10 +953,6 @@ extern "C" void CopSpeak_Flush(void)
 void CopSpeak_Server(void)
 
 {
-  int noise;
-  CopSpeak_tRequest * next;
-  CopSpeak_tRequest * r;
-  int i;
   int iVar1;
   int iVar2;
   CopSpeak_tRequest *pCVar3;
@@ -1079,9 +1037,7 @@ int CopSpeak_SfxQueued(void)
 {
   int iVar1;
   int iVar2;
-  int chkQ;
   int iVar3;
-  int count;
   
   iVar3 = 0;
   iVar2 = CopSpeak_gQueuePlay;
@@ -1101,8 +1057,6 @@ int CopSpeak_SfxQueued(void)
 void CopSpeak_ShowQueue(void)
 
 {
-  int chkQ;
-  int bufferstat;
   long lVar1;
   int iVar2;
   int iVar3;

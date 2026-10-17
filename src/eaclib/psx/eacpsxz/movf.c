@@ -78,7 +78,7 @@ extern "C" intptr movfxya(void *shapeData, int x, int y)
                         unsigned int uTile;
                         unsigned char vc, vc2;
                         char c5, c12;
-                        short sx, sx2, sy2, sy10;
+                        short sx, sx2, sy10;
 
                         if (uAcc < 0)
                             uAcc = uAcc + 0xf;

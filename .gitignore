@@ -46,3 +46,11 @@ _link_analysis.json
 build_obj/
 _ccpsx_objs.json
 _ccpsx_link.txt
+
+/_build/
+/bin/
+/status/
+/tools/
+/orig/
+/iso/
+/.cursor/

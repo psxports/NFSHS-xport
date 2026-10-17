@@ -217,7 +217,6 @@ long tCarManager::SellCar(short garageNumber,short playerNum)
   char cVar2;
   long result;
   int iVar4;
-  int iVar5;
   int iVar6;
   int i;
   
@@ -255,7 +254,6 @@ long tCarManager::PurchaseUpgrade(short garageNumber,short upgradeFlags,short pl
   u_char bVar1;
   tCarInfo *carInfo;
   int iVar3;
-  int iVar4;
   u_int mask;
   int i;
   int iVar7;
@@ -358,7 +356,6 @@ void tCarManager::AddUpgradesToPinkSlipsList(short garageNumber,short upgradeFla
 
 {
   u_char bVar1;
-  int iVar2;
   u_int mask;
   int iVar5;
   u_int i;
@@ -1028,7 +1025,6 @@ char tListIteratorCar::Value(tPlayer atIndex)
 short tListIteratorCar::TextValue(tPlayer atIndex)
 
 {
-  u_int *puVar1;
   short sVar2;
   tPlayer i;
   u_int uVar4;
@@ -1425,7 +1421,6 @@ char tListIteratorCarColor::Value(tPlayer arg1)
 
 {
   u_char player;
-  tCarInfo *carInfo;
   
   player = (u_char)*this->fPlayer;
   return (u_int)(u_char)(this->_base_tListIterator).fValue
@@ -1479,20 +1474,8 @@ int tListIteratorCarColor::Decrement(tPlayer arg1)
 {
   u_char player;
   u_int uVar1;
-  int carPrice;
   u_char *pbVar2;
   tCarInfo *carInfo;
-  short num;
-  short j;
-  short numCars;
-  short colorScheme;
-  short numColors;
-  int result;
-  short k;
-  int firstCar;
-  tCarInfo garageCar;
-  tTrackInformation trackInfo;
-  short nameBase [3];
   
   player = (u_char)*this->fPlayer;
   carInfo = this->fCarManager->fCars + (u_char)this->fPlayerCar[player];

@@ -329,7 +329,6 @@ int AskTheUserToSaveTheGame(void)
   short user_choice;
   void *is_cheater;
   int answer;
-  tDialogMessageString *dlgThis;
   tDialogYesNo YesNoDialog;
   
   is_cheater = (void *)(intptr)FECheat_IsTheUserACryBabyCheater();
@@ -413,7 +412,6 @@ void MenuExtended_GoToCarSelect(tMenuCommand *command)
   ushort uVar2;
   char *pcVar3;
   tMenu *ptVar4;
-  tFEApplication *dlgThis;
   tScreenCarSelectDuel *this_00;
   tListIteratorCar *this_01;
   uint state;
@@ -617,8 +615,6 @@ void * GenericMenuSaveGame(int showdialog)
   tFEApplication *ptVar3;
   char *pcVar4;
   void *pvVar5;
-  tScreenMemcard *dlgThis;
-  byte uninitafter;
   
   ptVar2 = FEApp;
   screenMemcard->message = 0x27e;
@@ -661,9 +657,6 @@ void * PinkSlipsPreSave(void)
 {
   short sVar1;
   void *pvVar2;
-  int answer;
-  tDialogYesNoTri *dlgThis;
-  byte ret;
   void *pvVar3;
   tDialogYesNoTri YesNoDialog;
   
@@ -798,9 +791,7 @@ void MenuExtended_GoToRace(tMenuCommand *command)
   tFEApplication *ptVar1;
   ushort uVar2;
   char *pcVar3;
-  tFEApplication *dlgThis;
   int wordnum;
-  tDialogMessageString *popUp;
   tCarInfo carInfo;
   
   ptVar1 = FEApp;
@@ -850,10 +841,8 @@ void MenuExtended_GoTo2PlayerRace(tMenuCommand *command)
 {
   tFEApplication *ptVar1;
   ushort uVar2;
-  tFEApplication *dlgThis;
   char *pcVar3;
   int wordnum;
-  tDialogMessageString *popUp;
   tCarInfo carInfo;
   
   ptVar1 = FEApp;
@@ -905,12 +894,9 @@ void MenuExtended_GoToTournTrackInfo(tMenuCommand *command)
   tTournamentDefinition *ptVar3;
   short sVar4;
   char *pcVar5;
-  long amount;
   int iVar6;
   int iVar7;
-  tDialogMessageString *dlgThis;
   tDialogMessageString *this_00;
-  tTourneyInfo *tourn;
   tDialogYesNo *popUp;
   union {
     intptr align;
@@ -972,12 +958,9 @@ void MenuExtended_GoToSpecialEventTrackInfo(tMenuCommand *command)
   tTournamentDefinition *ptVar3;
   short sVar4;
   char *pcVar5;
-  long amount;
   int iVar6;
   int iVar7;
-  tDialogMessageString *dlgThis;
   tDialogMessageString *this_00;
-  tTourneyInfo *tourn;
   tDialogYesNo *popUp;
   union {
     intptr align;
@@ -1038,9 +1021,6 @@ void MenuExtended_EnterUserName(tMenuCommand *command)
   byte bVar2;
   tGlobalMenuDefs *ptVar3;
   tScreenUserName *ptVar4;
-  char *data;
-  tUserNameMenuItem *dlgThis;
-  tOptionsMenu *m;
   
   ptVar3 = menuDefs;
   bVar1 = FEApp->fInputPlayer;
@@ -1212,9 +1192,7 @@ void MenuExtended_SellCar(tMenuCommand *command)
   long lVar5;
   long lVar6;
   char *pcVar7;
-  long money;
   tDialogMessageString *this_00;
-  tDialogMessageString *dlgThis;
   tDialogYesNo *popUp;
   union {
     intptr align;
@@ -1280,11 +1258,9 @@ void MenuExtended_BuyCar(tMenuCommand *command)
 {
   tFEApplication *ptVar1;
   short sVar2;
-  tFEApplication *dlgThis;
   long lVar3;
   char *pcVar4;
   tDialogMessageString *this_00;
-  tDialogMessageString *popUp;
   tCarInfo carInfo;
   tDialogYesNo yesNo;
   
@@ -1340,7 +1316,6 @@ void MenuExtended_PurchaseUpgrade(int upgradeNumber)
   long lVar3;
   char *pcVar4;
   tDialogMessageString *dlgThis;
-  int upgradeFlag;
   uint uVar5;
   tCarInfo carInfo;
   tDialogYesNo *popUp;
@@ -1491,7 +1466,6 @@ void GenericMenuLoadGame(int player)
 
 {
   tFEApplication *this_00;
-  tScreenMemcard *dlgThis;
   tDialogNoInputMessage *this_01;
   
   this_00 = FEApp;
@@ -1527,7 +1501,6 @@ void MenuExtended_LoadGame(tMenuCommand *command)
 
 {
   short sVar1;
-  tDialogYesNo *dlgThis;
   tDialogYesNo AreYouSure;
   
   if (((menuDefs->itemLoadGame)._base_tMenuItemGoToMenuButtonFade._base_tMenuItemGoToMenuButton._base_tMenuItemInteractive._base_tMenuItem.fFlags & 1) == 0) {
@@ -1600,8 +1573,6 @@ void * MenuExtended_DidUserWinBeTheCop(void)
 
 {
   tCarInfo *cop_car;
-  tCarInfo *activateCar;
-  byte result;
   void *pvVar1;
   tCarInfo carInfo;
   
@@ -1637,7 +1608,6 @@ extern "C" void MenuExtended_PostGameMenu(tMenuCommand *command)
   short sVar1;
   void *pvVar2;
   tMenu *ptVar3;
-  tScreenTournamentStandings *dlgThis;
   tScreenTournamentStandings *ptVar4;
   
   StatChk_ClearNewRecords();
@@ -1690,9 +1660,6 @@ void MenuExtended_FinishedPlayer1GetName(tMenuCommand *command)
   tScreenUserName *ptVar3;
   short sVar4;
   void *pvVar5;
-  tUserNameMenuItem *dlgThis;
-  tOptionsMenu *m;
-  Car_tStats *dummyCars;
   short nBestCarIndex;
   
   ptVar1 = FEApp;
@@ -1738,7 +1705,6 @@ void MenuExtended_FinishedPlayer2GetName(tMenuCommand *command)
   tGlobalMenuDefs *ptVar1;
   short sVar2;
   void *pvVar3;
-  Car_tStats *dummyCars;
   short nBestCarIndex;
   
   pvVar3 = (void *)(intptr)StatChk_IsRecordLapTime(Cars_gNewCarStatsList,(short)Cars_gNumRaceCars,&nBestCarIndex);
@@ -1776,7 +1742,6 @@ void MenuExtended_SetPinkSlips(tMenuCommand *command)
 
 {
   int iVar1;
-  short i;
   int iVar2;
   
   SwapBackground(screenMain,-1);
@@ -1880,7 +1845,6 @@ void MenuExtended_GoToGarage(tMenuCommand *command)
 
 {
   tMenu *ptVar1;
-  tListIteratorCar *dlgThis;
   tListIteratorCar *this_00;
   
   frontEnd.carListType = '\x01';
@@ -2033,7 +1997,6 @@ void MenuExtended_ExitTourney(tMenuCommand *command)
 {
   tGlobalMenuDefs *ptVar1;
   short sVar2;
-  tDialogYesNo *dlgThis;
   tDialogYesNo AreYouSure;
   
   tDialogYesNo_ctor(&AreYouSure);
@@ -2073,9 +2036,7 @@ void MenuExtended_ExitPinkSlipsEarly(tMenuCommand *command)
   short sVar3;
   char *fmt;
   char *pcVar4;
-  tDialogYesNo *dlgThis;
   int iVar5;
-  int player;
   int player_00;
   tDialogYesNo AreYouSure;
   char string [80];
@@ -2152,12 +2113,10 @@ void tGlobalMenuDefs::ConstructBody()
   tScreenTrackRecords *ptVar2;
   tScreenDisplay *screenHandler_00;
   tScreenMemcard *ptVar3;
-  tMenu *child;
   char *pcVar4;
   tListIteratorIndexed *ptVar5;
   tListIteratorCar *ptVar6;
   tListIterator *ptVar7;
-  char *in_v1;
   uint uVar8;
   tMenuNFS4 *ptVar9;
   tMenuNFS4 *this_00;
@@ -2871,12 +2830,7 @@ void tBlankMenuItemNFS4LeftRightChoice::Draw(int x,int y,char flags)
 tBlankMenuItemNFS4LeftRightChoice::~tBlankMenuItemNFS4LeftRightChoice()
 
 {
-  short i;
-  int upgradeFlag;
-  int fWinner;
-  char string [80];
   tDialogYesNo RetryCancelDialog;
-  short nBestCarIndex;
   
   ((tMenuItemNFS4LeftRightChoice*)(&this->_base_tMenuItemNFS4LeftRightChoice))->~tMenuItemNFS4LeftRightChoice();
   return;

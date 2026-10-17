@@ -4,7 +4,6 @@
  *   font working-state word). Both use currentfont+0x94 in retail MIPS.
  */
 #include "../../nfs4_types.h"
-#include "textpsx_externs.h"
 
 /* ---- fortext4  [TEXTPSX.C:153-179] SLD-VERIFIED ---- */
 void fortext4(int x, int y, void *source, int u, int v, int width, int height, int rowbytes)

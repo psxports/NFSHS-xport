@@ -1,8 +1,7 @@
 /* frontend/psx/drawshp.cpp  --  RECONSTRUCTED  (PSX FE styled-rectangle drawing; C++ TU)
  *   Bodies: Ghidra decompiler. Line numbers: PsyQ SLD (8c decl, 8e end).
  *   4 EXT functions; C++ linkage (cfront-mangled; PSX_RECT& reference params).
- *   NOTE: Ghidra lost several register/stack args to the PSXFront draw helpers
- *   (named x/y + dseIndex/dseFlags/dseX/dseY, decl-only) -- genuinely unrecoverable from the binary.
+ *   Several helper call carriers remain pending original MIPS review
  */
 #include "drawshp.h"
 
@@ -82,7 +81,7 @@ extern "C" void DrawShape_NFS4RoundRectangle(int textID,PSX_RECT &position,short
                position.y + 4,2,textState_Selected,textType_FramedInfo);
   }
   left = shapes + 0x29;
-  dseFlags = (selected == 0) | 8;
+  dseFlags = (int)(selected == 0) | 8;
   DrawShapeExtended(0x29,dseFlags,position.x,position.y,0,0,&drawFlags);
   DrawShapeExtended(0x29,dseFlags | 4,
                     (int)position.x + (int)position.w - (int)left->width,
@@ -116,17 +115,6 @@ extern "C" void DrawShape_NFS4Rectangle(PSX_RECT &position)
 
 {
   tTexture_ShapeInfo *shapes;
-  int abr;
-  int dseIndex;
-  int x;
-  int y;
-  tTexture_ShapeInfo *bottomright;
-  tTexture_ShapeInfo *topright;
-  tTexture_ShapeInfo *bottomleft;
-  tTexture_ShapeInfo *topleft;
-  int dseFlags;
-  int dseX;
-  int dseY;
   tDrawShapeExtended drawFlags;
   
   shapes = gHelpShapes;
@@ -134,39 +122,36 @@ extern "C" void DrawShape_NFS4Rectangle(PSX_RECT &position)
   drawFlags.tint[3] = 0x4a1900;
   drawFlags.tint[0] = 0x7b2908;
   drawFlags.tint[2] = 0x291000;
-  DrawShapeExtended
-            (dseIndex,dseFlags,dseX,dseY,0,0,&drawFlags);
-  DrawShapeExtended
-            (dseIndex,dseFlags,dseX,dseY,0,0,&drawFlags);
-  DrawShapeExtended
-            (dseIndex,dseFlags,dseX,dseY,0,0,&drawFlags);
-  DrawShapeExtended
-            ((int)position.w,dseFlags,dseX,dseY,0,0,&drawFlags);
+  DrawShapeExtended(0x2a,9,position.x,position.y,0,0,&drawFlags);
+  DrawShapeExtended(0x2b,9,position.x + position.w - shapes[0x2b].width,position.y,0,0,&drawFlags);
+  DrawShapeExtended(0x2c,9,position.x,position.y + position.h - shapes[0x2c].height,0,0,&drawFlags);
+  DrawShapeExtended(0x2d,9,position.x + position.w - shapes[0x2d].width,
+                    position.y + position.h - shapes[0x2d].height,0,0,&drawFlags);
   PSXDrawTransSquare
-            (drawFlags.tint[1],x,y,
+            (drawFlags.tint[1],position.x + shapes[0x2a].width,position.y,
              ((int)position.w - (int)shapes[0x2a].width) - (int)shapes[0x2b].width,1,1);
   PSXDrawTransSquare
-            (drawFlags.tint[0],x,y,
+            (drawFlags.tint[0],position.x + shapes[0x2c].width,position.y + position.h - 1,
              ((int)position.w - (int)shapes[0x2c].width) - (int)shapes[0x2d].width,1,1);
   PSXDrawTransGouraudSquare
-            (x,(int)position.y + (int)shapes[0x2a].height,2,
+            (position.x,(int)position.y + (int)shapes[0x2a].height,2,
              ((int)position.h - (int)shapes[0x2a].height) - (int)shapes[0x2c].height,1,
              drawFlags.tint[2],drawFlags.tint[2],drawFlags.tint[3],drawFlags.tint[3]);
   PSXDrawTransGouraudSquare
-            (x,(int)position.y + (int)shapes[0x2b].height,2,
+            (position.x + position.w - 2,(int)position.y + (int)shapes[0x2b].height,2,
              ((int)position.h - (int)shapes[0x2b].height) - (int)shapes[0x2d].height,1,
              drawFlags.tint[2],drawFlags.tint[2],drawFlags.tint[3],drawFlags.tint[3]);
   PSXDrawTransSquare
-            (0,x,y,shapes[0x2a].width + -2,
+            (0,position.x + 2,position.y + shapes[0x2a].height,shapes[0x2a].width + -2,
              ((int)position.h - (int)shapes[0x2a].height) - (int)shapes[0x2c].height,1);
   PSXDrawTransSquare
-            (0,x,y,2 - shapes[0x2b].width,
+            (0,position.x + position.w - 2,position.y + shapes[0x2b].height,2 - shapes[0x2b].width,
              ((int)position.h - (int)shapes[0x2b].height) - (int)shapes[0x2d].height,1);
-  abr = (int)position.x + (int)shapes[0x2a].width;
   PSXDrawTransSquare
-            (0,x,y,((int)position.w - (int)shapes[0x2a].width) - (int)shapes[0x2b].width,
+            (0,position.x + shapes[0x2a].width,position.y + 1,
+             ((int)position.w - (int)shapes[0x2a].width) - (int)shapes[0x2b].width,
              position.h + -2,1);
-  FeDraw_SetABRMode(abr);
+  FeDraw_SetABRMode(0);
   return;
 }
 
@@ -176,19 +161,15 @@ extern "C" void DrawShape_NFS4Rectangle(PSX_RECT &position)
 extern "C" void DrawShape_NFS4TransRectangle(PSX_RECT &r,short opacity)
 
 {
-  int abr;
-  int x;
-  int y;
   short opac;
   
   opac = (short)(((uint)(u_short)opacity << 0x11) >> 0x10);
-  PSXDrawTransSquare(0,x,y,4,(int)r.h,opac);
-  PSXDrawTransSquare(0,x,y,4,(int)r.h,opac);
-  PSXDrawTransSquare(0,x,y,r.w + -8,2,opac);
-  PSXDrawTransSquare(0,x,y,r.w + -8,2,opac);
-  abr = r.x + 4;
-  PSXDrawTransSquare(0,x,y,r.w + -8,r.h + -4,opacity);
-  FeDraw_SetABRMode(abr);
+  PSXDrawTransSquare(0,r.x,r.y,4,(int)r.h,opac);
+  PSXDrawTransSquare(0,r.x + r.w - 4,r.y,4,(int)r.h,opac);
+  PSXDrawTransSquare(0,r.x + 4,r.y,r.w - 8,2,opac);
+  PSXDrawTransSquare(0,r.x + 4,r.y + r.h - 2,r.w - 8,2,opac);
+  PSXDrawTransSquare(0,r.x + 4,r.y + 2,r.w - 8,r.h - 4,opacity);
+  FeDraw_SetABRMode(0);
   return;
 }
 

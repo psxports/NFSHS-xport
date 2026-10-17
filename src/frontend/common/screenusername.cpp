@@ -1,7 +1,6 @@
 /* frontend/screens/screenusername.cpp  --  RECONSTRUCTED  (username-entry screen; C++ TU)
  *   6 MEMBER functions of class tScreenUserName (: tScreen via _base_tScreen + manual vtable).
  *   Member-fn decls live in nfs4_types.h (non-virtual, ABI-neutral). Bodies: Ghidra decompiler.
- *   NOTE: Ghidra lost several draw-call args (boxY, dse-args, sprintf dest) -- decl-only, honest.
  */
 #include "screenusername.h"
 
@@ -96,14 +95,9 @@ void tScreenUserName::DrawBackground()
   int fade;
   uint startY;
   short y;
-  int yShift;
   uint lineFade;
   int rowY;
-  int boxY;
   int yAcc;
-  int dseY;
-  int dseFade;
-  int dseAbr;
   char output [2];
   short row;
   short col;
@@ -111,14 +105,14 @@ void tScreenUserName::DrawBackground()
   
   t = this->callingMenu->fScreenFade;
   x = (short)t;
-  fade = ((t << 0x10) >> 0x11) + -0x80;
+  fade = ((int)(short)t >> 1) - 0x80;
   if ((fade < 0x80) && (fade < 1)) {
     fade = 0;
   }
   else if (0x80 < fade) {
     fade = 0x80;
   }
-  startY = (t << 0x10) >> 0x12;
+  startY = (uint)((int)(short)t >> 2);
   if (((0x7f < (int)startY) || (lineFade = 0, 0 < (int)startY)) && (lineFade = startY, 0x80 < (int)startY)) {
     lineFade = 0x80;
   }
@@ -131,9 +125,9 @@ void tScreenUserName::DrawBackground()
     }
     this->fTextFade = x;
   }
-  SubtractiveBox(0xf0,boxY,0xc2,0x55,0x80808,0x80808,0,0);
+  SubtractiveBox(0xf0,0x2a,0xc2,0x55,0x80808,0x80808,0,0);
   SubtractiveBox
-            (0xf0,boxY,0xc2,0x55,0,0,0x80808,0x80808);
+            (0xf0,0x7f,0xc2,0x55,0,0,0x80808,0x80808);
   startY = (uint)(ushort)MENUUSERNAME_STARTY;
   row = 0;
   rowY = 0;            /* @0x800125e9 = 0x00 (rodata byte after "zUser%d") */
@@ -142,14 +136,14 @@ void tScreenUserName::DrawBackground()
   do {
     if (menu_kUserNameRows <= row) {
       SubtractiveBox
-                (0xf0,boxY,0xc2,0x55,0x505050,0x505050,0,0);
+                (0xf0,0x2a,0xc2,0x55,0x505050,0x505050,0,0);
       SubtractiveBox
-                (0xf0,boxY,0xc2,0x55,0,0,0x505050,0x505050);
+                (0xf0,0x7f,0xc2,0x55,0,0,0x505050,0x505050);
       x = 0xfc;
       t = 0;
       do {
         DrawVerticalLine(x,0x2e,
-                         (short)(((lineFade & 0xffff) - ((t << 0x10) >> 0xf)) * 0x10000 >> 0x10));
+                         (short)((short)lineFade - t * 2));
         t = t + 1;
         x = x + 0x1c;
       } while (t * 0x10000 >> 0x10 < 7);
@@ -166,7 +160,7 @@ void tScreenUserName::DrawBackground()
       t = 0;
       do {
         DrawShapeExtended
-                  (rowY,dseY,dseFade,dseAbr,(int)(short)fade,0,
+                  (t,0,0,0,(int)(short)fade,0,
                    (tDrawShapeExtended *)0x0);
         t = t + 1;
       } while (t * 0x10000 >> 0x10 < 0x20);
@@ -174,12 +168,11 @@ void tScreenUserName::DrawBackground()
     }
     x = 0x102;
     col = 0;
-    yAcc = (startY - 1) * 0x10000;
+    yAcc = (int)((startY - 1u) << 16);
     rowY = (int)(short)startY;
-    while (ch = this->fRowList[0][(int)col + row * 9], ch != '\0') {
+    while (ch = this->fRowList[row][col], ch != '\0') {
       output[0] = ch;
-      colText = CalcFadeVal(0xb54200,t);
-      yShift = yAcc >> 0x10;
+      colText = CalcFadeVal(0xb54200,(int)this->fTextFade);
       y = (short)((uint)yAcc >> 0x10);
       switch(output[0]) {
       case '!':
@@ -188,7 +181,6 @@ void tScreenUserName::DrawBackground()
       default:
         FETextRender_FullTextRGB
                   (output,x + 8,y,colText,'\x01',2);
-        t = yShift;
         break;
       case '#':
         t = 0x206;

@@ -4,6 +4,7 @@
 #include <vector>
 
 extern "C" int ticks, timerhz;
+extern "C" void *reservememadr(const char *, int, int);
 
 struct NfshsVideo
 {
@@ -52,13 +53,14 @@ int NfshsVideoDecode(uint32 *bitstream, int width, int height, bool rgb24, int x
     return 1;
 }
 
-intptr VIDEO_create(int width, int height, int fps, int streambuffersize, int)
+intptr VIDEO_create(int width, int height, int fps, int streambuffersize, int memtype)
 {
     if (width <= 0 || height <= 0 || fps <= 0 || streambuffersize <= 0)
         return 0;
-    NfshsVideo *video = new (std::nothrow) NfshsVideo();
-    if (!video)
+    void *storage = reservememadr("VIDEO", sizeof(NfshsVideo), memtype);
+    if (!storage)
         return 0;
+    NfshsVideo *video = new (storage) NfshsVideo();
     video->file = -1;
     video->width = width;
     video->height = height;
@@ -82,7 +84,9 @@ void VIDEO_abortplayback(intptr handle)
 void VIDEO_destroy(intptr handle)
 {
     VIDEO_abortplayback(handle);
-    delete (NfshsVideo *)handle;
+    // The caller releases the EAC handle after destroying its contents
+    if (handle)
+        ((NfshsVideo *)handle)->~NfshsVideo();
 }
 
 void VIDEO_spoolfile(intptr handle, char *name)

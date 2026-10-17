@@ -101,16 +101,6 @@ void AISpeeds_StartUp(void)
 /* ---- AISpeeds_ReadTuningInfo__Fv  [@0x8006d5ec] ---- */
 void AISpeeds_ReadTuningInfo(void)
 {
-  char filename[110];
-  int weatherRamp;
-  int slotLoop;
-  int skillMult[3];
-  int carType;
-  int carModelLoop;
-  int trackLoop;
-  int trackMult;
-  int nightMult;
-  int curveLoop;
   Udff_tInfo *handle;
   int iVar1;
   u_int uVar2;
@@ -208,8 +198,6 @@ void AISpeeds_CleanUp(void)
 /* ---- AISpeeds_SuperDuperSpeedUpTheCarsAtTheStartBecauseWeCannotActuallyHandleRenderingTheseCars__FP8Car_tObj  [@0x8006d89c] ---- */
 int AISpeeds_SuperDuperSpeedUpTheCarsAtTheStartBecauseWeCannotActuallyHandleRenderingTheseCars(Car_tObj *carObj)
 {
-  int leadIndex;
-  int f_crappyFrameRateCompensatingSpeedup;
   if ((((1 < Cars_gNumAIRaceCars) && (GameSetup_gData.raceType != 1)) &&
       (simGlobal.gameTicks < 0x780)) &&
      ((Cars_gNumHumanRaceCars == 1 && ((*(u_short *)((char *)Cars_gHumanRaceCarList[0] + 6)) < (carObj->N).totalSlice)))) {
@@ -221,20 +209,6 @@ int AISpeeds_SuperDuperSpeedUpTheCarsAtTheStartBecauseWeCannotActuallyHandleRend
 /* ---- AISpeeds_CalcOpponentTopSpeed__FP8Car_tObjPi  [@0x8006d938] ---- */
 int AISpeeds_CalcOpponentTopSpeed(Car_tObj *carObj,int *unFetteredDesiredSpeed)
 {
-  int topSpeed;
-  int newDesired;
-  int f_glue;
-  int f_script;
-  int f_nitrous;
-  int f_final;
-  int f_damage;
-  int f_unfettered;
-  int f_crappyFrameRateCompensatingSpeedup;
-  int f_caravan;
-  int metersPastFinish;
-  int latLeft;
-  int latRight;
-  int totalSortIndex;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -357,10 +331,6 @@ LAB_8006de40:
 /* ---- AISpeeds_NeedToSlowDownForCurve__FP8Car_tObjiii  [@0x8006de90] ---- */
 int AISpeeds_NeedToSlowDownForCurve(Car_tObj *carObj,int distanceMeters,int currentSpeed,int futureCurveSpeed)
 {
-  int neededDistance;
-  int futureSpeed;
-  int speed;
-  int sIndex;
   int *piVar1;
   AIPhysic_BrakeInfo *pAVar2;
   int iVar3;
@@ -397,11 +367,6 @@ int AISpeeds_NeedToSlowDownForCurve(Car_tObj *carObj,int distanceMeters,int curr
 /* ---- AISpeeds_CalcOpponentCurveSpeed__FP8Car_tObj  [@0x8006df34] ---- */
 int AISpeeds_CalcOpponentCurveSpeed(Car_tObj *carObj)
 {
-  int speedHere;
-  int scanMetersDistanceInt;
-  int scanSlice;
-  int curve;
-  int curveSpeed;
   int iVar1;
   int currentSpeed;
   int iVar2;
@@ -451,13 +416,6 @@ int AISpeeds_CalcOpponentCurveSpeed(Car_tObj *carObj)
 /* ---- AISpeeds_BTCGetGlueFactor__FP8Car_tObj  [@0x8006e09c] ---- */
 int AISpeeds_BTCGetGlueFactor(Car_tObj *carObj)
 {
-  int closestHumanDistance;
-  Car_tObj*closestHumanCarObj;
-  int humanLoop;
-  Car_tObj*copCar;
-  int longMetersBetween;
-  int glueIndex;
-  int glue;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -528,9 +486,6 @@ Car_tObj * AISpeeds_GetNextAICar(Car_tObj *carObj)
 /* ---- AISpeeds_GetPrevAICar__FP8Car_tObj  [@0x8006e264] ---- */
 Car_tObj * AISpeeds_GetPrevAICar(Car_tObj *carObj)
 {
-  Car_tObj*prevCar;
-  Car_tObj*testCar;
-  int carLoop;
   Car_tObj *pCVar1;
   int iVar2;
   Car_tObj **ppCVar3;
@@ -558,12 +513,6 @@ Car_tObj * AISpeeds_GetPrevAICar(Car_tObj *carObj)
 /* ---- AISpeeds_GetCaravanFactor__FP8Car_tObj  [@0x8006e2d0] ---- */
 int AISpeeds_GetCaravanFactor(Car_tObj *carObj)
 {
-  int slot;
-  Car_tObj*nextAICar;
-  int f_caravan;
-  int leaderIsThisManyMetersAhead;
-  u_int tempRandom;
-  Car_tObj*prevAICar;
   Car_tObj *carObj_00;
   Car_tObj *pCVar1;
   int iVar2;
@@ -652,14 +601,6 @@ LAB_8006e444:
 /* ---- AISpeeds_GetGlueFactor__FP8Car_tObj  [@0x8006e68c] ---- */
 int AISpeeds_GetGlueFactor(Car_tObj *carObj)
 {
-  int leadHumanRacerOdometer;
-  int leadAIRacerOdometer;
-  int lastAIRacerOdometer;
-  int glue;
-  int leadSpeed;
-  int packPositionGlueModifier;
-  int distance;
-  int glueIndex;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -771,9 +712,6 @@ int AISpeeds_GetDamageFactor(Car_tObj *carObj)
 /* ---- AISpeeds_LimitGlueMultiplier__FP8Car_tObji  [@0x8006e9b0] ---- */
 int AISpeeds_LimitGlueMultiplier(Car_tObj *carObj,int f_final)
 {
-  int bestDistanceAbsMeters;
-  int playerLoop;
-  int thisDistanceAbsMeters;
   int iVar1;
   Car_tObj **ppCVar2;
   int iVar3;
@@ -807,9 +745,6 @@ int AISpeeds_LimitGlueMultiplier(Car_tObj *carObj,int f_final)
 /* ---- AISpeeds_CalcCopTopSpeed__FP8Car_tObj  [@0x8006eaa4] ---- */
 int AISpeeds_CalcCopTopSpeed(Car_tObj *carObj)
 {
-  int topSpeed;
-  int newDesired;
-  int f_nitrous;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -848,7 +783,6 @@ int AISpeeds_CalcCopTopSpeed(Car_tObj *carObj)
 /* ---- AISpeeds_CalcTrafficTopSpeed__FP8Car_tObj  [@0x8006eb6c] ---- */
 extern "C" int AISpeeds_CalcTrafficTopSpeed(Car_tObj *carObj)
 {
-  int desired;
   int iVar1;
   int iVar2;
   u_int uVar3;
@@ -893,7 +827,6 @@ LAB_8006ec80:
 /* ---- AISpeeds_GetLegalSpeed__Fi  [@0x8006ed0c] ---- */
 int AISpeeds_GetLegalSpeed(int slice)
 {
-  speedData_t*speedData;
   speedData_t *psVar1;
   speedData_t *psVar2;
   
@@ -908,8 +841,6 @@ int AISpeeds_GetLegalSpeed(int slice)
 /* ---- AISpeeds_RandomizeTrafficSpeed__FP8Car_tObji  [@0x8006ed50] ---- */
 int AISpeeds_RandomizeTrafficSpeed(Car_tObj *carObj,int oldsafe)
 {
-  int newsafe;
-  int safeminus30;
   int iVar1;
   
   if (oldsafe < 1) {
@@ -976,7 +907,6 @@ void AISpeeds_CalcDesiredSpeed(Car_tObj *carObj)
 /* ---- AISpeeds_CalculateOncomingCarSpeed__FP8Car_tObj  [@0x8006ee80] ---- */
 int AISpeeds_CalculateOncomingCarSpeed(Car_tObj *carObj)
 {
-  int playerSpeed;
   int iVar1;
   u_int uVar2;
   
@@ -1008,7 +938,6 @@ int AISpeeds_CalculateOncomingCarSpeed(Car_tObj *carObj)
 /* ---- AISpeeds_SetTrafficSpeedRandomFactor__FP8Car_tObj  [@0x8006ef28] ---- */
 void AISpeeds_SetTrafficSpeedRandomFactor(Car_tObj *carObj)
 {
-  int randomSpeedMultipliers[4];
   int local_10 [4];
   
   randtemp = fastRandom * randSeed;
@@ -1024,10 +953,6 @@ void AISpeeds_SetTrafficSpeedRandomFactor(Car_tObj *carObj)
 /* ---- AISpeeds_MaintainLeaderBoard__Fv  [@0x8006efa4] ---- */
 void AISpeeds_MaintainLeaderBoard(void)
 {
-  int slot;
-  Car_tObj*lastAI;
-  int carLoop;
-  Car_tObj*test;
   Car_tObj **ppCVar1;
   Car_tObj *pCVar2;
   int iVar3;
@@ -1089,8 +1014,6 @@ int AISpeeds_GetScriptFactor(Car_tObj *carObj)
 /* ---- AISpeeds_GetUpgradeAccMult__Fi  [@0x8006f10c] ---- */
 int AISpeeds_GetUpgradeAccMult(int carIndex)
 {
-  Car_tObj*carObj;
-  int accMult;
   int a;
   Car_tObj *pCVar1;
 
@@ -1111,8 +1034,6 @@ int AISpeeds_GetUpgradeAccMult(int carIndex)
 /* ---- AISpeeds_GetUpgradeBrakeMult__Fi  [@0x8006f1c8] ---- */
 int AISpeeds_GetUpgradeBrakeMult(int carIndex)
 {
-  Car_tObj*carObj;
-  int brakeMult;
   int a;
   Car_tObj *pCVar1;
 
@@ -1133,8 +1054,6 @@ int AISpeeds_GetUpgradeBrakeMult(int carIndex)
 /* ---- AISpeeds_GetUpgradeHandlingMult__Fi  [@0x8006f284] ---- */
 int AISpeeds_GetUpgradeHandlingMult(int carIndex)
 {
-  Car_tObj*carObj;
-  int handlingMult;
   int a;
   Car_tObj *pCVar1;
 
@@ -1155,8 +1074,6 @@ int AISpeeds_GetUpgradeHandlingMult(int carIndex)
 /* ---- AISpeeds_GetUpgradeTopSpeedMult__Fi  [@0x8006f340] ---- */
 int AISpeeds_GetUpgradeTopSpeedMult(int carIndex)
 {
-  Car_tObj*carObj;
-  int topSpeedMult;
   int a;
   Car_tObj *pCVar1;
 

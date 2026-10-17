@@ -3,7 +3,7 @@
  *   GTE-free. Full SYM-locals applied.
  */
 #include "../../nfs4_types.h"
-#include "udff_externs.h"
+#include "../../lib/libfns.h"
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 Udff_tInfo * Udff_Opena(char *name,char *mem,int abortFlag);
@@ -18,7 +18,6 @@ Udff_tInfo * Udff_Opena(char *name,char *mem,int abortFlag)
 {
   Udff_tInfo *addr;
   char *pcVar1;
-  Udff_tInfo *newHandle;
   
   addr = (Udff_tInfo *)reservememadr("udffhandle",0xc,0x10);
   if (addr != (Udff_tInfo *)0x0) {
@@ -66,7 +65,6 @@ void Udff_Close(Udff_tInfo *handle)
 int Udff_GetInt(Udff_tInfo *handle)
 
 {
-  int value;
   int iVar1;
   
   iVar1 = *(int *)handle->memPtr;
@@ -78,7 +76,6 @@ int Udff_GetInt(Udff_tInfo *handle)
 void Udff_GetBuffer(Udff_tInfo *handle,char *mem,int size)
 
 {
-  int value;
   
   memcpy(mem,handle->memPtr,size);
   handle->memPtr = handle->memPtr + size;

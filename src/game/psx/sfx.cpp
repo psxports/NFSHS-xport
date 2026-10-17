@@ -127,19 +127,19 @@ void Sfx_AdditivePrim(Draw_tPixMap *pmx,SVECTOR *pt,int mode,int offset,Sfx_tCac
     gte_ldv0(pt);
     gte_rtps();
     prim = (POLY_FT4 *)Render_gPacketPtr;
-    gte_stsxy(&prim->x0);
+    gte_stsxy(&prim->p[0].xy.x);
     gte_ldv3(pt + 1,pt + 2,pt + 3);
     gte_rtpt();
     if ((mode & 2U) != 0) {
-      *(int *)&prim->r0 = 0x2e5898b8;
+      *(int *)&prim->rgbc.r = 0x2e5898b8;
     }
     else if (GameSetup_gData.Time == 0) {
-      *(int *)&prim->r0 = 0x2e181818;
+      *(int *)&prim->rgbc.r = 0x2e181818;
     }
     else {
-      *(int *)&prim->r0 = 0x2e080808;
+      *(int *)&prim->rgbc.r = 0x2e080808;
     }
-    gte_stsxy3(&prim->x1,&prim->x3,&prim->x2);
+    gte_stsxy3(&prim->p[1].xy.x,&prim->p[3].xy.x,&prim->p[2].xy.x);
     gte_avsz4();
     gte_stotz(&sd->otz);
     sd->otz = (sd->otz >> 1) + offset;
@@ -149,13 +149,13 @@ void Sfx_AdditivePrim(Draw_tPixMap *pmx,SVECTOR *pt,int mode,int offset,Sfx_tCac
       l1 = *(u_int *)&pmx->u1;
       l2 = *(u_int *)&pmx->u2;
       l3 = *(u_int *)&pmx->u3;
-      *(u_int *)&prim->u0 = *(u_int *)&pmx->u0;
-      *(u_int *)&prim->u1 = l1;
-      *(u_int *)&prim->u2 = l2;
-      *(u_int *)&prim->u3 = l3;
+      *(u_int *)&prim->p[0].uv.u = *(u_int *)&pmx->u0;
+      *(u_int *)&prim->p[1].uv.u = l1;
+      *(u_int *)&prim->p[2].uv.u = l2;
+      *(u_int *)&prim->p[3].uv.u = l3;
       tpage = pmx->tpage;
       ChangeTPage(&tpage,(mode & 1U) == 0 ? 1 : 2);
-      prim->tpage = tpage;
+      prim->p[1].attr = tpage;
       AddPrim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
       Render_gPacketPtr = Render_gPacketPtr + 0x28;
     }
@@ -285,24 +285,24 @@ SfxSouffle_billboard:
       prim = (POLY_FT4 *)sd->head.cprim.PrimPtr;
       gte_stlvnl(&proj);
       if (proj.vz >= 0x20) {
-        gte_stsxy(&prim->x1);
+        gte_stsxy(&prim->p[1].xy.x);
         gte_ldv3(&ribbon[0],&ribbon[2],&ribbon[3]);
         gte_rtpt();
-        *(int *)&prim->r0 = colorcode;
-        gte_stsxy3(&prim->x0,&prim->x3,&prim->x2);
+        *(int *)&prim->rgbc.r = colorcode;
+        gte_stsxy3(&prim->p[0].xy.x,&prim->p[3].xy.x,&prim->p[2].xy.x);
         gte_avsz4();
         gte_stotz(&sd->otz);
         sd->otz = (sd->otz >> 1) + otz;
         if ((sd->otz >= 0) && (sd->otz <= Draw_gViewOtSize + -3)) {
           /* 0x800DE308: sb v0,3(s0), preserving the FT4 GPU opcode. */
           prim->tag = (prim->tag & 0x00ffffffU) | 0x09000000U;
-          *(u_int *)&prim->u0 = *(u_int *)&pmx->u0;
-          *(u_int *)&prim->u1 = *(u_int *)&pmx->u1;
-          *(u_int *)&prim->u2 = *(u_int *)&pmx->u2;
-          *(u_int *)&prim->u3 = *(u_int *)&pmx->u3;
+          *(u_int *)&prim->p[0].uv.u = *(u_int *)&pmx->u0;
+          *(u_int *)&prim->p[1].uv.u = *(u_int *)&pmx->u1;
+          *(u_int *)&prim->p[2].uv.u = *(u_int *)&pmx->u2;
+          *(u_int *)&prim->p[3].uv.u = *(u_int *)&pmx->u3;
           tpage = pmx->tpage;
           ChangeTPage(&tpage,(is->type == 8) ? 2 : 1);
-          prim->tpage = tpage;
+          prim->p[1].attr = tpage;
           AddPrim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
           sd->head.cprim.PrimPtr = (char *)((char *)sd->head.cprim.PrimPtr + 0x28);
         }
@@ -321,21 +321,21 @@ SfxSouffle_billboard:
       gte_ldv0(&dSouffle.v0);
       gte_rtps();
       prim = (POLY_FT4 *)sd->head.cprim.PrimPtr;
-      gte_stsxy(&prim->x0);
+      gte_stsxy(&prim->p[0].xy.x);
       gte_ldv3(&dSouffle.v1,&dSouffle.v2,&dSouffle.v3);
       gte_rtpt();
-      *(int *)&prim->r0 = is->colour | 0x2c000000;
-      gte_stsxy3(&prim->x1,&prim->x3,&prim->x2);
+      *(int *)&prim->rgbc.r = is->colour | 0x2c000000;
+      gte_stsxy3(&prim->p[1].xy.x,&prim->p[3].xy.x,&prim->p[2].xy.x);
       gte_avsz4();
       gte_stotz(&sd->otz);
       sd->otz = (sd->otz >> 1) + 0xf;
       if ((sd->otz >= 0) && (sd->otz <= Draw_gViewOtSize + -3)) {
         /* 0x800DE590: sb v0,3(t0), preserving the FT4 GPU opcode. */
         prim->tag = (prim->tag & 0x00ffffffU) | 0x09000000U;
-        *(u_int *)&prim->u0 = *(u_int *)&gLeafPixmap->u0;
-        *(u_int *)&prim->u1 = *(u_int *)&gLeafPixmap->u1;
-        *(u_int *)&prim->u2 = *(u_int *)&gLeafPixmap->u2;
-        *(u_int *)&prim->u3 = *(u_int *)&gLeafPixmap->u3;
+        *(u_int *)&prim->p[0].uv.u = *(u_int *)&gLeafPixmap->u0;
+        *(u_int *)&prim->p[1].uv.u = *(u_int *)&gLeafPixmap->u1;
+        *(u_int *)&prim->p[2].uv.u = *(u_int *)&gLeafPixmap->u2;
+        *(u_int *)&prim->p[3].uv.u = *(u_int *)&gLeafPixmap->u3;
         AddPrim(sd->head.cprim.LastPrim + sd->otz,sd->head.cprim.PrimPtr);
         sd->head.cprim.PrimPtr = (char *)((char *)sd->head.cprim.PrimPtr + 0x28);
       }

@@ -7,18 +7,14 @@
  *   [0xc..0xf]=up to 4 filter bytes.  A bank entry is (2 + filterCnt) bytes: [0..1]=start offset (16-bit BE),
  *   [2..]=filter bytes; high bit of entry[0] flags a redirect to entry[entry[1]].
  *
- *   Ghidra-ism note: IDA typed iSPCH_InitSample as 1-arg (its body reads only `out`), but the sole caller
- *   (iSPCH_UnPackSample) passes (out, sampleId) -- kept 2-arg as the formal API, sampleId unused here.
  */
 
 #include "../../../nfs4_types.h"
-
-extern "C" void iSPCH_InitSample(int *out, int sampleId);                         /* @0x8010B5AC */
-extern "C" int iSPCH_UnPackSample(intptr bank, unsigned int sampleIdx, int *out); /* @0x8010B5D4 */
+#include "spchsamp.h"
 
 /* iSPCH_InitSample @0x8010B5AC : reset a VoxSample descriptor to "empty" (length 0, start -1, no filter,
  *   filter bytes 0xff). */
-extern "C" void iSPCH_InitSample(int *out, int sampleId)
+extern "C" void iSPCH_InitSample(int *out)
 {
     out[1] = -1;
     *out = 0;
@@ -44,7 +40,7 @@ extern "C" int iSPCH_UnPackSample(intptr bank, unsigned int sampleIdx, int *out)
     int startOff, endOff;
 
     endOff = 0;
-    iSPCH_InitSample(out, (int)sampleIdx);
+    iSPCH_InitSample(out);
     if ((int)sampleIdx < (int)(unsigned int)*(unsigned char *)(bank + 3))
     {
         unsigned char flagByte = *(unsigned char *)(bank + 2);

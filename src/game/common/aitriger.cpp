@@ -16,29 +16,21 @@ AITrigger_TriggerManager *triggerManagerTraffic;   /* @0x8013c5ec  (bss(zero)) *
 /* ---- AITrigger_TriggerManager::Init  [@0x8007286c] ---- */
 void AITrigger_TriggerManager::Init(char *rawTriggers)
 {
-  int*numTriggers;
-  char*currentTrigger;
-  int tLoop;
   int iVar1;
-  trigger_t **pptVar2;
   int iVar3;
   trigger_t *trigger;
   
   iVar3 = 99;
-  pptVar2 = this->triggers_ + 0x61;
   this->numTriggers_ = 0;
   this->invNumTriggers_ = 0;
   do {
-    pptVar2[0x66] = (trigger_t *)0xfffff600;
+    this->checkTime_[iVar3] = -0xa00;
     iVar3 = iVar3 + -1;
-    pptVar2 = pptVar2 + -1;
   } while (-1 < iVar3);
   iVar3 = 8;
-  pptVar2 = this->triggers_ + 6;
   do {
-    pptVar2[0xca] = (trigger_t *)0x0;
+    this->lastTriggerChecked_[iVar3] = 0;
     iVar3 = iVar3 + -1;
-    pptVar2 = pptVar2 + -1;
   } while (-1 < iVar3);
   if (rawTriggers != (char *)0x0) {
     trigger = (trigger_t *)(rawTriggers + 4);
@@ -46,7 +38,7 @@ void AITrigger_TriggerManager::Init(char *rawTriggers)
     if (0 < *(int *)rawTriggers) {
       do {
         iVar1 = this->InsertTrigger(trigger,(void *)0x1);
-        trigger = trigger + iVar1;
+        trigger = (trigger_t *)((char *)trigger + iVar1);
         iVar3 = iVar3 + 1;
       } while (iVar3 < *(int *)rawTriggers);
     }
@@ -62,19 +54,18 @@ void AITrigger_TriggerManager::Init(char *rawTriggers)
 /* ---- AITrigger_TriggerManager::InsertTrigger  [@0x80072948] ---- */
 int AITrigger_TriggerManager::InsertTrigger(trigger_t *trigger,bool fromFile)
 {
-  int size;
   int iVar1;
   int iVar2;
   
   iVar2 = 0;
   this->DescribeTrigger(trigger);
-  iVar1 = *(int *)trigger;
+  iVar1 = trigger->any.type;
   if (iVar1 == 5) {
     if (fromFile) {   /* @0x80072984: if(fromFile) bool test (disasm-v3) */
-      *(trigger_t **)(trigger + 0x3c) = trigger + 0x40;
+      trigger->trafficPath.path = (trigger_pathPosition_t *)((char *)trigger + 0x40);
     }
     this->triggers_[this->numTriggers_] = trigger;
-    iVar2 = *(int *)(trigger + 0x38) * 0x14 + 0x40;
+    iVar2 = trigger->trafficPath.numPoints * 0x14 + 0x40;
     goto LAB_80072a14;
   }
   if (iVar1 == 2) {
@@ -97,7 +88,6 @@ LAB_80072a14:
 trigger_t *
 AITrigger_TriggerManager::GetNextTrigger(int car)
 {
-  int triggerNum;
   int iVar1;
   
   if (this->numTriggers_ == 0) {
@@ -118,7 +108,6 @@ AITrigger_TriggerManager::GetNextTrigger(int car)
 trigger_t *
 AITrigger_TriggerManager::GetPrevTrigger(int car)
 {
-  int triggerNum;
   int iVar1;
   
   if (this->numTriggers_ == 0) {
@@ -138,7 +127,6 @@ AITrigger_TriggerManager::GetPrevTrigger(int car)
 /* ---- AITrigger_TriggerManager::CheckForTriggerAtSlice  [@0x80072b24] ---- */
 int AITrigger_TriggerManager::CheckForTriggerAtSlice(int car,int slice)
 {
-  int*lastTrigger;
   int iVar1;
   int iVar2;
   int *piVar3;
@@ -146,27 +134,27 @@ int AITrigger_TriggerManager::CheckForTriggerAtSlice(int car,int slice)
   iVar1 = -1;
   if (this->numTriggers_ != 0) {
     piVar3 = this->lastTriggerChecked_ + car;
-    if ((*(int *)(this->triggers_[*piVar3] + 4) < slice) && (1 < this->numTriggers_)) {
+    if ((this->triggers_[*piVar3]->any.slice < slice) && (1 < this->numTriggers_)) {
       do {
         if (*piVar3 == this->numTriggers_ + -1) break;
         this->GetNextTrigger(car);
-      } while (*(int *)(this->triggers_[*piVar3] + 4) < slice);
+      } while (this->triggers_[*piVar3]->any.slice < slice);
     }
     else {
       iVar1 = *piVar3;
-      if ((slice < *(int *)(this->triggers_[iVar1] + 4)) && (1 < this->numTriggers_)) {
+      if ((slice < this->triggers_[iVar1]->any.slice) && (1 < this->numTriggers_)) {
         do {
           if (iVar1 == 0) break;
           this->GetPrevTrigger(car);
           iVar1 = *piVar3;
-        } while (slice < *(int *)(this->triggers_[iVar1] + 4));
+        } while (slice < this->triggers_[iVar1]->any.slice);
       }
     }
     iVar2 = *piVar3;
     iVar1 = -1;
-    if (((*(int *)(this->triggers_[iVar2] + 4) == slice) &&
+    if (((this->triggers_[iVar2]->any.slice == slice) &&
         (0xa00 < simGlobal.gameTicks - this->checkTime_[iVar2])) &&
-       (*(int *)this->triggers_[iVar2] != 2)) {
+       (this->triggers_[iVar2]->any.type != 2)) {
       iVar1 = iVar2;
     }
   }
@@ -177,7 +165,6 @@ int AITrigger_TriggerManager::CheckForTriggerAtSlice(int car,int slice)
 trigger_t *
 AITrigger_TriggerManager::GetTrigger(int trigger,int *used)
 {
-  int triggerNum;
   trigger_t *ptVar1;
   
   if (simGlobal.gameTicks - this->checkTime_[trigger] < 0xa01) {
@@ -197,12 +184,6 @@ AITrigger_TriggerManager::GetTrigger(int trigger,int *used)
 /* ---- AITrigger_TriggerManager::CheckForClosestTriggerOfType  [@0x80072d40] ---- */
 int AITrigger_TriggerManager::CheckForClosestTriggerOfType(int slice,triggerType type,int direction)
 {
-  int tLoop;
-  trigger_t *prevTrigger;
-  trigger_t *firstTrigger;
-  int prevTriggerIndex;
-  int firstTriggerIndex;
-  trigger_t *thisTrigger;
   int *piVar1;
   int iVar2;
   trigger_t *ptVar3;
@@ -232,17 +213,17 @@ int AITrigger_TriggerManager::CheckForClosestTriggerOfType(int slice,triggerType
     ptVar3 = this->triggers_[iVar4];
     ptVar6 = ptVar5;
     iVar8 = iVar2;
-    if (*(triggerType *)ptVar3 == type) {
+    if (ptVar3->any.type == type) {
       if (ptVar7 == (trigger_t *)0x0) {
         ptVar7 = ptVar3;
         iVar9 = iVar4;
       }
-      if (*(int *)(ptVar3 + 4) == slice) {
+      if (ptVar3->any.slice == slice) {
         return iVar4;
       }
       ptVar6 = ptVar3;
       iVar8 = iVar4;
-      if (slice < *(int *)(ptVar3 + 4)) {
+      if (slice < ptVar3->any.slice) {
         if (0 < direction) {
           return iVar4;
         }
@@ -264,28 +245,19 @@ void AITrigger_TriggerManager::DescribeTrigger(trigger_t *trigger)
 }
 
 /* ---- AITrigger_Compare  [@0x80072e18] ---- */
-int AITrigger_Compare(void *op1,void *op2)
+int AITrigger_Compare(const void *op1,const void *op2)
 {
-  trigger_t *ta;
-  trigger_t *tb;
-  return *(int *)(*(int *)op1 + 4) - *(int *)(*(int *)op2 + 4);
+  const uint32 *ta = (const uint32 *)(uintptr_t)*(const uint32 *)op1;
+  const uint32 *tb = (const uint32 *)(uintptr_t)*(const uint32 *)op2;
+  return (sint32)(ta[1] - tb[1]);
 }
 
 /* ---- AITrigger_TriggerManager::Sort  [@0x80072e30] ---- */
 void AITrigger_TriggerManager::Sort()
 {
-  trigger_t *ta;
-  trigger_t *tb;
-  trigger_t *prevTrigger;
-  trigger_t *firstTrigger;
-  int prevTriggerIndex;
-  int firstTriggerIndex;
-  int size;
-  int *lastTrigger;
-  int *numTriggers;
   
   if (this->numTriggers_ != 0) {
-    qsortPSX(this->triggers_,this->numTriggers_,4,(int (*)(const void *,const void *))AITrigger_Compare /* @0x80072e18 qsort comparator */);
+    qsortPSX(this->triggers_,this->numTriggers_,4,AITrigger_Compare);
   }
   return;
 }

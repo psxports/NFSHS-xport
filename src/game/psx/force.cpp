@@ -36,14 +36,11 @@ void Force_Vbl(void)
   u_char bVar2;
   u_int uVar3;
   int iVar4;
-  int padstate;
   u_int uVar5;
   u_int uVar6;
   u_int uVar7;
   Force_tGlobal *pFVar8;
-  int padnum;
   int port;
-  int i;
   int iVar9;
   
   iVar9 = 0;
@@ -104,26 +101,16 @@ void Force_Update(Car_tObj *car)
 
 {
   int iVar1;
-  int shock;
   int iVar2;
-  int skids;
   u_int uVar3;
   int iVar4;
-  int impacts;
   int iVar5;
-  int time;
   int *piVar6;
-  int force;
   u_char uVar7;
-  int v1;
   int iVar8;
   u_char uVar9;
-  int v0;
   int iVar10;
   int iVar11;
-  int c;
-  Force_tGlobal *f;
-  int impactmultiplier;
   int frontmultiplier;
   int rearmultiplier;
   
@@ -292,7 +279,6 @@ void Force_StartUp(void)
 {
   u_char *actuator_walk;
   Force_tGlobal *force_walk;
-  Force_tGlobal *f;
   
   force_walk = Force_g;
   actuator_walk = Force_g[0].actuator + 1;
@@ -320,7 +306,6 @@ void Force_Disable(void)
 {
   u_char *puVar1;
   Force_tGlobal *pFVar2;
-  Force_tGlobal *f;
   
   pFVar2 = Force_g;
   puVar1 = Force_g[0].actuator + 1;
@@ -340,7 +325,6 @@ void Force_Disable(void)
 int Force_IsForceOn(Car_tObj *car)
 
 {
-  Force_tGlobal *f;
   
   if (1 < Replay_ReplayMode) {
     return 0;
@@ -357,7 +341,6 @@ void Force_Pause(void)
 {
   u_char *puVar1;
   Force_tGlobal *pFVar2;
-  Force_tGlobal *f;
   
   pFVar2 = Force_g;
   puVar1 = &Force_g[0].time;
@@ -389,18 +372,6 @@ void Force_HitSign(Car_tObj *car)
 void Force_HitWall(int impulse)
 
 {
-  int shock;
-  int skids;
-  int impacts;
-  int time;
-  int padnum;
-  int force;
-  int v1;
-  int v0;
-  int c;
-  int impactmultiplier;
-  int frontmultiplier;
-  int rearmultiplier;
   
   return;
 }

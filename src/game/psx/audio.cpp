@@ -65,7 +65,6 @@ void Audio_CleanUp(void)
 
 {
   SndBnk_t *pSVar1;
-  int i;
   int iVar2;
   
   iVar2 = 0;
@@ -99,10 +98,7 @@ int AudioCmn_AddBank(char *filename,int size,char *pdata,int BankNum)
 {
   char cVar1;
   int iVar2;
-  char *p;
-  int check;
   char *pool_name;
-  char *ptemp;
   char *destBuf;
   int bhandle;
   
@@ -142,8 +138,6 @@ int AudioCmn_LoadBank(char *filename,int BankNum)
 {
   char *pdata_00;
   int iVar1;
-  char *p;
-  char *pdata;
   char bankdata [80];
   
   strcpy(bankdata,filename);

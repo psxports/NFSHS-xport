@@ -394,7 +394,6 @@ TexVramf_loadImageEmit:
 void Texture_Vramcf(shapetbl *shp,int x,int y,int clutx,int cluty)
 
 {
-  char*s;
   int rowbytes;
   u_short height;
   int rowall;
@@ -451,14 +450,7 @@ int Texture_GetTranslucencyMode(shapetbl *shp)
 extern "C" void Texture_LoadPmx(char *f,char *n,int ctrl,int rx,int ry,int cx,int cy,Draw_tPixMap *pmx)
 
 {
-  int rotated;
-  int bshapex;
-  int bshapey;
-  int bwidth;
-  int bheight;
-  int bpp_real;
   shapetbl*clutptr;
-  int bwidthclut;
   shapetbl *shpptr;
   u_char typebyte;
   int bpp;
@@ -754,8 +746,6 @@ void Texture_LoadMenuTexture(void)
   static char lightBName[] = "lgtb";
   static char lightCName[] = "lgtc";
   char *shapefile;
-  Draw_tPixMap *pmx;
-  char *shpfile;
   char name [255];
   
   if (gMenuPixmap[0] == (Draw_tPixMap *)0x0) {
@@ -790,15 +780,6 @@ void Texture_KillTrackTexture(void)
 extern "C" void Texture_KillMenuTexture(void)
 
 {
-  u_short abr;
-  int u;
-  int v;
-  int *checkdata;
-  int *indata;
-  short *dest;
-  int height;
-  char *shpfile;
-  char name [255];
   
   purgememadr(gFreePal4);
   purgememadr(gFreePal8);

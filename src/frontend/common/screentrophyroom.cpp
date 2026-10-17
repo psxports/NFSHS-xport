@@ -221,9 +221,7 @@ void tScreenTrophyRoom::DrawBackground()
 {
   char *sMenuText;
   int texttoshow;
-  short x;
   int amount;
-  short y;
   short i;
   int fModNumber;
   int TROPHY_LEFTOFFSET = 0x114;
@@ -284,13 +282,7 @@ void tScreenTrophyRoom::DrawBackground()
 void tScreenTrophyRoom::LoadTrophy()
 
 {
-  short x;
   char *fileName;
-  short y;
-  int fModNumber;
-  int TROPHY_LEFTOFFSET;
-  tDrawShapeExtended drawFlags3;
-  tDrawShapeExtended drawFlags;
   
   if (this->fRealCurrentTourn[this->tier] != (ushort)(byte)this->fPreviousTrophy) {
     fileName = (char *)0x0;

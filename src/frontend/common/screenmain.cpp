@@ -144,7 +144,6 @@ void tScreenMain::SetState(tScreenMainState state)
   int iVar4;
   tScreenMainState tVar5;
   tTexture_ShapeInfo *shape;
-  short i;
   int iVar7;
   
   if (state != this->fState) {
@@ -222,26 +221,15 @@ void tScreenMain::InitDynamicImages()
   byte bVar1;
   byte bVar2;
   ushort uVar3;
-  int index;
   int iVar4;
   int iVar5;
-  int xOffset, yOffset;
   uint uVar6;
-  int startX;
-  int i;
   int iVar7;
-  int startY;
-  tVideo *video;
   tVideo *video2;
-  int x;
   int iVar9;
-  int y;
   int iVar10;
-  int k;
   int iVar11;
-  int j;
   int iVar12;
-  int videoWallConfig;
   
   iVar4 = randPSX();
   iVar4 = iVar4 % 0x18;
@@ -320,9 +308,7 @@ void tScreenMain::ProcessInput(tPlayer fromPlayer,tInputKeyType &keyval,tMenuCom
 void tScreenMain::DrawDropShadow()
 
 {
-  int addr_24;
   int i;
-  u_char *pal_link;
   u_char *prim;
   const tVertex *src_walk;
   
@@ -330,12 +316,8 @@ void tScreenMain::DrawDropShadow()
   do {
     src_walk = dropShadow[i];
     prim = Render_gPacketPtr;
-    pal_link = Render_gPalettePtr;
-    *(uint *)Render_gPacketPtr =
-         *(uint *)Render_gPacketPtr & 0xff000000 | *(uint *)Render_gPalettePtr & 0xffffff;
-    addr_24 = (uint)Render_gPacketPtr & 0xffffff;
+    AddPrim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x24;
-    *(uint *)pal_link = *(uint *)pal_link & 0xff000000 | addr_24;
     *(u_int *)(prim + 4) = 0x808080;
     prim[7] = 0x3a;
     *(u_int *)(prim + 0xc) = 0x808080;
@@ -387,7 +369,6 @@ void tScreenMain::DrawBackground()
   byte bVar1;
   bool bVar2;
   short sVar3;
-  int fade;
   char *str;
   int iVar5;
   uint uVar6;
@@ -395,14 +376,9 @@ void tScreenMain::DrawBackground()
   tScreenMainState tVar8;
   uint uVar9;
   uint32 deltaTicks;
-  byte bAllTVsOn;
-  int drawAnimFade;
-  int TextCol, shapeX, shapeY;
+  int shapeX, shapeY;
   int iVar10;
   short x;
-  short i;
-  short y;
-  short animFade, j;
   short sVar11;
   short randomAnim;
   tDrawShapeExtended drawFlags;
@@ -690,7 +666,6 @@ void tScreenMain::PreLoad()
 {
   int rnd;
   int iVar1;
-  short i;
   int i_int;
   int local_s2_356;
   char buffer [32];
@@ -729,9 +704,7 @@ void tScreenMain::Initialize()
 {
   void *loaded;
   void *pv;
-  int i;
   int iVar2;
-  byte shapesLoaded;
   int scratch;
   int iVar3;
   bool all_loaded;

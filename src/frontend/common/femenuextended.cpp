@@ -1300,18 +1300,6 @@ tMenuItemOptionsLeftRightChoice::~tMenuItemOptionsLeftRightChoice()
 void tMenuItemGoToMenuNFS4Button::Draw(bool selected)
 
 {
-  u_int deltaTicks;
-  short numItems;
-  int itemY;
-  int ypos;
-  int textpix;
-  int h;
-  int w;
-  PSX_RECT temp;
-  tDrawShapeExtended drawFlags;
-  PSX_RECT rect;
-  int ColTextOn;
-  int ColTextOff;
   
   return;
 }

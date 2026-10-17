@@ -55,16 +55,11 @@ void tTournamentManager::LoadDescription()
   uint uVar3;
   short sVar4;
   uint uVar5;
-  short track;
   uint uVar6;
-  char *data;
   u_char *src_00;
-  short tourney;
   uint uVar7;
-  short tier;
   int iVar8;
   char filename [80];
-  char *input;
   
   sprintf(filename,"%s%s",Paths_Paths[0x25],"tourn.trn");
   this->ReleaseDescription();
@@ -199,10 +194,7 @@ void tTournamentManager::StartNewTournament(byte tier,byte tournament)
   tTournamentDefinition *ptVar6;
   int iVar7;
   tTournamentDefinition *ptVar8;
-  tTrackInfo *track;
-  short i;
   int iVar9;
-  tTourneyInfo *tourn;
   
   this->fTier = (uint)tier;
   this->fTournament = (uint)tournament;
@@ -296,23 +288,22 @@ short tTournamentManager::IsTournamentFinished()
 
 /* ---- (free)::free  [FETOURN.CPP:349-365] ---- */
 
-int tournPointsCompare(char *p1,char *p2)
+int tournPointsCompare(const void *p1,const void *p2)
 
 {
   byte bVar1;
   byte bVar2;
-  int result;
   int iVar3;
-  Car_tStats *dummyCars;
   
-  bVar1 = *p2;
-  bVar2 = *p1;
+  bVar1 = *(const byte *)p2;
+  bVar2 = *(const byte *)p1;
   iVar3 = (uint)tournamentManager.fCompetitors[bVar1].fPoints -
           (uint)tournamentManager.fCompetitors[bVar2].fPoints;
   if ((iVar3 == 0) &&
      (iVar3 = (int)tournamentManager.fCompetitors[bVar1].fIsPlayerCar -
               (int)tournamentManager.fCompetitors[bVar2].fIsPlayerCar, iVar3 == 0)) {
-    iVar3 = Cars_gNewCarStatsList[bVar2].finalPosition - Cars_gNewCarStatsList[bVar1].finalPosition;
+    iVar3 = (sint32)((uint32)Cars_gNewCarStatsList[bVar2].finalPosition -
+                    (uint32)Cars_gNewCarStatsList[bVar1].finalPosition);
   }
   return iVar3;
 }
@@ -325,10 +316,8 @@ void tTournamentManager::UpdateTournFinishMoney()
 
 {
   long lVar1;
-  byte i;
   byte bVar2;
   uint uVar3;
-  tTourneyInfo *tourn;
   tTourneyInfo *ptVar4;
   
   ptVar4 = this->fDefinition->fTournaments +
@@ -364,7 +353,6 @@ void tTournamentManager::UpdateTrackFinishMoney()
 
 {
   long prize;
-  Car_tStats *dummyCars;
   
   if (Cars_gNewCarStatsList[0].finalFinishType == 2) {
     prize = this->GetTrackFinishPrize((short)Cars_gNewCarStatsList[0].finalPosition + -1);
@@ -380,12 +368,8 @@ void tTournamentManager::UpdateTrackFinishMoney()
 void tTournamentManager::CalcTrackFinishDamageBill(bool recalculate,long *bill,long *bonus)
 
 {
-  int i;
   uint uVar1;
   int iVar2;
-  long totalcarprice;
-  int damage;
-  Car_tStats *dummyCars;
   tCarInfo carInfo;
   
   if (recalculate != 0) {
@@ -434,10 +418,7 @@ void tTournamentManager::UpdateTrackFinishPoints()
   int iVar4;
   int i;
   int iVar5;
-  short k;
   short sVar6;
-  short numCompetitors;
-  Car_tStats *dummyCars;
   Car_tStats *pCVar7;
   
   sVar1 = this->GetNumCompetitors();
@@ -463,8 +444,7 @@ void tTournamentManager::UpdateTrackFinishPoints()
       this->fRanking[iVar5] = (uchar)iVar5;
       iVar5 = iVar5 + -1;
     } while (-1 < iVar5);
-    qsortPSX(this->fRanking,(int)sVar1,1,
-               (int (*)(const void *,const void *))tournPointsCompare);
+    qsortPSX(this->fRanking,(int)sVar1,1,tournPointsCompare);
     iVar5 = 0;
     do {
       iVar4 = iVar5 + 1;
@@ -506,19 +486,13 @@ short tTournamentManager::AdvanceToNextTrack()
 {
   byte bVar1;
   short sVar2;
-  tTourneyInfo *tourn;
-  short i;
   int iVar3;
   tCarInfo *ptVar4;
   void *pvVar5;
   int iVar6;
   tTournamentDefinition *ptVar7;
-  tTierInfo *currentTier;
   tTierInfo *ptVar8;
-  int numGarageCars;
-  tTourneyInfo *currentTourney;
   tTourneyInfo *ptVar9;
-  tCarInfo *carInfo;
   
   ptVar9 = this->fDefinition->fTournaments +
            (uint)this->fDefinition->fTiers[this->fTier].fTournOffset + this->fTournament;
@@ -696,8 +670,6 @@ void tTournamentManager::UpdateCarLineup()
   int _i;
   short sVar1;
   int iVar2;
-  short i;
-  short k;
   short sVar3;
   
   sVar1 = this->GetNumCompetitors();
@@ -729,20 +701,16 @@ void tTournamentManager::UpdateCarLineup()
 long tTournamentManager::GetTrackFinishPrize(short position)
 
 {
-  int openClassAdjust[6][7];
   int *piVar1;
   int *piVar2;
   int *piVar3;
   long lVar4;
   int *piVar5;
   tTournamentDefinition *ptVar6;
-  long carPrice;
   int iVar7;
   int iVar8;
   int iVar9;
-  long result;
   int iVar10;
-  tTourneyInfo *currentTourney;
   tCarInfo carInfo;
   int aiStack_c0 [42];
   
@@ -815,9 +783,6 @@ void tTournamentManager::GetAwardInformation(tAwardInformation *info)
   long tourn_money;
   uint flags_pack;
   int activate_class;
-  short tu1;
-  byte tc2;
-  byte tu3;
   
   src_walk = (int *)&(this->fAwards).fMoney;
   do {
@@ -905,7 +870,6 @@ short tTournamentManager::PlayerRanking(short pos)
 
 {
   int _i;
-  short i;
   short sVar1;
   int iVar2;
   
@@ -946,12 +910,9 @@ void tTournamentManager::GetTrophyName(tTourneyInfo *tourn,tTrophySize size,char
 
 {
   char cVar1;
-  uint uVar2;
-  int showplace;
   int iVar3;
   char trophySizeLetter [3];
   char trophyPlacementLetter [4];
-  void *tp1;
   
   trophySizeLetter[0] = gFEData_80011658;
   trophySizeLetter[1] = gFEData_80011659;
@@ -985,9 +946,7 @@ void * tTournamentManager::ValidCar(tCarInfo *carInfo)
   void *pvVar3;
   int iVar4;
   tTournamentDefinition *ptVar5;
-  byte result;
   void *pvVar6;
-  tTourneyInfo *tourney;
   
   ptVar5 = this->fDefinition;
   iVar4 = (uint)ptVar5->fTiers[this->fTier].fTournOffset + this->fTournament;
@@ -1076,7 +1035,6 @@ int tListIteratorTournament::Value(tPlayer arg1)
 int tListIteratorTournament::TextValue(tPlayer player_id)
 
 {
-  short tournIndex;
   tTournamentDefinition *ptVar1;
   
   ptVar1 = this->fTournamentManager->fDefinition;
@@ -1097,7 +1055,6 @@ int tListIteratorTournament::Increment(tPlayer arg1)
   tTournamentDefinition *ptVar3;
   char *pcVar4;
   byte *pbVar5;
-  tTierInfo *tier;
   
   uVar2 = (uint)(byte)frontEnd.tier;
   ptVar3 = this->fTournamentManager->fDefinition;
@@ -1125,7 +1082,6 @@ int tListIteratorTournament::Decrement(tPlayer arg1)
   uint uVar3;
   tTournamentDefinition *ptVar4;
   uchar *puVar5;
-  tTierInfo *tier;
   
   uVar3 = (uint)(byte)frontEnd.tier;
   ptVar4 = this->fTournamentManager->fDefinition;
@@ -1149,18 +1105,10 @@ void * tListIteratorTournament::ValidTournament(char tourn)
 
 {
   ushort uVar1;
-  tTierInfo *currentTier;
-  byte result;
   int iVar2;
   void *pvVar3;
   tTournamentDefinition *ptVar4;
-  tTourneyInfo *currentTourn;
-  short trackOffset;
   tTournamentManager *ptVar5;
-  short numTracks;
-  char *data;
-  char filename [80];
-  char *input;
   
   ptVar5 = this->fTournamentManager;
   ptVar4 = ptVar5->fDefinition;

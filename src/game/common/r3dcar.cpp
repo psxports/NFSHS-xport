@@ -86,7 +86,6 @@ void R3DCar_ChangeTrafficColor(Car_tObj *carObj,int newColorIndex)
   bool bVar3;
   Texture_pal8bit *palCopy;
   u_int uVar4;
-  int color;
   int iVar5;
   
   if ((carObj->render).palCopy != (char *)0x0) {
@@ -147,7 +146,6 @@ extern "C" void R3DCar_PostStartUp(void)
 
 {
   bool bVar1;
-  int otSize;
   int iVar2;
   
   if (R3DCar_InMenu == 0) {
@@ -176,11 +174,9 @@ void R3DCar_Restart(void)
 
 {
   int iVar1;
-  Car_tObj *carObj;
   Car_tObj *pCVar2;
   Car_tObj **ppCVar3;
   int iVar4;
-  int i;
   
   iVar1 = Cars_gNumCars;
   ppCVar3 = Cars_gList;
@@ -206,7 +202,6 @@ extern "C" void R3DCar_CleanUp(void)
 {
   Transformer_zScene **scene_walk;
   char *counter_walk;
-  int i;
   int i_2;
   
   i_2 = 0;
@@ -265,7 +260,6 @@ Transformer_zScene *
 R3DCar_ReadInCarData(char *filename,Car_tObj *carObj)
 
 {
-  char * filestart;
   void *src;
   Transformer_zScene *dst;
   u_int uVar1;
@@ -273,21 +267,12 @@ R3DCar_ReadInCarData(char *filename,Car_tObj *carObj)
   int iVar3;
   Transformer_zObj *pTVar4;
   int iVar5;
-  short nm_vx;
   short sVar6;
-  int in_a2;
-  Transformer_zObj *Nobj;
   int iVar7;
-  int offset;
   int iVar8;
-  int j;
   int iVar9;
-  int i;
   int iVar10;
-  char *rawData;
   char (*pacVar11) [6];
-  short tz;
-  short ty;
   char infilename [15];
   VECTOR vt;
   SVECTOR nm;
@@ -363,7 +348,7 @@ R3DCar_ReadInCarData(char *filename,Car_tObj *carObj)
           if (eScaleX == 0) {
             trap(0x1c00);
           }
-          if ((eScaleX == -1) && (iVar3 == -0x80000000)) {
+          if ((eScaleX == -1) && (iVar3 == 0x80000000)) {
             trap(0x1800);
           }
           if (eScaleY == 0) {
@@ -416,9 +401,7 @@ void R3DCcar_ReadeMapData(void)
   char *addr;
   int iVar1;
   R3DCar_tEnvMapInfo *pRVar2;
-  int i;
   int iVar3;
-  char *RenderingFileData;
   char name [256];
   char *ScaneData;
   
@@ -451,9 +434,7 @@ void R3DCcar_ReadTrackShadow(void)
 {
   char *addr;
   int iVar1;
-  int i;
   int iVar2;
-  char *RenderingFileData;
   char name [256];
   char *ScaneData;
   
@@ -590,15 +571,11 @@ extern "C" void R3DCar_DeInstantiate3DCar(Car_tObj *carObj)
 extern "C" void R3DCar_DeInstantiate3DCarMenu(Car_tObj *carObj)
 
 {
-  int countryFlag;
   char cVar1;
-  char *bigFile;
   void *addr;
-  int status;
   u_int uVar2;
   char *addr_00;
   void *in_a1;
-  int currentCarType;
   int iVar3;
   
   iVar3 = (int)(carObj->render).currentCarType;
@@ -653,7 +630,6 @@ void R3DCar_GetFileName(char *infilename,char *filename,const char *suffix)
 char * R3DCar_LoadFileAdr(char *name)
 
 {
-  char * buf;
   int size;
   char *loadAddr;
   
@@ -667,7 +643,6 @@ char * R3DCar_LoadFileAdr(char *name)
 void R3DCar_GetCarName(char *filename,int carType,int country)
 
 {
-  int index;
   
   sprintf(filename,"zz%s",GameSetup_gCarNames[carType]);
   if (carType - 0x16U < 6) {
@@ -687,26 +662,20 @@ extern "C" void R3DCar_Instantiate3DCar(Car_tObj *carObj,int index)
   static char suffixLight[] = "l";
   static char suffixDark[] = "d";
   static char suffixGlass[] = "g";
-  int infilenames;
   u_char bVar1;
   u_short uVar2;
   short sVar3;
   Transformer_zScene *pTVar4;
   char *pcVar5;
-  int color;
   GameSetup_tCarData *pGVar6;
   char *pcVar7;
   u_int uVar8;
   int iVar9;
-  int i;
   int iVar10;
   char *bigfile;
   char **ppcVar11;
-  int carType;
   int carType_00;
-  int reload;
   u_int uVar12;
-  int duplicateLicense;
   char filename [10];
   char workFile [10];
   char bigname [100];
@@ -927,7 +896,6 @@ int R3DCar_Visibilty(Car_tObj *carObj,DRender_tView *Vi)
 {
   bool bVar1;
   bool bVar2;
-  Car_tObj *camCarObj;
   int iVar3;
   int iVar4;
   int iVar5;
@@ -936,17 +904,9 @@ int R3DCar_Visibilty(Car_tObj *carObj,DRender_tView *Vi)
   int iVar8;
   int x;
   int iVar9;
-  int z;
   int iVar10;
-  int carZ;
-  int maxMax;
-  int zoom;
   u_int uVar11;
-  int maxMid;
   int iVar12;
-  int inCarCam;
-  coorddef carPos [4];
-  coorddef car;
   
   iVar8 = Vi->player;
   bVar2 = false;
@@ -1046,7 +1006,7 @@ int R3DCar_Visibilty(Car_tObj *carObj,DRender_tView *Vi)
   }
 R3DVis_setNoDetailReturn:
   (carObj->render).detail = -1;
-  return -0x80000000;
+  return 0x80000000;
 }
 
 /* ---- R3DCar_TurnHeadLightOn__FP8Car_tObji  [R3DCAR.CPP:1516-1521] SLD-VERIFIED ---- */
@@ -1113,50 +1073,28 @@ void R3DCar_MATRIX3DT_Copy(int *from,int *to)
 void R3DCar_InsertCarFacet(Car_tObj *carObj,DRender_tView *Vi)
 
 {
-  Transformer_zObj*obj;
-  coorddef car;
-  coorddef pos;
-  matrixtdef bodyIMat;
-  matrixtdef matP;
-  int vel;
-  int spin;
-  int rear;
-  matrixtdef matR;
-  int pitch;
   bool bVar1;
   bool bVar2;
   u_short uVar3;
   u_short uVar4;
-  int damage;
   int iVar5;
   int iVar6;
   int iVar7;
   u_int uVar8;
-  int index;
   int iVar9;
   DrawC_tEnvMap *pDVar10;
-  int suspensionOffset;
   int iVar11;
   matrixtdef *pmVar12;
   matrixtdef *pmVar13;
   u_char bVar14;
   char cVar15;
-  short code;
   int iVar16;
   Transformer_zObj *pTVar17;
   Car_tObj *pCVar18;
-  int steeringAngle;
   matrixtdef insideBodyMat;
-  int maxAngleFactor;
-  int roll;
-  int i;
-  int cop_flag;
-  int carType;
   int iVar19;
-  int detailIndex;
   int iVar20;
   int angle;
-  coorddef parent;
   matrixtdef bodyMat;
   matrixtdef orientMat;
   matrixtdef insideMat;
@@ -1377,7 +1315,7 @@ R_ICFt_wheelspinRpmCalc:
             if (iVar7 == 0) {
               trap(0x1c00);
             }
-            if ((iVar7 == -1) && (iVar9 == -0x80000000)) {
+            if ((iVar7 == -1) && (iVar9 == 0x80000000)) {
               trap(0x1800);
             }
             if (iVar16 == 2) {
@@ -1788,19 +1726,14 @@ void R3DCar_ReadInCarTextureMenu(Car_tObj *carObj,char *bigfile,int reload,int p
   static char suffixInside[] = "i";
   static char suffixLight[] = "l";
   static char suffixDark[] = "d";
-  int carType;
-  int infilenames;
   short sVar1;
-  char *shpfile;
   char *pcVar2;
   char *pcVar3;
   Texture_pal8bit *palCopy;
   int iVar4;
-  int i;
   int iVar5;
   char *bigfile_00;
   char **ppcVar6;
-  int index;
   char filename [10];
   char infilename [3][15];
   char *shpfiles [3];
@@ -1906,26 +1839,15 @@ void R3DCar_ReadInCarTextureMenu(Car_tObj *carObj,char *bigfile,int reload,int p
 void R3DCar_InsertCarFacetMenu(Car_tObj *carObj,DRender_tView *Vi)
 
 {
-  Transformer_zObj*obj;
-  int currentCarType;
-  coorddef translation;
-  int i;
   char filename[16];
   char bigname[112];
-  int status;
-  int workFile;
-  coorddef car;
-  coorddef pos;
-  coorddef tmp;
   bool bVar1;
   u_char bVar2;
   short sVar3;
   bool bVar4;
   bool bVar5;
-  short code;
   char cVar6;
   u_short uVar7;
-  char *bigFile;
   int iVar8;
   int iVar9;
   char *addr;
@@ -1933,7 +1855,6 @@ void R3DCar_InsertCarFacetMenu(Car_tObj *carObj,DRender_tView *Vi)
   int iVar11;
   int iVar12;
   int iVar13;
-  int index;
   GameSetup_tCarData *pGVar14;
   int iVar15;
   int iVar16;
@@ -1942,16 +1863,8 @@ void R3DCar_InsertCarFacetMenu(Car_tObj *carObj,DRender_tView *Vi)
   void *pvVar18;
   Transformer_zObj *pTVar19;
   u_int uVar20;
-  int changeCar;
-  int front;
   Transformer_zScene **ppTVar21;
-  int detailIndex;
-  int carType;
   int iVar22;
-  int cop_flag;
-  int countryFlag;
-  int reload;
-  coorddef parent;
   matrixtdef bodyMat;
   matrixtdef orientMat;
   matrixtdef insideMat;
@@ -1959,9 +1872,6 @@ void R3DCar_InsertCarFacetMenu(Car_tObj *carObj,DRender_tView *Vi)
   coorddef lengthVector;
   coorddef widthVector;
   coorddef frontWidthVector;
-  coorddef temp1;
-  coorddef temp2;
-  coorddef dimension;
   int rideHeight;
   int rightHandDrive;
   
@@ -2432,11 +2342,6 @@ void R3DCar_InsertCarFacetII(Car_tObj *carObj)
 
 {
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceR3DCarEntry(carObj,R3DCar_ObjectVisible));
-  int light;
-  int lightR;
-  int lightG;
-  int lightB;
-  int inAir;
   u_char bVar1;
   bool bVar2;
   int iVar3;
@@ -2449,26 +2354,14 @@ void R3DCar_InsertCarFacetII(Car_tObj *carObj)
   Transformer_zOverlay *overlay_00;
   u_int uVar7;
   u_int envmap;
-  int clip;
-  Transformer_zObj *obj;
   Transformer_zObj *obj_00;
   int type;
-  int offset;
   int iVar8;
   int visible;
-  int i;
   int iVar9;
-  int carType;
   int iVar10;
-  Draw_CarCache *sd;
   int iVar11;
   int iVar12;
-  int lightAvg;
-  int countryFlag;
-  int mirror;
-  int worldZ;
-  int rightHandDrive;
-  Transformer_zOverlay *overlay;
   int reflect;
   int iStack_2c;
   
@@ -2625,36 +2518,24 @@ R_ICFtII_setQuadLight:
 void R3DCar_InsertCarFacetMenuII(Car_tObj *carObj,int light)
 
 {
-  int lightAvg;
   u_char bVar1;
   bool bVar2;
   int iVar3;
   int cop_type;
   Transformer_zScene *pTVar4;
   int iVar5;
-  int index;
   int index_00;
   int copIndex;
-  Transformer_zObj *obj;
   Transformer_zObj *obj_00;
   int type;
-  int offset;
   int iVar6;
   int visible;
-  int envmap;
   u_int envmap_00;
   u_int uVar7;
-  int i;
   int iVar8;
-  int carType;
   int iVar9;
-  Draw_CarCache *sd;
   char (*pacVar10) [6];
   int iVar11;
-  int countryFlag;
-  int mirror;
-  int rightHandDrive;
-  Transformer_zOverlay *overlay;
   
   iVar3 = R3DCar_rightHandDrive;
   iVar9 = (int)(carObj->render).currentCarType;
@@ -2787,61 +2668,23 @@ void R3DCar_InsertCarFacetZ(Car_tObj *carObj,DRender_tView *Vi)
 void R3DCar_InsertAllListFacet(DRender_tView *Vi)
 
 {
-  int size;
-  int cop_type;
   int iVar1;
   int iVar2;
-  int lightB;
-  int sub_otSize;
-  Car_tObj *sort_carObj;
   Car_tObj *pCVar3;
-  int diffZ;
   int iVar4;
-  int type;
   int *piVar5;
-  int carZ;
   Car_tObj **ppCVar6;
   int *piVar7;
-  int visible;
   int *piVar8;
   int *piVar9;
-  int j;
   int iVar10;
-  int minWheelZ;
-  int sort;
   int iVar11;
-  Car_tObj *carObj;
   Car_tObj *pCVar12;
-  int maxAngleFactor;
-  int i;
   int iVar13;
-  int roll;
   Car_tObj **ppCVar14;
   int *piVar15;
-  int maxMid;
   int *piVar16;
-  int inCarCam;
-  int *sort_max;
-  int *sort_min;
-  coorddef parent;
-  matrixtdef bodyMat;
-  matrixtdef orientMat;
-  matrixtdef insideMat;
-  matrixtdef orientIMat;
-  matrixtdef steerMat;
-  matrixtdef tmpMat;
-  coorddef translation;
-  coorddef tmp;
-  coorddef lengthVector;
-  coorddef widthVector;
-  coorddef frontWidthVector;
-  coorddef temp1;
-  coorddef temp2;
-  coorddef dimension;
-  int worldZ;
-  int reflect;
   int rightHandDrive;
-  char workFile [10];
   int sortMinStorage[9];
   int sortMaxStorage[9];
   
@@ -2886,7 +2729,7 @@ void R3DCar_InsertAllListFacet(DRender_tView *Vi)
   piVar9 = piVar5;
   piVar15 = piVar7;
   for (iVar13 = 0; iVar10 = Cars_gNumCars, iVar13 < rightHandDrive; iVar13 = iVar13 + 1) {
-    if (*piVar16 != -0x80000000) {
+    if (*piVar16 != 0x80000000) {
       pCVar12 = *ppCVar14;
       piVar8 = R3DCar_PositionZ + iVar11;
       ppCVar6 = Cars_gList + iVar11;
@@ -2924,7 +2767,7 @@ void R3DCar_InsertAllListFacet(DRender_tView *Vi)
   R3DCar_subOt = R3DCar_subOtStart[gFlip][gCView.player];
   piVar9 = R3DCar_PositionZ;
   for (iVar13 = 0; iVar13 < iVar10; iVar13 = iVar13 + 1) {
-    if (*piVar9 != -0x80000000) {
+    if (*piVar9 != 0x80000000) {
       pCVar12 = *ppCVar14;
       *piVar5 = *piVar5 + -0x30;
       iVar1 = *piVar7;

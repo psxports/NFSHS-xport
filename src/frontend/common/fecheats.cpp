@@ -32,7 +32,6 @@ void FECheat_HandleActivation(tCheatCode cheat)
 {
   int i;
   int iVar1;
-  short num;
   short sVar2;
   int iVar3;
   
@@ -122,10 +121,8 @@ void FECheat_EncodeString(char *input,char *output)
   char *pcVar2;
   char *pcVar3;
   u_char *pbVar4;
-  int j;
   u_int uVar5;
   int iVar6;
-  int i;
   char buffer [8];
   
   iVar6 = 0;
@@ -164,7 +161,6 @@ void FECheat_EncodeString2(char *input,char *output)
   u_char *pbVar4;
   u_char *pbVar5;
   int iVar6;
-  int i;
   u_int uVar7;
   char buffer [8];
   
@@ -230,12 +226,8 @@ extern "C" void * FECheat_ActivateCheat(char *cheat)
   tFEApplication *ptVar2;
   int iVar3;
   char *pcVar4;
-  int j;
   int iVar5;
   int iVar6;
-  tDialogMessageString *dlgThis;
-  u_char result;
-  int i;
   int iVar7;
   char buffer [8];
   
@@ -297,7 +289,6 @@ extern "C" void FECheat_SaveBonus(uint32 &cheat)
 extern "C" void FECheat_LoadBonus(uint32 &cheat)
 
 {
-  int i;
   u_int i_2;
   
   i_2 = 0;
@@ -330,13 +321,10 @@ extern "C" void * FECheat_ActivateBonusByCode(char *code)
 
 {
   int iVar1;
-  int j;
   int iVar2;
   int iVar3;
   int iVar4;
-  int i;
   tCheat *ptVar5;
-  u_char result;
   char buffer [8];
   
   FECheat_EncodeString2(code,buffer);

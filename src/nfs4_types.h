@@ -18,26 +18,13 @@
         }())
 
 #include "psx.h"
+#include "eaclib/psx/eacpsxz/systask.h"
 
-#ifdef AP_WIN
     #include "host/diagnostics.h"
     #include "lib/nfs4_new.h"
-#endif
 
-#ifdef AP_WIN
     #include <stddef.h>
-#endif
 
-
-/* systask.obj slot: four 32-bit words on PSX.  Only the callback grows on a
- * wider native host; timing and reentrancy state retain MIPS int semantics. */
-struct SystemTaskSlot
-{
-    intptr callback;
-    int period;
-    int deadline;
-    int busy;
-};
 
 /* spchpick.obj aggregate at PSX 0x8014843c.  On PSX/Win32 intptr is
  * exactly one MIPS word, preserving offsets 0x00/0x04/0x08/0x0c/0x10.
@@ -58,14 +45,14 @@ struct SPCHChosenSentence
  * This is address-space compatibility, not a substitute game object. */
 static inline u_char PsyQ_readRam8(intptr address)
 {
-    if ((intptr)address < 0x10000U)
+    if ((uintptr_t)address < 0x10000)
         return DRAM[(intptr)address];
     return *(volatile u_char *)address;
 }
 
 static inline u_short PsyQ_readRam16(intptr address)
 {
-    if ((intptr)address < 0xffffU)
+    if ((uintptr_t)address < 0xffff)
     {
         intptr offset = (intptr)address;
         return (u_short)((u_short)DRAM[offset] | (u_short)DRAM[offset + 1] << 8);
@@ -75,7 +62,7 @@ static inline u_short PsyQ_readRam16(intptr address)
 
 static inline uint32 PsyQ_readRam32(intptr address)
 {
-    if ((intptr)address < 0xfffdU)
+    if ((uintptr_t)address < 0xfffd)
     {
         intptr offset = (intptr)address;
         return (uint32)DRAM[offset] | (uint32)DRAM[offset + 1] << 8 | (uint32)DRAM[offset + 2] << 16 | (uint32)DRAM[offset + 3] << 24;
@@ -613,7 +600,6 @@ typedef union tPadStdAnalog_u tPadStdAnalog_u;
    exactly what GCC 2.7.2 / the SYM mean by it: the 8-byte entry. Native code stores an opaque
    function address and restores a fixed-arity signature at each dispatch; size/layout are unaffected.
    _vf fields are always POINTERS to arrays of these, so this size never changes any struct's size. */
-#ifdef AP_WIN
     #if defined(_MSC_VER) && defined(_M_IX86)
         #define NFS4_VT_THUNK __fastcall
         #define NFS4_THISCALL __thiscall
@@ -670,19 +656,6 @@ typedef struct __nfs4_vtbl_ptr_t
     nfs4_vtbl_pfn pfn;
 } __nfs4_vtbl_ptr_t;
     #endif
-#else
-    #define NFS4_VT_THUNK
-    #define NFS4_THISCALL
-typedef void (*nfs4_vtbl_pfn)(void);
-    #define NFS4_VTABLE_ENTRY(value) ((nfs4_vtbl_pfn)(value))
-
-typedef struct __nfs4_vtbl_ptr_t
-{
-    short delta;
-    short index;
-    nfs4_vtbl_pfn pfn;
-} __nfs4_vtbl_ptr_t;
-#endif
 #define __vtbl_ptr_type __nfs4_vtbl_ptr_t
 
 /* Vtable entries store opaque function addresses
@@ -738,13 +711,12 @@ static inline intptr nfs4_vcall_dtor(nfs4_vtbl_pfn fn, void *obj, int mode)
 }
 
 #define NFS4_VCALL0(fn, obj) (((int(NFS4_THISCALL *)(void *))(fn))((void *)(obj)))
+#define NFS4_VCALL_VOID0(fn, obj) (((void(NFS4_THISCALL *)(void *))(fn))((void *)(obj)))
+#define NFS4_VCALL_VOID_P1(fn, obj, p1) (((void(NFS4_THISCALL *)(void *, void *))(fn))((void *)(obj), (void *)(p1)))
 #define NFS4_VCALL1(fn, obj, a1) (((int(NFS4_THISCALL *)(void *, int))(fn))((void *)(obj), (int)(a1)))
 #define NFS4_VCALL2(fn, obj, a1, a2) (((int(NFS4_THISCALL *)(void *, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2)))
 #define NFS4_VCALL3(fn, obj, a1, a2, a3) (((int(NFS4_THISCALL *)(void *, int, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2), (int)(a3)))
 #define NFS4_VCALL4(fn, obj, a1, a2, a3, a4) (((int(NFS4_THISCALL *)(void *, int, int, int, int))(fn))((void *)(obj), (int)(a1), (int)(a2), (int)(a3), (int)(a4)))
-/* ObjectAnim::Draw thunks are free functions using NFS4_VT_THUNK
-   Match that ABI so MSVC passes Vi in EDX and the callee pops only sd/offset. */
-#define NFS4_VCALL_PTR_PTR_INT(fn, obj, p1, p2, i3) (((int(NFS4_VT_THUNK *)(void *, void *, void *, int))(fn))((void *)(obj), (void *)(p1), (void *)(p2), (int)(i3)))
 /* Frontend ProcessInput entries take a player enum followed by key/command
    pointers.  Do not route those pointers through the generic integer helper. */
 #define NFS4_VCALL_INT_PTR_PTR(fn, obj, i1, p2, p3) (((int(NFS4_THISCALL *)(void *, int, void *, void *))(fn))((void *)(obj), (int)(i1), (void *)(p2), (void *)(p3)))
@@ -1982,21 +1954,17 @@ struct AIDataRecord_t
     char name_[64];                          /* +0x8 */
     char *dataBuffer_, *preAllocatedBuffer_; /* +0x48 */
     int recordMethod_;                       /* +0x50 */
-    __vtbl_ptr_type (*_vf)[3];               /* +0x54 */
-
-    AIDataRecord_t()
-    {
-    }
 
     AIDataRecord_t(AIDataRecord_WhichRecord_t which, char *name);
-    ~AIDataRecord_t();
+    virtual ~AIDataRecord_t();
+    static void operator delete(void *storage);
     int AddRecordToCollection();
     int RemoveRecordFromCollection();
     static void StartUp1();
     static void StartUp2();
     static void CleanUp1();
     static void CleanUp2();
-    void Setup();
+    virtual void Setup();
     int Load();
     int SaveAndPurge();
 };
@@ -2005,26 +1973,17 @@ struct AIDataRecord_AccTable_t : public AIDataRecord_t
 {               /* 92 bytes */
     int scale_; /* +0x58 */
 
-    AIDataRecord_AccTable_t()
-    {
-    }
-
     AIDataRecord_AccTable_t(char *name, int n, AIDataRecord_WhichRecord_t which);
-    ~AIDataRecord_AccTable_t();
+    virtual ~AIDataRecord_AccTable_t();
     int Get(int i);
-    void Setup();
+    virtual void Setup();
 };
 
-struct AIDataRecord_CurveSpeedTable_t
-{                                        /* 88 bytes */
-    AIDataRecord_t _base_AIDataRecord_t; /* +0x0 */
-
-    AIDataRecord_CurveSpeedTable_t()
-    {
-    }
+struct AIDataRecord_CurveSpeedTable_t : public AIDataRecord_t
+{
 
     AIDataRecord_CurveSpeedTable_t(char *name, AIDataRecord_WhichRecord_t which);
-    ~AIDataRecord_CurveSpeedTable_t();
+    virtual ~AIDataRecord_CurveSpeedTable_t();
     int Get(int i);
     void Upgrade(int i);
 };
@@ -2047,16 +2006,11 @@ struct AIPhysic_ModelConfig_t
     int dlpos_to_dlvel, max_dlvel, dlvel_to_clacc, max_clacc, dangle_to_dav, max_dav, dav_to_aa, max_aa, vel_limit_range, lat_vel_limit_factor, ang_vel_limit_factor; /* +0x0 */
 };
 
-struct AIDataRecord_BestLine_t
-{                                        /* 88 bytes */
-    AIDataRecord_t _base_AIDataRecord_t; /* +0x0 */
-
-    AIDataRecord_BestLine_t()
-    {
-    }
+struct AIDataRecord_BestLine_t : public AIDataRecord_t
+{
 
     AIDataRecord_BestLine_t(AIDataRecord_WhichRecord_t which);
-    ~AIDataRecord_BestLine_t();
+    virtual ~AIDataRecord_BestLine_t();
 };
 
 struct BW_tContext
@@ -2103,17 +2057,21 @@ struct AnimDef
 
 struct ObjectAnim
 {                              /* 4 bytes */
-    __vtbl_ptr_type (*_vf)[3]; /* +0x0 */
+    virtual ~ObjectAnim();
+    virtual int Draw(DRender_tView *view,Draw_DCache *cache,int offset) = 0;
+    static void operator delete(void *storage);
 };
 
-struct ObjectFinishedMultiAnim
-{                                /* 4 bytes */
-    ObjectAnim _base_ObjectAnim; /* +0x0 */
+struct ObjectFinishedMultiAnim : public ObjectAnim
+{
+    virtual ~ObjectFinishedMultiAnim();
+    virtual int Draw(DRender_tView *view,Draw_DCache *cache,int offset);
 };
 
-struct ObjectFinishedSignAnim
-{                                            /* 48 bytes */
-    ObjectAnim _base_ObjectAnim;             /* +0x0 */
+struct ObjectFinishedSignAnim : public ObjectAnim
+{
+    virtual ~ObjectFinishedSignAnim();
+    virtual int Draw(DRender_tView *view,Draw_DCache *cache,int offset);
     matrixtdef finalMatrix;                  /* +0x4 */
     Trk_ObjectDef *objDef;                   /* +0x28 */
     Trk_CollideBoomInst *objCollideInstance; /* +0x2C */
@@ -2486,15 +2444,19 @@ struct SPCHNFSType_REVINTRO
     uint32 flags; /* +0x0 */
 };
 
+struct CarBankName;
+
 struct CarBank
 {                             /* 12 bytes */
     int fFull, fMake, fModel; /* +0x0 */
+    bool Check(char *name,uint32 id,CarBankName *bankname);
 };
 
 struct LocationBank
 {                                        /* 16 bytes */
     int fStartSlice, fEndSlice, fBankId; /* +0x0 */
     char *fName;                         /* +0xC */
+    int Distance(int slice);
 };
 
 struct CallSignBank
@@ -2519,23 +2481,59 @@ struct tCallSignBankPair
 };
 
 struct Speaker
-{                                           /* 80 bytes */
-    SPCHNFSType_POSITION fPosition;         /* +0x0 */
-    SPCHNFSType_DISTANCE fDistance;         /* +0x4 */
-    SPCHNFSType_COLOUR fColour;             /* +0x8 */
-    SPCHNFSType_ACCIDENT fAccident;         /* +0xC */
-    SPCHNFSType_AMBULANCE fAmbulance;       /* +0x10 */
-    SPCHNFSType_vs_RDBLK_SSTRP fBlockade;   /* +0x14 */
-    SPCHNFSType_REVINTRO fReverse;          /* +0x18 */
-    SPCHNFSType_CONFIRM fConfirm;           /* +0x1C */
-    SPCHNFSType_PERP_NAME fPerpName;        /* +0x20 */
-    SPCHNFSType_SPIKE_BELT_SIDE fSpikeSide; /* +0x24 */
-    SPCHNFSType_PURS_UPDT fUpdate;          /* +0x28 */
-    SPCHNFSType_ARREST fArrest;             /* +0x2C */
-    int fCar, fLocation, fFrom, fTo, fWing; /* +0x30 */
-    BOOL fHavePerp;                         /* +0x44 */
-    Speaker *fSub;                          /* +0x48 */
-    __vtbl_ptr_type (*_vf)[31];             /* +0x4C */
+{
+    Speaker();
+    SPCHNFSType_POSITION fPosition;
+    SPCHNFSType_DISTANCE fDistance;
+    SPCHNFSType_COLOUR fColour;
+    SPCHNFSType_ACCIDENT fAccident;
+    SPCHNFSType_AMBULANCE fAmbulance;
+    SPCHNFSType_vs_RDBLK_SSTRP fBlockade;
+    SPCHNFSType_REVINTRO fReverse;
+    SPCHNFSType_CONFIRM fConfirm;
+    SPCHNFSType_PERP_NAME fPerpName;
+    SPCHNFSType_SPIKE_BELT_SIDE fSpikeSide;
+    SPCHNFSType_PURS_UPDT fUpdate;
+    SPCHNFSType_ARREST fArrest;
+    int fCar, fLocation, fFrom, fTo, fWing;
+    BOOL fHavePerp;
+    Speaker *fSub;
+
+
+    void SetCar(Car_tObj *car);
+    void FindLocation(Car_tObj *car);
+    virtual void Report(Car_tObj *cop);
+    virtual void Deny();
+    virtual void Grant();
+    virtual void Ready(Car_tObj *wing);
+    virtual void Engage(Car_tObj *perp);
+    virtual void Lose();
+    virtual void Accident(int slice);
+    virtual void Catch(int ticket);
+    virtual void RoadBlock();
+    virtual void SpikeBelt();
+    virtual void Backup();
+    virtual void ReportBlockade();
+    virtual void Roger();
+    virtual void Bullhorn();
+    virtual void Purge();
+    void Promote();
+    int CalcMph(Car_tObj *perp);
+    virtual LocationBank * FindClosestLocationTo(int slice);
+    virtual CarBank * GetCarBank(int carIndex);
+    virtual Car_tObj * Perp();
+    virtual void ReActivate();
+    virtual Car_tObj * CarObj();
+    virtual int DistToPerp();
+    virtual void PurgeStatusSub();
+    virtual Speaker * StatusSub();
+    virtual int StatusCount();
+    virtual void * IsSuper();
+    virtual void ClearPerp(Car_tObj *car);
+    virtual void * KnownPerp(Car_tObj *car);
+    virtual int Unit();
+    virtual void Status();
+    virtual CallSignBank * CallSign();
 };
 
 struct Trk_SFX
@@ -2807,29 +2805,19 @@ struct kernpair
     char pad[3];                /* +0x5 */
 };
 
-struct AIDataRecord_TrackCurve_t
-{                                        /* 88 bytes */
-    AIDataRecord_t _base_AIDataRecord_t; /* +0x0 */
-
-    AIDataRecord_TrackCurve_t()
-    {
-    }
+struct AIDataRecord_TrackCurve_t : public AIDataRecord_t
+{
 
     AIDataRecord_TrackCurve_t(AIDataRecord_WhichRecord_t which);
-    ~AIDataRecord_TrackCurve_t();
+    virtual ~AIDataRecord_TrackCurve_t();
     int Get(int i);
 };
 
-struct AIDataRecord_CarTracking_t
-{                                        /* 88 bytes */
-    AIDataRecord_t _base_AIDataRecord_t; /* +0x0 */
+struct AIDataRecord_CarTracking_t : public AIDataRecord_t
+{
 
-    AIDataRecord_CarTracking_t()
-    {
-    }
-
-    ~AIDataRecord_CarTracking_t();
-    int Get(int i);
+    virtual ~AIDataRecord_CarTracking_t();
+    virtual int Get(int i);
 };
 
 struct AISpeeds_tLeaderBoard
@@ -3050,7 +3038,7 @@ struct tTexture_ShapeInfo
     shapetbl *shpptr;                                      /* +0x0 */
     long clutID;                                           /* +0x4 */
     char depth;                                            /* +0x8 */
-    uint32 type : 8;                                       /* +0x9 bit 0 */
+    uint8 type;                                            /* +0x9 */
     long next : 24;                                        /* +0xC bit 0 */
     short width, height, centerx, centery, shapex, shapey; /* +0x10 */
     u_short tpage, clut;                                   /* +0x1C */
@@ -3308,7 +3296,6 @@ struct AudioMus_tCurrentSong
 struct AudioMus_tSongList
 {                                /* 8 bytes */
     int numsongs, currentsong;   /* +0x0 */
-    AudioMus_tSongEntry song[0]; /* +0x8 */
 };
 
 struct SNDREQUESTSTATUS
@@ -3452,7 +3439,8 @@ struct Draw_DCache
 };
 
 struct Chunk
-{                                                                                                                                                                                        /* 112 bytes */
+{
+    void InstanceGroup(SerializedGroup *chunkGroup,SimpleMem *mem);                                                                                                                                                                                        /* 112 bytes */
     RelCoord16 boundPts[4], chunkboundPts[4];                                                                                                                                            /* +0x0 */
     u_char quadCounts[6];                                                                                                                                                                /* +0x20 */
     u_char pad[2];                                                                                                                                                                       /* +0x26 */
@@ -3600,11 +3588,22 @@ struct SimpleMem
 {                         /* 12 bytes */
     void *heap, *freeMem; /* +0x0 */
     int freeMemSize;      /* +0x8 */
+
+    void * Alloc(int len,int feign);
+    void * FeignAlloc(int len);
+    void ResizeToFit();
 };
 
 struct SerializedGroup
 {                                                /* 16 bytes */
     int m_type, m_length, dummy, m_num_elements; /* +0x0 */
+
+    SerializedGroup * LocateNextGroupType(int type);
+    SerializedGroup * LocateGroupType(int type,int index);
+    SerializedGroup * LocateGroupNum(int index);
+    void * LocateCreateGroupType(int type,SimpleMem *mem_,int index);
+    Group * CreateLiteGroup(SerializedGroup *source_,SimpleMem *mem_);
+    Group * CreateLiteGroupDataSize(SerializedGroup *source_,SimpleMem *mem_,int dataSize);
 };
 
 struct Trk_SimpleInst
@@ -3650,10 +3649,13 @@ struct SPCHNFSType_VOICE
 struct CarBankName
 {                                 /* 12 bytes */
     char *fFull, *fMake, *fModel; /* +0x0 */
+    void SetCar(int carIndex);
 };
 
 struct Speech
-{                                                                                                /* 932 bytes */
+{
+    Speech();
+    ~Speech();                                                                                                /* 932 bytes */
     tCarBankPair fCarBank;                                                                       /* +0x0 */
     tLocationBankPair fLocationBank;                                                             /* +0xD8 */
     tCallSignBankPair fCallSignBank;                                                             /* +0x2D8 */
@@ -3665,24 +3667,83 @@ struct Speech
     Car_tObj *fSpeakerCar;                                                                       /* +0x38C */
     MobileSpeaker *fMobile[4];                                                                   /* +0x390 */
     DispatchSpeaker *fDispatch;                                                                  /* +0x3A0 */
+
+    uint32 CheckCarBank(CarBank *carbank,char *name,uint32 id,CarBankName *bankname);
+    void CountLocations();
+    uint32 CheckLocationBank(LocationBank *locationbank,char *name,int id);
+    void * FindClosestLocationTo(LocationBank *bank,int slice);
+    bool CheckCallSignBank(CallSignBank *bank,char *name,uint32 id);
+    uint32 CheckMultiBank(char *name,uint32 id,CarBankName *bn);
+    int CalculateBankSize(char *header,CarBankName *bn,long *hoffset,long *hsize);
+    void LoadBankHeaders(char *header,CarBankName *bn,long hoffset,long hsize);
+    uint32 BankPatch(int bank,Car_tObj *car);
+    void SetDelayedStatus(Speaker *sub,int delay);
+    int PickVoice(Car_tObj *carObj);
+    Speaker * FindMobile(Car_tObj *carObj);
 };
 
-struct MobileSpeaker
-{                                      /* 104 bytes */
-    Speaker _base_Speaker;             /* +0x0 */
-    SPCHNFSType_VOICE fVoice;          /* +0x50 */
-    SPCHNFSType_vs_KMH_MPH fSpeedType; /* +0x54 */
-    int fSpeed, fUnit;                 /* +0x58 */
-    Car_tObj *fCarObj, *fPerp;         /* +0x60 */
+struct MobileSpeaker : public Speaker
+{
+    MobileSpeaker();
+
+    SPCHNFSType_VOICE fVoice;
+    SPCHNFSType_vs_KMH_MPH fSpeedType;
+    int fSpeed, fUnit;
+    Car_tObj *fCarObj, *fPerp;
+
+    void Status();
+    void Activate(Car_tObj *carObj);
+    void ReActivate();
+    void SetSpeed(Car_tObj *perp);
+    int DistToPerp();
+    void Report(Car_tObj *perp);
+    void Engage(Car_tObj *perp);
+    void Lose();
+    void Accident(int slice);
+    void Catch(int ticket);
+    void RoadBlock();
+    void SpikeBelt();
+    void Backup();
+    void Roger();
+    void Bullhorn();
+    void Purge();
+    void ReportBlockade();
+    Car_tObj * Perp();
+    int Unit();
+    CallSignBank * CallSign();
+    LocationBank * FindClosestLocationTo(int slice);
+    CarBank * GetCarBank(int carIndex);
+    Car_tObj * CarObj();
+    void * IsSuper();
 };
 
-struct DispatchSpeaker
-{                          /* 100 bytes */
-    Speaker _base_Speaker; /* +0x0 */
-    int fStatusCount;      /* +0x50 */
-    Speaker *fStatusSub;   /* +0x54 */
-    int fUpdateCount;      /* +0x58 */
-    Car_tObj *fPerp[2];    /* +0x5C */
+struct DispatchSpeaker : public Speaker
+{
+    DispatchSpeaker();
+
+    int fStatusCount;
+    Speaker *fStatusSub;
+    int fUpdateCount;
+    Car_tObj *fPerp[2];
+
+    void Activate(uint32 seedupdatecount);
+    void Roger();
+    void StatusReply();
+    void Status();
+    void ClearPerp(Car_tObj *car);
+    void * KnownPerp(Car_tObj *car);
+    void AddPerp(Car_tObj *car);
+    void Report(Car_tObj *perp);
+    void Accident(int slice);
+    void Deny();
+    void Grant();
+    void Ready(Car_tObj *carObj);
+    CallSignBank * CallSign();
+    LocationBank * FindClosestLocationTo(int slice);
+    CarBank * GetCarBank(int carIndex);
+    void PurgeStatusSub();
+    Speaker * StatusSub();
+    int StatusCount();
 };
 
 struct Speech_tCarDescription
@@ -4299,9 +4360,11 @@ struct tRecordBuffer
     int nCar, nTime, nBestLap; /* +0x8 */
 };
 
-struct ObjectMultiAnim
-{                                            /* 48 bytes */
-    ObjectAnim _base_ObjectAnim;             /* +0x0 */
+struct ObjectMultiAnim : public ObjectAnim
+{
+    ObjectMultiAnim(coorddef *impactVel,AnimDef *def,Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj,ObjectFinishedMultiAnim *finishedAnim);
+    virtual ~ObjectMultiAnim();
+    virtual int Draw(DRender_tView *view,Draw_DCache *cache,int offset);
     coorddef impactVel;                      /* +0x4 */
     Trk_SimObject *simObj;                   /* +0x10 */
     Trk_CollideBoomInst *objCollideInstance; /* +0x14 */
@@ -4312,9 +4375,11 @@ struct ObjectMultiAnim
     ObjectFinishedMultiAnim *finishedAnim;   /* +0x2C */
 };
 
-struct ObjectSignAnim
-{                                            /* 48 bytes */
-    ObjectAnim _base_ObjectAnim;             /* +0x0 */
+struct ObjectSignAnim : public ObjectAnim
+{
+    ObjectSignAnim(coorddef *impactVel,int impactAngle,AnimDef *def,Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj,coorddef *roadNormal,ObjectFinishedSignAnim *finishedAnim);
+    virtual ~ObjectSignAnim();
+    virtual int Draw(DRender_tView *view,Draw_DCache *cache,int offset);
     coorddef impactVel;                      /* +0x4 */
     Trk_SimObject *simObj;                   /* +0x10 */
     Trk_CollideBoomInst *objCollideInstance; /* +0x14 */
@@ -4470,6 +4535,10 @@ struct TrackHeader
 
 struct SaveSurface
 {                            /* 8 bytes */
+    explicit SaveSurface(int numEntries);
+    ~SaveSurface();
+    void Save(Trk_NewSimQuad *simQuad);
+    void RestoreAll();
     short fCount, fMaxCount; /* +0x0 */
     tSaveSurface *fStack;    /* +0x4 */
 };
@@ -6576,18 +6645,12 @@ typedef matrixtdef MATRIX3DT;
 typedef cdstreamstruct CDSTREAM;
 typedef linedef LINE;
 typedef COORD16 Transformer_zVertex;
-#ifndef AP_WIN
-typedef void *va_list;
-#endif
 typedef unsigned int u_int;
 #if !defined(__EMSCRIPTEN__)
 typedef long daddr_t;
 typedef char *caddr_t;
 typedef long *qaddr_t;
 typedef long swblk_t;
-    #ifndef AP_WIN
-typedef long time_t;
-    #endif
 typedef long off_t;
 typedef u_short uid_t;
 typedef u_short gid_t;

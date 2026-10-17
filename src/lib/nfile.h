@@ -10,6 +10,8 @@
 #ifndef LIB_NFILE_H
 #define LIB_NFILE_H
 
+#include "../eaclib/psx/eacpsxz/nfile_completion.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -29,7 +31,7 @@ extern "C"
         int result1C;    /* +0x1C completeop result for op types 4/5 (e.g. read bytes)              */
         unsigned char _g20[0x24 - 0x20];
         int result24;           /* +0x24 completeop result for op types 2/9 (e.g. open handle)             */
-        void (*callback)(void); /* +0x28 completion callback fn ptr                                        */
+        NFSHS_FileCompletion callback; /* +0x28 completion callback */
         struct FileOp *qnext;   /* +0x2C next op in the priority-sorted pending queue                       */
     } FileOp;                   /* 0x30 */
 

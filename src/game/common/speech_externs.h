@@ -4,6 +4,8 @@
 #ifndef SPEECH_EXTERNS_H
     #define SPEECH_EXTERNS_H
 
+    #include "../../eaclib/psx/spchpsxz/spch_callbacks.h"
+
     /* ---- speech-event trigger fns (spchevnt.cpp, unmangled C-linkage; variadic call sites) ---- */
     #if defined(_MSC_VER) || defined(__EMSCRIPTEN__)
         #include "spchevnt.h"
@@ -13,8 +15,6 @@ extern "C"
     void SPCH_ClearEventQueue(void);
     void SPCH_Deinit(void);
     int SPCH_GetSampleDataRate(int numSamples, int rate, int channels);
-    int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate);
-    intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks);
     void SPCH_PlaySpeech(void);
     int SPCH_ResolveData(unsigned short *dat);
 }
@@ -237,8 +237,6 @@ extern "C"
     void SPCH_ClearEventQueue(void);
     void SPCH_Deinit(void);
     int SPCH_GetSampleDataRate(int numSamples, int rate, int channels);
-    int SPCH_Init(intptr sampleRequestCb, unsigned int gameNum, int dataRate);
-    intptr SPCH_InitBankMem(intptr memAllocFn, intptr memFreeFn, int numBanks);
     void SPCH_PlaySpeech(void);
     int SPCH_ResolveData(unsigned short *dat);
 }
@@ -295,8 +293,5 @@ extern u_int randtemp;
 extern "C" int stackSpeedUpEnbabledFlag;
 
 /* ---- per-class vtables (data syms; assigned to _vf[31]) ---- */
-extern __vtbl_ptr_type Speaker_vtable[];         /* @0x80055dc4 #75 data-mat (defined in speech.cpp) */
-extern __vtbl_ptr_type MobileSpeaker_vtable[];   /* @0x80055bd4 #75 data-mat (defined in speech.cpp) */
-extern __vtbl_ptr_type DispatchSpeaker_vtable[]; /* @0x80055ccc #75 data-mat (defined in speech.cpp) */
 
 #endif /* SPEECH_EXTERNS_H */

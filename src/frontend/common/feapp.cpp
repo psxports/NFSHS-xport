@@ -188,7 +188,6 @@ void tFEApplication::DrawHelpIcons()
   short x;
   int i;
   int y;
-  int Col;
   tDrawShapeExtended flags;
   char string [12];
   char string2 [2];
@@ -270,9 +269,7 @@ void tFEApplication::Redraw()
   int ti2;
   int freeHeap_or_buf;
   __vtbl_ptr_type (*pa_Var2) [11];
-  int pkt_addr24_p2;
   tMenuItem *curItem;
-  int pkt_addr24_p1;
   tMenu *menu_per_player;
   tMenu *parentMenu;
   tMenu *curMenu;
@@ -288,7 +285,6 @@ void tFEApplication::Redraw()
   u_char bVar2;
   u_char *daprim;
   tGlobalMenuDefs *globalMenuDefs;
-  u_char *prev_pkt_p1;
   
   saveFPlayer = this->fPlayer;
   FeAudio_systemtask(0);
@@ -340,17 +336,13 @@ void tFEApplication::Redraw()
     }
   }
   daprim = Render_gPacketPtr;
-  prev_pkt_p1 = Render_gPalettePtr;
   i = 1;
   r.x = 0;
   r.y = drenv->clip.y;
   r.w = 0x200;
   r.h = (short)screenheight;
-  *(u_int *)Render_gPacketPtr =
-       *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-  pkt_addr24_p1 = (u_int)((intptr)Render_gPacketPtr & 0xffffffU);
+  AddPrim(Render_gPalettePtr,daprim);
   Render_gPacketPtr = Render_gPacketPtr + 0xc;
-  *(u_int *)prev_pkt_p1 = *(u_int *)prev_pkt_p1 & 0xff000000 | pkt_addr24_p1;
   SetDrawArea((DR_AREA *)daprim,&r);
   do {
     this->fPlayer = (char)i;
@@ -412,15 +404,11 @@ Redraw_vtableCallback9:
       (this->fCurrentScreen[(u_char)this->fPlayer])->Draw(true);
     }
     daprim = Render_gPacketPtr;
-    prev_pkt_p1 = Render_gPalettePtr;
     r.x = 0;
     r.y = drenv->clip.y + this->fYOffset;
     r.w = 0x200;
-    *(u_int *)Render_gPacketPtr =
-         *(u_int *)Render_gPacketPtr & 0xff000000 | *(u_int *)Render_gPalettePtr & 0xffffff;
-    pkt_addr24_p2 = (u_int)((intptr)Render_gPacketPtr & 0xffffffU);
+    AddPrim(Render_gPalettePtr,daprim);
     Render_gPacketPtr = Render_gPacketPtr + 0xc;
-    *(u_int *)prev_pkt_p1 = *(u_int *)prev_pkt_p1 & 0xff000000 | pkt_addr24_p2;
     r.h = height;
     SetDrawArea((DR_AREA *)daprim,&r);
     i = i - 1;
@@ -547,7 +535,6 @@ void tFEApplication::RunDemoVideo()
   __vtbl_ptr_type (*pa_Var2) [11];
   int iVar3;
   __vtbl_ptr_type (*pa_Var4) [10];
-  char buffer [40];
   
   if ((tMenuNFS4 *)this->fCurrentMenu[0] == &menuDefs->menuMain) {
     AudioMus_StopSong(0x78);
@@ -634,12 +621,9 @@ tAppCommand tFEApplication::MainLoop(tMenu *newMenu)
   char *pcVar16;
   tMenu *ptVar17;
   tScreen *ptVar18;
-  tDialogBase *this_tDialogBase_l181;
   tMenu *this_tMenu_l139;
   u_char wasSubMenu;
   tInputKeyType *ptVar19;
-  tDialogMessageString *this_tDialogMessageString_l311;
-  uint32 ticks_l351;
   int player;
   PinkSlipsErrorCode err;
   short i;
@@ -651,7 +635,6 @@ tAppCommand tFEApplication::MainLoop(tMenu *newMenu)
   tInputKeyType keyVal [2];
   tCarInfo carInfo;
   short stackBackupPin;
-  uint32 tick;
   int demoLoopLastInputTick;
   
   stackBackupPin = -1;

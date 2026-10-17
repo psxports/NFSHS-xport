@@ -73,9 +73,7 @@ extern "C" void Controller_SetRamp(void)
 {
   int device;
   int devType;
-  int config;
   int type_idx;
-  short i;
   short p;
   short ctrl_type;
   byte config_idx;
@@ -319,7 +317,7 @@ void tScreenControllerConfig::SetCurrentController(bool firsttime)
   (this->negconPopUp).yesnowords[0] = 0x20c;
   (this->negconPopUp).yesnowords[1] = 0x20d;
   (this->negconPopUp)._base_tDialogInteractive._base_tDialogMessageString._base_tDialogBase.fDefault = 1;
-  playerMask = -(uint)(this->player != 0);
+  playerMask = 0 - (uint)(this->player != 0);
   padOffset = playerMask & 0x20;
   setmenutonull = false;
   if ((&gPadinfo.buf[0].nopad)[padOffset] != '\0') {
@@ -527,7 +525,6 @@ void tScreenControllerConfig::DrawController()
   int fadelevel;
   uint frame;
   int absA;
-  int player;
   int axisB;
   int t;
   short shakey;
@@ -589,7 +586,7 @@ void tScreenControllerConfig::DrawController()
     if (t == 0) {
       trap(0x1c00);
     }
-    if ((t == -1) && (fadelevel == -0x80000000)) {
+    if ((t == -1) && (fadelevel == 0x80000000)) {
       trap(0x1800);
     }
     shakex = (short)(fadelevel % t) - (maxshakex >> 1);
@@ -598,7 +595,7 @@ void tScreenControllerConfig::DrawController()
     if (fadelevel == 0) {
       trap(0x1c00);
     }
-    if ((fadelevel == -1) && (t == -0x80000000)) {
+    if ((fadelevel == -1) && (t == 0x80000000)) {
       trap(0x1800);
     }
     shakey = (short)(t % fadelevel) - (maxshakey >> 1);
@@ -738,7 +735,7 @@ DrawCtrl_ticksUpdate:
     if (axisB == 0) {
       trap(0x1c00);
     }
-    if ((axisB == -1) && (fadelevel == -0x80000000)) {
+    if ((axisB == -1) && (fadelevel == 0x80000000)) {
       trap(0x1800);
     }
     if (t < 0) {

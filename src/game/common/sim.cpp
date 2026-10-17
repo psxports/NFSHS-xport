@@ -5,12 +5,10 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "sim_externs.h"
-#ifdef AP_WIN
 extern "C" void NFSHS_HostRaceBoundaryStart(void);
 extern "C" void NFSHS_HostRaceBoundaryTick(void);
 extern "C" int NFSHS_HostShouldRenderTick(int gameTick);
 extern "C" void NFSHS_HostReplayCameraButton(void);
-#endif
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 extern "C" { void Sim_StartUp(void); }
@@ -138,13 +136,10 @@ void Sim_FadeInSFX(void)
 void Sim_ProcessSimSchedules(void)
 
 {
-  int i;
   int cd_minus_1;
   int cd_clamped;
 
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostReplayCameraButton());
-#endif
   
   if (((GameSetup_gData.raceType == 1) || (GameSetup_gData.raceType == 5)) &&
      (((Cars_gHumanRaceCarList[0]->carFlags & 0x200U) != 0 ||
@@ -213,7 +208,6 @@ void Sim_ProcessPause(void)
 
 {
   int iVar1;
-  int r;
   
   if (unPauseDelay <= clock_realTime.time32Hz) {
     iVar1 = MPause_Logic();
@@ -274,24 +268,16 @@ extern "C" void Sim_MainGameLoop(void)
 
 {
   int iVar1;
-  int diffGoal;
   int iVar2;
   int iVar3;
-  int diffReal;
   uint32 uVar4;
-  int realTick;
-  int i;
-  int lastRealTick;
-  int lastGoalTick;
   int iVar5;
 
   quitType = 1;
   iVar5 = 0;
   simGlobal.time32Hz = Input_gTime;
   iVar2 = nfs4_mips_addu_s32(clock_realTime.time64Hz,10000);
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostRaceBoundaryStart());
-#endif
   do {
     if (simVar.endSimGame != 0) {
       if (Replay_ReplayMode < 2) {
@@ -408,9 +394,7 @@ extern "C" void Sim_MainGameLoop(void)
           else {
 SimMainLoop_processSchedules:
             Sim_ProcessSimSchedules();
-#ifdef AP_WIN
             NFSHS_DIAGNOSTIC_CALL(NFSHS_HostRaceBoundaryTick());
-#endif
           }
           simVar.currentClockTicks =
                nfs4_mips_addu_s32(simVar.currentClockTicks,1);
@@ -421,9 +405,7 @@ SimMainLoop_processSchedules:
       Camera_Update();
     }
     if (skipRender == 0
-#ifdef AP_WIN
         && NFSHS_HostShouldRenderTick(simGlobal.gameTicks)
-#endif
        ) {
       Render_Render(simVar.pauseSim);
     }

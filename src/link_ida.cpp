@@ -36,11 +36,7 @@ CarIO_textureInfo CarIO_textureName[51] = { /* @8011e804 612B; pointer targets r
 };
 /* MIPS cdfs.obj treats 0x80146CC4 as one context: CD_Init clears 0x83c
  * bytes and every named CD_* datum is an offset from this base. */
-#ifdef AP_WIN
 unsigned char CD_context[0x83c];                                                /* backing for @80146cc4 */
-#else
-int Cdinfo[0x83c / sizeof(int)];                                                 /* @80146cc4 */
-#endif
 Input_tDeviceList Device_gDeviceList[5] = {
     {Device_nameNull,   Device_Null,        0},
     {Device_nameAnalog, Device_Analog,      0},

@@ -5,6 +5,8 @@
 #include "front.h"
 #include "../../mips_semantics.h"
 
+extern "C" void NFSHS_HostPumpTimers(void);
+
 /* ---- Front.obj-OWNED globals -- DEFINED here (self-contained; .data=real EXE bytes, .bss=zero) ---- */
 int          overRide;   /* @0x800517e8  (bss(zero)) */
 extern "C" { int          ComingIntoTheFrontEndTheVeryFirstTime; } /* @0x800517ec  (bss(zero)) */
@@ -127,7 +129,6 @@ void Front_ResetSettingsForCar(int player,int car)
 void Front_ResetSettingsMenu(int player)
 
 {
-  int i;
   int car;
   
   car = 0;
@@ -198,9 +199,7 @@ int GetPSXPadValue(int value,int player)
 
 {
   byte bVar1;
-  int newControl;
   byte bVar2;
-  int type;
   uint uVar3;
   uint uVar4;
   
@@ -271,7 +270,7 @@ front_badPadValue:
       return nfs4_mips_bits_to_s32((uint)player << 0x1a |
                                    (uint)value << 8 | 2U);
     }
-    if (value != -0x80000000) goto front_badPadValue;
+    if (value != 0x80000000) goto front_badPadValue;
     bVar2 = frontEnd.J2MIN[player];
     uVar3 = 0x2000000;
   }
@@ -329,20 +328,12 @@ void SetPads(void)
 
 {
   bool bVar1;
-  int starttick;
   int iVar2;
   int iVar3;
-  int i;
   int offs;
-  int pad;
   int port;
-  int numoffsets;
-  byte gotone;
-  int theanalogoffset;
   int iVar4;
-  int j;
   int iVar5;
-  int LookingFor;
   int iVar6;
   tfrontEnd *ptVar7;
   
@@ -353,6 +344,8 @@ void SetPads(void)
       iVar6 = 7;
     }
     do {
+      // Service the original interrupt-driven timeout on cooperative hosts
+      NFSHS_HostPumpTimers();
       bVar1 = false;
       if (ticks - iVar4 < 0x80) {
         iVar2 = PadGetState(port);
@@ -401,12 +394,9 @@ void InitFrontEndStructure(void)
   tfrontEnd *ptVar2;
   int iVar3;
   tCarInfo *ptVar4;
-  int j;
   int iVar5;
-  int i;
   int iVar6;
   int iVar7;
-  tfrontEnd *ptVar8;
   int iStack_30;
   
   frontEnd.randomSeed = 0;
@@ -597,9 +587,7 @@ extern "C" void Front_SecondaryMemCardCheck(void)
 
 {
   short sVar1;
-  int i;
   int retry_i;
-  int j;
   int card_i;
   
   MEMCARDFRONTENDISINITTED = 0;
@@ -682,10 +670,7 @@ int Front_Menu(tFront_ProcessingType role)
 
 {
   ushort uVar1;
-  Car_tStats *dummyCars;
   long extraMoney;
-  int *in_a3;
-  int result;
   tAppCommand tVar3;
   tMenuCommand tempCommand;
   
@@ -766,7 +751,6 @@ int * OutputDisplaySettings(int *d,int c,int player,tTrackInformation *trackInfo
 {
   byte bVar1;
   int iVar2;
-  int valtopass;
   
   bVar1 = frontEnd.displaySpeed[player];
   iVar2 = 0;
@@ -886,9 +870,7 @@ void Front_InitPlayerCars(tFEStream *streamData)
   char *pcVar3;
   void *pvVar4;
   int iVar5;
-  tCarInfo *carInfo;
   tCarInfo *ptVar6;
-  short i;
   tCarModels carModel;
   char carColor;
   
@@ -971,7 +953,6 @@ void Front_InitTourneyTraffic(tFEStream *streamData)
   short sVar3;
   void *pvVar4;
   int iVar5;
-  short i;
   int iVar6;
   tCarModels carModel;
   char carColor;
@@ -1030,15 +1011,10 @@ void Front_InitOpponentCars(tFEStream *streamData)
   tCarInfo *ptVar4;
   void *pvVar5;
   uchar uVar6;
-  tCarClassType opponentClass;
   int iVar7;
   tPersonalities tVar8;
   short sVar9;
-  tCarInfo *carInfo;
-  short i;
   int iVar10;
-  tTourneyInfo *tourn;
-  short numOpponents;
   int iVar11;
   tCarInfo tStack_120;
   tCarModels modelList [3];
@@ -1046,7 +1022,6 @@ void Front_InitOpponentCars(tFEStream *streamData)
   char carColor;
   tCarModels tStack_38;
   char loc_34 [4];
-  byte usePlayerUpgrades;
   
   streamData->numOpponents = 0;
   ptVar2 = tournamentManager.fDefinition;
@@ -1189,12 +1164,8 @@ void Front_InitMissions(tFEStream *streamData)
   char cVar1;
   char cVar2;
   char cVar3;
-  short i;
   int iVar4;
   char cVar5;
-  tCarModels fBestCar;
-  char oldTier;
-  char oldMission;
   
   streamData->pMission = (tMissionInfo *)0x0;
   streamData->pStages = (tStageInfo *)0x0;
@@ -1250,10 +1221,7 @@ void Front_InitCopCars(tFEStream *streamData)
   tCarModels tVar6;
   uint uVar7;
   tCarModels tVar8;
-  tCarModels fBestModel;
   uint uVar9;
-  tCarClassType fBestClass;
-  short i;
   int iVar10;
   tCarModels copModel;
   char copColor;
@@ -1367,10 +1335,7 @@ void Front_InitPerps(tFEStream *streamData)
   int iVar3;
   int iVar4;
   void *pvVar5;
-  short j;
   int iVar6;
-  tCarInfo *carInfo;
-  short i;
   short sVar7;
   tCarModels carModel;
   char carColor;
@@ -1424,7 +1389,6 @@ void Front_InitTrack(tFEStream *streamData)
 {
   tTrackInformation *src;
   int iVar1;
-  tTrackInfo *tournTrack;
   
   if (frontEnd.raceType == '\x02') {
     GetTrackToRace(&tournamentManager,&streamData->track);
@@ -1481,14 +1445,11 @@ void Front_InitTraffic(tFEStream *streamData)
 
 {
   bool bVar1;
-  byte bTraffic;
   short sVar2;
   int iVar3;
   void *pvVar4;
   int iVar5;
-  short maxTraffic;
   short sVar6;
-  short i;
   tCarModels carModel;
   char carColor;
   
@@ -1564,8 +1525,6 @@ int * Front_AppendPlayerCarData(int *stream,tFEStream *streamData)
   uint uVar2;
   short sVar3;
   tCarInfo *carInfo;
-  tCarLineup *carLineup;
-  short i;
   int iVar4;
   
   iVar4 = 0;
@@ -1689,11 +1648,8 @@ int * Front_AppendOpponentData(int *stream,tFEStream *streamData)
 {
   byte bVar1;
   uint color;
-  tCarInfo *carInfo;
   int iVar2;
   tCarInfo *ptVar3;
-  tCarLineup *carLineup;
-  short i;
   int iVar4;
   
   iVar4 = 0;
@@ -1774,7 +1730,6 @@ int * Front_AppendCopData(int *stream,tFEStream *streamData)
   tCarInfo *ptVar1;
   int iVar2;
   int iVar3;
-  short i;
   short sVar4;
   
   if (0 < (int)streamData->numCops + (int)streamData->numSuperCops) {
@@ -1842,7 +1797,6 @@ int * Front_AppendPerpData(int *stream,tFEStream *streamData)
 {
   tCarInfo *ptVar1;
   int *piVar3;
-  short i;
   int iVar4;
   
   if (streamData->pMission == (tMissionInfo *)0x0) {
@@ -1917,8 +1871,6 @@ int * Front_AppendTrafficData(int *stream,tFEStream *streamData)
 
 {
   tCarInfo *ptVar1;
-  int density;
-  short i;
   int iVar2;
   
   iVar2 = 0;
@@ -1983,7 +1935,6 @@ int * Front_AppendTrafficData(int *stream,tFEStream *streamData)
 int * Front_AppendTrackData(int *stream,tFEStream *streamData)
 
 {
-  int valtopass;
   int iVar1;
   tTrackInformation trackInfo;
   
@@ -2034,7 +1985,6 @@ int * Front_AppendTrackData(int *stream,tFEStream *streamData)
 void * Front_EnableLocalSpeech(void)
 
 {
-  byte result;
   void *ret;
   tTrackInformation trackInfo;
   
@@ -2067,20 +2017,13 @@ extern "C" int * Front_BuildStream(int *stream)
 {
   void *pvVar1;
   int *piVar2;
-  int colourLoop;
-  int j, type;
   int iVar3;
   uint uVar4;
   tfrontEnd *ptVar5;
   uint uVar6;
-  int numplaylistsongs;
   int iVar7;
-  int *d;
   uint *puVar8;
   int *piVar9;
-  int trackLang;
-  int gameLang;
-  int config;
   tFEStream streamData;
   
   Front_InitStream(&streamData);
@@ -2562,7 +2505,6 @@ extern "C" void Front_GetInGameVars(void)
 
 {
   GameSetup_tData *pGVar1;
-  int i;
   int iVar2;
   int iVar3;
   
@@ -2619,7 +2561,6 @@ extern "C" void SetLicensePlate(void)
   char (*s)[8];
   int p;
   int player;
-  short i;
   int p_next;
   
   p_next = 0;
@@ -2660,9 +2601,6 @@ extern "C" void SetPlayList(int ivealreadygotone)
   static char gamePattern[] = "game*";
   AudioMus_tSongList *addr;
   int iVar1;
-  int i;
-  int iVar2;
-  AudioMus_tSongList *songlist;
   AudioMus_tSongList *pAVar3;
   
   AudioMus_SysCleanUp();
@@ -2699,7 +2637,6 @@ extern "C" void SetPlayList(int ivealreadygotone)
 short Front_GetTrackRaced(void)
 
 {
-  short trackraced;
   short sVar1;
   tTrackInformation trackInfo;
   
@@ -2977,20 +2914,6 @@ tAllScreens::tAllScreens()
 tAllScreens::~tAllScreens()
 
 {
-  short trackraced;
-  int colourLoop;
-  short maxTraffic;
-  char oldMission;
-  int theanalogoffset;
-  int j;
-  int LookingFor;
-  short numOpponents;
-  tCarModels copModel;
-  char copColor;
-  tMenuCommand tempCommand;
-  tCarModels carModel;
-  char carColor;
-  short lapconv [2];
   
   ((tScreen*)((tScreen *)&this->screenTournamentCongrats))->~tScreen();
   ((tScreen*)((tScreen *)&this->screenBeTheCopCongrats))->~tScreen();

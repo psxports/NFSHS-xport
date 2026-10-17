@@ -48,11 +48,8 @@ void Scene_PurgeScene(void)
 int Scene_BuildCustomSceneList(void)
 
 {
-  int i;
   int i_2;
-  SceneElem *se;
   SceneElem *objectData;
-  int slice;
   int ret_slice;
   
   Object_ClearCustomObjects();
@@ -104,7 +101,6 @@ int GetPlaneY(const coorddef *norm,const coorddef *pointOnPlane,const coorddef *
   int iVar3;
   int iVar4;
   int iVar5;
-  int D;
   
   iVar1 = fixedmult(norm->x,pointOnPlane->x);
   iVar2 = fixedmult(norm->y,pointOnPlane->y);

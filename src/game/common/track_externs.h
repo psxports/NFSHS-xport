@@ -43,15 +43,11 @@ extern "C"
 }
 extern void Chunk_DeInit(void);
 extern void Chunk_Init(void);
-extern Group *CreateLiteGroup(SerializedGroup *, SerializedGroup *, SimpleMem *);
-extern "C"
-{
-    extern void *FeignAlloc(void *, int);
-}
+
+
 extern void Hrz_GetHorizonPixMap(Draw_tPixMap *);
-extern void InstanceGroup(Chunk *, SerializedGroup *, SimpleMem *);
-extern SerializedGroup *LocateGroupNum(SerializedGroup *, int);
-extern SerializedGroup *LocateGroupType(SerializedGroup *, int, int);
+
+
 extern int Math_DistXZ(coorddef *, coorddef *);
 
 /* ---- Ghidra C++/alloca idioms + typedef aliases ---- */
@@ -77,13 +73,8 @@ extern "C" u_char *Track_gInViewCount; /* one count per chunk */
 extern "C" int gtrackNumber;
 extern char wordFile_psh_snow[]; /* retail data @8013D468: "S0.psh" */
 
-extern SaveSurface *SaveSurface_ct(SaveSurface *, int);
-extern void SaveSurface_dt(SaveSurface *, int);
-extern void *Alloc(SimpleMem *, int, int);
-extern void *LocateCreateGroupType(SerializedGroup *, int, SimpleMem *, int);
-extern "C"
-{
-    extern void *LocateNextGroupType(SerializedGroup *, int);
-}
-extern void ResizeToFit(SimpleMem *);
+
+
+
+
 #endif

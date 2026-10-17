@@ -86,8 +86,6 @@ extern "C" AudioMus_tCurrentSong * AudioMus_GetCurrentSong(void)
 {
   static char bufferNotAllocated[] = "BUFFER NOT ALLOCATED";
   static char streamNotCreated[] = "STREAM NOT CREATED";
-  AudioMus_tCurrentSong*curr;
-  AudioMus_tSongEntry*info;
   AudioMus_tMusicGlobals *pAVar1;
   int iVar2;
   char *pcVar3;
@@ -125,7 +123,6 @@ LAB_8007a0ac:
 /* ---- AudioMus_SwitchSong__Fv  [@0x8007a0e4] ---- */
 void AudioMus_SwitchSong(void)
 {
-  AudioMus_tSongEntry*info;
   bool bVar1;
   AudioMus_tMusicGlobals *pAVar2;
   int iVar3;
@@ -191,7 +188,6 @@ void AudioMus_Fail(int errorcode)
 void AudioMus_QueueRequestedSong(void)
 {
   int offset;
-  AudioMus_tSongEntry*info;
   AudioMus_tMusicGlobals *pAVar2;
   char *pcVar3;
   int iVar4;
@@ -221,9 +217,6 @@ void AudioMus_QueueRequestedSong(void)
 /* ---- AudioMus_SetEntry__FP19AudioMus_tSongEntry  [@0x8007a308] ---- */
 void AudioMus_SetEntry(AudioMus_tSongEntry *info)
 {
-  int titlechar;
-  int havefile;
-  char*p;
   char cVar1;
   bool bVar2;
   int iVar3;
@@ -264,7 +257,6 @@ LAB_8007a37c:
 /* ---- AudioMus_SetCurrentSongInfo__Fv  [@0x8007a390] ---- */
 void AudioMus_SetCurrentSongInfo(void)
 {
-  AudioMus_tSongEntry*info;
   AudioMus_tCurrentSong *pAVar1;
   AudioMus_tMusicGlobals *pAVar2;
   int iVar3;
@@ -351,7 +343,7 @@ int AudioMus_Server(int mode,int ticks)
               if (iVar6 == 0) {
                 trap(0x1c00);
               }
-              if ((iVar6 == -1) && (iVar3 + 1 == -0x80000000)) {
+              if ((iVar6 == -1) && (iVar3 + 1 == 0x80000000)) {
                 trap(0x1800);
               }
               AudioMus_g->requestsong = (iVar3 + 1) % iVar6;
@@ -369,14 +361,14 @@ int AudioMus_Server(int mode,int ticks)
               if (iVar7 == 0) {
                 trap(0x1c00);
               }
-              if ((iVar7 == -1) && (iVar5 == -0x80000000)) {
+              if ((iVar7 == -1) && (iVar5 == 0x80000000)) {
                 trap(0x1800);
               }
               iVar3 = iVar3 + 1 + iVar5 % iVar7;
               if (iVar6 == 0) {
                 trap(0x1c00);
               }
-              if ((iVar6 == -1) && (iVar3 == -0x80000000)) {
+              if ((iVar6 == -1) && (iVar3 == 0x80000000)) {
                 trap(0x1800);
               }
               pAVar4->requestsong = iVar3 % iVar6;
@@ -456,12 +448,7 @@ int AudioMus_Server(int mode,int ticks)
 /* ---- AudioMus_GetSongList__FPci  [@0x8007a880] ---- */
 extern "C" AudioMus_tSongList *AudioMus_GetSongList(char *pattern,int memtype)
 {
-  AudioMus_tSongList*list;
-  AudioMus_tSongEntry*song;
-  int numsongs;
-  int i;
   int size;
-  char*songname;
   AudioMus_tMusicGlobals *pAVar1;
   u_char *pbVar2;
   int iVar3;
@@ -533,7 +520,6 @@ void AudioMus_InitGlobals(void)
 /* ---- AudioMus_InitDriverGlobals__Fv  [@0x8007aa78] ---- */
 void AudioMus_InitDriverGlobals(void)
 {
-  AudioMus_tSongEntry*info;
   AudioMus_tMusicGlobals *pAVar1;
   
   pAVar1 = AudioMus_g;
@@ -598,7 +584,7 @@ void AudioMus_DriverStartUp(int buffersize,int spusize)
     }
     gMusicHandle = AudioMus_g->streamhandle;
     if (AudioMus_g->serveractive == 0) {
-      addsystemtask((intptr)AudioMus_Server,0x19,0);
+      addsystemtask(AudioMus_Server,0x19,0);
       AudioMus_g->serveractive = 1;
     }
   }
@@ -645,7 +631,7 @@ void AudioMus_DriverCleanUp(void)
 {
   if (AudioMus_g != (AudioMus_tMusicGlobals *)0x0) {
     if (AudioMus_g->serveractive != 0) {
-      delsystemtask((intptr)AudioMus_Server /* @0x8007a3d0 system-task callback */);
+      delsystemtask(AudioMus_Server /* @0x8007a3d0 system-task callback */);
       AudioMus_g->serveractive = 0;
     }
     if (-1 < AudioMus_g->streamhandle) {
@@ -710,7 +696,6 @@ extern "C" void AudioMus_StopSong(int fadeticks)
 /* ---- AudioMus_BuildPlayList__FiPi  [@0x8007aed8] ---- */
 void AudioMus_BuildPlayList(int numplaylistsongs,int *playlist)
 {
-  int i;
   int iVar1;
   
   if (AudioMus_g != (AudioMus_tMusicGlobals *)0x0) {
@@ -733,7 +718,6 @@ void AudioMus_BuildPlayList(int numplaylistsongs,int *playlist)
 /* ---- AudioMus_BuildPattern__FPc  [@0x8007af60] ---- */
 void AudioMus_BuildPattern(char *pattern)
 {
-  int i;
   int *piVar1;
   u_char *pattern_00;
   int iVar2;
@@ -764,8 +748,6 @@ void AudioMus_BuildPattern(char *pattern)
 /* ---- AudioMus_PlaySong__FPc  [@0x8007b030] ---- */
 extern "C" int AudioMus_PlaySong(char *pattern)
 {
-  char title[128];
-  int newsong;
   int *piVar1;
   AudioMus_tMusicGlobals *pAVar2;
   u_int uVar3;
@@ -808,7 +790,7 @@ extern "C" int AudioMus_PlaySong(char *pattern)
           if (iVar7 == 0) {
             trap(0x1c00);
           }
-          if ((iVar7 == -1) && (iVar6 == -0x80000000)) {
+          if ((iVar7 == -1) && (iVar6 == 0x80000000)) {
             trap(0x1800);
           }
           iVar5 = iVar5 + 1 + iVar6 % iVar7;
@@ -816,7 +798,7 @@ extern "C" int AudioMus_PlaySong(char *pattern)
           if (iVar4 == 0) {
             trap(0x1c00);
           }
-          if ((iVar4 == -1) && (iVar5 == -0x80000000)) {
+          if ((iVar4 == -1) && (iVar5 == 0x80000000)) {
             trap(0x1800);
           }
         }
@@ -833,7 +815,7 @@ extern "C" int AudioMus_PlaySong(char *pattern)
           if (iVar4 == 0) {
             trap(0x1c00);
           }
-          if ((iVar4 == -1) && (iVar5 == -0x80000000)) {
+          if ((iVar4 == -1) && (iVar5 == 0x80000000)) {
             trap(0x1800);
           }
         }
@@ -875,7 +857,6 @@ extern "C" int AudioMus_PlaySong(char *pattern)
 /* ---- AudioMus_Volume__Fi  [@0x8007b2b0] ---- */
 extern "C" void AudioMus_Volume(int volume)
 {
-  int ticksleft;
   int curvol;
   int iVar1;
   int iVar2;
@@ -906,7 +887,7 @@ extern "C" void AudioMus_Volume(int volume)
         if (iVar1 == 0) {
           trap(0x1c00);
         }
-        if ((iVar1 == -1) && (volume * s == -0x80000000)) {
+        if ((iVar1 == -1) && (volume * s == 0x80000000)) {
           trap(0x1800);
         }
         SNDSTRM_vol(AudioMus_g->streamhandle,(volume * s) / iVar1);
@@ -927,15 +908,6 @@ extern "C" void AudioMus_Volume(int volume)
 /* ---- AudioMus_AutoVolume__Fii  [@0x8007b46c] ---- */
 void AudioMus_AutoVolume(int fadeticks,int volume)
 {
-  int curvol;
-  int titlechar;
-  char *p;
-  int havefile;
-  int ticksleft;
-  int chunks;
-  AudioMus_tSongEntry *song;
-  char title [128];
-  int offset;
   
   if ((AudioMus_g != (AudioMus_tMusicGlobals *)0x0) && (AudioMus_g->volume != volume)) {
     if (volume == 0) {

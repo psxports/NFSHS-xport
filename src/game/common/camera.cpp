@@ -5,7 +5,7 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "camera_externs.h"
-#if defined(AP_WIN) && NFSHS_DIAGNOSTICS
+#if NFSHS_DIAGNOSTICS
 extern "C" void NFSHS_HostTraceCamera(int,int,int,const void *,const void *);
 #endif
 
@@ -94,10 +94,6 @@ void Camera_ResetRelPos(int bitMask);
 /* ---- EulerToMat__FP10matrixtdefiii  [@0x8008060c] ---- */
 void EulerToMat(matrixtdef *m,int ax,int ay,int az)
 {
-  matrixtdef mx;
-  matrixtdef my;
-  matrixtdef mz;
-  matrixtdef mt;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -126,11 +122,11 @@ void EulerToMat(matrixtdef *m,int ax,int ay,int az)
 /* ---- Camera_SetCamera__FP13DRender_tView  [@0x80080704] ---- */
 void Camera_SetCamera(DRender_tView *cview)
 {
-#if defined(AP_WIN) && NFSHS_DIAGNOSTICS
+#if NFSHS_DIAGNOSTICS
   NFSHS_HostTraceCamera(cview->player,cview->id,0,&Camera_gInfo[cview->player],&cview->cview);
 #endif
   Camera_GetViewInfo(cview->player,&cview->cview,cview->id);
-#if defined(AP_WIN) && NFSHS_DIAGNOSTICS
+#if NFSHS_DIAGNOSTICS
   NFSHS_HostTraceCamera(cview->player,cview->id,1,&Camera_gInfo[cview->player],&cview->cview);
 #endif
   TrsProj_SetViewTrsProjEnviro(cview);
@@ -155,12 +151,6 @@ void Camera_LookBack(matrixtdef *src,matrixtdef *tgt)
 /* ---- Camera_TunnelLimit__FiPi  [@0x800807c4] ---- */
 void Camera_TunnelLimit(int player,int *armheight)
 {
-  BWorldSm_Pos*slicePos;
-  coorddef quadnormal;
-  coorddef underCam;
-  int roadheight;
-  int track;
-  int maxheight;
   bool bVar1;
   void *pvVar2;
   coorddef *pcVar3;
@@ -264,7 +254,6 @@ void Camera_UpdateBumperCam(int player)
 {
   coorddef arm;
   coorddef newarm;
-  int lookingBehind;
   short sVar1;
   bool bVar2;
   matrixtdef *pmVar3;
@@ -325,14 +314,6 @@ void Camera_UpdateTailCam(int player,int behavior)
   coorddef newarm;
   coorddef oldarm;
   Car_tObj*anchor;
-  int maxrate;
-  int rate;
-  int rateY;
-  int vertigo;
-  int slice;
-  int lookahead;
-  int len;
-  int scale;
   char cVar1;
   short sVar2;
   bool bVar3;
@@ -538,15 +519,6 @@ void Camera_UpdateHeliCam(int player,int behavior)
   coorddef newarm;
   coorddef oldarm;
   Car_tObj*anchor;
-  int fallback;
-  int maxrate;
-  int rate;
-  int rateY;
-  int vertigo;
-  int slice;
-  int lookahead;
-  int len;
-  int scale;
   char cVar1;
   short sVar2;
   bool bVar3;
@@ -774,12 +746,6 @@ void Camera_UpdateCircleCam(int player)
 {
   coorddef src;
   coorddef des;
-  int sin;
-  int cos;
-  int circle_height[3];
-  int h0;
-  int h1;
-  int ang;
   short sVar1;
   BO_tNewtonObj *pBVar2;
   u_int uVar3;
@@ -855,8 +821,6 @@ void Camera_UpdateTVCam(int player)
 {
   static int lastX[2];
   static int lastY[2];
-  int targetDist;
-  int height;
   int iVar1;
   int iVar2;
   coorddef *b;
@@ -895,7 +859,6 @@ void Camera_UpdateAnimCam(int player)
 {
   coorddef animPos;
   coorddef newarm;
-  matrixtdef animRot;
   char cVar1;
   int iVar2;
   AnimScript *pAVar3;
@@ -974,9 +937,7 @@ void Camera_UpdateAnimCam(int player)
 /* ---- Camera_UpdateFinishCam__Fi  [@0x80082254] ---- */
 void Camera_UpdateFinishCam(int player)
 {
-  coorddef finishPos;
   coorddef newarm;
-  matrixtdef finishRot;
   int iVar1;
   AnimScript *pThis;
   BO_tNewtonObj *pBVar2;
@@ -1008,8 +969,6 @@ void Camera_UpdateFinishCam(int player)
 /* ---- Camera_UpdateBlimpCam__Fi  [@0x8008237c] ---- */
 void Camera_UpdateBlimpCam(int player)
 {
-  coorddef arm;
-  coorddef oldarm;
   short sVar1;
   BO_tNewtonObj *pBVar2;
   int iVar3;
@@ -1044,9 +1003,6 @@ void Camera_UpdateBlimpCam(int player)
 /* ---- Camera_SetSplineCam__Fi  [@0x800824c0] ---- */
 void Camera_SetSplineCam(int player)
 {
-  Car_tObj*anchor;
-  int numSlice;
-  int direction;
   short sVar1;
   int iVar2;
   int iVar3;
@@ -1104,15 +1060,6 @@ void Camera_SetSplineCam(int player)
 /* ---- Camera_UpdateSplineCam__Fi  [@0x800826c0] ---- */
 void Camera_UpdateSplineCam(int player)
 {
-  Car_tObj*anchor;
-  coorddef cameraVel;
-  int change;
-  int sliceDist;
-  int numSlice;
-  int direction;
-  coorddef splineVel;
-  coorddef nextVel;
-  int relativeVel;
   short sVar1;
   bool bVar2;
   int iVar3;
@@ -1251,8 +1198,6 @@ void Camera_UpdateSplineCam(int player)
 /* ---- Camera_IslandProfile__FUs  [@0x80082c3c] ---- */
 int Camera_IslandProfile(u_short before)
 {
-  u_short after;
-  u_short diff;
   bool bVar1;
   u_int uVar2;
   u_int uVar3;
@@ -1279,12 +1224,6 @@ int Camera_IslandProfile(u_short before)
 /* ---- Camera_UpdatePulloverCam__Fi  [@0x80082c94] ---- */
 void Camera_UpdatePulloverCam(int player)
 {
-  coorddef sCenter;
-  coorddef sForward;
-  coorddef sRight;
-  coorddef sccVec;
-  coorddef newarm;
-  int ySign;
   char cVar1;
   Trk_NewSlice *sliceData;
   int iVar3;
@@ -1357,7 +1296,6 @@ void Camera_UpdatePulloverCam(int player)
 /* ---- Camera_UpdateCopCam1__Fi  [@0x80083010] ---- */
 void Camera_UpdateCopCam1(int player)
 {
-  coorddef vec;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -1392,7 +1330,6 @@ void Camera_UpdateCopCam1(int player)
 /* ---- Camera_UpdateCopCam2__Fi  [@0x800831a8] ---- */
 void Camera_UpdateCopCam2(int player)
 {
-  coorddef dirVec;
   BO_tNewtonObj *pBVar1;
   Camera_tInfo *pCVar2;
   coorddef local_18;
@@ -1451,9 +1388,6 @@ void Camera_UpdateBTCopCam(int player)
 /* ---- Camera_Update__Fv  [@0x800833d8] ---- */
 void Camera_Update(void)
 {
-  Car_tObj*anchor;
-  int direction;
-  camera_flags*flagMode;
   short sVar1;
   bool bVar2;
   int iVar3;
@@ -1607,11 +1541,6 @@ LAB_80083584:
 /* ---- Camera_Init__Fv  [@0x80083858] ---- */
 extern "C" void Camera_Init(void)
 {
-  int splitScreen;
-  BWorldSm_Pos slicePos;
-  int localCar;
-  int i;
-  int type;
   BO_tNewtonObj *pBVar1;
   matrixtdef *pmVar2;
   int *piVar3;
@@ -1735,8 +1664,6 @@ extern "C" void Camera_Init(void)
 /* ---- Camera_Kill__Fv  [@0x80083bec] ---- */
 extern "C" void Camera_Kill(void)
 {
-  int i;
-  int splitScreen;
   bool bVar1;
   Camera_tInfo *pCVar2;
   int iVar3;
@@ -1758,9 +1685,6 @@ extern "C" void Camera_Kill(void)
 /* ---- Camera_PitchAndRoll__Fi  [@0x80083c74] ---- */
 void Camera_PitchAndRoll(int player)
 {
-  matrixtdef m1;
-  matrixtdef m2;
-  matrixtdef m3;
   Car_tObj*anchor;
   int pitch;
   matrixtdef mStack_90;
@@ -1781,10 +1705,6 @@ void Camera_PitchAndRoll(int player)
 /* ---- Camera_TooSteep__FiP12BWorldSm_Pos  [@0x80083d28] ---- */
 int Camera_TooSteep(int player,BWorldSm_Pos *slicePos)
 {
-  BWorldSm_Pos*slicePos2;
-  coorddef normUnderCam;
-  coorddef normUnderCar;
-  coorddef camToCar;
   coorddef *pcVar1;
   int iVar2;
   int iVar3;
@@ -1828,21 +1748,6 @@ int Camera_TooSteep(int player,BWorldSm_Pos *slicePos)
 /* ---- Camera_CheckWallCollisions__FiP8coorddef  [@0x80083e98] ---- */
 void Camera_CheckWallCollisions(int player,coorddef *pos)
 {
-  BWorldSm_Pos slicePos;
-  coorddef edge;
-  coorddef normal;
-  coorddef step;
-  coorddef temp;
-  coorddef quadUnderCamera;
-  coorddef triPnt;
-  coorddef triVec;
-  int camAngle;
-  int sin;
-  int cos;
-  int camDotNorm;
-  int edgeDotNorm;
-  int count;
-  int i;
   short sVar1;
   short sVar2;
   u_short uVar3;
@@ -2070,9 +1975,6 @@ LAB_800845d0:
 /* ---- Camera_SetAboveGround__FiP8coorddef  [@0x8008480c] ---- */
 void Camera_SetAboveGround(int player,coorddef *pos)
 {
-  BWorldSm_Pos*slicePos;
-  coorddef quadnormal;
-  int elevation;
   coorddef *pcVar1;
   int iVar2;
   coorddef local_20;
@@ -2091,11 +1993,6 @@ void Camera_SetAboveGround(int player,coorddef *pos)
 /* ---- Camera_AcquireTarget__FiP8coorddefT1P10matrixtdefi  [@0x80084898] ---- */
 void Camera_AcquireTarget(int player,coorddef *point,coorddef *pos,matrixtdef *rot,int hirez)
 {
-  coorddef upvector;
-  coorddef tgtPos;
-  coorddef*rotx;
-  coorddef*roty;
-  coorddef*rotz;
   BO_tNewtonObj *pBVar1;
   int iVar2;
   int iVar3;
@@ -2197,12 +2094,6 @@ void Camera_AcquireTarget(int player,coorddef *point,coorddef *pos,matrixtdef *r
 /* ---- Camera_OpponentLookBehind__FiP8coorddefi  [@0x80084c34] ---- */
 void Camera_OpponentLookBehind(int player,coorddef *pos,int reset)
 {
-  coorddef oppVector;
-  coorddef tempVector;
-  int oppAngle;
-  int i;
-  int dist;
-  int oppSlice;
   static coorddef lastOppVector[2];
   Car_tObj *pCVar1;
   int iVar2;
@@ -2311,10 +2202,6 @@ switchD_80084f6c_default:
 /* ---- Camera_GetViewInfo__FiP17DRender_tCalcViewi  [@0x80085008] ---- */
 void Camera_GetViewInfo(int cviewP,DRender_tCalcView *cview,int viewID)
 {
-  int t1;
-  int t2;
-  int t3;
-  int scale;
   coorddef tmp;
   matrixtdef *pmVar1;
   matrixtdef *pmVar2;
@@ -2494,7 +2381,6 @@ int Camera_GetMode(int cviewP)
 /* ---- Camera_SetMode__Fii  [@0x80085608] ---- */
 void Camera_SetMode(int cviewP,int mode)
 {
-  camera_flags*flagMode;
   short sVar1;
   u_int uVar2;
   u_int uVar3;
@@ -2553,7 +2439,6 @@ void Camera_SetMode(int cviewP,int mode)
 /* ---- Camera_NextMode__Fi  [@0x8008581c] ---- */
 void Camera_NextMode(int cviewP)
 {
-  camera_flags*flagMode;
   short sVar1;
   u_int uVar2;
   u_int uVar3;
@@ -2670,21 +2555,6 @@ void Camera_ReplayUpdate(int cviewP,Camera_tCamSlot *ptr)
 /* ---- Camera_ResetRelPos__Fi  [@0x80085cd4] ---- */
 void Camera_ResetRelPos(int bitMask)
 {
-  int h1;
-  int ang;
-  int h0;
-  int maxrate;
-  int scale;
-  int lookingBehind;
-  int rate;
-  int rateY;
-  matrixtdef mx;
-  matrixtdef my;
-  matrixtdef mz;
-  coorddef des;
-  int circle_height [3];
-  int sin;
-  int cos;
   intptr anchorAddress;
   
   if ((bitMask & 1U) != 0) {

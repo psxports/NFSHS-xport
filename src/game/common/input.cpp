@@ -30,9 +30,6 @@ extern "C" { u_int Input_MainExitKey(void); }
 extern "C" int * Input_StartUp(void)
 
 {
-  int * h;
-  int i;
-  int j;
   int *piVar1;
   int iVar2;
   int iVar3;
@@ -78,7 +75,6 @@ extern "C" int * Input_StartUp(void)
 int Input_WingCommandMode(int player)
 
 {
-  int * h;
   int *piVar1;
   
   piVar1 = Input_gHandler + 0x2d;
@@ -96,8 +92,6 @@ int Input_WingCommandMode(int player)
 void Input_Update(void)
 
 {
-  int right;
-  int active;
   u_char bVar1;
   uint32 *puVar2;
   uint32 *puVar3;
@@ -106,24 +100,16 @@ void Input_Update(void)
   int iVar6;
   int iVar7;
   int *piVar8;
-  int k;
   u_int uVar9;
   u_int uVar10;
   int iVar11;
   int iVar12;
   u_int *puVar13;
-  int j;
   int iVar14;
-  int left;
-  int *h;
   int *piVar15;
   u_int *puVar16;
-  int m;
   u_char *puVar17;
-  uint32 acc;
-  int mode;
   int iVar18;
-  int i;
   int iVar19;
   char iactive [32];
   char hactive [17];

@@ -43,7 +43,6 @@ void AIPerson_Cleanup(void);
 /* ---- AIPerson_LoadGridAndSetPersonalityIndexes__Fv  [@0x800689e8] ---- */
 void AIPerson_LoadGridAndSetPersonalityIndexes(void)
 {
-  int carLoop;
   GameSetup_tCarData *pGVar1;
   int iVar2;
   int iVar3;
@@ -86,7 +85,6 @@ void AIPerson_SetPersonality(Car_tObj *carObj,int personalityIndex)
 /* ---- AIPerson_SetPersonalityPointers__Fv  [@0x80068afc] ---- */
 void AIPerson_SetPersonalityPointers(void)
 {
-  int carLoop;
   Car_tObj *carObj;
   Car_tObj **ppCVar1;
   int iVar2;
@@ -211,7 +209,6 @@ void AIPerson_LoadScriptData(Udff_tInfo *handle)
 /* ---- AIPerson_LoadGlue__FP10Udff_tInfo  [@0x80068f80] ---- */
 void AIPerson_LoadGlue(Udff_tInfo *handle)
 {
-  int glueLoop;
   int iVar1;
   int b;
   int *piVar2;
@@ -250,8 +247,6 @@ LAB_skip:
 /* ---- AIPerson_Startup__Fv  [@0x8006908c] ---- */
 void AIPerson_Startup(void)
 {
-  Udff_tInfo*handle;
-  char filename[110];
   Udff_tInfo *pUVar1;
   const char *fmt;
   char acStack_80 [112];
@@ -287,18 +282,6 @@ void AIPerson_Startup(void)
 /* ---- AIPerson_Cleanup__Fv  [@0x80069230] ---- */
 void AIPerson_Cleanup(void)
 {
-  int carLoop;
-  int rearEndingTendency;
-  int aggression;
-  int blockingDistance;
-  int glueLoop;
-  int actionLoop;
-  int lookAhead;
-  int swervyness;
-  int corneringAbility;
-  int roadRage;
-  int braking;
-  char filename [110];
   
   return;
 }

@@ -2,20 +2,13 @@
  *   Source obj : nfs4\eaclib\psx\addtimer.obj ; archive C:\nfs4\EACLIB\PSX\EACPSXZ.LIB (xlsx col11)
  *   2 fns: addtimer@0x800EAFE8, deltimer@0x800EB048.  FULL reconstruction (disasm-v3 MIPS); no stubs.
  *
- *   EA per-frame timer-callback registry: an 8-slot table of function pointers, gTimerSubs[8]
+ *   EA per-frame timer-callback registry: an 8-slot table of function pointers, tmrsub[8]
  *   @0x8012360C, scanned every tick by tmrint/inittimer.  addtimer(fn) registers `fn` (idempotent:
  *   if already present it returns; else it drops `fn` into the first empty slot).  deltimer(fn) clears
  *   the slot holding `fn`.  Both walk all 8 slots; neither returns a meaningful value.
  */
 
-/* owning-TU def (extern-declared, never defined; BSS) */
-extern "C"
-{
-    void (*gTimerSubs[8])(void);
-}
 extern "C" int tmrsub;
-
-extern "C" void (*gTimerSubs[8])(void); /* @0x8012360C (data-mat pass owns) */
 
 extern "C" void addtimer(void (*fn)(void)) /* @0x800EAFE8 */
 {

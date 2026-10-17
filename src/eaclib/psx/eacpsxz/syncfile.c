@@ -18,6 +18,7 @@
  *   synccallback (the registered completion callback).  Plain C -> extern "C".
  */
 #include "../../../nfs4_types.h"
+#include "nfile_completion.h"
 
 struct SyncCtrl;
 typedef unsigned int (*SyncIoFn)(intptr handle, unsigned int offset, intptr dest, int chunk, int cbarg, intptr ctrl);
@@ -45,7 +46,6 @@ extern "C" unsigned int FILE_read(intptr handle, unsigned int offset, intptr des
 extern "C" int FILE_waitop(unsigned int op);
 extern "C" int FILE_opstatus(unsigned int op);
 extern "C" int FILE_completeop(unsigned int op);
-extern "C" void FILE_callbackop(unsigned int op, void *cb);
 
 extern "C" void synccallback(int op, int type, SyncCtrl *ctrl);                                                 /* @0x800EA6CC */
 extern "C" int syncblockio(intptr handle, unsigned int offset, intptr dest, int len, int cbarg, SyncIoFn iofn); /* @0x800EA7E8 */
@@ -76,7 +76,7 @@ extern "C" void synccallback(int op, int type, SyncCtrl *c)
             c->op = c->iofn(c->handle, c->offset, c->dest, c->chunk, c->cbarg, (intptr)c);
             if (c->op != 0)
             {
-                FILE_callbackop((unsigned int)c->op, (void *)synccallback);
+                FILE_callbackop((unsigned int)c->op, NFSHS_FILE_COMPLETION(synccallback));
                 return;
             }
         }
@@ -110,7 +110,7 @@ extern "C" int syncblockio(intptr handle, unsigned int offset, intptr dest, int 
     c.op = iofn(handle, offset, dest, c.chunk, cbarg, (intptr)&c);
     if (c.op != 0)
     {
-        FILE_callbackop((unsigned int)c.op, (void *)synccallback);
+        FILE_callbackop((unsigned int)c.op, NFSHS_FILE_COMPLETION(synccallback));
         while ((c.remain != 0) || (c.op != 0))
             FILE_waitop((unsigned int)c.op);
     }

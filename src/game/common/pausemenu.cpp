@@ -17,7 +17,6 @@ void PauseMenu_FullText(char *sMenuText,short x,short flags,short color)
 
 {
   int iVar1;
-  char *str;
   
   if (gPause_CurrentY == 0x62) {
     x = 0xa0;
@@ -44,7 +43,6 @@ void PauseMenu_FullText(char *sMenuText,short x,short flags,short color)
 void PauseMenu_MenuTextPositioned(short index,short selected,short disabled,short x)
 
 {
-  char *str;
   int iVar1;
   char *sMenuText;
   short color;
@@ -461,7 +459,6 @@ void tPMenuItemLeftRightChoice::Draw(bool selected)
   int pkt_addr24;
   int color_packed;
   short selected_00;
-  POLY_GT4 *prim;
   u_char *prev_pkt;
   u_char *cur_pkt;
   u_char *drmode_p;
@@ -548,7 +545,6 @@ int tPMenuItemLeftRightSlider::ProcessInput(tInputKeyType &keyval,tPMenuCommand 
   int iVar2;
   u_int uVar3;
   u_int uVar4;
-  u_char sound;
   
   bVar1 = false;
   if (keyval == kInput_KeyType_Left) {
@@ -602,14 +598,10 @@ void tPMenuItemLeftRightSlider::Draw(bool selected)
   int tickX;
   int xacc;
   int fadeColor;
-  uint32 col;
   int tickColor;
-  short y;
   int label_y_pack;
   int label_y;
-  int i;
   int endX;
-  int valueX;
   int xpos;
   short x;
   u_char *tp1;
@@ -1163,11 +1155,6 @@ void * tPMenuItem::IsEnabled()
 void * tPMenuItem::IsDisabled()
 
 {
-  int ret;
-  short item;
-  int *orgdata;
-  u_int col;
-  int i;
   
   return (void *)(this->fFlags & 1);
 }

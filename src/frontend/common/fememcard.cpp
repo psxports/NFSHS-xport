@@ -43,7 +43,6 @@ void * VerifySuccessfulRead(tMemCardData *memCardData)
 
 {
   uint32 uVar1;
-  byte result;
   void *pvVar2;
   
   uVar1 = crc16(&memCardData->frontEnd,0x450);
@@ -103,11 +102,8 @@ int Confirm(int Text,int yesText)
   tFEApplication *ptVar2;
   tFEApplication *ptVar3;
   short sVar4;
-  int num, yes;
   char *pcVar5;
-  tDialogMessageString *dlgmsg;
   int ret;
-  byte putbackon;
   tDialogYesNoMem MyDialog;
   
   BringThatBeatBack();
@@ -243,16 +239,12 @@ extern "C" void Init_Memcard(bool redraw,bool pinkslips)
   }
   PAD_restore();
   padrestorestarttick = ticks;
-#ifdef AP_WIN
   /* On PSX `ticks` advances asynchronously in the root-counter interrupt.
    * The native port models that hardware boundary from systemtask(), so an
    * empty single-threaded host loop can never observe a changed value. */
   while (ticks - padrestorestarttick < 0x3c) {
     systemtask(0);
   }
-#else
-  do { } while (ticks - padrestorestarttick < 0x3c);
-#endif
   deltimer(Clock_MasterInterruptHandler);
   timedwait(0x14);
   MCRD_init(0);
@@ -290,13 +282,9 @@ extern "C" void DeInit_Memcard(void)
   addtimer(Clock_MasterInterruptHandler);
   PAD_restore();
   padrestorestarttick = ticks;
-#ifdef AP_WIN
   while (ticks - padrestorestarttick < 0xc0) {
     systemtask(0);
   }
-#else
-  do { } while (ticks - padrestorestarttick < 0xc0);
-#endif
   padinit();
   if (MEMCARDFRONTENDISINITTED != 0) {
     UpdateMusic(FEApp);
@@ -352,24 +340,16 @@ extern "C" void * SaveGame(short player)
   CARDINFO_def *pCVar4;
   char *pcVar5;
   tfrontEnd *ptVar6;
-  int iVar7, event;
-  int i;
+  int iVar7;
   tTournamentManager *this_00;
   short sVar8;
-  tDialogMessageString *dlgmsg;
-  int returnmessage;
   int iVar9;
-  byte finished;
   void *pvVar10;
-  byte returnvalue;
   void *pvVar11;
-  char *shapeFile;
   tMemCardData memCardData;
-  char memorycardbuffer [256];
   tDialogNoInputMessage WarningDialog;
   MCRDFILE_def memCardFile;
   char shapeFileName [64];
-  short cardNum;
   
   iVar7 = 0;
   this_00 = &tournamentManager;
@@ -507,22 +487,14 @@ short LoadGame(short player,bool PinkSlips,bool WithDialogs)
   int iVar5;
   void *pvVar6;
   CARDINFO_def *pCI;
-  int memCardResult;
   char *pcVar8;
   int iVar9;
   int card;
   int iVar10;
-  tDialogMessageString *dlgmsg;
-  byte finished;
   int iVar11;
-  int returnmessage;
   int iVar12;
-  short cardNum;
   short sVar13;
-  int result;
   ushort cardnum;
-  int count;
-#ifdef AP_WIN
   /* MCRD reads a fixed 0x1500-byte save block.  The MIPS LoadGame frame
    * reserves that complete transfer region at sp+0x10 (the next object starts
    * at sp+0x15c0), although the typed payload is only 0x14ac bytes. */
@@ -531,10 +503,6 @@ short LoadGame(short player,bool PinkSlips,bool WithDialogs)
     byte transferTail[0x1500 - sizeof(tMemCardData)];
   } memCardTransfer;
   tMemCardData &memCardData = memCardTransfer.value;
-#else
-  tMemCardData memCardData;
-#endif
-  char memorycardbuffer [256];
   MCRDFILE_def memCardFile;
   tDialogNoInputMessage *warningDialog;
   union {
@@ -737,19 +705,12 @@ PinkSlipsErrorCode SavePinkSlipsCars(short player,short withoutCarInGarageNumber
   int iVar5;
   void *pvVar6;
   CARDINFO_def *pCVar7;
-  int card, memCardResult;
-  int event;
-  PinkSlipsErrorCode result;
+  int card;
   PinkSlipsErrorCode PVar8;
-  byte finished;
   PinkSlipsErrorCode PVar9;
-  byte finishedsave;
-  char *shapeFile;
   tMemCardData memCardData;
-  char memorycardbuffer [256];
   char shapeFileName [64];
   MCRDFILE_def memCardFile;
-  short cardNum;
   
   MakeWayForMemoryCard();
   CURRENTPLAYER = (int)player;
@@ -875,14 +836,8 @@ SavePinkSlipsCarsWithErrorDialogs(short player,short WillLoseCar,short withoutCa
   PinkSlipsErrorCode PVar2;
   char *pcVar3;
   char *pcVar4;
-  tDialogYesNo *dlgmsg;
-  int count;
   int iVar5;
-  PinkSlipsErrorCode err;
-  int yes;
   int player_00;
-  int retry;
-  char *shapeFile;
   tDialogYesNo RetryCancelDialog;
   tDialogNoInputMessage WillLoseCarMessage;
   char string [500];

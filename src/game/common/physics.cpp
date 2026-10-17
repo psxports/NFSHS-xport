@@ -42,7 +42,6 @@ void Physics_InitCarSpecs(Car_tObj *carObj,Udff_tInfo *handle)
 {
   int iVar1;
   int iVar2;
-  int i;
   int iVar3;
   
   iVar1 = Udff_GetInt(handle);
@@ -136,8 +135,6 @@ void Physics_CalculateDerivedCarSpecs(Car_tObj *carObj)
   int iVar1;
   int iVar2;
   Car_tSpecs *pCVar3;
-  int iVar4;
-  int i;
   int iVar5;
   
   if (carObj->specs->redline == 0) {
@@ -255,8 +252,6 @@ int Physics_AttenuateVelocity(Car_tObj *carObj,int force,matrixtdef *roadMat)
   int iVar6;
   int iVar7;
   int iVar8;
-  int vx;
-  int absvelbx;
   coorddef vel_b;
   matrixtdef transposeMat;
   
@@ -442,9 +437,6 @@ void Physics_CorrectPostCollisionYaw(Car_tObj *carObj,int impactVel,coorddef bar
   int iVar2;
   int iVar3;
   int iVar4;
-  int result;
-  int diffX;
-  int diffZ;
   
   (carObj->N).collision.impulse = impactVel * 6;
   iVar1 = currentWallType;
@@ -496,11 +488,9 @@ void Physics_CorrectPostCollisionYaw(Car_tObj *carObj,int impactVel,coorddef bar
 int Physics_DoBarrierCheck(Car_tObj *carObj)
 
 {
-  int wallType;
   char cVar1;
   char cVar2;
   short sVar3;
-  int r2;
   int iVar4;
   Trk_NewSlice *pTVar5;
   int iVar6;
@@ -508,29 +498,16 @@ int Physics_DoBarrierCheck(Car_tObj *carObj)
   int r3;
   int iVar8;
   int iVar9;
-  int r1;
   int iVar10;
   int iVar11;
   int iVar12;
-  int x2;
   int iVar13;
   int iVar14;
   int iVar15;
-  int carCollisionWidth;
   int iVar16;
-  int x1;
-  int x3;
-  int x_relRoad;
-  int collide;
   int iVar17;
-  int diff;
   int iVar18;
-  int slice;
-  coorddef vel_b;
-  coorddef right;
   coorddef normal;
-  coorddef widthVector;
-  int in_stack_ffffff9c;
   
   iVar18 = 0;
   sVar3 = (carObj->N).simRoadInfo.slice;
@@ -748,17 +725,9 @@ void Physics_AutoShift(Car_tObj *carObj)
   Car_tSpecs *pCVar6;
   u_int uVar7;
   u_int uVar8;
-  int previousRpm;
   int iVar9;
-  int velocity;
-  int previousGear;
-  int nextGear;
   u_int uVar10;
-  int wheelRpm;
-  int ShiftPoint;
   int iVar11;
-  int SkipLastGear;
-  int sliding;
   
   pCVar6 = carObj->specs;
   iVar9 = pCVar6->redline;
@@ -853,20 +822,16 @@ void Physics_AutoShift(Car_tObj *carObj)
 void Physics_RampCarControlValues(Car_tObj *carObj)
 
 {
-  char inc;
   u_char bVar1;
   u_char bVar2;
   char cVar3;
   char cVar4;
-  int diff;
   int iVar5;
   int iVar6;
   int rampIn;
   Car_tSpecs *pCVar7;
   int iVar8;
   int iVar9;
-  int i;
-  int gear;
   if ((carObj->RSControl != 0) && ((u_char)(carObj->control).gear < 2)) {
     (carObj->control).desiredGear = '\x02';
     (carObj->control).gear = '\x02';
@@ -1196,7 +1161,6 @@ void Physics_FixEngineRpm(Car_tObj *carObj)
 void Physics_ResetCar(Car_tObj *carObj)
 
 {
-  int i;
   int iVar1;
   
   if (carObj->carInfo->Transmission == 1) {
@@ -1277,7 +1241,6 @@ void Physics_TestForBarrierCollision(Car_tObj *carObj)
 
 {
   int iVar1;
-  int hit;
   
   iVar1 = Physics_DoBarrierCheck(carObj);
   if (iVar1 != 0) {
@@ -1293,19 +1256,12 @@ void Physics_TestForBarrierCollision(Car_tObj *carObj)
 void Physics_CalculateRoadGripModifiers(Car_tObj *carObj)
 
 {
-  int tempSurface;
-  int roadSurfaceType;
   u_int uVar1;
   int iVar2;
-  int i;
   Car_tObj *pCVar3;
-  int frontWheels;
   int iVar4;
-  int rearWheels;
   int iVar5;
-  int leftWheels;
   int iVar6;
-  int rightWheels;
   int iVar7;
   
   iVar4 = 0;
@@ -1353,31 +1309,19 @@ void Physics_CalculateRoadGripModifiers(Car_tObj *carObj)
 int Physics_CalculateCarAcceleration(Car_tObj *carObj)
 
 {
-  int diffDesiredRpm;
-  int ratio;
-  int temp;
   char cVar1;
   u_char bVar2;
   bool bVar3;
   int iVar4;
   int iVar5;
   u_int uVar6;
-  int rpmRise;
   int rpmDrop;
   int iVar7;
   int iVar8;
   int iVar9;
-  int desiredRpm;
   int iVar10;
-  Car_tSpecs *specs;
   Car_tSpecs *pCVar11;
-  int diffFlywheelRpm;
   int iVar12;
-  int driveAcc;
-  int wheelRpm;
-  int drag;
-  int damage;
-  int smokeRpm;
   int blip [8];
   int bblip [8];
   
@@ -1734,11 +1678,8 @@ void Physics_CalcWheelLockAcc(Car_tObj *carObj,Physics_tWheelAccStruct *wheel)
   int iVar3;
   int iVar4;
   int *piVar5;
-  int optVar2;
   int totalAcc;
-  int roadGrip;
   int iVar6;
-  int optVar1;
   
   if (wheel->frontTire == 0) {
     iVar3 = wheel->roadGrip;
@@ -1786,7 +1727,7 @@ void Physics_CalcWheelLockAcc(Car_tObj *carObj,Physics_tWheelAccStruct *wheel)
   if (iVar4 == 0) {
     trap(0x1c00);
   }
-  if ((iVar4 == -1) && (iVar1 == -0x80000000)) {
+  if ((iVar4 == -1) && (iVar1 == 0x80000000)) {
     trap(0x1800);
   }
   if (iVar1 < totalAcc) {
@@ -1824,14 +1765,10 @@ void Physics_CalcTractionCircleAcc(Car_tObj *carObj,Physics_tWheelAccStruct *whe
 {
   int iVar1;
   int iVar2;
-  int gripLoss;
   int iVar3;
   int *piVar4;
   int roadGrip;
-  int gripLossDivider;
   int iVar5;
-  int ratio;
-  int totalAcc;
   
   iVar1 = (wheel->finalAcc).x;
   iVar3 = (wheel->finalAcc).z;
@@ -1881,13 +1818,13 @@ PhyTracCircle_divCheck:
       if (iVar3 == 0) {
         trap(0x1c00);
       }
-      if ((iVar3 == -1) && (iVar5 == -0x80000000)) {
+      if ((iVar3 == -1) && (iVar5 == 0x80000000)) {
         trap(0x1800);
       }
       if (iVar3 == 0) {
         trap(0x1c00);
       }
-      if ((iVar3 == -1) && (roadGrip == -0x80000000)) {
+      if ((iVar3 == -1) && (roadGrip == 0x80000000)) {
         trap(0x1800);
       }
       iVar2 = iVar5 / iVar3;
@@ -1967,14 +1904,11 @@ PhyTracCircle_skidAdjust:
 void Physics_CalculateTireForces(Car_tObj *carObj,Physics_tWheelAccStruct *wheel)
 
 {
-  int brakingSituation;
   bool bVar1;
   int iVar2;
   int iVar3;
   int iVar4;
   int latAcc;
-  int slipAngle;
-  int roadGrip;
   int iVar5;
   
   iVar5 = wheel->roadGrip;
@@ -2189,15 +2123,11 @@ cfLbl2:   /* @0x800abf68  (-f-build goto label) */
 int Physics_CalculateRSControlDesiredPosition(Car_tObj *carObj,int sliceAhead,int lookAhead)
 
 {
-  int driveSide;
   bool bVar1;
-  int position;
   int iVar2;
   int iVar3;
   u_int uVar4;
-  int laneOffset;
   int iVar5;
-  int desLane;
   
   iVar3 = carObj->RSControl * AITune_driveSide;
   bVar1 = false;
@@ -2247,21 +2177,7 @@ int Physics_CalculateRSControlDesiredPosition(Car_tObj *carObj,int sliceAhead,in
 void Physics_Real(Car_tObj *carObj)
 
 {
-  int driveAcc;
-  int brakeAcc;
-  int frontBrake;
-  int ratio;
-  int tempSteer;
-  int frontGrip;
-  int roadGrip;
-  int damage;
-  int damageMult;
-  int transferMult;
-  int Xcomponent;
-  int desiredRpm;
-  int diffRpm;
   bool bVar1;
-  int currentRpm;
   void *pvVar2;
   int iVar3;
   int iVar4;
@@ -2270,26 +2186,16 @@ void Physics_Real(Car_tObj *carObj)
   int iVar7;
   u_int uVar8;
   Trk_NewSlice *pTVar9;
-  int lookAhead;
   int tempGas;
   int iVar10;
-  int sliceAhead;
   int iVar11;
-  int damp;
-  int roadPosition;
-  int rotationalAccCap;
-  Car_tSpecs *specs;
   Car_tSpecs *pCVar12;
   u_int uVar13;
   Physics_tWheelAccStruct frontWheel;
   Physics_tWheelAccStruct rearWheel;
-  coorddef temp;
   coorddef finalAngularAcc_ch;
-  coorddef carAccCap_ch;
   matrixtdef transposeMat;
-  coorddef carPos;
   coorddef dirVector;
-  coorddef offset;
   
   (carObj->linearAcc_ch).x = 0;
   (carObj->linearAcc_ch).y = 0;
@@ -2737,7 +2643,7 @@ PhyReal_calcAccel:
     if (iVar5 == 0) {
       trap(0x1c00);
     }
-    if ((iVar5 == -1) && (iVar3 << 8 == -0x80000000)) {
+    if ((iVar5 == -1) && (iVar3 << 8 == 0x80000000)) {
       trap(0x1800);
     }
     iVar4 = iVar3 - (iVar4 >> 0x10);
@@ -2746,7 +2652,7 @@ PhyReal_calcAccel:
         if (iVar3 == 0) {
           trap(0x1c00);
         }
-        if ((iVar3 == -1) && (iVar4 * 0x80 == -0x80000000)) {
+        if ((iVar3 == -1) && (iVar4 * 0x80 == 0x80000000)) {
           trap(0x1800);
         }
         iVar10 = iVar10 + (iVar4 * 0x80) / iVar3;
@@ -2766,7 +2672,7 @@ PhyReal_calcAccel:
           if (iVar5 == 0) {
             trap(0x1c00);
           }
-          if ((iVar5 == -1) && (iVar3 == -0x80000000)) {
+          if ((iVar5 == -1) && (iVar3 == 0x80000000)) {
             trap(0x1800);
           }
           uVar8 = uVar13 & 0xff;
@@ -2785,7 +2691,7 @@ PhyReal_calcAccel:
       if (iVar3 == 0) {
         trap(0x1c00);
       }
-      if ((iVar3 == -1) && (iVar4 * 0x80 == -0x80000000)) {
+      if ((iVar3 == -1) && (iVar4 * 0x80 == 0x80000000)) {
         trap(0x1800);
       }
       iVar10 = iVar10 + (iVar4 * 0x80) / iVar3;
@@ -2947,28 +2853,6 @@ PhyReal_iceBraking:
 void Physics_SimCar(Car_tObj *carObj)
 
 {
-  int currentRpm;
-  int tempSteer;
-  int diffRpm;
-  int roadGrip;
-  int optVar1;
-  int frontWheels;
-  int rearWheels;
-  int leftWheels;
-  int rightWheels;
-  int damp;
-  int roadPosition;
-  int rotationalAccCap;
-  int diffFlywheelRpm;
-  int driveAcc;
-  int ShiftPoint;
-  int drag;
-  int damage;
-  coorddef finalAngularAcc_ch;
-  coorddef carAccCap_ch;
-  coorddef carPos;
-  coorddef dirVector;
-  coorddef offset;
   if ((carObj->N).orientationToGround.y < 0x1999) {
     carObj->wheelSpin = 0;
     carObj->slide = 0;

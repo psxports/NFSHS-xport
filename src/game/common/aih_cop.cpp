@@ -60,7 +60,6 @@ void AIHigh_Cop::SetTuningLevers()
 
 
 {
-  int carTypeIndex;
 
   Car_tObj *pCVar1;
 
@@ -112,36 +111,8 @@ void AIHigh_Cop::HighExecute()
 
 
 {
-  trigger_t *pNewTrigger;
-  AIState_Base*newState;
-  int forceForwardTrigger;
   trigger_t newTrigger;
-  int distanceMeters;
-  int oldSlice;
-  int direction;
-  coorddef pos;
-  coorddef newPos;
-  AIState_Chase*chaseState;
-  int endSlice;
-  int slowDownEndTime;
-  int minTimeInZone;
-  int minLatMetersDistance;
-  int minLongMetersDistance;
   coorddef zero;
-  int rbDistanceMeters;
-  int rbAbsDistanceMeters;
-  int release;
-  int size;
-  int left;
-  int right;
-  int slice;
-  int rightLatPos;
-  int timeNow;
-  int timeToRB;
-  int hLoop;
-  Car_tObj*thisPlayerObj;
-  AIHigh_Player*thisPlayer;
-  AIState_GotoSlice*gotoState;
 
   bool bVar1;
 
@@ -155,7 +126,6 @@ void AIHigh_Cop::HighExecute()
 
   int iVar9;
 
-  uint32 uVar10;
 
   AIState_Purgatory *pAVar11;
 
@@ -533,9 +503,8 @@ void AIHigh_Cop::HighExecute()
         pSVar8 = (Speaker *)Speech_Mobile(pCVar21);
 
         {
-          __vtbl_ptr_type *entry = &(*pSVar8->_vf)[6];
-          NFS4_VCALL_P1(entry->pfn,(u_char *)pSVar8 + entry->delta,
-                        (this->perpTarget_->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
+
+          (pSVar8)->Engage((this->perpTarget_->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
         }
 
       }
@@ -555,8 +524,8 @@ void AIHigh_Cop::HighExecute()
     pSVar8 = (Speaker *)Speech_Mobile(pCVar21);
 
     {
-      __vtbl_ptr_type *entry = &(*pSVar8->_vf)[16];
-      NFS4_VCALL0(entry->pfn,(u_char *)pSVar8 + entry->delta);
+
+      (pSVar8)->Purge();
     }
 
     this->AssignToPlayer((AIHigh_Player *)0x0);
@@ -664,9 +633,8 @@ void AIHigh_Cop::HighExecute()
             pSVar8 = (Speaker *)Speech_Mobile(pCVar21);
 
             {
-              __vtbl_ptr_type *entry = &(*pSVar8->_vf)[6];
-              NFS4_VCALL_P1(entry->pfn,(u_char *)pSVar8 + entry->delta,
-                            (this->perpTarget_->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
+
+              (pSVar8)->Engage((this->perpTarget_->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
             }
 
             goto switchD_80063d30_caseD_6;
@@ -988,8 +956,8 @@ LAB_80064a0c:
     pSVar8 = (Speaker *)Speech_Mobile(pCVar21);
 
     {
-      __vtbl_ptr_type *entry = &(*pSVar8->_vf)[16];
-      NFS4_VCALL0(entry->pfn,(u_char *)pSVar8 + entry->delta);
+
+      (pSVar8)->Purge();
     }
 
     this->AssignToPlayer((AIHigh_Player *)0x0);
@@ -1043,8 +1011,8 @@ LAB_80064a0c:
       pSVar8 = (Speaker *)Speech_Mobile(pCVar21);
 
       {
-        __vtbl_ptr_type *entry = &(*pSVar8->_vf)[7];
-        NFS4_VCALL0(entry->pfn,(u_char *)pSVar8 + entry->delta);
+
+        (pSVar8)->Lose();
       }
 
     }
@@ -1236,8 +1204,8 @@ LAB_80064778:
       pSVar8 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_);
 
       {
-        __vtbl_ptr_type *entry = &(*pSVar8->_vf)[7];
-        NFS4_VCALL0(entry->pfn,(u_char *)pSVar8 + entry->delta);
+
+        (pSVar8)->Lose();
       }
 
     }
@@ -1245,8 +1213,8 @@ LAB_80064778:
     pSVar8 = (Speaker *)Speech_Mobile((this->_base_AIHigh_BasicCop)._base_AIHigh_Base.carObj_);
 
     {
-      __vtbl_ptr_type *entry = &(*pSVar8->_vf)[16];
-      NFS4_VCALL0(entry->pfn,(u_char *)pSVar8 + entry->delta);
+
+      (pSVar8)->Purge();
     }
 
     this->forcePurgatory_ = 0;
@@ -1428,10 +1396,6 @@ int AIHigh_Cop::CheckForNeedyPlayers()
 
 
 {
-  int needy;
-  int hLoop;
-  Car_tObj*thisPlayerObj;
-  AIHigh_Player*thisPlayer;
 
   int iVar1;
 
@@ -1493,12 +1457,6 @@ void AIHigh_Cop::CheckForWipeOut()
 
 
 {
-  int perTickProb;
-  int randVal;
-  int thisTargetLevel;
-  int hLoop;
-  Car_tObj*thisPlayerObj;
-  AIHigh_Player*thisPlayer;
 
   bool bVar1;
 
@@ -1590,16 +1548,6 @@ int AIHigh_Cop::CheckForNewTarget()
 
 
 {
-  AIHigh_Player*newTarget;
-  int newTargetDistance;
-  int playerLoop;
-  AIHigh_Player*old;
-  int thisCarIndex;
-  AIHigh_Player*thisPlayer;
-  int needs;
-  int got;
-  copType type;
-  int copToTargetDistanceMeters;
 
   bool bVar1;
 
@@ -1814,8 +1762,6 @@ int AIHigh_Cop::GetCheckChasePosition(coorddef *pos)
 
 
 {
-  int newPosition;
-  int changed;
 
   bool bVar1;
 
@@ -1873,25 +1819,6 @@ trigger_t * AIHigh_Cop::CheckForNewTriggers()
 
 
 {
-  int sortedLoop;
-  Car_tObj*testCar;
-  int dir;
-  AIHigh_Player*thisPlayer;
-  int needs;
-  int got;
-  copLevel_t*pLevel;
-  int thisSlice;
-  int startSlice;
-  int endSlice;
-  int fRandomChance;
-  copType type;
-  int newSlice;
-  int temp;
-  int sliceLoop;
-  int triggerHere;
-  int iRandomChance;
-  int randomValue;
-  int unused;
 
   copType cVar1;
 

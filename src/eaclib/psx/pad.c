@@ -13,7 +13,6 @@
  *   names across all 5 fns are SEMANTIC reconstructions (debug info preserved no other locals).
  */
 #include "pad.h"         /* extern "C" prototypes for the 4 exported fns + globals */
-#include "pad_externs.h" /* libpad + eaclib prototypes */
 
 /* PAD_convert is SYM class STAT (file-local static); forward-declared for PAD_state. */
 static u_short PAD_convert(PAD_COMMON *pad);

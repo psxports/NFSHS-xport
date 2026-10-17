@@ -7,15 +7,6 @@ extern "C" int psxdevelopmentsystem(void); /* @0x80106CF0 */
 
 extern "C" int psxdevelopmentsystem(void)
 {
-#ifdef AP_WIN
     /* Native port always has the extracted host filesystem available. */
     return 1;
-#else
-    unsigned short v = *(volatile unsigned short *)0x86; /* PSX kernel region marker */
-    if (v == 0x375a)
-        return 1;
-    if (v == 0x275a)
-        return 0;
-    return -1;
-#endif
 }

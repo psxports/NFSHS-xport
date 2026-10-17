@@ -23,11 +23,6 @@ void AIHigh_BasicPerp::CheckForCrimes()
 
 
 {
-  int crime;
-  int originalCrime;
-  int legal;
-  int carLoop;
-  Car_tObj*carObj;
 
   int iVar1;
 
@@ -213,18 +208,6 @@ int AIHigh_BasicPerp::CheckIfCaught()
 
 
 {
-  int absSpeed;
-  int perpUpright;
-  int skill;
-  int carLoop;
-  Car_tObj*cop;
-  int diffSpeed;
-  int validCar;
-  int distanceAbsMeters;
-  int barrierInWay;
-  int xDot;
-  int zDot;
-  coorddef carCopVector;
 
   u_char bVar1;
 
@@ -498,10 +481,6 @@ void AIHigh_BasicPerp::RemoveCloseCops()
 
 
 {
-  int copLoop;
-  Car_tObj*cop;
-  int distance;
-  AIHigh_Cop*thisCop;
 
   int iVar1;
 
@@ -568,8 +547,8 @@ void AIHigh_BasicPerp::RemoveCloseCops()
         pSVar2 = (Speaker *)Speech_Mobile(pAVar3->carObj_);
 
         {
-          const __vtbl_ptr_type &entry = (*pSVar2->_vf)[16];
-          ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar2 + entry.delta));
+
+          (pSVar2)->Purge();
         }
 
       }
@@ -598,7 +577,6 @@ void AIHigh_BasicPerp::RemoveChaser(int copIndex,int carIndex,copType type)
 
 
 {
-  int pos;
 
   int iVar1;
 
@@ -634,7 +612,6 @@ int AIHigh_BasicPerp::AddChaser(int copIndex,int carIndex,copType type)
 
 
 {
-  int pos;
 
   int iVar1;
 
@@ -672,10 +649,6 @@ int AIHigh_BasicPerp::CheckChaserPosition(int copIndex,int carIndex)
 
 
 {
-  int pos;
-  int thisCopSlice;
-  int nextCopIndex;
-  int nextCarIndex;
 
   short sVar1;
 
@@ -753,7 +726,6 @@ void AIHigh_BasicPerp::Clear()
 
 
 {
-  int loop;
 
   AIHigh_BasicPerp *pAVar1;
 

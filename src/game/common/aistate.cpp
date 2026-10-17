@@ -201,7 +201,6 @@ void AIState_Idle::Execute()
 
 
 {
-  int off;
 
   int iVar1;
 
@@ -495,7 +494,6 @@ void AIState_Chase::SetUp()
 
 
 {
-  coorddef targetCarPosition;
 
   Car_tObj *pCVar1;
 
@@ -614,8 +612,6 @@ void AIState_Chase::DoNitrous(int checkForHumans)
 
 
 {
-  int humanLoop;
-  int distanceMeters;
 
   int iVar1;
 
@@ -683,10 +679,6 @@ void AIState_Chase::Execute()
 
 
 {
-  int far;
-  int velocityToHitInTime;
-  int deltaVelocity;
-  int targetCarVerySlow;
 
   bool bVar1;
 
@@ -861,8 +853,6 @@ int AIState_Chase::CalculateCloseTargettingAheadSlowDownFactor()
 
 
 {
-  int absLongMetersBetween;
-  int slowDown;
 
   int iVar1;
 
@@ -922,19 +912,6 @@ void AIState_Chase::CloseTargeting()
 
 
 {
-  int latPos;
-  int longPos;
-  int bigLongPos;
-  int forceLatAction;
-  int doLatAction;
-  int forceLongAction;
-  int dir;
-  int desiredSpeed;
-  int latTarget;
-  int longTarget;
-  int superSlowDown;
-  int targettingStrength;
-  int targetLanePosition;
 
   bool bVar1;
 
@@ -1196,7 +1173,7 @@ LAB_80070704:
 
       iVar10 = (((this->_base_AIState_Base).carObj_)->N).simRoadInfo.slice * 0x20 + (int)BWorldSm_slices;
 
-      iVar7 = -((u_int)*(u_char *)(iVar10 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar10 + 0x1d) >> 4));
+      iVar7 = 0 - ((u_int)*(u_char *)(iVar10 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar10 + 0x1d) >> 4));
 
       if (iVar7 < iVar8) {
 
@@ -1252,10 +1229,6 @@ void AIState_Chase::ApproachTargeting(int intercept)
 
 
 {
-  int xDistance;
-  int zDistance;
-  int distance;
-  int minSpeed;
 
   bool bVar1;
 
@@ -1461,12 +1434,6 @@ void AIState_Chase::CheckForBarriersAndTargetAroundThem()
 
 
 {
-  int mySlice;
-  int targetSlice;
-  int barrierBesideTarget;
-  int barrierBesideMe;
-  int myLane;
-  int targetLane;
 
   u_char bVar1;
 
@@ -1566,23 +1533,6 @@ int AIState_Chase::FindBarrierEndSlice()
 
 
 {
-  int mySlice;
-  int myLane;
-  int targetLane;
-  int leftLane;
-  int rightLane;
-  int barrierLane;
-  int currentBarrierLane;
-  int forwardBarrierEndSlice;
-  int forwardBarrierDistance;
-  int backwardsBarrierEndSlice;
-  int backwardsBarrierDistance;
-  int sliceLoop;
-  int sliceCheck;
-  int temp;
-  int leftBarrier;
-  int hereBarrier;
-  int rightBarrier;
 
   u_char bVar1;
 
@@ -1926,8 +1876,6 @@ void AIState_Offroad::UnleashIfInRange(Car_tObj *car)
 
 
 {
-  int distanceAbsMeters;
-  int releaseDistanceMeters;
 
   bool bVar1;
 
@@ -2123,8 +2071,6 @@ AIState_Purgatory::AIState_Purgatory(Car_tObj *carObj)
 
 
 {
-  coorddef trafficOffset;
-  int lifeTimer;
 
   u_int uVar1;
 
@@ -2218,8 +2164,6 @@ void ___17AIState_Purgatory(AIState_Purgatory *self, int __in_chrg)
 
 
 {
-  int search;
-  Car_tObj*test;
 
   Car_tObj *pCVar1;
 
@@ -2315,7 +2259,6 @@ int AIState_Purgatory::TestForRelease()
 
 
 {
-  int trafficInWorld;
 
   int iVar1;
 
@@ -2460,8 +2403,6 @@ void AIState_RovingTraffic::CheckIfCarIsNearbyAndStop(Car_tObj *otherCarObj,int 
 
 
 {
-  int distance;
-  coorddef posDiff;
 
   int iVar1;
 
@@ -2579,11 +2520,6 @@ void AIState_RovingTraffic::Execute()
 
 
 {
-  int search;
-  int status;
-  coorddef centerBack;
-  coorddef carRelativeForLatPos;
-  coorddef carRelativeForDistance;
 
   trigger_pathPosition_t *ptVar1;
 
@@ -2812,14 +2748,6 @@ void AIState_Donuts::Execute()
 
 
 {
-  coorddef right;
-  coorddef forward;
-  coorddef targetPos;
-  int latPos;
-  int slice;
-  int forwardDot;
-  int forwardSlice;
-  int dCarToCenter;
 
   int iVar1;
 
@@ -3069,7 +2997,7 @@ void AIState_Donuts::Execute()
 
       iVar11 = iVar11 * 0x20 + (int)BWorldSm_slices;
 
-      if ((int)-((u_int)*(u_char *)(iVar11 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar11 + 0x1d) >> 4)) <=
+      if ((int)(0 - ((u_int)*(u_char *)(iVar11 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar11 + 0x1d) >> 4))) <=
 
           iVar7 + -0x20000) goto LAB_800722ec;
 
@@ -3155,9 +3083,6 @@ void AIState_GotoSlice::Execute()
 
 
 {
-  int longMetersBetween;
-  int distMeters;
-  int cap;
 
   bool bVar1;
 
@@ -3265,7 +3190,6 @@ int AIState_GotoSlice::InTargetSliceRange(int rangeMeters)
 
 
 {
-  int distanceMeters;
 
   int iVar1;
 
@@ -3634,46 +3558,26 @@ AIState_Base::~AIState_Base()
 
 {
 
-  int forwardSlice;
-
-  int distMeters;
-
-  int cap;
 
 
-  int trafficInWorld;
 
-  int xDistance;
 
-  int placementSide;
 
-  int targettingStrength;
 
-  int doBrake;
 
-  int distanceAbsMeters;
 
-  int slice;
 
-  int currentBarrierLane;
 
-  int sliceLoop;
 
-  int barrierLane;
 
-  int longPos;
 
-  int backwardsBarrierEndSlice;
 
-  int forwardBarrierEndSlice;
 
-  coorddef centerBack;
 
-  coorddef right;
 
-  coorddef forward;
 
-  coorddef targetPos;
+
+
 
   
 

@@ -38,10 +38,6 @@ void AIHigh_StartUp(void)
 
 
 {
-  int carLoop;
-  int copCounter;
-  int humanCopCounter;
-  Car_tObj*carObj;
 
   AIHigh_BTC_HumanCop *newObj;
 
@@ -389,7 +385,6 @@ void AIHigh_CleanUp(void)
 
 
 {
-  int carLoop;
 
   AIHigh_Base *pAVar1;
 
@@ -444,8 +439,6 @@ void AIHigh_Execute(void)
 
 
 {
-  int carLoop;
-  Car_tObj*carObj;
 
   bool bVar1;
 

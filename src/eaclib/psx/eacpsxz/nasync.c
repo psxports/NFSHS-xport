@@ -20,6 +20,7 @@
  */
 #include "../../../lib/nasync.h"
 #include "../../../nfs4_types.h"
+#include "nfile_completion.h"
 #include <stddef.h>
 
 /* nasync.obj-local counter @0x8013DEB8; distinct from stream.obj's
@@ -32,13 +33,11 @@ extern "C" unsigned int FILE_close(void *handle, unsigned int a1, unsigned int a
 extern "C" unsigned int FILE_read(intptr handle, unsigned int offset, intptr dest, int len, unsigned int a5, intptr a6); /* @0x800EC4EC */
 extern "C" unsigned int FILE_size(void *handle, unsigned int a1, unsigned int a2);                                       /* @0x800EC5D0 */
 extern "C" int FILE_completeop(unsigned int id);                                                                         /* @0x800EC2B0 */
-extern "C" void FILE_callbackop(unsigned int id, void (*cb)(int, int));                                                  /* @0x800EBE4C */
 extern "C" void FILE_cancelop(unsigned int id);                                                                          /* @0x800EC008 */
 extern "C" int FILE_opensync(char *name, int mode, int prio, int *outHandle);                                            /* @0x800EA8A8 */
 extern "C" int FILE_closesync(int handle, int prio);                                                                     /* @0x800EA950 */
 extern "C" void *reservememadr(const char *name, int size, int classid);                                                 /* @0x800E533C */
 extern "C" int purgememadr(void *p);                                                                                     /* @0x800E5540 */
-extern "C" int addsystemtask(intptr fn, int period, int delay);                                                          /* @0x800E6AF4 */
 extern "C" void *allocmutex(void);                                                                                       /* @0x800FE424 */
 
 /* forward decls for the FILE completion callbacks (referenced by FILE_callbackop and each other) */
@@ -47,7 +46,6 @@ extern "C" int loadfilereadcallback(int id, int status, AsyncReq *req);
 extern "C" int loadfilesizecallback(int id, int status, AsyncReq *req);
 extern "C" int loadfileopencallback(int id, int status, AsyncReq *req);
 extern "C" int loadsegreadcallback(int id, int status, AsyncReq *req);
-extern "C" int asyncsystemtask(void);
 
 #define RQ(r) ((unsigned int)(size_t)(AsyncReq *)(r)) /* req ptr as a FILE callback param (uint) */
 
@@ -159,7 +157,7 @@ extern "C" int loadfilereadcallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfileclosecallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfileclosecallback));
     }
     else
     { /* full chunk -> read the next one */
@@ -169,7 +167,7 @@ extern "C" int loadfilereadcallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfilereadcallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfilereadcallback));
     }
     return 0;
 }
@@ -185,7 +183,7 @@ extern "C" int loadfilesizecallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfileclosecallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfileclosecallback));
     }
     else
     { /* allocate "ASYNCBUF" of the file size */
@@ -196,7 +194,7 @@ extern "C" int loadfilesizecallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfilereadcallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfilereadcallback));
     }
     return 0;
 }
@@ -221,7 +219,7 @@ extern "C" int loadfileopencallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfileclosecallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfileclosecallback));
     }
     else if (req->buffer != 0)
     { /* alloc mode -> get the size first */
@@ -229,7 +227,7 @@ extern "C" int loadfileopencallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfilesizecallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfilesizecallback));
     }
     else
     { /* direct read into the preset dest */
@@ -237,7 +235,7 @@ extern "C" int loadfileopencallback(int id, int status, AsyncReq *req)
         if (nextop == 0)
             return 0;
         req->fileop = (int)nextop;
-        FILE_callbackop(nextop, (void (*)(int, int))loadfilereadcallback);
+        FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadfilereadcallback));
     }
     return 0;
 }
@@ -269,13 +267,13 @@ extern "C" int loadsegreadcallback(int id, int status, AsyncReq *req)
     if (nextop == 0)
         return 0;
     req->fileop = (int)nextop;
-    FILE_callbackop(nextop, (void (*)(int, int))loadsegreadcallback);
+    FILE_callbackop(nextop, NFSHS_FILE_COMPLETION(loadsegreadcallback));
     return 0;
 }
 
 /* asyncsystemtask @0x800F1120 : drain callqueue -- fire each finished request's user callback (or clean
  *   up a cancelled one), then recycle the slot.  Registered as a periodic system task by initasync. */
-extern "C" int asyncsystemtask(void)
+extern "C" int asyncsystemtask(int taskArg, int elapsed)
 {
     AsyncReq *req = queuefetch(&callqueue);
     while (req != 0)
@@ -320,7 +318,7 @@ extern "C" int initasync(int numreq, int blocksize, int memclass)
             r->fileop = 0;
         }
         request[numreq - 1].next = 0; /* terminate the free list */
-        addsystemtask((intptr)asyncsystemtask, 1, 1);
+        addsystemtask(asyncsystemtask, 1, 1);
     }
     return 0;
 }
@@ -346,7 +344,7 @@ extern "C" int asyncloadfilecallback(int name, int memclass, int cb)
     if (op == 0)
         return 0;
     req->fileop = (int)op;
-    FILE_callbackop(op, (void (*)(int, int))loadfileopencallback);
+    FILE_callbackop(op, NFSHS_FILE_COMPLETION(loadfileopencallback));
     return req->id;
 }
 
@@ -374,7 +372,7 @@ extern "C" int asyncloadfileatcallback(int name, int dest, int cb)
     if (op == 0)
         return 0;
     req->fileop = (int)op;
-    FILE_callbackop(op, (void (*)(int, int))loadfileopencallback);
+    FILE_callbackop(op, NFSHS_FILE_COMPLETION(loadfileopencallback));
     return req->id;
 }
 
@@ -425,7 +423,7 @@ extern "C" int asyncloadsegmentcallback(int offset, int dest, int size, int cb)
     req->fileop = (int)op; /* asm: set on both branches */
     if (op == 0)
         return 0;
-    FILE_callbackop(op, (void (*)(int, int))loadsegreadcallback);
+    FILE_callbackop(op, NFSHS_FILE_COMPLETION(loadsegreadcallback));
     return req->id;
 }
 

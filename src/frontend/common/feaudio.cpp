@@ -105,10 +105,8 @@ void Feaudio_StartPatch(SPEECHINFO *info)
 void FeAudio_systemtask(int x)
 
 {
-  int ti1;
   int rd_status;
   u_int snd_over;
-  int tu3;
   int i;
   int iVar1;
   u_int tu1;
@@ -392,11 +390,6 @@ extern "C" void FeAudio_InitCommentary(int language,int arg1)
 extern "C" void FeAudio_DeInitCommentary(void)
 
 {
-  char *tempChar;
-  char *streamBuffer;
-  u_int i;
-  LUMPYHEAD lumpHead;
-  char vivname [5];
   
   if (speechfileHeader != (LUMPYHEAD *)0x0) {
     purgememadr(speechfileHeader);

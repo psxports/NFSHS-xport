@@ -27,6 +27,7 @@
  *   CHUNK in ring buffer:  word0 tag (-1 wrap / -2 free / else stream-header id)  word1 (len | filterValue<<24)
  */
 #include "../../../nfs4_types.h"
+#include "nfile_completion.h"
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
 /* stream.obj-local counter @0x8013DEDC; not nasync.obj's @0x8013DEB8. */
@@ -37,7 +38,6 @@ extern "C" unsigned int FILE_open(char *name, unsigned int mode, unsigned int pr
 extern "C" unsigned int FILE_close(void *handle, unsigned int prio, unsigned int udata);
 extern "C" unsigned int FILE_read(void *handle, unsigned int offset, unsigned int dest, int len, unsigned int a5, unsigned int a6); /*@0x800EC4EC (asm sets a0..a3 only)*/
 extern "C" int FILE_completeop(unsigned int id);
-extern "C" void FILE_callbackop(unsigned int id, void (*cb)(int, int)); /*@0x800EBE4C*/
 extern "C" void FILE_priorityop(unsigned int id, int prio);             /*@0x800EBECC*/
 extern "C" int FILE_closesync(int handle, int priority);                /* syncfile.obj */
 
@@ -86,7 +86,7 @@ extern "C" void closecallback(int a0, int a1, intptr s);                        
 extern "C" int readcallback(int a0, int a1, intptr s);                             /* @0x800FC8A8 */
 extern "C" int startnextrequest(intptr s, unsigned int prio, intptr x);            /* @0x800FC9B4 */
 extern "C" int restartstream(intptr s);                                            /* @0x800FCB44 */
-extern "C" intptr STREAM_get(intptr consumer, void *buf, int len);                 /* @0x800FD9AC */
+extern "C" intptr STREAM_get(intptr consumer);                                    /* @0x800FD9AC */
 extern "C" void STREAM_release(intptr s, intptr consumer);                         /* @0x800FDAD0 */
 extern "C" void STREAM_kill(intptr s);                                             /* @0x800FD808 */
 extern "C" void STREAM_setgreedystate(intptr s, int state);                        /* @0x800FD2B4 */
@@ -278,7 +278,7 @@ extern "C" int parsechunks(intptr s)
 
     while (1)
     {
-        if (iVar2 < 8 || ((uVar5 = chunk[1], (uVar5 & 0xff000000) != 0)) || fillAddress < (intptr)chunk + uVar5)
+        if (iVar2 < 8 || ((uVar5 = chunk[1], (uVar5 & 0xff000000) != 0)) || (uintptr_t)fillAddress < (uintptr_t)chunk + uVar5)
             return 0; /* incomplete / malformed chunk */
 
         uVar3 = filterchunk(s, (intptr)chunk);
@@ -345,7 +345,7 @@ extern "C" void closecallback(int a0, int a1, intptr s)
     op = FILE_open((char *)(s + 0x5c), 1, MU(s, 0x30), (unsigned int)s);
     MU(s, 0xa4) = op;
     if (op != 0)
-        FILE_callbackop(op, (void (*)(int, int))opencallback);
+        FILE_callbackop(op, NFSHS_FILE_COMPLETION(opencallback));
 }
 
 /* readcallback @0x800FC8A8 : nfile read-op completion (stream object in $a2).  Advances the read
@@ -442,7 +442,7 @@ extern "C" int startnextrequest(intptr s, unsigned int prio, intptr x)
                     MU(s, 0xa4) = op;
                     if (op == 0)
                         return 0;
-                    FILE_callbackop(op, (void (*)(int, int))closecallback);
+                    FILE_callbackop(op, NFSHS_FILE_COMPLETION(closecallback));
                     return op;
                 }
                 {
@@ -450,7 +450,7 @@ extern "C" int startnextrequest(intptr s, unsigned int prio, intptr x)
                     MU(s, 0xa4) = op;
                     if (op == 0)
                         return 0;
-                    FILE_callbackop(op, (void (*)(int, int))opencallback);
+                    FILE_callbackop(op, NFSHS_FILE_COMPLETION(opencallback));
                     return op;
                 }
             }
@@ -550,7 +550,7 @@ have_room:
         MU(s, 0xa4) = op;
         if (op == 0)
             return 0;
-        FILE_callbackop(op, (void (*)(int, int))readcallback);
+        FILE_callbackop(op, NFSHS_FILE_COMPLETION(readcallback));
         return op;
     }
 }
@@ -567,7 +567,7 @@ extern "C" int STREAM_overhead(int numReq, int numFilters, int numConsumers)
  *   failure. */
 extern "C" intptr STREAM_create(int numReq, int numFilters, int numConsumers, void *objbuf, int bufsize)
 {
-    int over, i, off;
+    int over, i;
     intptr objaddr = (intptr)objbuf;
     intptr base;
 
@@ -837,37 +837,31 @@ extern "C" int STREAM_cancelrequest(intptr s, int reqid)
 
     STREAM_enterCS();
     req = locaterequest(s, reqid);
-    if (req != 0 && MI(req, 4) != 4)
+    if (req == 0 || MI(req, 4) == 4)
     {
-        if (MI(req, 4) != 1)
-        {                                    /* active (not merely queued) */
-            MI(req, 4) = 4;                  /* mark cancelled */
-            s7 = (int *)(intptr)MU(s, 0x40); /* readptr */
-            s4 = s7;
-            if (req != MI(s, 0x4c))
-                s4 = (int *)(intptr)MU(req, 0x60); /* this request's start fill */
-            {
-                int nx = MI(req, 0xc);
-                if (nx == 0 || MI(nx, 4) == 1)
-                {
-                    s6 = (int *)(intptr)MU(s, 0x44); /* writeptr */
-                    ret = 0;
-                }
-                else
-                {
-                    s6 = (int *)(intptr)MU(nx, 0x60);
-                    ret = 0;
-                }
-            }
-            goto reclaim;
-        }
-        freerequest(s, req); /* queued -> just drop it */
+        STREAM_leaveCS();
+        return 1;
     }
-    ret = 1;
-reclaim:
+    if (MI(req, 4) == 1)
+    {
+        freerequest(s, req); /* queued -> just drop it */
+        STREAM_leaveCS();
+        return 1;
+    }
+    MI(req, 4) = 4;                  /* mark cancelled */
+    s7 = (int *)(intptr)MU(s, 0x40); /* readptr */
+    s4 = s7;
+    if (req != MI(s, 0x4c))
+        s4 = (int *)(intptr)MU(req, 0x60); /* this request's start fill */
+    {
+        int nx = MI(req, 0xc);
+        if (nx == 0 || MI(nx, 4) == 1)
+            s6 = (int *)(intptr)MU(s, 0x44); /* writeptr */
+        else
+            s6 = (int *)(intptr)MU(nx, 0x60);
+    }
+    ret = 0;
     STREAM_leaveCS();
-    if (ret != 0)
-        return ret;
 
     /* sweep every consumer, returning or freeing the cancelled request's chunks */
     {
@@ -884,10 +878,9 @@ reclaim:
                     if (u2 == 0)
                     { /* consumer head is before this request -> drain it */
                         unsigned int pos = MU(cons, 0xc);
-                        int *p;
-                        while ((p = s6, inbetween((unsigned int)s4, (unsigned int)s6, pos) != 0))
+                        while (inbetween((unsigned int)s4, (unsigned int)s6, pos) != 0)
                         {
-                            ret = STREAM_get(cons, p, pos);
+                            ret = STREAM_get(cons);
                             STREAM_release(cons, ret);
                             if (MI(cons, 8) < 1)
                                 break;
@@ -990,7 +983,7 @@ extern "C" void STREAM_kill(intptr s)
 
 /* STREAM_get @0x800FD9AC : pop the next available chunk for a consumer, returning a pointer to its data
  *   (or 0 if none).  Advances the consumer's read cursor to the following same-tagged chunk. */
-extern "C" intptr STREAM_get(intptr consumer, void *buf, int len)
+extern "C" intptr STREAM_get(intptr consumer)
 {
     intptr out[2];
     intptr cons, chunk;

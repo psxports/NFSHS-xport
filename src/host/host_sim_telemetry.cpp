@@ -114,7 +114,6 @@ extern "C" void NFSHS_HostEacAudioReplay(unsigned *state)
     if(!remaining) NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "EAC_REPLAY all non-audio calls verified"); NFSHS_HostLog(nfshsLogLine); }()));
 }
 
-#ifdef AP_WIN
 enum { HOST_STATE_TRACE_VERSION=1, HOST_STATE_TRACE_TRAFFIC_SLOTS=9 };
 struct HostStateTraceHeader {
     char magic[8];
@@ -239,7 +238,6 @@ static void host_trace_state_tick(void)
     for(int index=0;index<HOST_STATE_TRACE_TRAFFIC_SLOTS;++index)
         host_trace_car(index<trafficCount ? Cars_gTrafficCarList[index] : (Car_tObj *)0);
 }
-#endif
 
 
 extern "C" void NFSHS_HostRaceBoundaryStart(void)
@@ -282,9 +280,7 @@ extern "C" void NFSHS_HostRaceBoundaryStart(void)
 
 extern "C" void NFSHS_HostRaceBoundaryTick(void)
 {
-#ifdef AP_WIN
     host_trace_state_tick();
-#endif
     if(!hostCar) return;
 
     int hostDx=nfs4_mips_subu_s32(hostCar->N.position.x,hostStartX);

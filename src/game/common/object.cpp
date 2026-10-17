@@ -1,7 +1,6 @@
 /* game/common/object.cpp -- RECONSTRUCTED (track-object collision + custom-object pool +
  *   IMass scene props + ObjectMultiAnim/SignAnim animation classes; C++ TU, 36 fns).
- *   4 anim classes (: ObjectAnim) emitted as free fns (Class_ct/_dt/_Class_Draw) per
- *   track.obj convention (ctors explicitly called on __builtin_new memory).
+ *   ObjectAnim owns native virtual drawing and game-heap destruction
  */
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
@@ -44,16 +43,6 @@ void Object_DeInitIMassObjectInfo(void);
 int Object_GetNumIMassObjects(void);
 void Object_GetIMassObjectDimensions(int objIndex,coorddef *dimensions);
 void Object_GetIMassObjectMotion(int objIndex,coorddef *cpoint,matrixtdef *orientMat,coorddef *velocity);
-int NFS4_VT_THUNK ObjectFinishedMultiAnim_Draw(ObjectFinishedMultiAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset);
-ObjectMultiAnim * ObjectMultiAnim_ct(ObjectMultiAnim *pThis,coorddef *impactVel,AnimDef *def, Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj, ObjectFinishedMultiAnim *finishedAnim);
-int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset);
-int NFS4_VT_THUNK ObjectFinishedSignAnim_Draw(ObjectFinishedSignAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset);
-ObjectSignAnim * ObjectSignAnim_ct(ObjectSignAnim *pThis,coorddef *impactVel,int impactAngle,AnimDef *def, Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj, coorddef *roadNormal,ObjectFinishedSignAnim *finishedAnim);
-int NFS4_VT_THUNK ObjectSignAnim_Draw(ObjectSignAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset);
-void NFS4_VT_THUNK ObjectSignAnim_dt(ObjectSignAnim *pThis,int __in_chrg);
-void NFS4_VT_THUNK ObjectFinishedSignAnim_dt(ObjectFinishedSignAnim *pThis,int __in_chrg);
-void NFS4_VT_THUNK ObjectMultiAnim_dt(ObjectMultiAnim *pThis,int __in_chrg);
-void NFS4_VT_THUNK ObjectFinishedMultiAnim_dt(ObjectFinishedMultiAnim *pThis,int __in_chrg);
 
 
 /* ---- CalcObjYawAngle  [OBJECT.CPP:69-74] SLD-VERIFIED ---- */
@@ -131,7 +120,6 @@ FindObjInstanceFromSerialNum(Group *group,int index)
 
 {
   int count;
-  Group *pThis;
   Trk_SimpleInst *objInstance;
   
   if (1 < index - 0x7eU) {
@@ -249,7 +237,6 @@ int Object_GetRadiusCollisionData(Object_tSimObjList *objList,int objIndex,coord
 {
   Trk_SimObject *simObj;
   Trk_SimpleInst *animInst;
-  Chunk *pMChunk;
   int iVar1;
   int iVar2;
   int chunk;
@@ -286,7 +273,6 @@ void Object_GetPointsCollisionData(Object_tSimObjList *objList,int objIndex,int 
   Trk_SimObject *simObj;
   Trk_SimpleInst *objInstance;
   Group *group;
-  Trk_ObjectDef *objDef;
   int iVar3;
   int iVar4;
   int chunk;
@@ -368,10 +354,7 @@ void Object_KillStatus(void)
   ppOVar2 = gSimObjAnims;
   do {
     pOVar1 = *ppOVar2;
-    if (pOVar1 != (ObjectAnim *)0x0) {
-      __nfs4_vtbl_ptr_t *entry = &(*pOVar1->_vf)[1];
-      nfs4_vcall_dtor(entry->pfn,(u_char *)pOVar1 + entry->delta,3);
-    }
+    delete pOVar1;
     i = i + 1;
     ppOVar2 = ppOVar2 + 1;
   } while (i < 0x1c2);
@@ -405,8 +388,8 @@ int Object_CheckCollisionResults(Object_tSimObjList *objList,int objIndex,BO_tNe
   ObjectFinishedMultiAnim *finishedMulti;
   ObjectMultiAnim *multiAnim;
   ObjectSignAnim *signAnim;
+  ObjectAnim *newAnim;
   ObjectFinishedSignAnim *finishedSign;
-  Chunk *pMChunk;
   int iVar3;
   u_char type;
   u_char boomIndex;
@@ -448,29 +431,24 @@ int Object_CheckCollisionResults(Object_tSimObjList *objList,int objIndex,BO_tNe
         objDef = (Trk_ObjectDef *)(gPersistObjDef + 1);
       }
       if (animDef->type == 0) {
-        finishedSign = (ObjectFinishedSignAnim *)__builtin_new(sizeof(ObjectFinishedSignAnim));
-        (finishedSign->_base_ObjectAnim)._vf =
-             (__vtbl_ptr_type (*) [3])ObjectFinishedSignAnim_vtable;
+        finishedSign = new(__builtin_new(sizeof(ObjectFinishedSignAnim))) ObjectFinishedSignAnim;
         signAnim = (ObjectSignAnim *)__builtin_new(sizeof(ObjectSignAnim));
         vel = fixedatan(nfs4_mips_sra_s32((N->linearVel).x,8),
                         nfs4_mips_sra_s32((N->linearVel).z,8));
-        signAnim = ObjectSignAnim_ct(signAnim,&N->linearVel,nfs4_mips_sra_s32(vel,8),animDef,objInstance,objDef,
+        newAnim = new(signAnim) ObjectSignAnim(&N->linearVel,nfs4_mips_sra_s32(vel,8),animDef,objInstance,objDef,
                                      simObj,(coorddef *)((N->roadMatrix).m + 3),finishedSign);
       }
       else {
         if (animDef->type != 1) {
           return -1;
         }
-        finishedMulti = (ObjectFinishedMultiAnim *)__builtin_new(sizeof(ObjectFinishedMultiAnim));
-        (finishedMulti->_base_ObjectAnim)._vf =
-             (__vtbl_ptr_type (*) [3])ObjectFinishedMultiAnim_vtable;
+        finishedMulti = new(__builtin_new(sizeof(ObjectFinishedMultiAnim))) ObjectFinishedMultiAnim;
         multiAnim = (ObjectMultiAnim *)__builtin_new(sizeof(ObjectMultiAnim));
-        signAnim = (ObjectSignAnim *)
-                   ObjectMultiAnim_ct(multiAnim,&N->linearVel,animDef,objInstance,objDef,simObj,
+        newAnim = new(multiAnim) ObjectMultiAnim(&N->linearVel,animDef,objInstance,objDef,simObj,
                                       finishedMulti);
       }
       ret = -1;
-      gSimObjAnims[simObj->serialNum] = &signAnim->_base_ObjectAnim;
+      gSimObjAnims[simObj->serialNum] = newAnim;
       return ret;
     }
   }
@@ -571,7 +549,7 @@ void Object_ClearCustomObjects(void)
     } while (i < iVar1);
   }
   if (Track_gSaveSurface != (SaveSurface *)0x0) {
-    RestoreAll(Track_gSaveSurface);
+    Track_gSaveSurface->RestoreAll();
   }
   return;
 }
@@ -587,7 +565,7 @@ void SetCautionSurface(coorddef *pt,BWorldSm_Pos *slicePos)
   BWorldSm_FindClosestQuadRez(pt,slicePos,1);
   simQuad = slicePos->simQuad;
   if ((simQuad != (Trk_NewSimQuad *)0x0) && ((simQuad->surface & 0x40) == 0)) {
-    Save(Track_gSaveSurface,simQuad);
+    Track_gSaveSurface->Save(simQuad);
     slicePos->simQuad->surface = slicePos->simQuad->surface | 0x40;
   }
   return;
@@ -600,7 +578,6 @@ int Object_AddCustomSimObject(SceneElem *objectData,int serialNum,int instIndex)
 
 {
   u_char tu1;
-  Group *pThis;
   int iVar1;
   Trk_SimObject *simObj;
   BWorldSm_Pos slicePos;
@@ -663,7 +640,6 @@ int Object_GetObjDefID(int index)
 int Object_FindDefWithThisID(int ID)
 
 {
-  Group *pThis;
   Trk_ObjectDef *objDef;
   int i;
   Trk_ObjectDef **ppTVar2;
@@ -978,7 +954,7 @@ void Object_GetIMassObjectMotion(int objIndex,coorddef *cpoint,matrixtdef *orien
 
 /* ---- ObjectFinishedMultiAnim_Draw  [OBJECT.CPP:1160-1161] SLD-VERIFIED ---- */
 
-int NFS4_VT_THUNK ObjectFinishedMultiAnim_Draw(ObjectFinishedMultiAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset)
+int ObjectFinishedMultiAnim::Draw(DRender_tView *Vi,Draw_DCache *sd,int offset)
 
 {
   return 2;
@@ -987,9 +963,7 @@ int NFS4_VT_THUNK ObjectFinishedMultiAnim_Draw(ObjectFinishedMultiAnim *pThis,DR
 
 
 /* ---- ObjectMultiAnim_ct  [OBJECT.CPP:1165-1183] SLD-VERIFIED ---- */
-ObjectMultiAnim * ObjectMultiAnim_ct(ObjectMultiAnim *pThis,coorddef *impactVel,AnimDef *def,
-          Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj,
-          ObjectFinishedMultiAnim *finishedAnim)
+ObjectMultiAnim::ObjectMultiAnim(coorddef *impactVel,AnimDef *def, Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj, ObjectFinishedMultiAnim *finishedAnim)
 
 {
   u_char bVar1;
@@ -997,36 +971,34 @@ ObjectMultiAnim * ObjectMultiAnim_ct(ObjectMultiAnim *pThis,coorddef *impactVel,
   AnimScript *pAVar3;
   AnimDef *pAVar4;
   
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectMultiAnim_vtable;
-  (pThis->impactVel).x = impactVel->x >> 6;
-  (pThis->impactVel).y = impactVel->y >> 6;
+  (this->impactVel).x = impactVel->x >> 6;
+  (this->impactVel).y = impactVel->y >> 6;
   iVar2 = impactVel->z;
-  pThis->animParms = def;
-  pThis->objCollideInstance = objCollideInstance;
-  pThis->objDef = objDef;
-  pThis->simObj = simObj;
-  (pThis->impactVel).z = iVar2 >> 6;
+  this->animParms = def;
+  this->objCollideInstance = objCollideInstance;
+  this->objDef = objDef;
+  this->simObj = simObj;
+  (this->impactVel).z = iVar2 >> 6;
   if (objCollideInstance->type == '\x06') {
     pAVar3 = (AnimScript *)__builtin_new(sizeof(AnimScript));
-    pAVar4 = pThis->animParms;
+    pAVar4 = this->animParms;
     bVar1 = ((Trk_AnimateBoomInst *)objCollideInstance)->boomIndex;
   }
   else {
     pAVar3 = (AnimScript *)__builtin_new(sizeof(AnimScript));
-    pAVar4 = pThis->animParms;
+    pAVar4 = this->animParms;
     bVar1 = objCollideInstance->boomIndex;
   }
   pAVar3 = new(pAVar3) AnimScript(gPersistObjInst,8,(u_int)bVar1,pAVar4->numPieces);  /* @placement-ctor (was flat __10AnimScriptP5Groupiii); storage from __builtin_new above */
-  pThis->script = pAVar3;
-  (pThis->script)->SetAnimAttrib(2);
-  pThis->finishedAnim = finishedAnim;
-  return pThis;
+  this->script = pAVar3;
+  (this->script)->SetAnimAttrib(2);
+  this->finishedAnim = finishedAnim;
 }
 
 
 
 /* ---- ObjectMultiAnim_Draw  [OBJECT.CPP:1188-1296] SLD-VERIFIED ---- */
-int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset)
+int ObjectMultiAnim::Draw(DRender_tView *Vi,Draw_DCache *sd,int offset)
 
 {
   int status;
@@ -1052,33 +1024,28 @@ int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim *pThis,DRender_tView *Vi,
   coorddef impact;
   tQuat quat;
 
-  status = (pThis->script)->GetTimedAnimPosRot(0, &animcp, &matrix);
+  status = (this->script)->GetTimedAnimPosRot(0, &animcp, &matrix);
   if (status + 1U < 2) {
-    finishedAnim = pThis->finishedAnim;
-    serial = pThis->simObj->serialNum;
-    pThis->finishedAnim = (ObjectFinishedMultiAnim *)0x0;
+    finishedAnim = this->finishedAnim;
+    serial = this->simObj->serialNum;
+    this->finishedAnim = (ObjectFinishedMultiAnim *)0x0;
     anim = gSimObjAnims[serial];
-    if (anim != (ObjectAnim *)0x0) {
-      __nfs4_vtbl_ptr_t *entry = &(*anim->_vf)[1];
-      nfs4_vcall_dtor(entry->pfn,(u_char *)anim + entry->delta,3);
-    }
-    gSimObjAnims[serial] = &finishedAnim->_base_ObjectAnim;
-    __nfs4_vtbl_ptr_t *entry = &(*(finishedAnim->_base_ObjectAnim)._vf)[2];
-    ret = NFS4_VCALL_PTR_PTR_INT(entry->pfn,
-              (u_char *)finishedAnim + entry->delta,Vi,sd,offset);
+    delete anim;
+    gSimObjAnims[serial] = finishedAnim;
+    ret = finishedAnim->Draw(Vi,sd,offset);
   }
   else {
-    animInst = *pThis->script->inst;
-    ticks = simGlobal.gameTicks - pThis->script->baseTicks;
-    partCount = pThis->animParms->numPieces;
+    animInst = *this->script->inst;
+    ticks = simGlobal.gameTicks - this->script->baseTicks;
+    partCount = this->animParms->numPieces;
     animIndex = (int)animInst->interval * (int)animInst->count >> 1;
     i = 0;
     if (animIndex < ticks) {
       ticks = animIndex;
     }
-    impact.x = (pThis->impactVel).x;
-    impact.z = (pThis->impactVel).z;
-    oci = pThis->objCollideInstance;
+    impact.x = (this->impactVel).x;
+    impact.z = (this->impactVel).z;
+    oci = this->objCollideInstance;
     if (oci->type != '\x06') {
       quat.x = oci->qx;
       quat.y = oci->qy;
@@ -1101,16 +1068,16 @@ int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim *pThis,DRender_tView *Vi,
     objInst = (Trk_SimpleInst *)(gPersistObjInst + 1);
     if (0 < partCount) {
       do {
-        (pThis->script)->GetTimedAnimPosRot(i, &animcp, &matrix);
-        if (pThis->objCollideInstance->type != '\x06') {
+        (this->script)->GetTimedAnimPosRot(i, &animcp, &matrix);
+        if (this->objCollideInstance->type != '\x06') {
           Math_fasttransmult(&matrix,&RSmatrix,&matrix);
         }
-        cp.x = pThis->simObj->point[0] + animcp.x + impact.x * ticks;
-        cp.y = pThis->simObj->point[1] + animcp.y;
-        cp.z = pThis->simObj->point[2] + animcp.z + impact.z * ticks;
+        cp.x = this->simObj->point[0] + animcp.x + impact.x * ticks;
+        cp.y = this->simObj->point[1] + animcp.y;
+        cp.z = this->simObj->point[2] + animcp.z + impact.z * ticks;
         while( true ) {
           if (objInst->type == '\b') {
-            oci = pThis->objCollideInstance;
+            oci = this->objCollideInstance;
             if (((oci->type != '\x05') ||
                  (((Trk_AnimateBoomInst *)objInst)->boomIndex == oci->boomIndex)) &&
                 ((oci->type != '\x06') ||
@@ -1132,73 +1099,66 @@ int NFS4_VT_THUNK ObjectMultiAnim_Draw(ObjectMultiAnim *pThis,DRender_tView *Vi,
 
 /* ---- ObjectFinishedSignAnim_Draw  [OBJECT.CPP:1302-1304] SLD-VERIFIED ---- */
 
-int NFS4_VT_THUNK ObjectFinishedSignAnim_Draw(ObjectFinishedSignAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset)
+int ObjectFinishedSignAnim::Draw(DRender_tView *Vi,Draw_DCache *sd,int offset)
 
 {
   
-  DrawObjectTransform(Vi,sd,&pThis->finalMatrix,pThis->objDef,
-             (coorddef *)&pThis->objCollideInstance->x,offset,-1);
+  DrawObjectTransform(Vi,sd,&this->finalMatrix,this->objDef,
+             (coorddef *)&this->objCollideInstance->x,offset,-1);
   return 2;
 }
 
 
 
 /* ---- ObjectSignAnim_ct  [OBJECT.CPP:1308-1354] SLD-VERIFIED ---- */
-ObjectSignAnim * ObjectSignAnim_ct(ObjectSignAnim *pThis,coorddef *impactVel,int impactAngle,AnimDef *def,
-          Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj,
-          coorddef *roadNormal,ObjectFinishedSignAnim *finishedAnim)
+ObjectSignAnim::ObjectSignAnim(coorddef *impactVel,int impactAngle,AnimDef *def, Trk_CollideBoomInst *objCollideInstance,Trk_ObjectDef *objDef,Trk_SimObject *simObj, coorddef *roadNormal,ObjectFinishedSignAnim *finishedAnim)
 
 {
   int iVar1;
   AnimScript *pAVar2;
   int iVar3;
   int iVar4;
-  int vel;
   int iVar5;
-  coorddef *roty;
-  coorddef *rotz;
-  coorddef *rotx;
   matrixtdef *m2;
   matrixtdef yawMat;
   matrixtdef objAngleMat;
   matrixtdef tmpMat;
   matrixtdef mat;
   
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectSignAnim_vtable;
   iVar5 = impactVel->x;
   iVar1 = impactVel->z;
   iVar3 = impactVel->y;
   iVar4 = impactVel->z;
-  (pThis->impactVel).x = impactVel->x;
-  (pThis->impactVel).y = iVar3;
-  (pThis->impactVel).z = iVar4;
-  pThis->impactAngle = nfs4_mips_sll_s32(impactAngle,8);
-  pThis->animParms = def;
+  (this->impactVel).x = impactVel->x;
+  (this->impactVel).y = iVar3;
+  (this->impactVel).z = iVar4;
+  this->impactAngle = nfs4_mips_sll_s32(impactAngle,8);
+  this->animParms = def;
   if (iVar5 < 0) {
     iVar5 = nfs4_mips_negu_s32(iVar5);
   }
   if (iVar1 < 0) {
     iVar1 = nfs4_mips_negu_s32(iVar1);
   }
-  pThis->objCollideInstance = objCollideInstance;
-  pThis->objDef = objDef;
-  pThis->simObj = simObj;
+  this->objCollideInstance = objCollideInstance;
+  this->objDef = objDef;
+  this->simObj = simObj;
   iVar3 = CalcObjYawAngle((CCOORD16 *)(objDef + 1));
-  pThis->objectAngle = nfs4_mips_sll_s32(iVar3,8);
+  this->objectAngle = nfs4_mips_sll_s32(iVar3,8);
   if (nfs4_mips_sra_s32(nfs4_mips_addu_s32(iVar5,iVar1),0x10) < 10) {
     pAVar2 = (AnimScript *)__builtin_new(sizeof(AnimScript));
-    iVar5 = pThis->animParms->baseAnim;
-    iVar1 = pThis->animParms->numPieces;
+    iVar5 = this->animParms->baseAnim;
+    iVar1 = this->animParms->numPieces;
   }
   else {
     pAVar2 = (AnimScript *)__builtin_new(sizeof(AnimScript));
-    iVar1 = pThis->animParms->numPieces;
-    iVar5 = pThis->animParms->baseAnim + 1;
+    iVar1 = this->animParms->numPieces;
+    iVar5 = this->animParms->baseAnim + 1;
   }
   pAVar2 = new(pAVar2) AnimScript(iVar5,iVar1);  /* @placement-ctor (was flat __10AnimScriptii); storage from __builtin_new above */
-  pThis->script = pAVar2;
-  (pThis->script)->SetAnimAttrib(2);
-  pThis->finishedAnim = finishedAnim;
+  this->script = pAVar2;
+  (this->script)->SetAnimAttrib(2);
+  this->finishedAnim = finishedAnim;
   iVar5 = roadNormal->y;
   iVar1 = roadNormal->z;
   (finishedAnim->finalMatrix).m[3] = roadNormal->x;
@@ -1229,25 +1189,23 @@ ObjectSignAnim * ObjectSignAnim_ct(ObjectSignAnim *pThis,coorddef *impactVel,int
   (finishedAnim->finalMatrix).m[8] = iVar5 - iVar1;
   reorthogonalize(m2->m);
   fixedxformx(&mat,0x4000);
-  fixedxformy(&objAngleMat,-pThis->objectAngle);
-  fixedxformy(&yawMat,pThis->impactAngle);
+  fixedxformy(&objAngleMat,-this->objectAngle);
+  fixedxformy(&yawMat,this->impactAngle);
   Math_fasttransmult(&objAngleMat,&mat,&tmpMat);
   Math_fasttransmult(&tmpMat,&yawMat,&tmpMat);
   Math_fasttransmult(&tmpMat,m2,m2);
   finishedAnim->objDef = objDef;
   finishedAnim->objCollideInstance = objCollideInstance;
-  return pThis;
 }
 
 
 
 /* ---- ObjectSignAnim_Draw  [OBJECT.CPP:1360-1401] SLD-VERIFIED ---- */
-int NFS4_VT_THUNK ObjectSignAnim_Draw(ObjectSignAnim *pThis,DRender_tView *Vi,Draw_DCache *sd,int offset)
+int ObjectSignAnim::Draw(DRender_tView *Vi,Draw_DCache *sd,int offset)
 
 {
   short i;
   int ret;
-  __vtbl_ptr_type (*pa_Var3) [3];
   Trk_CollideBoomInst *pTVar4;
   ObjectAnim *anim;
   Trk_ObjectDef *pObjDef;
@@ -1258,137 +1216,68 @@ int NFS4_VT_THUNK ObjectSignAnim_Draw(ObjectSignAnim *pThis,DRender_tView *Vi,Dr
   int frame;
   int numFrames;
 
-  ret = (pThis->script)->GetTimedAnimPosRot(0, &animcp, &matrix);
+  ret = (this->script)->GetTimedAnimPosRot(0, &animcp, &matrix);
   if (ret + 1U < 2) {
-    finishedAnim = pThis->finishedAnim;
-    i = pThis->simObj->serialNum;
-    pThis->finishedAnim = (ObjectFinishedSignAnim *)0x0;
+    finishedAnim = this->finishedAnim;
+    i = this->simObj->serialNum;
+    this->finishedAnim = (ObjectFinishedSignAnim *)0x0;
     anim = gSimObjAnims[i];
-    if (anim != (ObjectAnim *)0x0) {
-      __nfs4_vtbl_ptr_t *entry = &(*anim->_vf)[1];
-      nfs4_vcall_dtor(entry->pfn,(u_char *)anim + entry->delta,3);
-    }
-    gSimObjAnims[i] = &finishedAnim->_base_ObjectAnim;
-    pa_Var3 = (finishedAnim->_base_ObjectAnim)._vf;
-    __nfs4_vtbl_ptr_t *entry = &(*pa_Var3)[2];
-    ret = NFS4_VCALL_PTR_PTR_INT(entry->pfn,
-              (u_char *)finishedAnim + entry->delta,Vi,sd,offset);
+    delete anim;
+    gSimObjAnims[i] = finishedAnim;
+    ret = finishedAnim->Draw(Vi,sd,offset);
   }
   else {
-    pObjDef = pThis->objDef;
-    (pThis->script)->GetTimedAnimPosRot(0, &animcp, &matrix);
-    (pThis->script)->GetAnimFrameInfo(&frame, &numFrames);
-    pTVar4 = pThis->objCollideInstance;
+    pObjDef = this->objDef;
+    (this->script)->GetTimedAnimPosRot(0, &animcp, &matrix);
+    (this->script)->GetAnimFrameInfo(&frame, &numFrames);
+    pTVar4 = this->objCollideInstance;
     cp.x = pTVar4->x + animcp.x;
     cp.y = pTVar4->y + animcp.y;
     cp.z = pTVar4->z + animcp.z;
-    BuildObjCollisionMatrix(nfs4_mips_sll_s32(frame,0x10) / numFrames,pThis->objectAngle,pThis->impactAngle,&matrix);
+    BuildObjCollisionMatrix(nfs4_mips_sll_s32(frame,0x10) / numFrames,this->objectAngle,this->impactAngle,&matrix);
     DrawObjectTransform(Vi,sd,&matrix,pObjDef,&cp,offset,-1);
     ret = 4;
   }
   return ret;
 }
 
-/* ---- ObjectSignAnim_dt  [OBJECT.CPP:?] SLD-FLAG:NO_SLD ---- */
-
-void NFS4_VT_THUNK ObjectSignAnim_dt(ObjectSignAnim *pThis,int __in_chrg)
-
+/* Original destructors: 0x800a6c10, 0x800a6cf8, 0x800a6de0 */
+ObjectAnim::~ObjectAnim()
 {
-  __vtbl_ptr_type (*pa_Var1) [3];
-  ObjectFinishedSignAnim *pOVar2;
-  AnimScript *deleteMe;
-  
-  deleteMe = pThis->script;
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectSignAnim_vtable;
-  if (deleteMe != (AnimScript *)0x0) {
-    if (deleteMe->inst != (Trk_AnimateInst **)0x0) {
-      __builtin_vec_delete(deleteMe->inst);
+}
+
+void ObjectAnim::operator delete(void *storage)
+{
+  __builtin_delete(storage);
+}
+
+ObjectSignAnim::~ObjectSignAnim()
+{
+  if (script != 0) {
+    if (script->inst != 0) {
+      __builtin_vec_delete(script->inst);
     }
-    __builtin_delete(deleteMe);
+    __builtin_delete(script);
   }
-  pOVar2 = pThis->finishedAnim;
-  if (pOVar2 != (ObjectFinishedSignAnim *)0x0) {
-    pa_Var1 = (pOVar2->_base_ObjectAnim)._vf;
-    __nfs4_vtbl_ptr_t *entry = &(*pa_Var1)[1];
-    nfs4_vcall_dtor(entry->pfn,(u_char *)pOVar2 + entry->delta,3);
-  }
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectAnim_vtable;
-  if ((__in_chrg & 1U) != 0) {
-    __builtin_delete(pThis);
-  }
-  return;
+  delete finishedAnim;
 }
 
-
-
-/* ---- ObjectFinishedSignAnim_dt  [OBJECT.CPP:?] SLD-FLAG:NO_SLD ---- */
-
-void NFS4_VT_THUNK ObjectFinishedSignAnim_dt(ObjectFinishedSignAnim *pThis,int __in_chrg)
-
+ObjectMultiAnim::~ObjectMultiAnim()
 {
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectAnim_vtable;
-  if ((__in_chrg & 1U) != 0) {
-    __builtin_delete(pThis);
-  }
-  return;
-}
-
-
-
-/* ---- ObjectMultiAnim_dt  [OBJECT.CPP:?] SLD-FLAG:NO_SLD ---- */
-
-/* ---- ObjectAnim_dt  @0x800a6de0  base deleting-dtor (vtable-only ref; not separately
- * reconstructed -- surfaced by #75 bare-VA pass). nfs4-f.exe: if(__in_chrg&1){ _vf=vtable; delete } */
-void NFS4_VT_THUNK ObjectAnim_dt(ObjectAnim *pThis,int __in_chrg)
-{
-  if (__in_chrg & 1) {
-    pThis->_vf = (__vtbl_ptr_type (*) [3])ObjectAnim_vtable;
-    __builtin_delete(pThis);
-  }
-}
-
-void NFS4_VT_THUNK ObjectMultiAnim_dt(ObjectMultiAnim *pThis,int __in_chrg)
-
-{
-  __vtbl_ptr_type (*pa_Var1) [3];
-  ObjectFinishedMultiAnim *pOVar2;
-  AnimScript *deleteMe;
-  
-  deleteMe = pThis->script;
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectMultiAnim_vtable;
-  if (deleteMe != (AnimScript *)0x0) {
-    if (deleteMe->inst != (Trk_AnimateInst **)0x0) {
-      __builtin_vec_delete(deleteMe->inst);
+  if (script != 0) {
+    if (script->inst != 0) {
+      __builtin_vec_delete(script->inst);
     }
-    __builtin_delete(deleteMe);
+    __builtin_delete(script);
   }
-  pOVar2 = pThis->finishedAnim;
-  if (pOVar2 != (ObjectFinishedMultiAnim *)0x0) {
-    pa_Var1 = (pOVar2->_base_ObjectAnim)._vf;
-    __nfs4_vtbl_ptr_t *entry = &(*pa_Var1)[1];
-    nfs4_vcall_dtor(entry->pfn,(u_char *)pOVar2 + entry->delta,3);
-  }
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectAnim_vtable;
-  if ((__in_chrg & 1U) != 0) {
-    __builtin_delete(pThis);
-  }
-  return;
+  delete finishedAnim;
 }
 
-
-
-/* ---- ObjectFinishedMultiAnim_dt  [OBJECT.CPP:?] SLD-FLAG:NO_SLD ---- */
-
-void NFS4_VT_THUNK ObjectFinishedMultiAnim_dt(ObjectFinishedMultiAnim *pThis,int __in_chrg)
-
+/* Original empty derived destructors: 0x800a6cc4 and 0x800a6dac */
+ObjectFinishedSignAnim::~ObjectFinishedSignAnim()
 {
-  (pThis->_base_ObjectAnim)._vf = (__vtbl_ptr_type (*) [3])ObjectAnim_vtable;
-  if ((__in_chrg & 1U) != 0) {
-    __builtin_delete(pThis);
-  }
-  return;
 }
 
-
-
-/* end of object.cpp */
+ObjectFinishedMultiAnim::~ObjectFinishedMultiAnim()
+{
+}

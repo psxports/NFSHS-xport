@@ -28,20 +28,14 @@
 extern "C"
 {
     char currentdir[64];
-#ifdef AP_WIN
     char *fsprefix1 = (char *)"cdrom:";
     char *fsprefix2 = (char *)"sim:";
-#else
-    char *fsprefix1;
-    char *fsprefix2;
-#endif
 }
 
 /* ---- PC host (dev link) filesystem backend (fs 2) ---- */
 extern "C" int psxdevelopmentsystem(void);              /* @0x80106CF0 (dev link present?) */
 
 /* ---- system glue + string helpers ---- */
-extern "C" int addsystemtask(intptr fn, int period, int delay); /* @0x800E6AF4 */
 extern "C" int iFILE_CommandCompleteCallback(int result);       /* @0x800ED020 (nfile) */
 extern "C" char *fsprefix1;   /* @0x8013DD34 -> "cdrom:" (CD drive prefix, 6-char compare)  */
 extern "C" char *fsprefix2;   /* @0x8013DD40 -> "sim:"   (PC-host prefix, 4-char compare)   */
@@ -59,7 +53,6 @@ extern "C" int currentfilesystem;    /* the fs selected by initfileio/setdirecto
 
 ReadCmd readcmd; /* definition (BSS zero) */
 
-#ifdef AP_WIN
 extern "C" void NFSHS_HostResetDeferredRead(void)
 {
     readcmd.pending = 0;
@@ -68,7 +61,6 @@ extern "C" void NFSHS_HostResetDeferredRead(void)
     readcmd.offset = 0;
     readcmd.len = 0;
 }
-#endif
 
 /* cop0 IRQ-disabled critical section guarding the readcmd slot (host no-op). */
 #if defined(__mips__)
@@ -93,7 +85,7 @@ extern "C" int initfileio(void)
     if (psxdevelopmentsystem() != 0)
     { /* dev link present -> use PC host */
         PCinit();
-        addsystemtask((intptr)readfile_systask, 0, 0);
+        addsystemtask(readfile_systask, 0, 0);
         currentfilesystem = 2;
         availablefilesystems |= 2;
     }
@@ -109,14 +101,12 @@ extern "C" int initfileio(void)
  *   settable cwd, so a CD prefix only switches the current filesystem. */
 extern "C" void setdirectory(char *dir)
 {
-#ifdef AP_WIN
     if (strncmp(dir, fsprefix1, 6) == 0)
     {
         currentfilesystem = 2;
         currentdir[0] = 0;
         return;
     }
-#endif
     int prefixlen = 0;
     if (strncmp(dir, fsprefix1, 6) == 0)
     { /* CD prefix */
@@ -162,18 +152,8 @@ extern "C" int openfile(char *name, int flags, int *outp)
     { /* a "drive:"/fs prefix is present */
         if (strncmp(name, fsprefix1, 6) == 0)
         { /* CD prefix */
-#ifdef AP_WIN
             fs = 2;
             name += 6;
-#else
-            if ((availablefilesystems & 1) == 0)
-            {
-                *outp = 0;
-                return 0;
-            }
-            fs = 1;
-            name += 6;
-#endif
         }
         else if (strncmp(name, fsprefix2, 4) == 0)
         { /* PC-host prefix */
@@ -282,7 +262,6 @@ extern "C" int readfile(int handle, int dest, int offset, int len)
     }
     else if (fs == 2)
     {
-#ifdef AP_WIN
         /* The original PSX PC filesystem was a slow serial dev-link, hence
            reads were deferred to a system task.  The native host backend is
            ordinary local file I/O; complete it immediately just like the
@@ -292,26 +271,13 @@ extern "C" int readfile(int handle, int dest, int offset, int len)
         int n = PCread(dev, (char *)(intptr)dest, len);
         iFILE_CommandCompleteCallback(n == len);
         r = 1;
-#else
-        FROOT_enterCS();
-        if (readcmd.pending == 0)
-        { /* one PC read in flight at a time */
-            readcmd.pending = 1;
-            readcmd.handle = dev;
-            readcmd.dest = dest;
-            readcmd.offset = offset;
-            readcmd.len = len;
-            r = 1;
-        }
-        FROOT_leaveCS();
-#endif
     }
     return r;
 }
 
 /* readfile_systask @0x800F3F80 : execute a queued PC-host read (PClseek + PCread) and complete the FILE op
  *   (success when the full length was read).  Registered as a periodic task by initfileio. */
-extern "C" int readfile_systask(void)
+extern "C" int readfile_systask(int taskArg, int elapsed)
 {
     FROOT_enterCS();
     if (readcmd.pending != 0)

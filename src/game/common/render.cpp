@@ -10,9 +10,6 @@ extern void NFSHS_WebRenderProbe(DRender_tView *view, int phase);
 #endif
 
 /* ---- link-harness owned-global definition (extern-declared, never defined) ---- */
-#ifndef AP_WIN
-short Render_gPacketLenLo, Render_gPacketLenHi;  /* render.obj-owned packet-length accumulators (BSS) */
-#endif
 
 /* ---- render.obj-OWNED globals -- DEFINED here (self-contained; SYM-typed via gen_owned_defs:
    .data = real NFS4.EXE bytes, .bss = zero) ---- */
@@ -31,19 +28,6 @@ int          Render_gPauseMenuView;   /* @0x8013d3e8  (bss(zero)) */
 /* ---- PSX scratchpad (0x1F800000 region) Render_-owned globals -- lost-symbols (NOT in SYM;
    render.cpp is canonical owner of the Render_ packet/scratchpad namespace; draww + FE extern
    these). Defined here so the project links self-contained. ---- */
-#ifndef AP_WIN
-int     Render_gMenuRenderFlag;   /* render mirror/menu render flag (render-owned scratch) */
-u_char *Render_gPacketPtr;        /* @0x1F800004  GPU OT packet build pointer */
-u_char *Render_gPalettePtr;       /* @0x1F800000  palette/CLUT scratch pointer */
-u_char *Render_gPacketEnd;        /* GPU OT packet-buffer end pointer */
-MATRIX  Render_gWorldMat;         /* @0x1F800014  world->view matrix (scratchpad) */
-MATRIX  Render_gNightMat;         /* @0x1F800034 night-lighting matrix */
-MATRIX  Render_gCopMat;           /* @0x1F800054..0x073 cop-car matrix */
-/* ownerless Ghidra-named scratchpad slots (shared draww/r3dcar; no module prefix) -- centralized
-   here as render owns the un-prefixed PSX scratchpad (0x1F8000xx) region. */
-int     INT_1f800084, INT_1f800088, INT_1f80008c, INT_1f800090;   /* @0x1F800084  scratch matrix-t slot */
-int     gScratchLastWord;         /* @0x1F8003FC  scratch stack top word */
-#endif
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 void Render_CreatePlayerViews(void);
@@ -137,7 +121,6 @@ void Render_RenderWorld(DRender_tView *Vi)
 
 {
   void *pvVar1;
-  int savesp;
   BWorld_OnyxBuildFacets(Vi);
   pvVar1 = NFSHS_NativeStackHint(getScratchAddr(0xff));
   Skidmark_OnyxBuildFacets(Vi);
@@ -213,7 +196,6 @@ void Render_RenderPauseMenuView(void)
 
 {
   int iVar1;
-  int ogFlip;
   
   gCView.id = Render_gPauseMenuView;
   Draw_StartRenderingView(Render_gPauseMenuView);
@@ -291,10 +273,8 @@ void Render_Render(int pause)
 void FlareThing(void)
 
 {
-  int i;
   int i_2;
   u_short *screen_walk;
-  int players;
   int n_players;
   FLARE_DEF *flare_walk;
   PSX_RECT rec;
@@ -317,9 +297,7 @@ void FlareThing(void)
     screen_walk = screen_walk + 0x19;
     flare_walk = (FLARE_DEF *)(flare_walk->pos + 1);
   }
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceFlareState(&gFlare_LensFlare));
-#endif
   return;
 }
 
@@ -396,13 +374,10 @@ extern "C" void Render_InitLibRender(void)
 void StampImage(int xo,int depth)
 
 {
-  POLY_FT4 * ft4_p;
   int tu1;
   u_int *pal_link;
-  int i;
   int x_pos;
   int x_remain;
-  int frame;
   int buf_idx;
   u_char *ft4_packet;
   short ts1;
@@ -483,20 +458,10 @@ void Render_InitBlurMode(void)
 void Render_InsertDepthOfField(void)
 
 {
-  POLY_F4 * prim;
-  DR_STP * stp_prim;
   short tpage;
   u_int *puVar1;
-  int frame;
-  DR_MODE *dr_mode;
-  int i;
-  int players;
-  PSX_RECT rec;
-  void *prev_pkt_drm2;
-  void *prev_pkt_drm;
   u_char *cur_pkt_poly;
   u_char *cur_pkt_stp;
-  void *prev_pkt_stp;
   u_char *cur_pkt_drm;
   
   if ((Render_gBlurEffectMode & 1U) != 0) {

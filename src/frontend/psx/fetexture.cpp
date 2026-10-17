@@ -23,26 +23,14 @@ void FETexture_LoadPmxAtOffset(char *f,int index,tTexture_ShapeInfo *dest,int yo
   int shapeDataSize;
   int decompBuf;
   int uploadResult;
-  int bpp;
   uint clutmode;
   uint savedHdr4;
   int savedHdr0;
   uint savedHdr1;
   uint savedHdr2;
   int savedHdr3;
-  shapetbl *unpacked;
-  shapetbl *shpptr;
-  char is_compressed;
-  int loc_48;
-  shapetbl old_shape;
   int xclut;
   int yclut;
-  byte ts1 [20];
-  short ts4;
-  short ts5;
-  short ts2;
-  short ts3;
-  byte tc6;
   
   xclut = 0;
   yclut = 0;

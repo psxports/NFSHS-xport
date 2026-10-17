@@ -1,7 +1,6 @@
 /* game/common/object_externs.h -- cross-TU decls for object.cpp (track-object collision +
  *   custom-object pool + IMass props + ObjectMultiAnim/SignAnim animation classes).
- *   Methods of the 4 anim classes are emitted as free fns (Class_ct/_dt/_Draw) per the
- *   track.obj convention (explicit ctor-on-allocated-memory calls). */
+ *   ObjectAnim inheritance and virtual methods are declared in nfs4_types.h */
 #ifndef _GAME_COMMON_OBJECT_EXTERNS_H_
 #define _GAME_COMMON_OBJECT_EXTERNS_H_
 #include "../../nfs4_types.h"
@@ -54,14 +53,6 @@ extern int DrawObjectTransform(DRender_tView *Vi, Draw_DCache *sd, matrixtdef *m
 extern int DrawW_GetAnimationTime(Trk_AnimateInst *animInst);
 extern int BWorldSm_FindClosestQuadRez(coorddef *c, BWorldSm_Pos *pos, int rez); /* bworldsm.obj */
 extern void BWorldSm_SetSlice(int slice, BWorldSm_Pos *pos);
-extern void Save(SaveSurface *pThis, Trk_NewSimQuad *simQuad); /* track.obj (SaveSurface) */
-extern void RestoreAll(SaveSurface *pThis);
 
-/* ---- vtables for the 4 anim classes (data owned by object.obj) ---- */
-extern __vtbl_ptr_type ObjectAnim_vtable[]; /* @0x800560e8 base ObjectAnim vtable (vtables_object.cpp) */
-extern __vtbl_ptr_type ObjectMultiAnim_vtable[];
-extern __vtbl_ptr_type ObjectSignAnim_vtable[];
-extern __vtbl_ptr_type ObjectFinishedMultiAnim_vtable[];
-extern __vtbl_ptr_type ObjectFinishedSignAnim_vtable[];
 
 #endif /* _GAME_COMMON_OBJECT_EXTERNS_H_ */

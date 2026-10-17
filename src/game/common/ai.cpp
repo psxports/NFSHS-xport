@@ -161,7 +161,6 @@ void AI_TargetLane(Car_tObj *carObj,int lane)
 /* ---- AI_ClearLaneMerits__Fv  [@0x80057b6c] ---- */
 void AI_ClearLaneMerits(void)
 {
-  int o;
   int iVar1;
   
   iVar1 = 0;
@@ -177,10 +176,6 @@ void AI_ClearLaneMerits(void)
 /* ---- AI_DoReactions__FP8Car_tObj  [@0x80057b94] ---- */
 void AI_DoReactions(Car_tObj *carObj)
 {
-  int target;
-  int absDistance;
-  int seconds;
-  int metersDistance;
   int iVar1;
   u_int uVar2;
   int ticksOn;
@@ -260,7 +255,6 @@ LAB_80057cc0:
 /* ---- AI_CheckForPlayerActions__FP8Car_tObjT0  [@0x80057dd4] ---- */
 void AI_CheckForPlayerActions(Car_tObj *carObj,Car_tObj *otherCarObj)
 {
-  int absDistance;
   int iVar1;
   int iVar2;
   Car_tObj *pCVar3;
@@ -322,7 +316,6 @@ LAB_80057f34:
 /* ---- AI_DoReactionsAndBehavior__FP8Car_tObj  [@0x80058014] ---- */
 void AI_DoReactionsAndBehavior(Car_tObj *carObj)
 {
-  int t;
   Car_tObj *otherCarObj;
   Car_tObj **ppCVar1;
   int iVar2;
@@ -345,8 +338,6 @@ void AI_DoReactionsAndBehavior(Car_tObj *carObj)
 /* ---- AI_OpponentBlockPlayer__FP8Car_tObjT0  [@0x800580d8] ---- */
 void AI_OpponentBlockPlayer(Car_tObj *carObj,Car_tObj *otherCarObj)
 {
-  int otherCarObjSlice;
-  int distance;
   u_char bVar1;
   short sVar2;
   int iVar3;
@@ -416,17 +407,6 @@ LAB_8005829c:
 /* ---- AI_CheckForBarriers__FP8Car_tObj  [@0x800582d4] ---- */
 void AI_CheckForBarriers(Car_tObj *carObj)
 {
-  int dir;
-  int slicesAhead;
-  int forwardSlice0;
-  int forwardSlice1;
-  int interval;
-  int masks[3];
-  int laneNotChecked[3];
-  int speed;
-  int sliceLoop;
-  int profileHere;
-  int checkSlice;
   short sVar1;
   bool bVar2;
   bool bVar3;
@@ -542,7 +522,6 @@ void AI_CheckForBarriers(Car_tObj *carObj)
 /* ---- AI_SetupOncomingLaneDemerits__FP8Car_tObj  [@0x80058694] ---- */
 void AI_SetupOncomingLaneDemerits(Car_tObj *carObj)
 {
-  int opposingLaneMerit;
   int iVar1;
   
   iVar1 = AI_IsMellowZone(carObj,0x3c0000);
@@ -577,10 +556,6 @@ void AI_SetupOncomingLaneDemerits(Car_tObj *carObj)
 /* ---- AI_HandleChangeInNumLanes__FP8Car_tObj  [@0x800587ec] ---- */
 void AI_HandleChangeInNumLanes(Car_tObj *carObj)
 {
-  int lookAheadSlice;
-  int absLaneLookAhead;
-  int lookAhead;
-  int laneIndex;
   u_char bVar1;
   int iVar2;
   int iVar3;
@@ -630,9 +605,6 @@ LAB_800588a4:
 /* ---- AI_HandleShouldersAndOffRoad__FP8Car_tObj  [@0x8005895c] ---- */
 void AI_HandleShouldersAndOffRoad(Car_tObj *carObj)
 {
-  int slice;
-  int shoulder_merit;
-  int isRight;
   u_char bVar1;
   bool bVar2;
   int iVar3;
@@ -707,22 +679,6 @@ void AI_HandleShouldersAndOffRoad(Car_tObj *carObj)
 /* ---- AI_CalculateLaneSpeeds__FP8Car_tObj  [@0x80058d20] ---- */
 void AI_CalculateLaneSpeeds(Car_tObj *carObj)
 {
-  Car_tObj*otherCarObj;
-  int ci;
-  int carObjIndexInSortedList;
-  int carsFound;
-  int lanesFilled;
-  int distanceFixedMeters;
-  int distanceIntMeters;
-  int distanceFixedMetersSignChecked;
-  int inverseCollisionTime;
-  int inverseAheadCollisionTime;
-  int carObjLeftLaneBits;
-  int carObjThisLaneBits;
-  int carObjRightLaneBits;
-  int maxDistanceToCheck;
-  int collisionSpeed;
-  int aheadCollisionSpeed;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -763,7 +719,7 @@ void AI_CalculateLaneSpeeds(Car_tObj *carObj)
     if (Cars_gNumCars == 0) {
       trap(0x1c00);
     }
-    if ((Cars_gNumCars == -1) && (iVar2 == -0x80000000)) {
+    if ((Cars_gNumCars == -1) && (iVar2 == 0x80000000)) {
       trap(0x1800);
     }
     carObj_00 = Cars_gSortedList[iVar2 % Cars_gNumCars];
@@ -850,9 +806,6 @@ LAB_80058f88:
 /* ---- AI_CalcMeritsBasedOnSpeed__FP8Car_tObj  [@0x800590b4] ---- */
 void AI_CalcMeritsBasedOnSpeed(Car_tObj *carObj)
 {
-  int dSpeed;
-  int cSpeed;
-  int considerDesired;
   int iVar1;
   int iVar2;
   int *paiVar3;
@@ -940,13 +893,6 @@ void AI_CalcMeritsBasedOnSpeed(Car_tObj *carObj)
 /* ---- AI_CheckForClearLanes__FP8Car_tObj  [@0x80059434] ---- */
 void AI_CheckForClearLanes(Car_tObj *carObj)
 {
-  int lanesFilled;
-  int dir;
-  int carsFound;
-  int ci;
-  Car_tObj*otherCarObj;
-  int carObjIndexInSortedList;
-  int clearAheadMerits[3];
   int iVar1;
   int iVar2;
   u_int uVar3;
@@ -975,7 +921,7 @@ void AI_CheckForClearLanes(Car_tObj *carObj)
       if (Cars_gNumCars == 0) {
         trap(0x1c00);
       }
-      if ((Cars_gNumCars == -1) && (iVar4 + Cars_gNumCars == -0x80000000)) {
+      if ((Cars_gNumCars == -1) && (iVar4 + Cars_gNumCars == 0x80000000)) {
         trap(0x1800);
       }
       carObj_00 = Cars_gSortedList[(iVar4 + Cars_gNumCars) % Cars_gNumCars];
@@ -1017,15 +963,11 @@ void AI_CheckForClearLanes(Car_tObj *carObj)
 /* ---- AI_CalcBestLineMerits__FP8Car_tObj  [@0x800596a4] ---- */
 void AI_CalcBestLineMerits(Car_tObj *carObj)
 {
-  int checkSlice;
-  int slice;
-  char*buffer;
-  int latPos;
   int iVar1;
   
   if ((carObj->carFlags & 8U) != 0) {
     iVar1 = fixedmult(carObj->personality->bestLineAbility,
-                       (int)(AIDataRecord_BestLine->_base_AIDataRecord_t).dataBuffer_
+                       (int)AIDataRecord_BestLine->dataBuffer_
                             [carObj->lookAheadSlice] << 0xe);
     carObj->preferredLateralPosition = iVar1;
     carObj->preferredLateralPositionPower = 0x50000;
@@ -1037,16 +979,8 @@ void AI_CalcBestLineMerits(Car_tObj *carObj)
 /* ---- AI_AddCollidableObjects__FP8Car_tObjP5Group  [@0x8005972c] ---- */
 void AI_AddCollidableObjects(Car_tObj *carObj,Group *groupSimObjs)
 {
-  Trk_SimObject*simObjs;
   static BWorldSm_Pos spos;
   static char firstTime;
-  int objectIndex;
-  coorddef pt;
-  coorddef centerSlice;
-  coorddef centerToPt;
-  int latPos;
-  int avoidance;
-  int radius;
   int iVar1;
   int *piVar2;
   int iVar3;
@@ -1134,9 +1068,6 @@ void AI_AvoidObjects(Car_tObj *carObj)
 /* ---- AI_AvoidSpikeBelt__FP8Car_tObj  [@0x8005995c] ---- */
 void AI_AvoidSpikeBelt(Car_tObj *carObj)
 {
-  int spikeSlice;
-  int leftLatPos;
-  int width;
   int iVar1;
   int local_18;
   int local_14;
@@ -1154,11 +1085,7 @@ void AI_AvoidSpikeBelt(Car_tObj *carObj)
 /* ---- AI_SubmitObstacle__FP8Car_tObjiiii  [@0x800599e4] ---- */
 void AI_SubmitObstacle(Car_tObj *carObj,int importance,int leftLatPosition,int rightLatPosition,int slice)
 {
-  int leftEdgeIndex;
-  int rightEdgeIndex;
   int observations[3];
-  int leftDistance;
-  int rightDistance;
   u_int uVar1;
   u_int uVar2;
   int iVar3;
@@ -1205,7 +1132,6 @@ void AI_SubmitObstacle(Car_tObj *carObj,int importance,int leftLatPosition,int r
 /* ---- AI_HandleTrafficHonking__FP8Car_tObj  [@0x80059b88] ---- */
 void AI_HandleTrafficHonking(Car_tObj *carObj)
 {
-  Car_tObj*visibleCar;
   Car_tObj *pCVar1;
   u_int uVar2;
   
@@ -1233,10 +1159,6 @@ void AI_HandleTrafficHonking(Car_tObj *carObj)
 /* ---- AI_CheckForCarsOnSide__FP8Car_tObj  [@0x80059c8c] ---- */
 void AI_CheckForCarsOnSide(Car_tObj *carObj)
 {
-  Car_tObj*otherCarObj;
-  int ci;
-  int absDistance;
-  int blockDistance;
   int iVar1;
   int iVar2;
   Car_tObj *carObj_00;
@@ -1282,7 +1204,6 @@ void AI_ProcessObservationsAndChooseLane(Car_tObj *carObj)
 /* ---- AI_ChooseBestLane__FP8Car_tObj  [@0x80059e20] ---- */
 void AI_ChooseBestLane(Car_tObj *carObj)
 {
-  int best;
   int iVar1;
   
   AI_Info.desiredLane = carObj->laneIndex;
@@ -1309,13 +1230,6 @@ void AI_ChooseBestLane(Car_tObj *carObj)
 /* ---- AI_CheckPreferredLateralPosition__FP8Car_tObj  [@0x80059eac] ---- */
 int AI_CheckPreferredLateralPosition(Car_tObj *carObj)
 {
-  int carSideLane;
-  int carLeftSideLaneWRTcurrent;
-  int carRightSideLaneWRTcurrent;
-  int tempLanePowers[3];
-  int bestLanePower;
-  int leftBestLane;
-  int rightBestLane;
   bool bVar1;
   int iVar2;
   u_int uVar3;
@@ -1375,12 +1289,6 @@ int AI_CheckPreferredLateralPosition(Car_tObj *carObj)
 /* ---- AI_TryToShareLanes__FP8Car_tObjT0  [@0x8005a060] ---- */
 int AI_TryToShareLanes(Car_tObj *carObj,Car_tObj *carInWay)
 {
-  int absLaneIndex;
-  int leftRoadEdge;
-  int rightRoadEdge;
-  int gapLeft;
-  int gapRight;
-  int minGapSize;
   int iVar1;
   u_int uVar2;
   int iVar3;
@@ -1421,8 +1329,6 @@ int AI_TryToShareLanes(Car_tObj *carObj,Car_tObj *carInWay)
 /* ---- AI_CalculateDesiredLatPosition__FP8Car_tObj  [@0x8005a15c] ---- */
 void AI_CalculateDesiredLatPosition(Car_tObj *carObj)
 {
-  Car_tObj*carInWay;
-  int slice;
   bool bVar1;
   int iVar2;
   u_int uVar3;
@@ -1492,13 +1398,6 @@ LAB_8005a30c:
 /* ---- AI_CalculateAdjustedDesiredSpeed__FP8Car_tObj  [@0x8005a390] ---- */
 void AI_CalculateAdjustedDesiredSpeed(Car_tObj *carObj)
 {
-  int Drel_hit;
-  int Dlane;
-  int Vrel_hit;
-  int Vlane;
-  int finalLaneSpeed;
-  int a;
-  int b;
   bool bVar1;
   int iVar2;
   int iVar3;
@@ -1585,9 +1484,6 @@ void AI_CalculateAdjustedDesiredSpeed(Car_tObj *carObj)
 /* ---- AI_IsMellowZone__FP8Car_tObji  [@0x8005a628] ---- */
 int AI_IsMellowZone(Car_tObj *carObj,int delay)
 {
-  int index;
-  int odom;
-  int endMellow;
   u_char bVar1;
   int iVar2;
   int iVar3;
@@ -1623,8 +1519,6 @@ void AI_KeepCarsInLane(Car_tObj *carObj)
 /* ---- AI_PushFinishedCarsToSide__FP8Car_tObj  [@0x8005a724] ---- */
 void AI_PushFinishedCarsToSide(Car_tObj *carObj)
 {
-  int absDistancePastFinish;
-  int totalSortIndex;
   u_char bVar1;
   int iVar2;
   int iVar3;
@@ -1667,8 +1561,6 @@ void AI_PushFinishedCarsToSide(Car_tObj *carObj)
 /* ---- AI_MaybeChangeLaneSlack__FP8Car_tObj  [@0x8005a8c0] ---- */
 void AI_MaybeChangeLaneSlack(Car_tObj *carObj)
 {
-  int adaptedSlice;
-  int range;
   int iVar1;
   u_int uVar2;
   
@@ -1700,24 +1592,6 @@ void AI_MaybeChangeLaneSlack(Car_tObj *carObj)
 /* ---- AI_ChooseNewLaneSlack__FP8Car_tObj  [@0x8005a9dc] ---- */
 void AI_ChooseNewLaneSlack(Car_tObj *carObj)
 {
-  char *buffer;
-  int aheadCollisionSpeed;
-  int inverseAheadCollisionTime;
-  int latPos;
-  int inverseCollisionTime;
-  int distanceFixedMetersSignChecked;
-  int shoulder_merit;
-  Trk_SimObject *simObjs;
-  int lanesFilled;
-  int cSpeed;
-  int dSpeed;
-  int considerDesired;
-  int ci;
-  int carObjRightLaneBits;
-  int carObjThisLaneBits;
-  int masks [3];
-  int clearAheadMerits [3];
-  int maxDistanceToCheck;
   
   randtemp = fastRandom * randSeed;
   fastRandom = randtemp & 0xffff;

@@ -25,7 +25,6 @@ extern "C" void CarIO_StartUp(void)
 
 {
   Draw_tPixMap *pDVar1;
-  int i;
   int iVar2;
   
   if (CarIO_carPixMap == (Draw_tPixMap *)0x0) {
@@ -64,7 +63,6 @@ extern "C" void CarIO_ReStart(void)
 
 {
   Draw_tPixMap *pDVar1;
-  int i;
   int iVar2;
   
   iVar2 = 0x263;
@@ -85,26 +83,17 @@ extern "C" void CarIO_ReStart(void)
 void CarIO_CopyFromShape(short *source,short *dest,int w,int h,int x,int y)
 
 {
-  int columns;
-  u_short rollOver;
   u_int uVar1;
   u_int uVar2;
   u_short *puVar3;
   u_short *puVar4;
   u_int uVar5;
-  int mask;
-  u_short current;
   u_short uVar6;
   u_short *puVar8;
-  u_short next;
-  int i;
   int iVar9;
-  u_short lastMask;
   u_short uVar10;
   u_int uVar11;
-  u_short lastLastMask;
   u_int uVar12;
-  u_short firstMask;
   u_int uVar13;
   int iVar7;
   
@@ -193,12 +182,9 @@ void CarIO_CopyToShape(short *source,short *dest,int mirror)
 {
   bool bVar1;
   u_short uVar2;
-  u_short pixel3;
   u_short *puVar3;
   u_int uVar4;
   int iVar5;
-  int i;
-  int h;
   int iVar6;
   
   iVar6 = 0x16;
@@ -247,18 +233,11 @@ extern "C" void CarIO_CreateLicense(char *text,int carType,int player)
   short *source;
   int iVar8;
   int *piVar9;
-  shapetbl *shape;
-  shapetbl *clutptr;
   int *piVar10;
   shapetbl *psVar11;
-  int start;
   shapetbl **ppsVar12;
   int length;
-  int i;
   int iVar13;
-  short *thePlate;
-  shapetbl *clutPlate1;
-  shapetbl *clutPlate2;
   u_char letter [5];
   
   if (carType < 0x16) {
@@ -385,8 +364,6 @@ void CarIO_LicenseCheck(int reload,int *license_vx,int *license_vy,Car_tObj *car
 {
   short sVar1;
   short sVar2;
-  int sfx_vy;
-  int sfx_vx;
   
   if (((reload & 2U) != 0) && (CarIO_licenseSFX_Count < 0xc)) {
     sVar1 = CarIO_licenseSFX_Vram[CarIO_licenseSFX_Count][0];
@@ -408,28 +385,18 @@ void CarIO_LicenseCheck(int reload,int *license_vx,int *license_vy,Car_tObj *car
 void CarIO_ReadInCarTextureData(char *shpfile,Car_tObj *carObj,int reload,int player)
 
 {
-  int palette;
-  int license;
-  int palIndex;
   short sVar1;
   short sVar2;
   bool bVar3;
   bool bVar4;
   int index;
   char *pcVar5;
-  u_short clut;
   int iVar6;
   int iVar7;
   int iVar8;
-  shapetbl *shape;
-  int i;
-  int cx;
   int cx_00;
-  int cy;
   int cy_00;
-  int vx;
   int rx;
-  int vy;
   int ry;
   CarIO_textureInfo *pCVar10;
   int license_vx;
@@ -437,7 +404,6 @@ void CarIO_ReadInCarTextureData(char *shpfile,Car_tObj *carObj,int reload,int pl
   int carType;
   int carPixMapCount;
   int recolor_flag;
-  int palShare;
   Draw_tPixMap *pmx;
   
   recolor_flag = 8;
@@ -618,36 +584,24 @@ void CarIO_ReadInCarTextureData(char *shpfile,Car_tObj *carObj,int reload,int pl
 void CarIO_UpdateCarTextureData(char *shpfile,Car_tObj *carObj,int player)
 
 {
-  int license;
-  int palIndex;
   short sVar1;
   short sVar2;
   bool bVar3;
   bool bVar4;
   char *pcVar5;
   shapetbl **ppsVar6;
-  u_short clut;
   Draw_tPixMap *pmx;
   int carType;
   int rx;
   int ry;
   int iVar9;
-  shapetbl *shape;
-  int cx;
   int iVar10;
   int cx_00;
-  int cy;
   u_int uVar11;
-  int i;
   int iVar13;
   CarIO_textureInfo *pCVar14;
-  int recolor_flag;
   int ctrl;
-  int vx;
-  int vy;
   int carPixMapCount;
-  int palShare;
-  int palette;
   
   carPixMapCount = (carObj->render).textureStartIndex;
   carType = (int)(carObj->render).currentCarType;
@@ -768,31 +722,8 @@ void CarIO_ReleaseCarCluts(Car_tObj *carObj)
 
 {
   Draw_tPixMap *pDVar1;
-  int index;
-  u_short clut;
-  int sfx_vx;
-  int y;
-  u_short next;
-  int h;
-  u_short lastMask;
-  u_short lastLastMask;
-  u_short firstMask;
-  int i;
   int iVar2;
-  int carPixMapCount;
   int iVar3;
-  short *thePlate;
-  int cx;
-  int cy;
-  int vx;
-  int vy;
-  int x;
-  int license_vx;
-  int license_vy;
-  int carType;
-  int recolor_flag;
-  int palShare;
-  char letter [5];
   
   iVar2 = 0;
   iVar3 = (carObj->render).textureStartIndex;

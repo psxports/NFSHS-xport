@@ -71,9 +71,6 @@ void TrsProj_SetViewTrsProjEnviro(DRender_tView *Vi)
 /* ---- TrsProj_SetPsxMatrix__FP10matrixtdefP8coorddef  [TRSPROJ.CPP:137-151] SLD-VERIFIED ---- */
 void TrsProj_SetPsxMatrix(matrixtdef *m,coorddef *t)
 {
-  int r0;
-  int r1;
-  int r2;
   MATRIX mpsx;
 
   mpsx.m[0][0] = (short)((int)m->m[0] >> 4);

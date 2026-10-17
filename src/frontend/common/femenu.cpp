@@ -112,7 +112,6 @@ int tListIterator::Decrement(tPlayer arg1)
 tListIteratorIndexed::tListIteratorIndexed(short *selection,char *valPtr,char *index)
   : _base_tListIterator(selection,valPtr)
 {
-  tListIterator *in_v0;
   
   *(void **)&((this->_base_tListIterator)._vf) = (void *)tListIteratorIndexed_vtable;
   this->fIndex = index;
@@ -412,7 +411,6 @@ void tListIteratorMultiPlayer::Decrement(tPlayer atIndex)
 tListIteratorRange::tListIteratorRange(char minValue,char maxValue,char *valPtr)
   : _base_tListIterator((short *)0x0,valPtr)
 {
-  tListIterator *in_v0;
   
   *(void **)&((this->_base_tListIterator)._vf) = (void *)tListIteratorRange_vtable;
   (this->_base_tListIterator).fMinValue = minValue;
@@ -894,7 +892,6 @@ extern "C" void DrawSlider(short value,short min,short max,short fX,short fY,sho
 
 {
   short sVar1;
-  int tickFadeColor;
   int tickColor;
   int interp_color;
   int x_pack;
@@ -912,13 +909,7 @@ extern "C" void DrawSlider(short value,short min,short max,short fX,short fY,sho
   int amountWidth;
   int shiftAmount;
   int endX_minus1;
-  short tickX;
-  int shadowColor;
   int amount_00;
-  short loc_60;
-  short loc_58;
-  short width;
-  short factor;
   short ts1;
   u_char *tp4;
   u_char *pkt2;
@@ -1140,7 +1131,6 @@ int tMenuItemGoToMenuButton::ProcessInput(tPlayer fromPlayer,tInputKeyType &keyv
 {
   u_int uVar1;
   u_int uVar2;
-  void *reg_a3;
   
   uVar2 = (this->_base_tMenuItemInteractive)._base_tMenuItem.fFlags;
   uVar1 = uVar2 & 1;
@@ -1228,7 +1218,6 @@ void tMenu::Initialize()
 {
   int iVar1;
   int iVar2;
-  int original;
   
   iVar1 = this->fCurrentItem;
   if (((this->fItemList[iVar1]->fFlags ^ 1) & 1) == 0) {
@@ -1373,10 +1362,8 @@ short tMenu::GetNumberEnabledItems()
 
 {
   u_int *puVar1;
-  short i;
   int iVar2;
   short sVar3;
-  short result;
   
   sVar3 = 0;
   if (this->fNeverAnyEnabled != 0) {
@@ -1402,7 +1389,6 @@ void tMenu::Draw()
 {
   tMenuItem *ptVar1;
   __vtbl_ptr_type (*pa_Var2) [11];
-  short item;
   int iVar3;
   
   if (-1 < this->fTitle) {
@@ -1429,7 +1415,6 @@ void tMenu::UpdateTransition()
 {
   tMenuItem *ptVar1;
   __vtbl_ptr_type (*pa_Var2) [11];
-  short item;
   int iVar3;
   
   iVar3 = 0;

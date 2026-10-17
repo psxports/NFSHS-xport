@@ -148,11 +148,7 @@ void tScreenAudio::DrawForeground()
   short fade;
   char *label;
   int textWidth;
-  int shapeIdx;
   int i;
-  int shapeFlags;
-  int shapeX;
-  int shapeY;
   
   fade = (short)((menuDefs->menuAudio).fScreenFade >> 1);
   if ((fade < 0x80) && (fade < 1)) {
@@ -163,7 +159,7 @@ void tScreenAudio::DrawForeground()
   }
   i = 0;
   do {
-    DrawShapeExtended(shapeIdx,shapeFlags,shapeX,shapeY,(int)fade,0,
+    DrawShapeExtended(i + 0x30,1,0,0,(int)fade,0,
                (tDrawShapeExtended *)0x0);
     i = i + 1;
   } while (i < 4);
@@ -171,7 +167,7 @@ void tScreenAudio::DrawForeground()
     FETextRender_MenuTextPositionedJustify(0x27d,0x1e0,0xdc,1,textState_Selected,textType_ScreenInfo);
     label = TextSys_Word(0x27d);
     textWidth = textpixels(label);
-    PSXDrawSquare(0,0x1e0,0xdc,-5 - textWidth,7);
+    PSXDrawSquare(0,0x1e0,0xdc,(int)(0xfffffffbu - (uint32)textWidth),7);
   }
   return;
 }
@@ -187,11 +183,7 @@ void tScreenAudio::DrawBackground()
   int ColText;
   int wordY;
   tMenuItemLeftRightAudioSlider *slider;
-  int shapeIdx;
   int percent;
-  int shapeFlags;
-  int shapeX;
-  int shapeY;
   char sBuildOutput [255];
   
   this->PlaySound();
@@ -226,10 +218,10 @@ DrawBg_noSlider:
     lastpercentage = ColText;
     if ((percent == -1) ||
        (transDone = TransitionIsFinished(&menuDefs->menuAudio), transDone != (void *)0x1)) {
-      perfade = perfade + 4;
+      perfade = (int)((uint32)perfade + 4u);
     }
     else {
-      perfade = perfade + -4;
+      perfade = (int)((uint32)perfade - 4u);
     }
     if (0x80 < perfade) {
       perfade = 0x80;
@@ -251,7 +243,7 @@ DrawBg_noSlider:
   percent = 0;
   do {
     DrawShapeExtended
-              (shapeIdx,shapeFlags,shapeX,shapeY,(int)fade,0,
+              (percent + 6,1,0,0,(int)fade,0,
                (tDrawShapeExtended *)0x0);
     percent = percent + 1;
   } while (percent < 0x20);

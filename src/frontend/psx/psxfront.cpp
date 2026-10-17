@@ -51,7 +51,6 @@ extern "C" void InitializeSpinningCars(void)
 
 {
   Car_tObj *carObj;
-  int i;
   uint index;
   GameSetup_tCarData *carData_walk;
   Car_tObj **obj_walk;
@@ -103,7 +102,6 @@ void CleanupSpinningCars(void)
 {
   int status;
   Car_tObj *addr;
-  int handle;
   Car_tObj **ppCar;
   int i;
   char fname [60];
@@ -171,7 +169,6 @@ void DoTitleScreen(void)
 
 {
   void *shape;
-  shapetbl *tempShp2;
   char fileName [48];
   char artfilename [20];
   
@@ -289,11 +286,6 @@ extern "C" void Init_PSX_FrontEnd(void)
     initlinkmode(0,0x14,0);
     DoLanguageScreen();
     TextSys_LoadWords((uint)(byte)frontEnd.language);
-#if !defined(AP_WIN)
-    /* Temporarily omitted by explicit port request.  This is only the startup
-       loading/title bitmap; frontend initialization below remains unchanged. */
-    DoTitleScreen();
-#endif
     initlinkmode(0,1,1);
     Front_SecondaryMemCardCheck();
   }
@@ -319,7 +311,6 @@ void AdjustShapeDrawing(tTexture_ShapeInfo *tShp,int *x,int *y,int *flags,int br
   int ftop;
   int cHi;
   int cLo;
-  short fadebottom;
   int cMid;
   int cB;
   int cG;
@@ -431,36 +422,26 @@ void DrawGouraudShape(tTexture_ShapeInfo *shp,int flags,int x,int y,int *color,i
   short uvAdj;
   short x1;
   byte v_byte;
-  short height;
   int verts_done;
   int remW;
   int c3;
-  short w1;
   int bpp;
   int bitOff;
   short tmpH;
-  int addw;
   int col;
   int stripW;
   int texX;
   byte u_byte;
-  short v;
-  short i;
   int accW;
-  short u;
   int shape_x;
-  short w;
   short dstY0;
   short dstY1;
-  short width;
-  short vh;
   byte tc1;
   u_char  *prevPrim;
   u_char  *prim;
   short srcH;
   short shpW2;
   short shpW;
-  short ts4;
   
   dstY0 = (short)nfs4_mips_sign_extend((unsigned int)y,16);
   tmpH = shp->height;
@@ -492,7 +473,7 @@ void DrawGouraudShape(tTexture_ShapeInfo *shp,int flags,int x,int y,int *color,i
     if (bpp == 0) {
       trap(0x1c00);
     }
-    if ((bpp == -1) && (verts_done == -0x80000000)) {
+    if ((bpp == -1) && (verts_done == 0x80000000)) {
       trap(0x1800);
     }
     texX = nfs4_mips_addu_s32((int)(ushort)shp->shapex,
@@ -502,7 +483,7 @@ void DrawGouraudShape(tTexture_ShapeInfo *shp,int flags,int x,int y,int *color,i
     if (bpp == 0) {
       trap(0x1c00);
     }
-    if ((bpp == -1) && (texXp == -0x80000000)) {
+    if ((bpp == -1) && (texXp == 0x80000000)) {
       trap(0x1800);
     }
     shape_x = nfs4_mips_subu_s32(
@@ -658,7 +639,6 @@ void ScaleGouraudShape(tTexture_ShapeInfo *shp,int flags,int x,int y,int scalex,
                int abr)
 
 {
-  char v;
   byte v_byte;
   byte u_byte;
   short clut;
@@ -668,18 +648,12 @@ void ScaleGouraudShape(tTexture_ShapeInfo *shp,int flags,int x,int y,int scalex,
   int scaledY;
   int tpage_word;
   byte v1_byte;
-  char vh;
-  char u;
   char u1_byte;
-  char uw;
   int vert_dx;
-  short height;
   short srcH;
-  short width;
   short srcW;
   short dstY;
   short dstX;
-  short bpp;
   u_char  *prevPrim;
   u_char  *prim;
   short srcH2;
@@ -783,8 +757,6 @@ void ScaleShapeExtended(int index,int flags,int x,int y,int fade,int abr,tDrawSh
 {
   tTexture_ShapeInfo *shapeTbl;
   tTexture_ShapeInfo *tShp;
-  int scalex;
-  int scaley;
   int color [4];
 
   /* ScaleShapeExtended: same uninit-local-shadow pattern -- forward the real flags/x/y params to
@@ -821,7 +793,6 @@ void LoadAllHelpShapes(void)
   char *f;
   int i;
   int index;
-  char *permFile;
   char fullName [48];
   
   sprintf(fullName,"%szperm.psh",Paths_Paths[0x20]);
@@ -920,7 +891,6 @@ void PSXDrawTransGouraudSquare(int x,int y,int w,int h,int opacity,int c1,int c2
 {
   uint opacityv;
   uint y_plus_h_pack;
-  int i;
   int iter;
   u_char  *prevPrim;
   u_char  *prim;
@@ -961,10 +931,7 @@ void PSXDrawTransSquare(int col,int x,int y,int w,int h,short opacity)
   short xv;
   short yv;
   short y_plus_h;
-  short i;
   int iter;
-  short ts1;
-  short ts2;
   u_char  *prevPrim;
   u_char  *prim;
   
@@ -1005,19 +972,10 @@ extern "C" void FontUpsideDownBlit(int x,int y,void *src,int u,int v,charactertb
 {
   byte uv_y_top;
   uint tpageBit;
-  short w1;
   int tpage_clut;
   byte uv_y_bottom;
   int dv;
-  int c4;
-  int h;
   short x_plus_w;
-  int height;
-  int width;
-  char *permFile;
-  short w;
-  short vh;
-  char fullName [48];
   u_char  *next_pkt;
   u_char  *prim;
   u_char  *prevPrim;

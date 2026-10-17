@@ -6,7 +6,7 @@
  *   NOT original source; SYM-faithful, self-contained, recompilable.
  */
 #include "color.h"
-#include "color_externs.h"
+#include "../../lib/libfns.h"
 
 /* @0x80091ec0  IsNumChar(char c) -- line 454 */
 char IsNumChar(char c)

@@ -15,22 +15,16 @@ void tScreenTrackSelect::DrawBackground()
   short tpage2;
   int videoState;
   int frameAdvanced;
-  VIDEOSTATE state;
-  int pkt_addr24;
   short bright;
   int pkt_addr24_2;
   uint tu1;
   byte swapShapesReady;
   byte videoFinished;
-  short shapeY;
-  int movieFrame_p;
   PSX_RECT r;
   PSX_RECT r2;
   tTrackInformation trackInfo;
   char moviename [80];
   u_char *cur_pkt;
-  u_char *prev_pkt;
-  u_char *cur_pkt_2;
   byte frameEven;
   int movieRetCode;
   u_char *prev_pkt_2;
@@ -88,14 +82,10 @@ void tScreenTrackSelect::DrawBackground()
     VIDEO_startplayback(this->hVideo);
   }
   cur_pkt = Render_gPacketPtr;
-  prev_pkt = Render_gPalettePtr;
   if (0 < this->fBrightness) {
     videoFinished = swapShapesReady | 0x7f;
-    *(uint *)Render_gPacketPtr =
-         *(uint *)Render_gPacketPtr & 0xff000000 | *(uint *)Render_gPalettePtr & 0xffffff;
-    pkt_addr24 = (uint)Render_gPacketPtr & 0xffffff;
+    AddPrim(Render_gPalettePtr,Render_gPacketPtr);
     Render_gPacketPtr = Render_gPacketPtr + 0x28;
-    *(uint *)prev_pkt = *(uint *)prev_pkt & 0xff000000 | pkt_addr24;
     pkt_addr24_2 = (int)this->fBrightness;
     cur_pkt[3] = 9;
     *(u_short *)(cur_pkt + 10) = 0x69;
@@ -120,10 +110,7 @@ void tScreenTrackSelect::DrawBackground()
     *(short *)(cur_pkt + 0x16) = tpage;
     *(u_short *)(cur_pkt + 0xe) = 0;
     prev_pkt_2 = Render_gPacketPtr;
-    cur_pkt_2 = Render_gPalettePtr;
-    *(uint *)Render_gPacketPtr =
-         *(uint *)Render_gPacketPtr & 0xff000000 | *(uint *)Render_gPalettePtr & 0xffffff;
-    *(uint *)cur_pkt_2 = *(uint *)cur_pkt_2 & 0xff000000 | (uint)Render_gPacketPtr & 0xffffff;
+    AddPrim(Render_gPalettePtr,Render_gPacketPtr);
     tu1 = (uint)this->fBrightness;
     tp1 = Render_gPacketPtr + 3;
     Render_gPacketPtr = Render_gPacketPtr + 0x28;
@@ -399,10 +386,6 @@ ProcInpLocSpch_setFlags:
 tScreenTrackSelect::~tScreenTrackSelect()
 
 {
-  int elapsed;
-  short shapeY;
-  PSX_RECT r;
-  char moviename [80];
   return;
 }
 

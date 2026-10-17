@@ -31,14 +31,10 @@ char * Replay_Compress(char *uncompressed_data)
 {
   char cVar1;
   bool bVar2;
-  int i;
   int iVar3;
-  int count;
   int iVar4;
   char *pcVar5;
   int c_pointer;
-  char begin_byte;
-  int done;
   char *pcVar6;
   
   bVar2 = false;
@@ -87,13 +83,9 @@ char * Replay_Decompress(char *compressed_data)
 
 {
   u_char bVar1;
-  char current_byte;
-  int i;
   int iVar2;
   char *pcVar3;
   char *pcVar4;
-  int count;
-  int c_pointer;
   int iVar5;
   int data_size;
   
@@ -236,10 +228,8 @@ extern "C" void Replay_InitReplay(void)
 extern "C" void Replay_ResetReplay(void)
 
 {
-  int p;
   int iVar1;
   int *piVar2;
-  int i;
   int cam_idx;
   int iVar3;
   tReplayCameraModes *cam_walk;
@@ -540,12 +530,10 @@ void Replay_GetInterfaceKey(void)
 {
   bool bVar1;
   int iVar2;
-  int i;
   int iVar3;
   Car_tObj **ppCVar4;
   camera_info *pcVar5;
   tReplayCameraModes *ptVar6;
-  int Cameras;
   int iVar7;
   
   iVar7 = 1;
@@ -704,11 +692,8 @@ void Replay_LoadCameraFile(void)
   u_int uVar3;
   Camera_tCamSlot *pCVar4;
   int *piVar5;
-  int i;
   int iVar6;
   const char *fmt;
-  int temp;
-  int j;
   int tu7;
   int tu8;
   int iVar7;
@@ -725,7 +710,6 @@ void Replay_LoadCameraFile(void)
   int tu19;
   int iVar16;
   int tu21;
-  Camera_tCamSlot *cameraFile;
   char fname [80];
   int bigFile;
   
@@ -873,15 +857,10 @@ void Replay_ReplayChooseCamera(int player,int slice)
   Camera_tCamSlot *pCVar2;
   u_int uVar3;
   u_int uVar4;
-  int nextDist;
   int iVar5;
-  int currDist;
   int iVar6;
-  int prevIndex;
   int iVar7;
-  int nextIndex;
   int iVar8;
-  int currIndex;
   int iVar9;
   
   iVar9 = Replay_ReplayCamera[player].cutToNextCamera;
@@ -950,29 +929,17 @@ void Replay_ReplayFindClosestCamera(int player,int slice)
 
 {
   bool bVar1;
-  char current_byte;
   int iVar2;
   Camera_tCamSlot *pCVar3;
   u_int uVar4;
   u_int uVar5;
-  int actualDist;
   int iVar6;
   int iVar7;
   int iVar8;
-  int prevIndex;
   Camera_tCamSlot *pCVar9;
-  int nextIndex;
-  int currIndex;
   int iVar10;
-  int nextDist;
   int iVar11;
-  int currDist;
-  int i;
   int iVar12;
-  int cameraIndex;
-  int Cameras;
-  char fname [80];
-  int bigFile;
   
   pCVar9 = gReplayCameraSlots;
   iVar8 = 1;

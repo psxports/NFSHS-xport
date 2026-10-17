@@ -99,67 +99,33 @@ extern "C" void iSNDcalcvol(int chan)
 /* iSNDpsxkeyon @0x800FF140 : strobe the SPU key-on register for `mask` (24 voices). */
 extern "C" int iSNDpsxkeyon(int mask)
 {
-#if defined(AP_WIN)
     SpuSetKey(SPU_ON, (uint32)mask);
     return 0;
-#else
-    *(short *)(DAT_80147e2c + 0x188) = (short)mask;
-    *(short *)(DAT_80147e2c + 0x18a) = (short)((unsigned)mask >> 0x10);
-    return DAT_80147e2c;
-#endif
 }
 
 /* iSNDpsxkeyoff @0x800FF168 : strobe the SPU key-off register for `mask`. */
 extern "C" int iSNDpsxkeyoff(int mask)
 {
-#if defined(AP_WIN)
     SpuSetKey(SPU_OFF, (uint32)mask);
     return 0;
-#else
-    *(short *)(DAT_80147e2c + 0x18c) = (short)mask;
-    *(short *)(DAT_80147e2c + 0x18e) = (short)((unsigned)mask >> 0x10);
-    return DAT_80147e2c;
-#endif
 }
 
 /* iSNDpsxeffecton @0x800FF190 : enable reverb on the `mask` voices (OR into the SPU echo-on register). */
 extern "C" unsigned int iSNDpsxeffecton(int mask)
 {
-#if defined(AP_WIN)
     return (uint32)mask & SPU_ALLCH;
-#else
-    unsigned int r;
-    *(unsigned short *)(DAT_80147e2c + 0x198) = *(unsigned short *)(DAT_80147e2c + 0x198) | (unsigned short)mask;
-    r = (unsigned int)*(unsigned short *)(DAT_80147e2c + 0x19a) | (mask >> 0x10);
-    *(short *)(DAT_80147e2c + 0x19a) = (short)r;
-    return r;
-#endif
 }
 
 /* iSNDpsxeffectoff @0x800FF1D0 : disable reverb on the `mask` voices. */
 extern "C" unsigned int iSNDpsxeffectoff(int mask)
 {
-#if defined(AP_WIN)
     return (uint32)mask & SPU_ALLCH;
-#else
-    unsigned int r;
-    *(unsigned short *)(DAT_80147e2c + 0x198) = *(unsigned short *)(DAT_80147e2c + 0x198) & ~(unsigned short)mask;
-    r = (unsigned int)*(unsigned short *)(DAT_80147e2c + 0x19a) & ~(mask >> 0x10);
-    *(short *)(DAT_80147e2c + 0x19a) = (short)r;
-    return r;
-#endif
 }
 
 /* iSNDpsxeffectvol @0x800FF210 : set the SPU reverb (echo) L/R output volume. */
 extern "C" int iSNDpsxeffectvol(int left, int right)
 {
-#if defined(AP_WIN)
     return left | right;
-#else
-    *(short *)(DAT_80147e2c + 0x184) = (short)left;
-    *(short *)(DAT_80147e2c + 0x186) = (short)right;
-    return DAT_80147e2c;
-#endif
 }
 
 /* iSNDsetvol @0x800FF238 : write a channel's SPU voice L/R volume from logical (left,right) levels,
@@ -167,9 +133,6 @@ extern "C" int iSNDpsxeffectvol(int left, int right)
 extern "C" unsigned int iSNDsetvol(int chan, int left, int right)
 {
     int vt = chan * 0x2c;
-#if !defined(AP_WIN)
-    unsigned short *vreg = (unsigned short *)(DAT_80147e28 + chan * 0x10);
-#endif
     unsigned int v;
     unsigned short u;
 
@@ -177,14 +140,8 @@ extern "C" unsigned int iSNDsetvol(int chan, int left, int right)
     { /* single channel */
         if ((char)sndgs[4] == 2)
         { /* stereo output */
-#if defined(AP_WIN)
             v = right * 0x81 & 0x7fff;
             SpuSetVoiceVolume(chan, (sint16)((short)left * 0x81 & 0x7fff), (sint16)v);
-#else
-            *vreg = (short)left * 0x81 & 0x7fff;
-            v = right * 0x81 & 0x7fff;
-            vreg[1] = (unsigned short)v;
-#endif
             return v;
         }
         {
@@ -209,45 +166,18 @@ extern "C" unsigned int iSNDsetvol(int chan, int left, int right)
     { /* linked pair */
         if ((char)sndgs[4] == 2)
         {
-#if !defined(AP_WIN)
-            unsigned short *vreg2;
-#endif
-#if defined(AP_WIN)
             SpuSetVoiceVolume(chan, (sint16)((short)left * 0x81 & 0x7fff), 0);
             v = right * 0x81 & 0x7fff;
             SpuSetVoiceVolume((sint8)SB(DAT_80147a10, vt), 0, (sint16)v);
-#else
-            *vreg = (short)left * 0x81 & 0x7fff;
-            vreg[1] = 0;
-            vreg2 = (unsigned short *)(DAT_80147e28 + ((int)((unsigned)SB(DAT_80147a10, vt) << 0x18) >> 0x14));
-            v = right * 0x81 & 0x7fff;
-            *vreg2 = 0;
-            vreg2[1] = (short)v;
-#endif
             return v;
         }
         u = (unsigned short)(left * 0x81 >> 1) & 0x7fff;
-#if defined(AP_WIN)
         SpuSetVoiceVolume(chan, (sint16)u, (sint16)u);
-#else
-        *vreg = u;
-        vreg[1] = u;
-#endif
         u = (unsigned short)(right * 0x81 >> 1);
-#if defined(AP_WIN)
         chan = (sint8)SB(DAT_80147a10, vt);
         v = 0;
-#else
-        vreg = (unsigned short *)(DAT_80147e28 + ((int)((unsigned)SB(DAT_80147a10, vt) << 0x18) >> 0x14));
-        v = DAT_80147e28;
-#endif
     }
-#if defined(AP_WIN)
     SpuSetVoiceVolume(chan, (sint16)(u & 0x7fff), (sint16)(u & 0x7fff));
-#else
-    *vreg = u & 0x7fff;
-    vreg[1] = u & 0x7fff;
-#endif
     return v;
 }
 
@@ -255,7 +185,6 @@ extern "C" unsigned int iSNDsetvol(int chan, int left, int right)
  *   address, sample rate). */
 extern "C" int iSNDsetslot(int chan, int addr, int pitch)
 {
-#if defined(AP_WIN)
     SpuVoiceAttr attr = {};
     attr.voice = SPU_KEYCH(chan);
     attr.mask = SPU_VOICE_PITCH | SPU_VOICE_WDSA | SPU_VOICE_LSAX | SPU_VOICE_ADSR_ADSR1 | SPU_VOICE_ADSR_ADSR2;
@@ -266,15 +195,6 @@ extern "C" int iSNDsetslot(int chan, int addr, int pitch)
     attr.adsr2 = 5;
     SpuSetVoiceAttr(&attr);
     return 0;
-#else
-    int r = DAT_80147e28 + chan * 0x10;
-    *(short *)(r + 8) = 0xf;                /* ADSR attack */
-    *(short *)(r + 10) = 5;                 /* ADSR sustain/release */
-    *(short *)(r + 4) = (short)pitch;       /* sample rate / pitch */
-    *(short *)(r + 6) = (short)(addr >> 3); /* SPU start address (8-byte units) */
-    *(short *)(r + 0xe) = 0x200;            /* ADSR sustain level */
-    return r;
-#endif
 }
 
 /* iSNDstartvoice @0x800FF3CC : key a channel's voice (and its linked partner) -- reset pan caches, arm the

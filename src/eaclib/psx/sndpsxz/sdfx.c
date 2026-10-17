@@ -101,15 +101,7 @@ extern "C" unsigned int iSNDpsxfxinit(int mode)
         rv[8] = (short)((sndgs[0x2a] * 0x8100) / 0x7f);
     }
 
-#if !defined(AP_WIN)
-    *(unsigned short *)(DAT_80147e2c + 0x1aa) = *(unsigned short *)(DAT_80147e2c + 0x1aa) & 0xff7f; /* reverb off while loading */
-    for (i = 0; i < 0x20; i++)                                                                      /* 0x20 reverb coefficient regs */
-        *(unsigned short *)(i * 2 + DAT_80147e2c + 0x1c0) = (unsigned short)rv[1 + i];
     work = 0x10000 - (unsigned short)rv[0];
-    *(short *)(DAT_80147e2c + 0x1a2) = (short)work; /* reverb work-area start address */
-#else
-    work = 0x10000 - (unsigned short)rv[0];
-#endif
 
     blockclear(scratch, 0x100); /* zero the 256-byte DMA scratch */
     i = 0;                      /* DMA-clear SPU reverb RAM in 0x20-word runs */
@@ -125,12 +117,7 @@ extern "C" unsigned int iSNDpsxfxinit(int mode)
         } while (iSNDdmcomplete(h) == 0);
     }
 
-#if defined(AP_WIN)
     ctl = mode == 0 ? 0 : 0x80;
-#else
-    ctl = *(unsigned short *)(DAT_80147e2c + 0x1aa) | 0x80; /* reverb enable */
-    *(short *)(DAT_80147e2c + 0x1aa) = (short)ctl;
-#endif
     return ctl;
 }
 

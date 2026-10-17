@@ -66,7 +66,6 @@ void AIHigh_BasicCop::CheckSpikeBelt()
 
 
 {
-  int timeNow;
 
   Car_tObj *pCVar1;
 
@@ -173,7 +172,6 @@ void Blockade_AddRoadFlare(coorddef *pos)
 
 
 {
-  Trk_SFX*sfxInstance;
 
   Group *pGVar1;
 
@@ -250,12 +248,6 @@ void PlacePointOnRoad(int slice,coorddef *offset)
 
 
 {
-  coorddef slicecenter;
-  BWorldSm_Pos testSimRoadInfo;
-  coorddef ioff;
-  int vecXz;
-  int vecZx;
-  int vecZz;
 
   char cVar1;
 
@@ -405,9 +397,6 @@ void AIHigh_BasicCop::SetupBlockadeElements(blockade_t *blockade)
 
 
 {
-  coorddef pt;
-  int i;
-  int objId;
 
   int iVar1;
 
@@ -599,10 +588,6 @@ void AIHigh_BasicCop::HandleBlockadeSpeech()
 
 
 {
-  Car_tObj*theCar;
-  int carSlice;
-  int sliceDiff;
-  int checkSlice;
 
   u_short uVar1;
 
@@ -659,8 +644,8 @@ void AIHigh_BasicCop::HandleBlockadeSpeech()
           pSVar4 = (Speaker *)Speech_Mobile((this->_base_AIHigh_Base).carObj_);
 
           {
-            const __vtbl_ptr_type &entry = (*pSVar4->_vf)[7];
-            ((void (*)(MobileSpeaker *))entry.pfn)((MobileSpeaker *)((char *)pSVar4 + entry.delta));
+
+            (pSVar4)->Lose();
           }
 
           (this->blockade_).blockadeSpeechFlags = 0;

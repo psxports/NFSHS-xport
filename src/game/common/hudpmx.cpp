@@ -49,28 +49,10 @@ static void HudPmx_LoadShapeName(const char *n,HudPmx_tShape *s)
 void HudPmx_InitTextures(void)
 
 {
-  char * carType0;
-  char * carType1;
-  char * name;
   int i;
-  char ** tachs;
-  int ntachs;
-  char * mapname;
-  HudPmx_tShape * shapes;
-  int u;
-  int v;
-  int w;
-  int h;
-  int yo;
   void *pvVar2;
   const char **puVar3;
   const char *shapeName;
-  u_char *puVar6;
-  char *pcVar7;
-  u_char *puVar8;
-  char *pcVar9;
-  u_char *puVar10;
-  char *pcVar11;
   HudPmx_tUV *pHVar12;
   HudPmx_tShape *pHVar13;
   int iVar14;
@@ -80,7 +62,6 @@ void HudPmx_InitTextures(void)
   const char *local_548 [29];
   const char *local_4d0 [29];
   char acStack_458 [8];
-  u_int local_328 [55];
   const char *local_24c;
   const char *local_244;
   const char *local_240 [132] = { 0 };

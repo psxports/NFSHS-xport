@@ -168,7 +168,7 @@ cfLbl1:   /* @0x800dc9f4  (-f-build goto label) */
           (u_int)nfs4_mips_sll_s32(value,8) | 2U);
       return newControl;
     }
-    if (value != -0x80000000) goto cfLbl1;
+    if (value != 0x80000000) goto cfLbl1;
     c = GameSetup_gData.controllerData.J2MIN[player];
     pack = 0x2000000;
   }

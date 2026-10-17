@@ -57,21 +57,15 @@ void GenericPMX_LoadTexture(void)
   static char flare1Name[] = "FLR1";
   static char rainbowName[] = "RBOW";
   bool bVar1;
-  shapetbl *shape;
   char *n;
   Draw_tPixMap *pDVar2;
   char *pcVar3;
   const char *textureFileFormat;
-  Draw_tPixMap *pmx;
   Draw_tPixMap **ppDVar4;
-  int i;
   int iVar5;
   int iVar6;
   int iVar7;
-  int np;
   int iVar8;
-  char *shpfile;
-  int recolor_flag;
   char name [255];
   char shpname [5];
   

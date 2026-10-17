@@ -4,7 +4,7 @@
  *   advance byte at charactertbl+8); textpixels(string) = textnpixels(string, 0x100).
  */
 #include "../../nfs4_types.h"
-#include "textpix_externs.h"
+#include "../../lib/libfns.h"
 
 /* ---- textnpixels  [TEXTPIX.C:61-98] SLD-VERIFIED ---- */
 int textnpixels(char *str, int n)

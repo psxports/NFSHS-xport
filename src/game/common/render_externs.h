@@ -18,9 +18,7 @@ extern "C" int gFlip, gMPauseUpdate, gMPauseUpdateNextTime;
 extern "C" dflip gEnviro[];
 extern FLARE_DEF gFlare_LensFlare;
 extern "C" GameSetup_tData GameSetup_gData;
-    #ifdef AP_WIN
 extern "C" void NFSHS_HostTraceFlareState(const void *);
-    #endif
 
 /* ---- functions ---- */
 extern void BWorld_OnyxBuildFacets(DRender_tView *v);

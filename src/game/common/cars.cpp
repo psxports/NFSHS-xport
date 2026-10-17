@@ -76,7 +76,6 @@ void Cars_CheckForAccidentScenes(void);
 /* ---- Cars_DoGravityEffectsOnAcc__FP8Car_tObji  [@0x80085d84] ---- */
 void Cars_DoGravityEffectsOnAcc(Car_tObj *carObj,int arcade)
 {
-  coorddef gravity_ch;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -138,7 +137,6 @@ void Cars_GetDashData(Car_tObj *carObj,int *rpm,int *gear,int *speed)
 /* ---- Cars_QDUpdateVelGlue__FP8Car_tObj  [@0x80085ee8] ---- */
 void Cars_QDUpdateVelGlue(Car_tObj *carObj)
 {
-  int glue;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -201,8 +199,6 @@ void Cars_ResetCarCounters(void)
 /* ---- Cars_InitStats__FP8Car_tObj  [@0x8008607c] ---- */
 void Cars_InitStats(Car_tObj *carObj)
 {
-  Car_tStats*stats;
-  int lapLoop;
   Car_tStats *pCVar1;
   int iVar2;
   
@@ -235,8 +231,6 @@ void Cars_InitStats(Car_tObj *carObj)
 /* ---- Cars_InitializeCarTablesFlagsAndCounters__FP8Car_tObj  [@0x800860e4] ---- */
 void Cars_InitializeCarTablesFlagsAndCounters(Car_tObj *carObj)
 {
-  int carClass;
-  int personality;
   char *pcVar1;
   void *pvVar2;
   Car_tObj **ppCVar3;
@@ -383,11 +377,6 @@ void Cars_ResetVariablesAfterACollision(Car_tObj *carObj)
 /* ---- Cars_ResetCollidedCars__FP8Car_tObjii  [@0x80086664] ---- */
 void Cars_ResetCollidedCars(Car_tObj *carObj,int forceReset,int forceParkAtSide)
 {
-  int y;
-  int newSlice;
-  coorddef offset;
-  int resetCounter;
-  int side;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -544,19 +533,6 @@ void Cars_SetCarUpForHiRezSim(Car_tObj *carObj)
 /* ---- Cars_DoExtraCarCollisionProcessing__FP8Car_tObj  [@0x80086b38] ---- */
 void Cars_DoExtraCarCollisionProcessing(Car_tObj *carObj)
 {
-  int y;
-  int wheel;
-  int roadSurfaceWheel;
-  int surfaceType;
-  coorddef position;
-  coorddef point;
-  coorddef sideX;
-  coorddef sideZ;
-  int surface1;
-  int surface2;
-  int collisionType;
-  int debris;
-  coorddef impactPoint;
   bool bVar1;
   int iVar2;
   u_int uVar3;
@@ -850,13 +826,6 @@ LAB_80087310:
 void Cars_AddCarSfx(Car_tObj *carObj,int wheel,coorddef *skidpt,int roadSurface,int surfaceType,
                int drawSkid)
 {
-  int objID;
-  int sfxType;
-  int stateBit;
-  int smoking;
-  int traffic;
-  int sfxDelay;
-  int skid;
   short sVar1;
   bool bVar2;
   int iVar3;
@@ -984,25 +953,6 @@ LAB_80087888:
 /* ---- Car_TireSkiddingStuff__FP8Car_tObj  [@0x800878cc] ---- */
 void Car_TireSkiddingStuff(Car_tObj *carObj)
 {
-  coorddef position;
-  coorddef point;
-  int visible;
-  int audioSurface;
-  int front;
-  int rear;
-  int skidFront;
-  int originalFront;
-  int originalRear;
-  int roadSurface;
-  int roadSurfaceWheel;
-  int surfaceType;
-  int speed;
-  int wetRoad;
-  coorddef wheelFrontX;
-  coorddef wheelFrontZ;
-  int rndOffset;
-  coorddef wheelBackX;
-  coorddef wheelBackZ;
   short sVar1;
   bool bVar2;
   bool bVar3;
@@ -1976,7 +1926,6 @@ LAB_80089674:
 /* ---- Cars_FindTotalSlice__FP8Car_tObj  [@0x80089760] ---- */
 void Cars_FindTotalSlice(Car_tObj *carObj)
 {
-  int lapSlices;
   short sVar1;
   short sVar2;
   
@@ -1999,8 +1948,6 @@ void Cars_FindTotalSlice(Car_tObj *carObj)
 /* ---- Car_DoSkiddingStuff__FP8Car_tObj  [@0x800897cc] ---- */
 void Car_DoSkiddingStuff(Car_tObj *carObj)
 {
-  int speed;
-  int audioSurface;
   u_int uVar1;
   
   if ((carObj->N).orientationToGround.y < 0x3334) {
@@ -2028,7 +1975,6 @@ void Car_DoSkiddingStuff(Car_tObj *carObj)
 /* ---- Car_DoPostCollisionStuff__FP8Car_tObj  [@0x800898dc] ---- */
 void Car_DoPostCollisionStuff(Car_tObj *carObj)
 {
-  int Yoffset;
   int iVar1;
   Car_tSpecs *pCVar2;
   int iVar3;
@@ -2115,11 +2061,6 @@ void Car_DoPostCollisionStuff(Car_tObj *carObj)
 /* ---- Cars_CalculateStartingGridOffset__FP8Car_tObjPiP8coorddef  [@0x80089b44] ---- */
 void Cars_CalculateStartingGridOffset(Car_tObj *carObj,int *slice,coorddef *offset)
 {
-  int startingPosition;
-  int carOnRight;
-  int negDir;
-  int center;
-  int totalWidth;
   int iVar1;
   int iVar2;
   u_int uVar3;
@@ -2193,10 +2134,6 @@ LAB_80089c40:
 /* ---- Cars_IniCarObjects__FP8Car_tObji  [@0x80089d88] ---- */
 void Cars_IniCarObjects(Car_tObj *carObj,int index)
 {
-  int startSlice;
-  coorddef offset;
-  int carMass;
-  int k;
   u_short uVar1;
   GameSetup_tCarData *pGVar2;
   int iVar3;
@@ -2371,12 +2308,6 @@ void Cars_IniCarObjects(Car_tObj *carObj,int index)
 /* ---- Cars_InitCar__FP8Car_tObji  [@0x8008a174] ---- */
 void Cars_InitCar(Car_tObj *carObj,int index)
 {
-  char carFile[100];
-  char specsFile[100];
-  char name[20];
-  char*file2;
-  char*file1;
-  Udff_tInfo*handle2;
   int iVar1;
   char *mem;
   Car_tSpecs *pCVar2;
@@ -2475,7 +2406,6 @@ void Cars_DeInitCar(Car_tObj *carObj)
 /* ---- Cars_Restart__Fv  [@0x8008a4cc] ---- */
 void Cars_Restart(void)
 {
-  int i;
   Object_tIMassObjInfo *pOVar1;
   Car_tObj *pCVar2;
   Car_tObj **ppCVar3;
@@ -2524,7 +2454,6 @@ void Cars_Restart(void)
 /* ---- Cars_Initialize__FPci  [@0x8008a5b4] ---- */
 void Cars_Initialize(char *mem,int size)
 {
-  int i;
   int iVar1;
   
   iVar1 = 0;
@@ -2541,10 +2470,6 @@ void Cars_Initialize(char *mem,int size)
 /* ---- Cars_StartUp__Fv  [@0x8008a5d8] ---- */
 void Cars_StartUp(void)
 {
-  int i;
-  Car_tObj*newCar;
-  coorddef dim;
-  Car_tObj*carObj;
   Car_tObj *pCVar1;
   Sched_tSchedule *schedule32Hz;
   BO_tNewtonObj *newtonObj;
@@ -2647,7 +2572,6 @@ void Cars_StartUp(void)
 /* ---- Cars_CleanUp__Fv  [@0x8008aa40] ---- */
 void Cars_CleanUp(void)
 {
-  int i;
   int iVar1;
   Sched_tSchedule *schedule32Hz;
   Car_tObj *pCVar2;
@@ -2693,7 +2617,6 @@ void Cars_CleanUp(void)
 /* ---- Cars_FindCurrentLap__FP8Car_tObj  [@0x8008abc8] ---- */
 void Cars_FindCurrentLap(Car_tObj *carObj)
 {
-  int roadSlice;
   u_int uVar1;
   u_int uVar2;
   
@@ -2726,8 +2649,6 @@ void Cars_FindCurrentLap(Car_tObj *carObj)
 /* ---- Cars_CalculateRoadSpan__FP8Car_tObj  [@0x8008ac80] ---- */
 int Cars_CalculateRoadSpan(Car_tObj *carObj)
 {
-  int span;
-  int tempSpan;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -2847,7 +2768,6 @@ int Cars_CalculateRoadPosition(Car_tObj *carObj)
 /* ---- Cars_CalcVelDownRoad__FP8Car_tObj  [@0x8008aee8] ---- */
 int Cars_CalcVelDownRoad(Car_tObj *carObj)
 {
-  int temp;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -2885,8 +2805,6 @@ int Cars_CalcVelDownRoad(Car_tObj *carObj)
 /* ---- Cars_Randomize__Fv  [@0x8008af84] ---- */
 void Cars_Randomize(void)
 {
-  int count;
-  int rLoop;
   int iVar1;
   int iVar2;
   

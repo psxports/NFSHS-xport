@@ -7,14 +7,10 @@
 #include "platform_externs.h"
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
-#ifdef AP_WIN /* PORTABILITY-REVIEWED: host-owned PSX memory regions */
 char *gDctBuffer = (char *)DRAM + 0x124038;
 char *gDctXtraMem;
 char *gEAMemPoolBase = (char *)DRAM + 0x148b0c;
 char *gPlatformInitMem = (char *)DRAM + 0x054d10;
-#else
-char gDctBuffer[64]; char *gDctXtraMem; char gEAMemPoolBase[64]; char gPlatformInitMem[64];  /* PSX linker-owned regions */
-#endif
 
 
 /* ---- Platform_InitMemory__Fv  [PLATFORM.CPP:125-135] SLD-VERIFIED ---- */
@@ -23,19 +19,11 @@ extern "C" void Platform_InitMemory(void)
 {
   intptr tempLow;
 
-#ifdef AP_WIN /* PORTABILITY-REVIEWED: host bump-arena address boundary */
   tempLow = (intptr)DRAM + 0x10080;
   gTotalMemory = 0x54d10 - 0x10080;
   gLowMemory = tempLow;
   gHighMemory = (intptr)DRAM + 0x54d10;
   gCurrentMemory = tempLow;
-#else
-  tempLow = 0x80010080;   /* PSX prog base 0x80010000 + 0x80 EXE-header = low-mem bound; memory-map constant (no data symbol), not a VA to migrate */
-  gTotalMemory = (u_int)((intptr)gPlatformInitMem - tempLow);
-  gLowMemory = tempLow;
-  gHighMemory = (intptr)gPlatformInitMem;
-  gCurrentMemory = tempLow;
-#endif
   return;
 }
 
@@ -86,15 +74,11 @@ extern "C" void Platform_SysStartUp(void)
 {
   char *endofcode;
 
-  disablecd = 0;
-#ifdef AP_WIN /* PORTABILITY-REVIEWED: separate host EAC heap region */
+  // Use extracted files through PCopen and xport_fopen instead of mounting a CD
+  disablecd = 1;
   endofcode = (char *)DRAM + 0x148b0c;
   /* Native call stacks do not consume the PSX top-of-RAM stack reserve */
   nfs_sysInfo.userRam = PSX_DRAM_SIZE - 0x148b0c;
-#else
-  endofcode = (char *)gEAMemPoolBase;
-  nfs_sysInfo.userRam = (int)((intptr)0x801fc000 - (intptr)endofcode);   /* PSX RAM top (2MB) - 16KB stack reserve */
-#endif
   initmemadr((int)(intptr)endofcode,nfs_sysInfo.userRam);
   nfs2eacinit();
   Draw_SetEnvironment(0x200,0xf0,1,0,1,0,0,0);

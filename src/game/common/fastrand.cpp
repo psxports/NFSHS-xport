@@ -2,7 +2,6 @@
  *   2 free fns: FastRandom_CleanUp(void) + FastRandom_StartUp(u_int). GTE-free.
  */
 #include "../../nfs4_types.h"
-#include "fastrand_externs.h"
 
 /* ---- fastrand.obj OWNED globals (PRNG state; EXT; SYM Globals.jsonl, $gp+0xbb0..0xbbc) ---- */
 u_int fastRandom;     /* 0x8013d0fc [$gp+0xbb0] */
@@ -26,10 +25,6 @@ void FastRandom_CleanUp(void)
 void FastRandom_StartUp(u_int seeder)
 
 {
-  u_int a;
-  u_int b;
-  int seedIterations;
-  int i;
   int iVar1;
   
   randSeed = 0x75bcd15;

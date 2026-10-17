@@ -39,13 +39,6 @@ void Anim_Restart(void)
 /* ---- Anim_InitSystem  [@0x80073b1c] ---- */
 int Anim_InitSystem(char *trackName)
 {
-  int i;
-  char fname[80];
-  char*bigFile;
-  char*mem;
-  int size;
-  int numParts;
-  Trk_AnimateInst*objInstance;
   int *src;
   void *pThis;
   Trk_AnimateInst *pTVar1;
@@ -98,7 +91,6 @@ int Anim_InitSystem(char *trackName)
 /* ---- Anim_DeInitSystem  [@0x80073cb0] ---- */
 void Anim_DeInitSystem(void)
 {
-  int i;
   bool bVar1;
   Trk_AnimateInst **ppTVar2;
   int iVar3;
@@ -121,7 +113,6 @@ void Anim_DeInitSystem(void)
 /* ---- Anim_Handle  [@0x80073ce8] ---- */
 int Anim_Handle(int num)
 {
-  int handle;
   AnimScript *pAVar1;
   int iVar2;
   AnimScript **ppAVar3;
@@ -164,15 +155,7 @@ AnimScript * Anim_GetAnim(int handle)
 void Anim_GetLastRotPos(Trk_AnimateInst *animInst,coorddef *pt,matrixtdef *mat)
 {
   Anim_tFrame*animFrames;
-  int animInd;
-  tQuat q;
-  u_char *puVar1;
-  u_int uVar2;
-  u_int *puVar3;
   Anim_tFrame *lastFrame;
-  u_int uVar5;
-  int iVar6;
-  int iVar7;
   tQuat tStack_10;
   
   animFrames = (Anim_tFrame *)((u_char *)animInst + 0xc);
@@ -188,7 +171,6 @@ void Anim_GetLastRotPos(Trk_AnimateInst *animInst,coorddef *pt,matrixtdef *mat)
 /* ---- Anim_GetLastAnimPosRot  [@0x80073e80] ---- */
 int Anim_GetLastAnimPosRot(int animNum,int flags,coorddef *pt,matrixtdef *mat)
 {
-  int tmp;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -212,24 +194,11 @@ int Anim_GetLastAnimPosRot(int animNum,int flags,coorddef *pt,matrixtdef *mat)
 extern "C" int Anim_GetRotPos(Trk_AnimateInst *animInst,int flags,int ticks,coorddef *pt,matrixtdef *mat)
 {
   Anim_tFrame*animFrames;
-  int animInd0;
-  int animInd1;
-  coorddef objcp0;
-  coorddef objcp1;
-  tQuat q;
-  int interval;
-  u_char *puVar1;
-  u_int uVar2;
-  u_int *puVar3;
   int iVar4;
   Anim_tFrame *frame1;
   int iVar6;
   Anim_tFrame *frame0;
   int iVar8;
-  Trk_AnimateInst *pTVar9;
-  u_int uVar10;
-  u_int uVar11;
-  u_int uVar12;
   int iVar13;
   coorddef local_40;
   coorddef local_30;
@@ -253,28 +222,28 @@ extern "C" int Anim_GetRotPos(Trk_AnimateInst *animInst,int flags,int ticks,coor
   if (iVar6 == 0) {
     trap(0x1c00);
   }
-  if ((iVar6 == -1) && (ticks == -0x80000000)) {
+  if ((iVar6 == -1) && (ticks == 0x80000000)) {
     trap(0x1800);
   }
   if (((flags & 2U) == 0) || (iVar4 = 0, iVar13 < animInst->count + -1)) {
     if (iVar6 == 0) {
       trap(0x1c00);
     }
-    if ((iVar6 == -1) && (ticks == -0x80000000)) {
+    if ((iVar6 == -1) && (ticks == 0x80000000)) {
       trap(0x1800);
     }
     iVar4 = animInst->count + -1;
     if (iVar4 == 0) {
       trap(0x1c00);
     }
-    if ((iVar4 == -1) && (iVar13 == -0x80000000)) {
+    if ((iVar4 == -1) && (iVar13 == 0x80000000)) {
       trap(0x1800);
     }
     iVar8 = ticks % iVar6 << 0x10;
     if (iVar6 == 0) {
       trap(0x1c00);
     }
-    if ((iVar6 == -1) && (iVar8 == -0x80000000)) {
+    if ((iVar6 == -1) && (iVar8 == 0x80000000)) {
       trap(0x1800);
     }
     frame0 = &animFrames[iVar13 % iVar4];
@@ -299,11 +268,6 @@ extern "C" int Anim_GetPos(Trk_AnimateInst *animInst,int flags,int ticks,coordde
               int *animLength)
 {
   Anim_tFrame*animFrames;
-  int animInd0;
-  int animInd1;
-  coorddef objcp0;
-  coorddef objcp1;
-  int interval;
   int iVar1;
   Anim_tFrame *frame;
   int iVar3;
@@ -322,28 +286,28 @@ extern "C" int Anim_GetPos(Trk_AnimateInst *animInst,int flags,int ticks,coordde
   if (iVar4 == 0) {
     trap(0x1c00);
   }
-  if ((iVar4 == -1) && (ticks == -0x80000000)) {
+  if ((iVar4 == -1) && (ticks == 0x80000000)) {
     trap(0x1800);
   }
   if (((flags & 2U) == 0) || (iVar1 = 0, iVar5 < animInst->count + -1)) {
     if (iVar4 == 0) {
       trap(0x1c00);
     }
-    if ((iVar4 == -1) && (ticks == -0x80000000)) {
+    if ((iVar4 == -1) && (ticks == 0x80000000)) {
       trap(0x1800);
     }
     iVar1 = animInst->count + -1;
     if (iVar1 == 0) {
       trap(0x1c00);
     }
-    if ((iVar1 == -1) && (iVar5 == -0x80000000)) {
+    if ((iVar1 == -1) && (iVar5 == 0x80000000)) {
       trap(0x1800);
     }
     iVar3 = ticks % iVar4 << 0x10;
     if (iVar4 == 0) {
       trap(0x1c00);
     }
-    if ((iVar4 == -1) && (iVar3 == -0x80000000)) {
+    if ((iVar4 == -1) && (iVar3 == 0x80000000)) {
       trap(0x1800);
     }
     animFrames = (Anim_tFrame *)((u_char *)animInst + 0xc);
@@ -361,7 +325,7 @@ extern "C" int Anim_GetPos(Trk_AnimateInst *animInst,int flags,int ticks,coordde
       if (iVar5 == 0) {
         trap(0x1c00);
       }
-      if ((iVar5 == -1) && (ticks == -0x80000000)) {
+      if ((iVar5 == -1) && (ticks == 0x80000000)) {
         trap(0x1800);
       }
       *animTicks = ticks % iVar5;
@@ -393,7 +357,6 @@ AnimScript::AnimScript(int num)
 /* ---- AnimScript::AnimScript  [@0x800743cc] ---- */
 AnimScript::AnimScript(int num,int numParts)
 {
-  int i;
   Trk_AnimateInst **ppTVar1;
   int iVar2;
   int iVar3;
@@ -420,9 +383,6 @@ AnimScript::AnimScript(int num,int numParts)
 /* ---- AnimScript::AnimScript  [@0x80074468] ---- */
 AnimScript::AnimScript(Group *instanceGroup,int type,int boomIndex,int numParts)
 {
-  int numElems;
-  Trk_AnimateBoomInst*objInstance;
-  int i;
   int iVar1;
   Trk_AnimateInst **ppTVar2;
   int iVar3;
@@ -461,9 +421,6 @@ void AnimScript::SetAnimAttrib(int flags)
 /* ---- AnimScript::GetAnimFrameInfo  [@0x8007453c] ---- */
 void AnimScript::GetAnimFrameInfo(int *frame,int *numFrames)
 {
-  Trk_AnimateInst*animInst;
-  int interval;
-  int ticks;
   int iVar1;
   int iVar2;
   Trk_AnimateInst *pTVar3;
@@ -481,14 +438,14 @@ void AnimScript::GetAnimFrameInfo(int *frame,int *numFrames)
   if (iVar1 == 0) {
     trap(0x1c00);
   }
-  if ((iVar1 == -1) && (iVar2 == -0x80000000)) {
+  if ((iVar1 == -1) && (iVar2 == 0x80000000)) {
     trap(0x1800);
   }
   iVar2 = pTVar3->count + -1;
   if (iVar2 == 0) {
     trap(0x1c00);
   }
-  if ((iVar2 == -1) && (iVar4 == -0x80000000)) {
+  if ((iVar2 == -1) && (iVar4 == 0x80000000)) {
     trap(0x1800);
   }
   *frame = iVar4 % iVar2;
@@ -508,7 +465,6 @@ int AnimScript::GetTimedAnimPosRot(coorddef *pt,matrixtdef *mat)
 /* ---- AnimScript::GetTimedAnimPosRot  [@0x80074624] ---- */
 int AnimScript::GetTimedAnimPosRot(int index,coorddef *pt,matrixtdef *mat)
 {
-  int tmp;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -544,17 +500,6 @@ int AnimScript::GetTimedAnimPosRot(int index,coorddef *pt,matrixtdef *mat)
 /* ---- AnimScript::GetStatus  [@0x8007471c] ---- */
 int AnimScript::GetStatus()
 {
-  int interval;
-  Anim_tFrame *animFrames;
-  int animInd1;
-  int tmp;
-  int size;
-  int numElems;
-  char *mem;
-  coorddef objcp0;
-  coorddef objcp1;
-  tQuat q0;
-  tQuat q1;
   
   return (u_int)(*this->inst != (Trk_AnimateInst *)0x0);
 }

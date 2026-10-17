@@ -114,15 +114,12 @@ void AIDelayCar::Update()
 
   int iVar6;
 
-  int currentDeltaRoadPosition;
 
   Car_tObj *pCVar7;
 
   int iVar8;
 
-  coorddef currentDeltaPosition;
 
-  coorddef changeDeltaPosition;
 
   
 

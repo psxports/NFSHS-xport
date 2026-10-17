@@ -1,10 +1,4 @@
-/* game/common/aidatarecord.cpp -- RECONSTRUCTED (AI state-machine hierarchy; C++ TU)
- *   52 fns across 11 classes (AIDataRecord_Base + Normal/NonActive/Idle/Chase/Offroad/Purgatory/
- *   RovingTraffic/Donuts/GotoSlice/Cruise) + 3 free AIDataRecord_StartUp/Restart/CleanUp.
- *   Composition-modeled inheritance (_base_ members); manual _vf vtable dispatch (8-byte
- *   __vtbl_ptr_type entries); deleting dtors. Each ctor/dtor installs AIDataRecord_<C>_vtable.
- *   Faithful C++ (option A). NOT original source; SYM-faithful, recompilable. vs disasm-v2.
- */
+/* AI record collection and native AIDataRecord hierarchy */
 #include "../../lib/nfs4_new.h"
 #include "../../nfs4_types.h"
 #include "aidatarecord_externs.h"
@@ -26,7 +20,6 @@ AIDataRecord_t::AIDataRecord_t(AIDataRecord_WhichRecord_t whichIsThis,char *preB
 
 {
 
-  this->_vf = (__vtbl_ptr_type (*) [3])AIDataRecord_t_vtable;
 
   this->AddRecordToCollection();
 
@@ -56,7 +49,6 @@ AIDataRecord_t::~AIDataRecord_t()
 
   
 
-  this->_vf = (__vtbl_ptr_type (*) [3])AIDataRecord_t_vtable;
 
   this->SaveAndPurge();
 
@@ -65,6 +57,11 @@ AIDataRecord_t::~AIDataRecord_t()
 
   return;
 
+}
+
+void AIDataRecord_t::operator delete(void *storage)
+{
+  __builtin_delete(storage);
 }
 
 
@@ -81,7 +78,6 @@ int AIDataRecord_t::AddRecordToCollection()
 
 
 {
-  int recordLoop;
 
   AIDataRecord_t **ppAVar1;
 
@@ -127,7 +123,6 @@ int AIDataRecord_t::RemoveRecordFromCollection()
 
 
 {
-  int recordLoop;
 
   AIDataRecord_t **ppAVar1;
 
@@ -173,7 +168,6 @@ void AIDataRecord_t::StartUp1(void)
 
 
 {
-  int recordLoop;
 
   AIDataRecord_t **ppAVar1;
 
@@ -225,7 +219,6 @@ void AIDataRecord_t::StartUp2(void)
 
 
 {
-  int recordLoop;
 
   AIDataRecord_t *pAVar1;
 
@@ -244,8 +237,7 @@ void AIDataRecord_t::StartUp2(void)
     pAVar1 = *ppAVar2;
 
     if (pAVar1 != (AIDataRecord_t *)0x0) {
-      const __vtbl_ptr_type &entry = (*pAVar1->_vf)[2];
-      ((void (NFS4_THISCALL *)(void *))entry.pfn)((char *)pAVar1 + entry.delta);
+      pAVar1->Setup();
 
     }
 
@@ -274,16 +266,12 @@ void AIDataRecord_t::CleanUp1(void)
 
 {
 
-  __vtbl_ptr_type (*pa_Var1) [3];
 
   
 
   if (AIDataRecord_BestLine != (AIDataRecord_BestLine_t *)0x0) {
 
-    pa_Var1 = (AIDataRecord_BestLine->_base_AIDataRecord_t)._vf;
-
-    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
-        ((char *)AIDataRecord_BestLine + (*pa_Var1)[1].delta,3);
+    delete AIDataRecord_BestLine;
 
     AIDataRecord_BestLine = (AIDataRecord_BestLine_t *)0x0;
 
@@ -291,10 +279,7 @@ void AIDataRecord_t::CleanUp1(void)
 
   if (AIDataRecord_TrackCurve != (AIDataRecord_TrackCurve_t *)0x0) {
 
-    pa_Var1 = (AIDataRecord_TrackCurve->_base_AIDataRecord_t)._vf;
-
-    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
-        ((char *)AIDataRecord_TrackCurve + (*pa_Var1)[1].delta,3);
+    delete AIDataRecord_TrackCurve;
 
     AIDataRecord_TrackCurve = (AIDataRecord_TrackCurve_t *)0x0;
 
@@ -447,14 +432,11 @@ int AIDataRecord_t::SaveAndPurge()
 
 /* ---- __23AIDataRecord_AccTable_tPci26AIDataRecord_WhichRecord_t  AIDataRecord_AccTable_t::ctor  [AIDATARECORD.CPP:394-399] SLD-VERIFIED ---- */
 
-AIDataRecord_AccTable_t::AIDataRecord_AccTable_t(char *preBuffer,int scale,
-
-          AIDataRecord_WhichRecord_t whichIsThis)
+AIDataRecord_AccTable_t::AIDataRecord_AccTable_t(char *preBuffer,int scale,AIDataRecord_WhichRecord_t whichIsThis)
   : AIDataRecord_t(whichIsThis,preBuffer)
 {
 
 
-  this->_vf = (__vtbl_ptr_type (*) [3])AIDataRecord_AccTable_t_vtable;
 
   this->numElements_ = 0x70;
 
@@ -462,7 +444,7 @@ AIDataRecord_AccTable_t::AIDataRecord_AccTable_t(char *preBuffer,int scale,
 
   this->scale_ = scale;
 
-  sprintf(this->name_,"%s%s.acc",Paths_Paths[5],(char *)Cars_gHumanRaceCarList[0] + 0x240);
+  sprintf(this->name_,"%s%s.acc",Paths_Paths[5],Cars_gHumanRaceCarList[0]->carName);
 
   return;
 
@@ -501,7 +483,6 @@ void AIDataRecord_AccTable_t::Setup()
 
 
 {
-  int loop;
 
   int iVar1;
 
@@ -535,7 +516,7 @@ void AIDataRecord_AccTable_t::Setup()
 /* ---- __23AIDataRecord_BestLine_t26AIDataRecord_WhichRecord_t  AIDataRecord_BestLine_t::ctor  [AIDATARECORD.CPP:457-464] SLD-VERIFIED ---- */
 
 AIDataRecord_BestLine_t::AIDataRecord_BestLine_t(AIDataRecord_WhichRecord_t whichIsThis)
-  : _base_AIDataRecord_t(whichIsThis,(char *)0x0)
+  : AIDataRecord_t(whichIsThis,(char *)0x0)
 {
 
   int iVar1;
@@ -546,21 +527,20 @@ AIDataRecord_BestLine_t::AIDataRecord_BestLine_t(AIDataRecord_WhichRecord_t whic
 
   iVar1 = gNumSlices;
 
-  (this->_base_AIDataRecord_t)._vf = (__vtbl_ptr_type (*) [3])AIDataRecord_BestLine_t_vtable;
 
-  (this->_base_AIDataRecord_t).numElements_ = iVar1;
+  this->numElements_ = iVar1;
 
-  (this->_base_AIDataRecord_t).bSize_ = iVar1;
+  this->bSize_ = iVar1;
 
-  if ((this->_base_AIDataRecord_t).recordMethod_ == 0) {
+  if (this->recordMethod_ == 0) {
 
-    sprintf((this->_base_AIDataRecord_t).name_,"%sTr%02d.qbe",Paths_Paths[12],GameSetup_gData.track);
+    sprintf(this->name_,"%sTr%02d.qbe",Paths_Paths[12],GameSetup_gData.track);
 
   }
 
   else {
 
-    sprintf((this->_base_AIDataRecord_t).name_,"%sTr%02d.bes",Paths_Paths[13],GameSetup_gData.track);
+    sprintf(this->name_,"%sTr%02d.bes",Paths_Paths[13],GameSetup_gData.track);
 
   }
 
@@ -580,7 +560,7 @@ AIDataRecord_BestLine_t::AIDataRecord_BestLine_t(AIDataRecord_WhichRecord_t whic
 /* ---- __25AIDataRecord_TrackCurve_t26AIDataRecord_WhichRecord_t  AIDataRecord_TrackCurve_t::ctor  [AIDATARECORD.CPP:535-542] SLD-VERIFIED ---- */
 
 AIDataRecord_TrackCurve_t::AIDataRecord_TrackCurve_t(AIDataRecord_WhichRecord_t whichIsThis)
-  : _base_AIDataRecord_t(whichIsThis,(char *)0x0)
+  : AIDataRecord_t(whichIsThis,(char *)0x0)
 {
 
   int iVar1;
@@ -591,21 +571,20 @@ AIDataRecord_TrackCurve_t::AIDataRecord_TrackCurve_t(AIDataRecord_WhichRecord_t 
 
   iVar1 = gNumSlices;
 
-  (this->_base_AIDataRecord_t)._vf = (__vtbl_ptr_type (*) [3])AIDataRecord_TrackCurve_t_vtable;
 
-  (this->_base_AIDataRecord_t).numElements_ = iVar1;
+  this->numElements_ = iVar1;
 
-  (this->_base_AIDataRecord_t).bSize_ = iVar1 + 1;
+  this->bSize_ = iVar1 + 1;
 
-  if ((this->_base_AIDataRecord_t).recordMethod_ == 0) {
+  if (this->recordMethod_ == 0) {
 
-    sprintf((this->_base_AIDataRecord_t).name_,"%sTr%02d.qcr",Paths_Paths[10],GameSetup_gData.track);
+    sprintf(this->name_,"%sTr%02d.qcr",Paths_Paths[10],GameSetup_gData.track);
 
   }
 
   else {
 
-    sprintf((this->_base_AIDataRecord_t).name_,"%sTr%02d.crv",Paths_Paths[11],GameSetup_gData.track);
+    sprintf(this->name_,"%sTr%02d.crv",Paths_Paths[11],GameSetup_gData.track);
 
   }
 
@@ -630,7 +609,7 @@ int AIDataRecord_TrackCurve_t::Get(int slice)
 
 {
 
-  return (u_int)(u_char)(this->_base_AIDataRecord_t).dataBuffer_[slice];
+  return (u_int)(u_char)this->dataBuffer_[slice];
 
 }
 
@@ -643,31 +622,28 @@ int AIDataRecord_TrackCurve_t::Get(int slice)
 
 /* ---- __30AIDataRecord_CurveSpeedTable_tPc26AIDataRecord_WhichRecord_t  AIDataRecord_CurveSpeedTable_t::ctor  [AIDATARECORD.CPP:617-624] SLD-VERIFIED ---- */
 
-AIDataRecord_CurveSpeedTable_t::AIDataRecord_CurveSpeedTable_t(char *carName,AIDataRecord_WhichRecord_t whichIsThis
-
-          )
-  : _base_AIDataRecord_t(whichIsThis,(char *)0x0)
+AIDataRecord_CurveSpeedTable_t::AIDataRecord_CurveSpeedTable_t(char *carName,AIDataRecord_WhichRecord_t whichIsThis)
+  : AIDataRecord_t(whichIsThis,(char *)0x0)
 {
 
 
   
 
 
-  (this->_base_AIDataRecord_t)._vf = (__vtbl_ptr_type (*) [3])AIDataRecord_CurveSpeedTable_t_vtable;
 
-  (this->_base_AIDataRecord_t).numElements_ = 0x100;
+  this->numElements_ = 0x100;
 
-  (this->_base_AIDataRecord_t).bSize_ = 0x100;
+  this->bSize_ = 0x100;
 
-  if ((this->_base_AIDataRecord_t).recordMethod_ == 0) {
+  if (this->recordMethod_ == 0) {
 
-    sprintf((this->_base_AIDataRecord_t).name_,"%s%s.qcs",Paths_Paths[4],carName);
+    sprintf(this->name_,"%s%s.qcs",Paths_Paths[4],carName);
 
   }
 
   else {
 
-    sprintf((this->_base_AIDataRecord_t).name_,"%s%s.csp",Paths_Paths[5],carName);
+    sprintf(this->name_,"%s%s.csp",Paths_Paths[5],carName);
 
   }
 
@@ -704,7 +680,7 @@ int AIDataRecord_CurveSpeedTable_t::Get(int curve)
 
   }
 
-  return (u_int)(u_char)(this->_base_AIDataRecord_t).dataBuffer_[curve] << 0x10;
+  return (u_int)(u_char)this->dataBuffer_[curve] << 0x10;
 
 }
 
@@ -722,7 +698,6 @@ void AIDataRecord_CurveSpeedTable_t::Upgrade(int handlingUpgrade)
 
 
 {
-  int curveLoop;
 
   int iVar1;
 
@@ -730,7 +705,7 @@ void AIDataRecord_CurveSpeedTable_t::Upgrade(int handlingUpgrade)
 
   
 
-  for (curve = 0; curve < (this->_base_AIDataRecord_t).numElements_; curve = curve + 1) {
+  for (curve = 0; curve < this->numElements_; curve = curve + 1) {
 
     iVar1 = this->Get(curve);
 
@@ -742,7 +717,7 @@ void AIDataRecord_CurveSpeedTable_t::Upgrade(int handlingUpgrade)
 
     }
 
-    (this->_base_AIDataRecord_t).dataBuffer_[curve] = (char)((u_int)iVar1 >> 0x10);
+    this->dataBuffer_[curve] = (char)((u_int)iVar1 >> 0x10);
 
   }
 
@@ -864,9 +839,7 @@ AIDataRecord_AccTable_t::~AIDataRecord_AccTable_t()
 
 {
 
-  int recordLoop;
 
-  int curveLoop;
 
   
 

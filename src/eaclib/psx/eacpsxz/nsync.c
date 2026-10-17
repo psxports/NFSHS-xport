@@ -12,6 +12,7 @@
  */
 
 #include "../../../nfs4_types.h"
+#include "nfile_atomic.h"
 
 /* the scratch record passed by-pointer through FILE_atomic to each *atomic worker */
 typedef struct LoadArgs
@@ -27,7 +28,6 @@ extern "C" int FILE_opensync(char *name, int mode, int retry, int *handle);     
 extern "C" int FILE_sizesync(int handle, int retry);                                                /* @0x800EA9A4 */
 extern "C" int FILE_readsync(intptr handle, unsigned int offset, intptr dest, int size, int retry); /* @0x800EA920 */
 extern "C" int FILE_closesync(int handle, int retry);                                               /* @0x800EA950 */
-extern "C" intptr FILE_atomic(intptr fn, int idle, int retries, void *args);                        /* @0x800ECB40 */
 extern "C" int asyncidle(void);                                                                     /* @0x800F6114 */
 
 /* ---- memstd allocator (eaclib/psx/eacpsxz/memstd.cpp) ---- */
@@ -44,10 +44,6 @@ extern "C" int abortflag;                                                   /* @
 extern "C" void *(*loadfilecallback)(void *dest, char *name, int memclass); /* @0x8013DD60 */
 
 /* forward decls of the intra-obj *atomic XDEFs (C-linkage) */
-extern "C" intptr filesizeatomic(int retry, void *args);
-extern "C" intptr loadfileadratomic(int retry, void *args);
-extern "C" intptr loadfileatadratomic(int retry, void *args);
-extern "C" intptr loadbigfileheaderatomic(int retry, void *args);
 
 /* ===================================================================== *
  *  filesizeatomic @0x800E5608 : open `a->name`, query its size, close.   *
@@ -73,7 +69,7 @@ extern "C" int filesize(char *name) /* @0x800E566C */
     a.name = name;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (int)FILE_atomic((intptr)filesizeatomic, idle, 0x64, &a);
+    return (int)FILE_atomic(filesizeatomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -119,7 +115,7 @@ extern "C" void *loadfileadrz(char *name, int memclass) /* @0x800E57A8 */
     a.memclass = memclass;
     a.abortval = 0;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr)loadfileadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic(loadfileadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -132,7 +128,7 @@ extern "C" void *loadfileadr(char *name, int memclass) /* @0x800E57E8 */
     a.memclass = memclass;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr)loadfileadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic(loadfileadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -161,7 +157,7 @@ extern "C" void *loadfileatadrz(char *name, void *dest) /* @0x800E58B0 */
     a.dest = dest;
     a.abortval = 0;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr)loadfileatadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic(loadfileatadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -174,7 +170,7 @@ extern "C" void *loadfileatadr(char *name, void *dest) /* @0x800E58F0 */
     a.dest = dest;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr)loadfileatadratomic, idle, 0x64, &a);
+    return (void *)FILE_atomic(loadfileatadratomic, idle, 0x64, &a);
 }
 
 /* ===================================================================== *
@@ -236,5 +232,5 @@ extern "C" void *loadbigfileheader(char *name, int memclass) /* @0x800E5A7C */
     a.memclass = memclass;
     a.abortval = abortflag;
     int idle = asyncidle();
-    return (void *)FILE_atomic((intptr)loadbigfileheaderatomic, idle, 0x64, &a);
+    return (void *)FILE_atomic(loadbigfileheaderatomic, idle, 0x64, &a);
 }

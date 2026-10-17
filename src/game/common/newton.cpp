@@ -66,24 +66,18 @@ void Newton_AddDamageZone(BO_tNewtonObj *newtonObj,int impulse,int zone,int type
 
 {
   Car_tObj *carObj = (Car_tObj *)newtonObj;
-  int temp;
   int iVar1;
   int iVar2;
   void *pvVar3;
   u_int uVar4;
   u_int uVar5;
   int iVar6;
-  int imp;
   int iVar7;
   int iVar8;
   int iVar9;
   u_int uVar10;
-  int intensity;
-  int zMult;
   u_int uVar11;
-  int yMult;
   u_int b;
-  int xMult;
   u_int uVar12;
   matrixtdef transposeMat;
   
@@ -319,12 +313,7 @@ void Newton_FindClosestQuad(BO_tNewtonObj *n)
 int Newton_CalculateSliceYaw(int slice)
 
 {
-  int z2;
-  int x2;
   int iVar1;
-  int x1;
-  int z1;
-  int s;
   
   iVar1 = slice + 1;
   if (gNumSlices <= iVar1) {
@@ -339,34 +328,20 @@ int Newton_CalculateSliceYaw(int slice)
 void Newton_UpdateRoadGeometry(BO_tNewtonObj *n)
 
 {
-  int hiRez;
-  int i;
   char cVar1;
   char cVar2;
   bool bVar3;
-  int z2;
   Trk_NewSlice *pTVar4;
   coorddef *pcVar5;
-  int x2;
   BO_tNewtonObj *pBVar6;
   int iVar7;
-  int z1;
   int iVar8;
-  int s;
-  int r3;
   int a;
-  int r5;
   int b;
-  int r1;
   int a_00;
-  int r6;
   int b_00;
-  int r4;
   int b_01;
-  int r2;
   int a_01;
-  int x1;
-  int slice;
   int iVar9;
   coorddef temp;
   
@@ -491,13 +466,11 @@ void Newton_UpdateRoadGeometry(BO_tNewtonObj *n)
 int Newton_FindGroundElevationGeneral(coorddef *point,coorddef *normal,coorddef *pointOnQuad)
 
 {
-  int result;
   int iVar1;
   int iVar2;
   int iVar3;
   int iVar4;
   int iVar5;
-  int index;
   
   iVar5 = normal->y;
   if (iVar5 < 0x9eb9) {
@@ -546,18 +519,11 @@ int Newton_FindGroundElevationGeneral(coorddef *point,coorddef *normal,coorddef 
 int Newton_FindGroundElevationRough(coorddef *point,coorddef *normal,coorddef *pointOnQuad)
 
 {
-  int result;
-  int fudgeIndex;
-  int index;
   int iVar1;
   int iVar2;
-  int fudgeDist;
   int iVar3;
   int iVar4;
-  int i;
   int iVar5;
-  int numerator;
-  int fudgeHeight;
   int iVar6;
   
   iVar3 = normal->x;
@@ -634,12 +600,6 @@ FindGERough_iterReduceA:
 int Newton_FindGroundElevationAndNormalFast(BO_tNewtonObj *newtonObj,coorddef *normal)
 
 {
-  int elevation;
-  int r1;
-  int r2;
-  int r3;
-  int surfaceType;
-  int r4;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -686,72 +646,27 @@ int Newton_FindGroundElevationAndNormal(BO_tNewtonObj *newtonObj,coorddef *norma
 
 {
   Car_tObj *carObj = (Car_tObj *)newtonObj;
-  coorddef roadCenterPoint;
-  int r2;
-  int r3;
-  int r4;
-  coorddef lengthVector;
-  coorddef widthVector;
-  coorddef carGroundCoord;
-  int v1;
-  int r1;
-  coorddef roadNormal;
-  int roadSurfaceType;
-  coorddef wheelVec;
-  int limit;
-  int wheelBounce;
-  int speed;
-  int ratio;
-  int groundY_ratio;
-  int tstr3;
-  int tpi4;
-  u_int tu1;
   int ti5;
   int ti1;
   int ti4;
-  int frontGroundY;
   int wheelGround_y;
   int compressDelta;
   int iVar20;
-  u_int tu21;
-  int rightGroundY;
   u_int uVar1;
-  u_int uVar2;
   int iVar3;
   int desiredCompression;
   int iVar5;
   int ti8;
-  int tstr9;
   int i;
   int ti9;
-  coorddef *point;
   int iVar24;
-  int rearGroundY;
   int tireMagic;
   int tireMagic2;
-  int leftGroundY;
-  int roll;
-  int wheelData_p;
-  int pitch;
-  int pt;
-  int tpi11;
-  int newtonData_p;
-  int tpi12;
-  int wheelInst_p;
-  int bounce;
   int bounce_iter;
-  int wheel_idx;
-  int ti17;
-  int wheelsInAir;
   int wheelsInAir_n;
-  int ti15;
-  int ti18;
-  int ti16;
   coorddef elevation;
   coorddef tireCoord [4];
-  coorddef carNormal;
   coorddef wheelHeight [4];
-  coorddef vecOffset;
   BWorldSm_Pos testSimRoadInfo;
   coorddef tempVecX;
   coorddef tempVecY;
@@ -941,7 +856,7 @@ Newton_FindGE_bounceFirst:
         if (count == 0) {
           trap(0x1c00);
         }
-        if ((count == -1) && (iVar24 == -0x80000000)) {
+        if ((count == -1) && (iVar24 == 0x80000000)) {
           trap(0x1800);
         }
         iVar3 = iVar24 / count >> 1;
@@ -1174,11 +1089,6 @@ int Newton_CalcPerpenHeightOfLowestPointFromGround(BO_tNewtonObj *newtonObj,coor
   int iVar10;
   int iVar11;
   int iVar12;
-  int zDir;
-  int yDir;
-  int xDir;
-  coorddef basisDots;
-  coorddef relativePos;
   
   relativeDot = normal->x;
   if (relativeDot < 0) {
@@ -1329,8 +1239,6 @@ int Newton_CalcPerpenHeightOfCenterPointFromGround(BO_tNewtonObj *newtonObj,coor
   int iVar3;
   int iVar4;
   int iVar5;
-  int relativeDot;
-  coorddef relativePos;
   
   iVar1 = (newtonObj->position).y;
   iVar4 = samplePoint->y;
@@ -1356,19 +1264,15 @@ int Newton_CalcPerpenHeightOfCenterPointFromGround(BO_tNewtonObj *newtonObj,coor
 void Newton_CalcDistToClosestPlayerCar(BO_tNewtonObj *n)
 
 {
-  int x;
   static coorddef dummy;
-  int dist;
   u_char bVar1;
   intptr uVar2;
-  int z;
   int iVar3;
   int oldOptz;
   int iVar4;
   int iVar5;
   int iVar6;
   int whichPlayer;
-  int forcedSimOptz;
   
   whichPlayer = 0;
   iVar4 = (n->position).x;
@@ -1500,8 +1404,6 @@ void Newton_CopyRoadMatrixToOrientMat(BO_tNewtonObj *n,int backwards)
 
 {
   matrixtdef *pmVar1;
-  matrixtdef *road;
-  matrixtdef *ori;
   matrixtdef *pmVar2;
   int iVar3;
   int iVar4;
@@ -1541,8 +1443,6 @@ void Newton_CopyRoadMatrixToShadowMat(BO_tNewtonObj *n,int backwards)
 
 {
   matrixtdef *pmVar1;
-  matrixtdef *road;
-  matrixtdef *shad;
   matrixtdef *pmVar2;
   int iVar3;
   int iVar4;
@@ -1595,13 +1495,10 @@ void Newton_SetInitialSlicePositionOrientationEtc(BO_tNewtonObj *n,int slice,coo
   int iVar11;
   u_int uVar12;
   Trk_NewSimQuad *pTVar13;
-  int quadCenterY;
   BO_tNewtonObj *pBVar14;
   int i;
   Trk_NewSlice *pTVar15;
-  int backwards;
   u_int backwards_00;
-  coorddef rOffset;
   matrixtdef transposeMat;
   coorddef temp;
   
@@ -1716,9 +1613,7 @@ void Newton_InitBaseNewtonObj(BO_tNewtonObj *newtonObj,u_int index,int mass,u_in
                int dimY,int dimZ)
 
 {
-  int i;
   int iVar1;
-  u_int *puVar2;
   int iVar3;
   
   u_int *rawWords = (u_int *)newtonObj;
@@ -1806,9 +1701,6 @@ void Newton_InitBaseNewtonObj(BO_tNewtonObj *newtonObj,u_int index,int mass,u_in
 void Newton_QDUpdateVel(BO_tNewtonObj *newtonObj)
 
 {
-  int t1;
-  int t2;
-  int t3;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -1870,9 +1762,6 @@ bool Newton_OptzRotxform(int *m,int ax,int ay,int az,u_int *reOrthoNeeded,
 void Newton_QDUpdateRot64Hz(BO_tNewtonObj *newtonObj)
 
 {
-  matrixtdef m;
-  int reOrthoNeeded;
-  coorddef angularVel;
   char cVar1;
   int iVar2;
   matrixtdef *m1;
@@ -1919,9 +1808,6 @@ void Newton_QDUpdateRot64Hz(BO_tNewtonObj *newtonObj)
 void Newton_QDUpdateRot32Hz(BO_tNewtonObj *newtonObj)
 
 {
-  matrixtdef m;
-  int reOrthoNeeded;
-  coorddef angularVel;
   char cVar1;
   int iVar2;
   matrixtdef *m1;
@@ -1967,21 +1853,13 @@ void Newton_QDUpdateRot32Hz(BO_tNewtonObj *newtonObj)
 void Newton_CalculateGroundShadowMatrix(BO_tNewtonObj *newtonObj,coorddef *normal,int orientToGround)
 
 {
-  int r1;
-  int r2;
-  int r3;
-  u_int *puVar1;
   int iVar2;
   int iVar3;
-  u_int *puVar4;
   int iVar5;
   int iVar6;
   int iVar7;
   int iVar8;
   coorddef *v;
-  u_int uVar9;
-  u_int uVar10;
-  u_int uVar11;
   
   if (((((Car_tObj *)newtonObj)->carFlags & 4) == 0) && 0xe666 < orientToGround) {
     newtonObj->shadowMat = newtonObj->orientMat;
@@ -2081,16 +1959,6 @@ NewtonGroundShadow_normalizeV:
 void Newton_CalcRealShadowCoordinates(Car_tObj *carObj,int currentTick)
 
 {
-  coorddef lengthVector;
-  coorddef widthVector;
-  coorddef frontWidthVector;
-  coorddef carGroundCoord;
-  coorddef temp;
-  coorddef vecOffset;
-  int diff;
-  coorddef dimension;
-  int front;
-  int i;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -2169,10 +2037,6 @@ void Newton_CalcRealShadowCoordinates(Car_tObj *carObj,int currentTick)
 void Newton_CheckForSpikeBelts(BO_tNewtonObj *newtonObj)
 
 {
-  int slice;
-  int leftLatPos;
-  int rightLatPos;
-  int latPos;
   int iVar1;
   Car_tObj *carObj = (Car_tObj *)newtonObj;
   
@@ -2195,11 +2059,6 @@ void Newton_CheckForSpikeBelts(BO_tNewtonObj *newtonObj)
 void Newton_DoPostBarrierCollisionHandling(BO_tNewtonObj *newtonObj,coorddef normal)
 
 {
-  coorddef barrierVec;
-  int impactVel;
-  int distRetreat;
-  coorddef upVec;
-  matrixtdef islandMatrix;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -2272,9 +2131,6 @@ void Newton_DoPostBarrierCollisionHandling(BO_tNewtonObj *newtonObj,coorddef nor
 void Newton_GenerateVector(int type,coorddef *vector,BWorldSm_Pos *testSimRoadInfo)
 
 {
-  coorddef fwdVec;
-  coorddef upVec;
-  coorddef result;
   int iVar1;
   int iVar2;
   coorddef local_40;
@@ -2341,20 +2197,7 @@ void Newton_TestForUndrivableSurfaces(BO_tNewtonObj *newtonObj)
 
 {
   Car_tObj *carObj = (Car_tObj *)newtonObj;
-  int impulse;
-  int i;
-  int collision_type;
-  int newHeight;
-  coorddef normal;
-  coorddef cautionaryCenter;
-  coorddef undrivableCenter;
   coorddef speedVec;
-  coorddef testPoint;
-  coorddef newTestPoint;
-  int check;
-  int j;
-  coorddef temp;
-  int zone;
   short sVar1;
   short sVar2;
   u_short uVar3;
@@ -2659,20 +2502,6 @@ void Newton_LimitAngularVelocity(BO_tNewtonObj *newtonObj)
 void Newton_ApplyTheLawOfGravity(Car_tObj *newtonObj)
 
 {
-  int objAltitude;
-  int groundVel;
-  coorddef collisionPoint;
-  int elevationOfGround;
-  int relativeClosingVelocity;
-  coorddef normal;
-  coorddef shadowNormal;
-  int timeCount;
-  int elapsedTime;
-  int iTimeCount;
-  int modifiedGravity;
-  int bounceVel;
-  int k;
-  int scale;
   int iVar1;
   int iVar2;
   void *pvVar3;
@@ -2858,8 +2687,6 @@ int Newton_CalculateRoadPositionFromSliceAndPosition(int slice,coorddef *positio
   int iVar5;
   int iVar6;
   int iVar7;
-  coorddef centerBack;
-  coorddef carRelative;
   
   pTVar2 = BWorldSm_slices + slice;
   iVar6 = position->x - pTVar2->center[0];
@@ -2893,43 +2720,13 @@ int Newton_CalculateRoadPositionFromSliceAndPosition(int slice,coorddef *positio
 int Newton_CalculateRoadPosition(BO_tNewtonObj *newtonObj)
 
 {
-  int ratio;
   Trk_NewSlice *pTVar1;
-  int z;
   int iVar2;
-  int oldOptz;
   int iVar3;
   int iVar4;
-  int desiredCompression;
   int iVar5;
-  int whichPlayer;
   int iVar6;
-  int index;
   int iVar7;
-  int v1;
-  int zDir;
-  int yDir;
-  int xDir;
-  int roll;
-  int pitch;
-  int forcedSimOptz;
-  int r6;
-  int r4;
-  int bounce;
-  int xMult;
-  int wheelsInAir;
-  coorddef tireCoord [4];
-  coorddef carNormal;
-  coorddef wheelHeight [4];
-  coorddef vecOffset;
-  BWorldSm_Pos testSimRoadInfo;
-  coorddef tempVecX;
-  coorddef tempVecY;
-  int compressionValue [4];
-  coorddef tempVecZ;
-  coorddef centerBack;
-  coorddef carRelative;
-  coorddef carPos;
   
   pTVar1 = BWorldSm_slices + newtonObj->simRoadInfo.slice;
   iVar7 = newtonObj->position.x - pTVar1->center[0];

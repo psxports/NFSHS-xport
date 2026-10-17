@@ -132,7 +132,8 @@ void tDialogBase::Hide()
   int i;
   
   i = 0;
-  if (this->currentlyOn != 0) {
+  // Startup can pass FEApp's low-RAM dialog address before FEApp exists
+  if (PsyQ_readRam32((intptr)this + offsetof(tDialogBase, currentlyOn)) != 0) {
     this->currentlyOn = 0;
     iVar1 = 0;
     do {
@@ -211,7 +212,6 @@ void tDialogHelp::AddItem(short textID,short controllerID)
 void tDialogHelp::CalculateDimensions()
 
 {
-  u_char *puVar1;
   short sVar2;
   bool bVar3;
   bool showLeftRight;
@@ -227,10 +227,7 @@ void tDialogHelp::CalculateDimensions()
   short i;
   int iVar11;
   tPlayer player;
-  char acStack_90038 [2];
-  short asStack_90036 [294911];
   tHelpData helpArray [1];
-  void *tp1;
   
   helpArray[0] = {};
   helpArray[0].autoGenerate = 1;
@@ -641,9 +638,7 @@ short tDialogInteractive::Run()
   tInputKeyType tVar4;
   tMenu *currentMenu;
   tInputKeyType *ptVar7;
-  int i;
   tPlayer player;
-  uint32 debounce;
   tInputKeyType keyVal [2];
   tMenuCommand command;
   
@@ -1013,13 +1008,6 @@ tDialogHelp::~tDialogHelp()
 tDialogBase::~tDialogBase()
 
 {
-  int newWidth;
-  int card;
-  int x;
-  int numLetters;
-  u_int debounce;
-  char buffer [80];
-  PSX_RECT r;
   
   return;
 }

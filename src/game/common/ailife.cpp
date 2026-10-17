@@ -57,13 +57,6 @@ void AILife_RCSetSpeeds(Car_tObj *carObj)
 /* ---- AILife_RCPickSliceAndDirection__FP8Car_tObj  [@0x800676e4] ---- */
 void AILife_RCPickSliceAndDirection(Car_tObj *carObj)
 {
-  int approachSide;
-  int offset;
-  int search;
-  int count;
-  Car_tObj*checkCar;
-  coorddef basisOuterCoord;
-  int basisOuterSlice;
   short sVar1;
   u_int uVar2;
   int iVar3;
@@ -101,7 +94,7 @@ void AILife_RCPickSliceAndDirection(Car_tObj *carObj)
     if (Cars_gNumCars == 0) {
       trap(0x1c00);
     }
-    if ((Cars_gNumCars == -1) && (iVar12 + Cars_gNumCars == -0x80000000)) {
+    if ((Cars_gNumCars == -1) && (iVar12 + Cars_gNumCars == 0x80000000)) {
       trap(0x1800);
     }
     pCVar9 = Cars_gSortedList[(iVar12 + Cars_gNumCars) % Cars_gNumCars];
@@ -178,9 +171,6 @@ LAB_800678dc:
 /* ---- AILife_RCPickDesiredLatPosition__FP8Car_tObj  [@0x80067b1c] ---- */
 void AILife_RCPickDesiredLatPosition(Car_tObj *carObj)
 {
-  int randNumLanes;
-  int newSlice;
-  int width;
   int iVar1;
   u_int uVar2;
   
@@ -223,7 +213,6 @@ void AILife_PlaceCarAtLocation(Car_tObj *carObj,int slice,int desiredLatPos,int 
 /* ---- AILife_SetInitialSlicePositionOrientationEtc__FP8Car_tObj  [@0x80067c8c] ---- */
 void AILife_SetInitialSlicePositionOrientationEtc(Car_tObj *carObj)
 {
-  coorddef offset;
   coorddef local_18;
   
   memset((u_char *)&local_18,'\0',0xc);
@@ -236,11 +225,6 @@ void AILife_SetInitialSlicePositionOrientationEtc(Car_tObj *carObj)
 /* ---- AILife_PlaceCarAtLocation__FP8Car_tObji  [@0x80067ce0] ---- */
 void AILife_PlaceCarAtLocation(Car_tObj *carObj,int rotation1024)
 {
-  coorddef targetDirection;
-  int speed;
-  coorddef zero;
-  matrixtdef rotMatrix;
-  uint32 uVar1;
   matrixtdef *pmVar2;
   int iVar3;
   int iVar4;
@@ -334,14 +318,10 @@ void AILife_ReencarnateTraffic(Car_tObj *carObj)
  * decl. Added `void` + the intra-TU forward declaration (sibling of AILife_ReencarnateCopByPosition) (M19). */
 void AILife_ReencarnateTrafficByPosition(Car_tObj *carObj,int slice,int travelDirection,coorddef *pos,matrixtdef *ori)
 {
-  coorddef zero;
-  coorddef offset;
   short sVar1;
-  int *piVar2;
   matrixtdef *pmVar3;
   int iVar4;
   int iVar5;
-  int iVar6;
   coorddef zeroVelocity;
   coorddef cStack_30;
   
@@ -387,8 +367,6 @@ void AILife_ReencarnateTrafficByPosition(Car_tObj *carObj,int slice,int travelDi
 /* ---- AILife_ReencarnateCopBySlice__FP8Car_tObjiiii  [@0x800681a0] ---- */
 void AILife_ReencarnateCopBySlice(Car_tObj *carObj,int slice,int travelDirection,int roadSide,int moving)
 {
-  int width;
-  int numLanes;
   int iVar1;
   u_int uVar2;
   u_int uVar3;
@@ -446,14 +424,10 @@ LAB_800682dc:
 /* ---- AILife_ReencarnateCopByPosition__FP8Car_tObjiiP8coorddefP10matrixtdef  [@0x80068324] ---- */
 void AILife_ReencarnateCopByPosition(Car_tObj *carObj,int slice,int travelDirection,coorddef *pos,matrixtdef *ori)
 {
-  coorddef zero;
-  coorddef offset;
   bool bVar1;
-  int *piVar2;
   matrixtdef *pmVar3;
   int iVar4;
   int iVar5;
-  int iVar6;
   coorddef zeroVelocity;
   coorddef cStack_28;
   
@@ -493,9 +467,6 @@ void AILife_ReencarnateCopByPosition(Car_tObj *carObj,int slice,int travelDirect
 /* ---- AILife_ReencarnateCopByLatPosAndRotation__FP8Car_tObjiiii  [@0x800684d4] ---- */
 void AILife_ReencarnateCopByLatPosAndRotation(Car_tObj *carObj,int slice,int travelDirection,int latPos,int rotation1024)
 {
-  coorddef zero;
-  coorddef offset;
-  matrixtdef rotMatrix;
   bool bVar1;
   matrixtdef *pmVar2;
   int iVar3;
@@ -552,9 +523,6 @@ void AILife_ReencarnateCopByLatPosAndRotation(Car_tObj *carObj,int slice,int tra
 /* ---- AILife_IsCoordInThisLiveArea__FP8coorddefP8Car_tObj  [@0x80068658] ---- */
 int AILife_IsCoordInThisLiveArea(coorddef *tPos,Car_tObj *racer)
 {
-  int xD;
-  int zD;
-  int dist;
   int iVar1;
   int iVar2;
   
@@ -581,8 +549,6 @@ int AILife_IsCoordInThisLiveArea(coorddef *tPos,Car_tObj *racer)
 /* ---- AILife_IsTrafficCarInAnyLiveArea__FP8Car_tObj  [@0x80068704] ---- */
 Car_tObj * AILife_IsTrafficCarInAnyLiveArea(Car_tObj *traffic)
 {
-  int racerLoop;
-  coorddef*tPos;
   int iVar1;
   Car_tObj **ppCVar2;
   int iVar3;
@@ -605,9 +571,6 @@ Car_tObj * AILife_IsTrafficCarInAnyLiveArea(Car_tObj *traffic)
 /* ---- AILife_IsCoordInThisVisibleArea__FP8coorddefP8Car_tObj  [@0x80068788] ---- */
 int AILife_IsCoordInThisVisibleArea(coorddef *tPos,Car_tObj *racer)
 {
-  int xD;
-  int zD;
-  int dist;
   int iVar1;
   int iVar2;
   
@@ -640,8 +603,6 @@ Car_tObj * AILife_IsCarInAnyVisibleArea(Car_tObj *carObj)
 /* ---- AILife_IsSliceInAnyVisibleArea__Fi  [@0x8006880c] ---- */
 Car_tObj * AILife_IsSliceInAnyVisibleArea(int slice)
 {
-  int racerLoop;
-  int sliceDist;
   int iVar1;
   Car_tObj **ppCVar2;
   int iVar3;
@@ -666,8 +627,6 @@ Car_tObj * AILife_IsSliceInAnyVisibleArea(int slice)
 /* ---- AILife_IsSliceCloseToAnyCopCar__Fi  [@0x800688ac] ---- */
 Car_tObj * AILife_IsSliceCloseToAnyCopCar(int slice)
 {
-  int copLoop;
-  int sliceDist;
   int iVar1;
   Car_tObj **ppCVar2;
   int iVar3;
@@ -692,7 +651,6 @@ Car_tObj * AILife_IsSliceCloseToAnyCopCar(int slice)
 /* ---- AILife_IsPositionInAnyVisibleArea__FP8coorddef  [@0x8006894c] ---- */
 Car_tObj * AILife_IsPositionInAnyVisibleArea(coorddef *pos)
 {
-  int racerLoop;
   int iVar1;
   Car_tObj **ppCVar2;
   int iVar3;
@@ -715,18 +673,6 @@ Car_tObj * AILife_IsPositionInAnyVisibleArea(coorddef *pos)
 /* ---- AILife_Debug__FPce  [@0x800689d0] ---- */
 void AILife_Debug(const char *format)
 {
-  int sliceDist;
-  int dist;
-  int newSlice;
-  int width;
-  int zD;
-  int speed;
-  int copLoop;
-  int count;
-  int approachSide;
-  int search;
-  coorddef zero;
-  matrixtdef rotMatrix;
   
   return;
 }

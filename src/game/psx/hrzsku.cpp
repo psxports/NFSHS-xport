@@ -7,10 +7,8 @@
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
 #include "hrzsku_externs.h"
-#ifdef AP_WIN
 extern "C" void NFSHS_HostTraceSkyProjection(void *);
 extern "C" void NFSHS_HostTraceHorizonCache(void *);
-#endif
 
 /* ---- link-harness owned-global definition (extern-declared, never defined) ---- */
 int Hrz_gProjResultZ0; int Hrz_gProjScratch_9C;  /* HrzSku.obj-owned projection scratch (BSS) */
@@ -70,8 +68,6 @@ void Horizon_InterpolateLineSCoords(DVECTOR *sc,DVECTOR *s0,DVECTOR *s1,int *per
   int iVar1;
   int iVar2;
   short *pScOut;
-  int p;
-  int i;
   int iVar3;
   
   pScOut = (short *)sc;
@@ -134,15 +130,8 @@ void Sky_InitStars(void)
   int iVar4;
   u_int uVar5;
   SVECTOR *pSVar6;
-  int starBright;
-  int heightAngle;
   int iVar7;
-  int radius;
-  int height;
-  int latAngle;
-  int i;
   int iVar8;
-  long oldSeed;
   
   if (starPosInSky == (SVECTOR *)0x0) {
     seed = random();
@@ -232,17 +221,11 @@ void Hrz_InitSky(void)
   int iVar2;
   int iVar3;
   int iVar4;
-  int angle;
   int iVar5;
   int angle_00;
-  int j;
   int iVar6;
   SVECTOR *pSVar7;
-  int i;
   int iVar8;
-  int height;
-  int radius;
-  int k;
   
   iVar2 = fixedcos(Sky_gTrackSpec->sunAngleInSky);
   iVar2 = fixedmult(iVar2,1000);
@@ -355,7 +338,7 @@ void Hrz_Init2DRing(void)
 
   for (int i = 0; i < 0x10; ++i) {
     int scaledHeight = nfs4_mips_sll_s32(pmxHeight[i],0x10);
-    if ((maxPmxHeight == -1) && (scaledHeight == -0x80000000)) {
+    if ((maxPmxHeight == -1) && (scaledHeight == 0x80000000)) {
       trap(0x1800);
     }
     gfxPmxHeightPercentage[i] = scaledHeight / maxPmxHeight;
@@ -431,9 +414,7 @@ void Hrz_LightningAddFork(char direction,char column,char row)
   int iVar2;
   u_int uVar3;
   u_int uVar4;
-  char type;
   u_int uVar5;
-  tHrz_LightningFork *fork;
   u_int uVar6;
   
   uVar5 = (u_int)(u_char)column;
@@ -510,23 +491,23 @@ void Hrz_TextureQuad(DVECTOR *pt,char type,char bright,Draw_DCache *sd)
   AddPrim(Render_gPalettePtr + sd->otz * 4,Render_gPacketPtr);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
   ((u_char *)&prim->tag)[3] = 9;
-  prim->code = 0x2e;
-  prim->r0 = bright;
-  prim->g0 = bright;
-  prim->b0 = bright;
-  prim->x0 = pt->vx;
-  prim->y0 = pt->vy;
-  prim->x2 = pt->vx;
-  prim->y2 = pt->vy + 0x10;
-  prim->x1 = pt->vx + 0x10;
-  prim->y1 = pt->vy;
-  prim->x3 = pt->vx + 0x10;
-  prim->y3 = pt->vy + 0x10;
+  prim->rgbc.code = 0x2e;
+  prim->rgbc.r = bright;
+  prim->rgbc.g = bright;
+  prim->rgbc.b = bright;
+  prim->p[0].xy.x = pt->vx;
+  prim->p[0].xy.y = pt->vy;
+  prim->p[2].xy.x = pt->vx;
+  prim->p[2].xy.y = pt->vy + 0x10;
+  prim->p[1].xy.x = pt->vx + 0x10;
+  prim->p[1].xy.y = pt->vy;
+  prim->p[3].xy.x = pt->vx + 0x10;
+  prim->p[3].xy.y = pt->vy + 0x10;
   pixmap = gLightningPixmap[(u_char)type];
-  *(u_int *)&prim->u0 = ((u_int *)pixmap)[0];
-  *(u_int *)&prim->u1 = ((u_int *)pixmap)[1];
-  *(u_int *)&prim->u2 = ((u_int *)pixmap)[2];
-  *(u_int *)&prim->u3 = ((u_int *)pixmap)[3];
+  *(u_int *)&prim->p[0].uv.u = ((u_int *)pixmap)[0];
+  *(u_int *)&prim->p[1].uv.u = ((u_int *)pixmap)[1];
+  *(u_int *)&prim->p[2].uv.u = ((u_int *)pixmap)[2];
+  *(u_int *)&prim->p[3].uv.u = ((u_int *)pixmap)[3];
   return;
 }
 
@@ -538,7 +519,6 @@ void Hrz_SetLightingPosInSky(DRender_tView *Vi)
   int iVar2;
   int iVar3;
   int iVar4;
-  coorddef forwardVec;
   
   iVar2 = (Vi->cview).mrotation.m[6];
   iVar3 = (Vi->cview).mrotation.m[7];
@@ -559,8 +539,6 @@ void Hrz_SetLightingPosInSky(DRender_tView *Vi)
 void Hrz_BuildForkLightning(Draw_DCache *sd)
 
 {
-  tHrz_LightningFork *fork;
-  char i;
   u_char bVar1;
   u_char bVar2;
   DVECTOR pos;
@@ -596,7 +574,6 @@ void Hrz_LightningFlicker(int on)
 {
   CSkySpec *pCVar1;
   CVECTOR *pCVar2;
-  int i;
   int iVar3;
   
   if (on == 0) {
@@ -646,9 +623,7 @@ void Hrz_LightningFlicker(int on)
 /* ---- HrzSetPsxMatrix__FP10matrixtdef  [HRZSKU.CPP:982-1017] SLD-VERIFIED ---- */
 void HrzSetPsxMatrix(matrixtdef *m)
 {
-  int r2, r0, r1, t2, t1, t3;
   MATRIX mpsx;
-  matrixtdef temp;
   int *mm = (int *)m;
 
   mpsx.m[0][0] = (short)(mm[0] >> 4);
@@ -700,10 +675,7 @@ void Hrz_RotProj16(int n, SVECTOR *s, int *z, DVECTOR *p)
 void Hrz_SetDitheringPrim(int dither,int otz)
 
 {
-  DR_MODE *prim;
   u_int *prev_pkt_slot;
-  int loc_10;
-  int loc_8;
   u_char *p;
   
   p = (u_char *)Render_gPacketPtr;
@@ -728,7 +700,7 @@ void Hrz_BuildSky(void)
   int n, otz_old, pshift, i, temp;
   POLY_GT4 *prim;
   Draw_tPixMap *pmx;
-  int ti1, ti2, skyColIdx, skyRowIdx;
+  int ti1, ti2;
   u_char *skyMesh_iter;
   u_char *tp2, *tp3;
   CSkySpec *tC4;
@@ -812,9 +784,7 @@ void Hrz_BuildSky(void)
       n = n + -1;
     } while (n != -1);
   }
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceSkyProjection(sd));
-#endif
   if ((Sky_gTrackSpec->flags & 0x40U) != 0) {
     Hrz_SetDitheringPrim(0,Draw_gViewOtSize + -2);
   }
@@ -923,17 +893,14 @@ void Sky_RenderStars(Draw_SkyCache *sd,int otz)
 
 {
   int iVar1;
-  u_int uVar2;
   uint32 uVar3;
   u_int *packetWords;
   TILE_1 *prim;
   u_int *puVar5;
-  int n;
   int iVar6;
   u_int uVar7;
   u_int uVar8;
   SVECTOR *pcnt;
-  int pshift;
   int iVar9;
   coorddef trans;
   DVECTOR scnt;
@@ -969,21 +936,14 @@ void Sky_RenderStars(Draw_SkyCache *sd,int otz)
           packetWords = (u_int *)Render_gPacketPtr;
           prim = (TILE_1 *)Render_gPacketPtr;
           puVar5 = (u_int *)(Render_gPalettePtr + otz * 4);
-#ifdef AP_WIN
           AddPrim(puVar5,packetWords);
           Render_gPacketPtr = Render_gPacketPtr + sizeof(TILE_1);
-#else
-          *packetWords = *packetWords & uVar8 | *puVar5 & uVar7;
-          uVar2 = *puVar5;
-          Render_gPacketPtr = Render_gPacketPtr + sizeof(TILE_1);
-          *puVar5 = uVar2 & uVar8 | (u_int)packetWords & uVar7;
-#endif
           uVar3 = (*(uint32 *)&starColors[iVar6]);
           ((u_char *)&prim->tag)[3] = 2;
-          *(uint32 *)&prim->r0 = uVar3;
-          prim->code = 0x68;
-          prim->x0 = scnt.vx;
-          prim->y0 = scnt.vy;
+          *(uint32 *)&prim->rgbc.r = uVar3;
+          prim->rgbc.code = 0x68;
+          prim->p[0].x = scnt.vx;
+          prim->p[0].y = scnt.vy;
         }
       }
       iVar6 = iVar6 + 1;
@@ -996,77 +956,24 @@ void Sky_RenderStars(Draw_SkyCache *sd,int otz)
 void Hrz_BuildHorizon(DRender_tView *Vi)
 
 {
-  u_int *puVar1;
-  u_int uVar2;
-  u_int uVar3;
-  u_int uVar4;
-  u_char *puVar5;
   u_char *p;
   POLY_GT4 *prim;
-  int iVar6;
-  DVECTOR DVar7;
-  int iVar8;
-  int iVar9;
-  u_int auVar10;
-  short shape_short;
-  int r2;
-  int r0;
   int *zval;
   SVECTOR *pSVar12;
-  int dx;
   int Zmax;
-  SVECTOR *pcnt;
-  int shape_visible;
-  int shape_idx;
   int rowDelta;
-  int shape_overlap;
-  int shape_w_idx;
-  int farIdx;
   int farI;
-  int t1;
-  DVECTOR *pDVar13;
-  int t3;
   Draw_tPixMap *pmx;
-  u_int *puVar14;
-  int height;
-  int iVar15;
-  int latAngle;
-  int iVar16;
-  int i;
   int iVar17;
-  int oldSeed;
-  int iVar18;
   Draw_HorizonCache *hsd;
-  int loc_70;
-  int loc_6c;
   coorddef trans;
   coorddef trans2;
-  u_int auStack_4c;
   DVECTOR right;
-  SVECTOR p_;
-  DVECTOR DStack_38;
   int fxOverlapPercentage;
   long hrz_projchange;
-  VECTOR transformed;
   SVECTOR updown [2];
   DVECTOR temp2d [2];
   DVECTOR mpts [4];
-  long s_;
-  void *tp1;
-  short ts3;
-  int tp2;
-  int tu5;
-  short ts4;
-  int tp6;
-  int tu8;
-  short tu7;
-  int tp9;
-  void *tp3;
-  short tu6;
-  short ts5;
-  u_int *tp10;
-  u_char *tp4;
-  u_int tu9;
   hsd = (Draw_HorizonCache *)getScratchAddr(0);
   
   fxOverlapPercentage = 0x107ae;
@@ -1139,9 +1046,7 @@ void Hrz_BuildHorizon(DRender_tView *Vi)
              hsd->scptTop,gfxPmxHeightPercentage,0x10,1);
   Horizon_InterpolateLineSCoords(hsd->scptPmxRight,hsd->scptMidBot + 1,
              hsd->scptTop + 1,gfxPmxHeightPercentage,0x10,1);
-#ifdef AP_WIN
   NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceHorizonCache(hsd));
-#endif
   iVar17 = 0;
   if (TrackSpec_gSpec.horizonstate != 0) {
     for (; iVar17 < 0x10; iVar17 = iVar17 + 1) {

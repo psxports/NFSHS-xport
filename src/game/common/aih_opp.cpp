@@ -27,9 +27,6 @@ void AIHigh_Opponent::CheckForWipeOut()
   int oppLevel;
   int oppFines;
   int hLoop;
-  Car_tObj*thisPlayerObj;
-  AIHigh_Player*thisPlayer;
-  int playFines;
 
   bool bVar1;
 
@@ -130,11 +127,6 @@ int AIHigh_Opponent::DoRearEnder()
 
 
 {
-  int attackIndex;
-  Car_tObj*otherCarObj;
-  int longDistance;
-  int latDistance;
-  int racerLoop;
 
   int iVar1;
 
@@ -216,7 +208,7 @@ int AIHigh_Opponent::DoRearEnder()
 
         iVar1 = (pCVar4->N).simRoadInfo.slice * 0x20 + (int)BWorldSm_slices;
 
-        if (((int)-((u_int)*(u_char *)(iVar1 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar1 + 0x1d) >> 4))
+        if (((int)(0 - ((u_int)*(u_char *)(iVar1 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar1 + 0x1d) >> 4)))
 
              <= pCVar4->roadPosition) &&
 
@@ -284,11 +276,6 @@ void AIHigh_Opponent::HighExecute()
 
 
 {
-  AIState_Base*newState;
-  int attackIndex;
-  coorddef pos;
-  int aggression;
-  AIState_Chase*attackState;
 
   AIState_Normal *pAVar1;
 

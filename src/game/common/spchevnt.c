@@ -144,7 +144,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -169,7 +168,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -193,7 +191,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -220,7 +217,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -250,7 +246,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -281,7 +276,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -306,7 +300,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -329,7 +322,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -357,7 +349,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -384,7 +375,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -412,7 +402,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -439,7 +428,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -465,7 +453,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -488,7 +475,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -511,7 +497,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -534,7 +519,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -558,7 +542,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -583,7 +566,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -608,7 +590,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -636,7 +617,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -662,7 +642,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -684,7 +663,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -708,7 +686,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -737,7 +714,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -761,7 +737,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -790,7 +765,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -814,7 +788,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -842,7 +815,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -866,7 +838,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -891,7 +862,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -920,7 +890,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -944,7 +913,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -968,7 +936,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -992,7 +959,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1015,7 +981,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1039,7 +1004,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1062,7 +1026,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1085,7 +1048,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1108,7 +1070,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1134,7 +1095,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1159,7 +1119,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1188,7 +1147,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1216,7 +1174,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1241,7 +1198,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1267,7 +1223,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1290,7 +1245,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1317,7 +1271,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1340,7 +1293,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1365,7 +1317,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1391,7 +1342,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1419,7 +1369,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1446,7 +1395,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 
@@ -1469,7 +1417,6 @@ extern "C"
 
     {
         long *plVar1;
-        long i;
         int iVar2;
         long parms[12];
 

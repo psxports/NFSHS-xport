@@ -93,7 +93,6 @@ void SubtractiveBox(int x,int y,int w,int h,int col1,int col2,int col3,int col4)
   short y_plus_h;
   short x_plus_w;
   short x_s;
-  short ts2;
   u_char *prim;
   u_char *prev_pkt;
   
@@ -1003,11 +1002,8 @@ void tMenuItemSlidingMenu::Draw(int offx,int offy,bool selected)
   int pkt_addr24;
   int ti1;
   int tu1;
-  int boxWidth_d;
-  int drawX;
   tInsideBoxMenu *index;
   int pa_Var3;
-  int rowSpacing;
   int hh;
   int itemColor;
   tTexture_ShapeInfo *shapebottom;
@@ -1021,9 +1017,6 @@ void tMenuItemSlidingMenu::Draw(int offx,int offy,bool selected)
   int width;
   int gray;
   DRAWENV *drenv;
-  u_char bVar1;
-  int ptVar3;
-  int ptVar4;
   u_char *cur_pkt;
   u_char *daprim;
   
@@ -1792,7 +1785,6 @@ void tInsideBoxSongMenu::DrawOneSong(short songnum,short x,short y,short w,short
   int Col;
   int ColText;
   char *pcVar3;
-  u_short in_register_0000001a;
   int iVar4;
   int iVar5;
   int ColTextOn;
@@ -1804,9 +1796,9 @@ void tInsideBoxSongMenu::DrawOneSong(short songnum,short x,short y,short w,short
   Col = CalcFadeVal(0x551e00,0x28);   /* H13: 2nd arg is the literal 0x28 (oracle 0x8001EC84 $a1=0x28), not x */
   CalcOnOffFade(textType_Options,fOnOffFade,fSelFade,0,ColTextOn,ColTextOff);
   ColText = CalcTextFadeSelToHi(textType_Options,fSelFade,0);
-  FETextRender_FullTextRGB(screenAudio->songlist->song[songnum].title,
+  FETextRender_FullTextRGB(((AudioMus_tSongEntry *)(screenAudio->songlist + 1))[songnum].title,
              (short)((u_int)((iVar4 + 3) * 0x10000) >> 0x10),y + 2,ColText,'\0',0);
-  FETextRender_FullTextRGB(screenAudio->songlist->song[songnum].artist,
+  FETextRender_FullTextRGB(((AudioMus_tSongEntry *)(screenAudio->songlist + 1))[songnum].artist,
              (short)((u_int)((iVar4 + 2) * 0x10000) >> 0x10),y + 10,ColText,'\0',0);
   pcVar3 = TextSys_Word(0x66);
   FETextRender_FullTextRGB(pcVar3,(short)((iVar4 + w + -0x5a) * 0x10000 >> 0x10),y + 6,ColTextOn,'\0',2);
@@ -2606,7 +2598,6 @@ int tUserNameMenuItem::Draw(bool selected)
   int startx;
   char output [2];
   /* SYM AUTO local optimizer-ELIMINATED (disasm: cursor draw uses fFlags, slot sp+0x28 unused) */
-  tDrawShapeExtended tCol;
   tDrawShapeExtended fFlags;
   int cursorX;
   
@@ -2702,7 +2693,6 @@ void tUserNameMenuItem::TransitionOn()
 {
   char cVar1;
   short sVar2;
-  u_int *puVar3;
   char *fmt;
   u_int uVar4;
   short sVar5;
@@ -2822,7 +2812,6 @@ int tMemoryCardMenuItem::Draw(bool selected)
   int amount;
   int fWidth;
   /* SYM AUTO local optimizer-ELIMINATED (disasm: draw passes NULL, slot sp+0x20 unused) */
-  tDrawShapeExtended tCol;
   
   if (((this->_base_tMenuItemGoToMenuButtonFade)._base_tMenuItemGoToMenuButton._base_tMenuItemInteractive._base_tMenuItem.fFlags & 1) == 0) {
     sVar2 = (this->_base_tMenuItemGoToMenuButtonFade).fEnableVal + 8;

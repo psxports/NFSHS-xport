@@ -88,10 +88,6 @@ void DrawW_AddSubdividPrimGT4(POLY_GT4 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
   short sVar22;
   short sVar23;
   short sVar24;
-  u_char a;
-  u_short b;
-  long c;
-  long d;
   
   ((u_char *)&prim->tag)[3] = 0xc;
   uVar3 = v0->g;
@@ -109,22 +105,22 @@ void DrawW_AddSubdividPrimGT4(POLY_GT4 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
   uVar15 = v3->g;
   uVar16 = v3->b;
   uVar17 = v3->a;
-  prim->r0 = v0->r;
-  prim->g0 = uVar3;
-  prim->b0 = uVar4;
-  prim->code = uVar5;
-  prim->r1 = uVar6;
-  prim->g1 = uVar7;
-  prim->b1 = uVar8;
-  prim->p1 = uVar9;
-  prim->r3 = uVar10;
-  prim->g3 = uVar11;
-  prim->b3 = uVar12;
-  prim->p3 = uVar13;
-  prim->r2 = uVar14;
-  prim->g2 = uVar15;
-  prim->b2 = uVar16;
-  prim->p2 = uVar17;
+  prim->p[0].rgbc.r = v0->r;
+  prim->p[0].rgbc.g = uVar3;
+  prim->p[0].rgbc.b = uVar4;
+  prim->p[0].rgbc.code = uVar5;
+  prim->p[1].rgbc.r = uVar6;
+  prim->p[1].rgbc.g = uVar7;
+  prim->p[1].rgbc.b = uVar8;
+  prim->p[1].rgbc.code = uVar9;
+  prim->p[3].rgbc.r = uVar10;
+  prim->p[3].rgbc.g = uVar11;
+  prim->p[3].rgbc.b = uVar12;
+  prim->p[3].rgbc.code = uVar13;
+  prim->p[2].rgbc.r = uVar14;
+  prim->p[2].rgbc.g = uVar15;
+  prim->p[2].rgbc.b = uVar16;
+  prim->p[2].rgbc.code = uVar17;
   sVar18 = v0->dvy;
   sVar19 = v1->dvx;
   sVar20 = v1->dvy;
@@ -132,14 +128,14 @@ void DrawW_AddSubdividPrimGT4(POLY_GT4 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
   sVar22 = v2->dvy;
   sVar23 = v3->dvx;
   sVar24 = v3->dvy;
-  prim->x0 = v0->dvx;
-  prim->y0 = sVar18;
-  prim->x1 = sVar19;
-  prim->y1 = sVar20;
-  prim->x3 = sVar21;
-  prim->y3 = sVar22;
-  prim->x2 = sVar23;
-  prim->y2 = sVar24;
+  prim->p[0].xy.x = v0->dvx;
+  prim->p[0].xy.y = sVar18;
+  prim->p[1].xy.x = sVar19;
+  prim->p[1].xy.y = sVar20;
+  prim->p[3].xy.x = sVar21;
+  prim->p[3].xy.y = sVar22;
+  prim->p[2].xy.x = sVar23;
+  prim->p[2].xy.y = sVar24;
   uVar3 = v0->v;
   uVar4 = v1->u;
   uVar5 = v1->v;
@@ -147,19 +143,19 @@ void DrawW_AddSubdividPrimGT4(POLY_GT4 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
   uVar7 = v2->v;
   uVar8 = v3->u;
   uVar9 = v3->v;
-  prim->u0 = v0->u;
-  prim->v0 = uVar3;
-  prim->u1 = uVar4;
-  prim->v1 = uVar5;
-  prim->u3 = uVar6;
-  prim->v3 = uVar7;
-  prim->u2 = uVar8;
-  prim->v2 = uVar9;
-  uVar1 = (sd->GT4Prim).tpage;
-  uVar2 = (sd->GT4Prim).clut;
-  prim->code = (sd->GT4Prim).code;
-  prim->tpage = uVar1;
-  prim->clut = uVar2;
+  prim->p[0].uv.u = v0->u;
+  prim->p[0].uv.v = uVar3;
+  prim->p[1].uv.u = uVar4;
+  prim->p[1].uv.v = uVar5;
+  prim->p[3].uv.u = uVar6;
+  prim->p[3].uv.v = uVar7;
+  prim->p[2].uv.u = uVar8;
+  prim->p[2].uv.v = uVar9;
+  uVar1 = (sd->GT4Prim).p[1].attr;
+  uVar2 = (sd->GT4Prim).p[0].attr;
+  prim->p[0].rgbc.code = (sd->GT4Prim).p[0].rgbc.code;
+  prim->p[1].attr = uVar1;
+  prim->p[0].attr = uVar2;
   return;
 }
 
@@ -186,9 +182,6 @@ void DrawW_AddSubdividPrimGT3(POLY_GT3 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
   short sVar16;
   short sVar17;
   short sVar18;
-  u_char a;
-  u_short b;
-  long c;
   
   ((u_char *)&prim->tag)[3] = 9;
   uVar3 = v0->g;
@@ -202,45 +195,45 @@ void DrawW_AddSubdividPrimGT3(POLY_GT3 *prim,Draw_SVertex *v0,Draw_SVertex *v1,D
   uVar11 = v2->g;
   uVar12 = v2->b;
   uVar13 = v2->a;
-  prim->r0 = v0->r;
-  prim->g0 = uVar3;
-  prim->b0 = uVar4;
-  prim->code = uVar5;
-  prim->r1 = uVar6;
-  prim->g1 = uVar7;
-  prim->b1 = uVar8;
-  prim->p1 = uVar9;
-  prim->r2 = uVar10;
-  prim->g2 = uVar11;
-  prim->b2 = uVar12;
-  prim->p2 = uVar13;
+  prim->p[0].rgbc.r = v0->r;
+  prim->p[0].rgbc.g = uVar3;
+  prim->p[0].rgbc.b = uVar4;
+  prim->p[0].rgbc.code = uVar5;
+  prim->p[1].rgbc.r = uVar6;
+  prim->p[1].rgbc.g = uVar7;
+  prim->p[1].rgbc.b = uVar8;
+  prim->p[1].rgbc.code = uVar9;
+  prim->p[2].rgbc.r = uVar10;
+  prim->p[2].rgbc.g = uVar11;
+  prim->p[2].rgbc.b = uVar12;
+  prim->p[2].rgbc.code = uVar13;
   sVar14 = v0->dvy;
   sVar15 = v1->dvx;
   sVar16 = v1->dvy;
   sVar17 = v2->dvx;
   sVar18 = v2->dvy;
-  prim->x0 = v0->dvx;
-  prim->y0 = sVar14;
-  prim->x1 = sVar15;
-  prim->y1 = sVar16;
-  prim->x2 = sVar17;
-  prim->y2 = sVar18;
+  prim->p[0].xy.x = v0->dvx;
+  prim->p[0].xy.y = sVar14;
+  prim->p[1].xy.x = sVar15;
+  prim->p[1].xy.y = sVar16;
+  prim->p[2].xy.x = sVar17;
+  prim->p[2].xy.y = sVar18;
   uVar3 = v0->v;
   uVar4 = v1->u;
   uVar5 = v1->v;
   uVar6 = v2->u;
   uVar7 = v2->v;
-  prim->u0 = v0->u;
-  prim->v0 = uVar3;
-  prim->u1 = uVar4;
-  prim->v1 = uVar5;
-  prim->u2 = uVar6;
-  prim->v2 = uVar7;
-  uVar1 = (sd->GT4Prim).tpage;
-  uVar2 = (sd->GT4Prim).clut;
-  prim->code = (sd->GT4Prim).code;
-  prim->tpage = uVar1;
-  prim->clut = uVar2;
+  prim->p[0].uv.u = v0->u;
+  prim->p[0].uv.v = uVar3;
+  prim->p[1].uv.u = uVar4;
+  prim->p[1].uv.v = uVar5;
+  prim->p[2].uv.u = uVar6;
+  prim->p[2].uv.v = uVar7;
+  uVar1 = (sd->GT4Prim).p[1].attr;
+  uVar2 = (sd->GT4Prim).p[0].attr;
+  prim->p[0].rgbc.code = (sd->GT4Prim).p[0].rgbc.code;
+  prim->p[1].attr = uVar1;
+  prim->p[0].attr = uVar2;
   return;
 }
 
@@ -265,11 +258,7 @@ int DrawW_CalcSubdivision(Draw_tGiveShelbyMoreCache *sd,Draw_SVertex *v0,Draw_SV
 
 {
   int iVar1;
-  int z0;
   int iVar2;
-  int z1;
-  int z2;
-  int z3;
   
   iVar2 = (int)v0->vz;
   if ((int)v1->vz < (int)v0->vz) {
@@ -460,7 +449,7 @@ gte_stflg(&flag);
     v8->a = '\0';
   }
   if (sd->doublelayer == 0) goto DrawWSubdiv_recurse;
-  (sd->GT4Prim).code = (sd->GT4Prim).code & 0xf7;
+  (sd->GT4Prim).p[0].rgbc.code = (sd->GT4Prim).p[0].rgbc.code & 0xf7;
   tp3 = (u_char *)Render_gPacketPtr;
   subOtz_local = nfs4_mips_addu_s32(sd->otz,8);
   if (v0->a == '\0') {
@@ -508,7 +497,7 @@ DrawWSubdiv_testV3:
       DrawW_AddSubdividPrimGT3((POLY_GT3 *)prim_00,v3,v0,v7,sd);
     }
   }
-  (sd->GT4Prim).code = (sd->GT4Prim).code | 8;
+  (sd->GT4Prim).p[0].rgbc.code = (sd->GT4Prim).p[0].rgbc.code | 8;
 DrawWSubdiv_recurse:
   l_00 = nfs4_mips_addu_s32(l,1);
 gte_swc2(0xe,&v8->dvx);
@@ -527,12 +516,9 @@ gte_swc2(0xe,&v8->dvx);
 void DrawW_LoadPrecVECTOR(Draw_SVertex *v,VECTOR *dv)
 
 {
-  int y;
   int x;
-  long temp;
   u_int uVar1;
   int iVar2;
-  int z;
   
   x = dv->vx;
   iVar2 = dv->vz;
@@ -547,10 +533,6 @@ void DrawW_LoadPrecVECTOR(Draw_SVertex *v,VECTOR *dv)
 void DrawW_SetUpSubdividFacet(int face,Draw_tGiveShelbyMoreCache *sd)
 
 {
-  long t0;
-  long t1;
-  long t2;
-  long t3;
   short sVar1;
   short sVar2;
   short sVar3;
@@ -573,30 +555,21 @@ void DrawW_SetUpSubdividFacet(int face,Draw_tGiveShelbyMoreCache *sd)
   u_char uVar20;
   u_char uVar21;
   u_char uVar22;
-  short u3;
-  short u0;
-  short u1;
-  short u2;
-  POLY_GT4 *prim;
   POLY_GT4 *pPVar23;
-  Draw_SVertex *v2;
-  Draw_SVertex *v3;
-  Draw_SVertex *v1;
-  Draw_SVertex *v0;
   
   DrawW_LoadPrecVECTOR(&sd->v0,&sd->tVn0);
   DrawW_LoadPrecVECTOR(&sd->v1,&sd->tVn1);
   DrawW_LoadPrecVECTOR(&sd->v2,&sd->tVn2);
   DrawW_LoadPrecVECTOR(&sd->v3,&sd->tVn3);
   pPVar23 = &sd->GT4Prim;
-  sVar1 = (sd->GT4Prim).y0;
-  sVar2 = (sd->GT4Prim).x1;
-  sVar3 = (sd->GT4Prim).y1;
-  sVar4 = (sd->GT4Prim).x3;
-  sVar5 = (sd->GT4Prim).y3;
-  sVar6 = (sd->GT4Prim).x2;
-  sVar7 = (sd->GT4Prim).y2;
-  (sd->v0).dvx = (sd->GT4Prim).x0;
+  sVar1 = (sd->GT4Prim).p[0].xy.y;
+  sVar2 = (sd->GT4Prim).p[1].xy.x;
+  sVar3 = (sd->GT4Prim).p[1].xy.y;
+  sVar4 = (sd->GT4Prim).p[3].xy.x;
+  sVar5 = (sd->GT4Prim).p[3].xy.y;
+  sVar6 = (sd->GT4Prim).p[2].xy.x;
+  sVar7 = (sd->GT4Prim).p[2].xy.y;
+  (sd->v0).dvx = (sd->GT4Prim).p[0].xy.x;
   (sd->v0).dvy = sVar1;
   (sd->v1).dvx = sVar2;
   (sd->v1).dvy = sVar3;
@@ -628,22 +601,22 @@ gte_lwc2(0,*(int *)(((char *)sd + 0x17c)));
     gte_rtps();
 gte_swc2(0xe,((char *)sd + 0x184));
   }
-  uVar8 = pPVar23->g0;
-  uVar9 = pPVar23->b0;
-  uVar10 = pPVar23->code;
-  uVar11 = pPVar23->r1;
-  uVar12 = pPVar23->g1;
-  uVar13 = pPVar23->b1;
-  uVar14 = pPVar23->p1;
-  uVar15 = pPVar23->r3;
-  uVar16 = pPVar23->g3;
-  uVar17 = pPVar23->b3;
-  uVar18 = pPVar23->p3;
-  uVar19 = pPVar23->r2;
-  uVar20 = pPVar23->g2;
-  uVar21 = pPVar23->b2;
-  uVar22 = pPVar23->p2;
-  (sd->v0).r = pPVar23->r0;
+  uVar8 = pPVar23->p[0].rgbc.g;
+  uVar9 = pPVar23->p[0].rgbc.b;
+  uVar10 = pPVar23->p[0].rgbc.code;
+  uVar11 = pPVar23->p[1].rgbc.r;
+  uVar12 = pPVar23->p[1].rgbc.g;
+  uVar13 = pPVar23->p[1].rgbc.b;
+  uVar14 = pPVar23->p[1].rgbc.code;
+  uVar15 = pPVar23->p[3].rgbc.r;
+  uVar16 = pPVar23->p[3].rgbc.g;
+  uVar17 = pPVar23->p[3].rgbc.b;
+  uVar18 = pPVar23->p[3].rgbc.code;
+  uVar19 = pPVar23->p[2].rgbc.r;
+  uVar20 = pPVar23->p[2].rgbc.g;
+  uVar21 = pPVar23->p[2].rgbc.b;
+  uVar22 = pPVar23->p[2].rgbc.code;
+  (sd->v0).r = pPVar23->p[0].rgbc.r;
   (sd->v0).g = uVar8;
   (sd->v0).b = uVar9;
   (sd->v0).a = uVar10;
@@ -659,14 +632,14 @@ gte_swc2(0xe,((char *)sd + 0x184));
   (sd->v3).g = uVar20;
   (sd->v3).b = uVar21;
   (sd->v3).a = uVar22;
-  uVar8 = pPVar23->v0;
-  uVar9 = pPVar23->u1;
-  uVar10 = pPVar23->v1;
-  uVar13 = pPVar23->u2;
-  uVar14 = pPVar23->v2;
-  uVar11 = pPVar23->u3;
-  uVar12 = pPVar23->v3;
-  (sd->v0).u = pPVar23->u0;
+  uVar8 = pPVar23->p[0].uv.v;
+  uVar9 = pPVar23->p[1].uv.u;
+  uVar10 = pPVar23->p[1].uv.v;
+  uVar13 = pPVar23->p[2].uv.u;
+  uVar14 = pPVar23->p[2].uv.v;
+  uVar11 = pPVar23->p[3].uv.u;
+  uVar12 = pPVar23->p[3].uv.v;
+  (sd->v0).u = pPVar23->p[0].uv.u;
   (sd->v0).v = uVar8;
   (sd->v1).u = uVar9;
   (sd->v1).v = uVar10;
@@ -748,18 +721,11 @@ void Night_NightCopCalc(VECTOR *v,short *idx)
 void Night_NightCalc(VECTOR *v,short *idx,Draw_tGiveShelbyMoreCache *sd)
 
 {
-  int index;
-  int xdist;
   u_char bVar1;
-  int lookup;
   int iVar2;
-  int x;
   int iVar3;
   int iVar4;
-  int z;
-  int znear;
   int iVar5;
-  int zfar;
   
   bVar1 = sd->night_ZDistShift;
   iVar4 = v->vz;
@@ -787,7 +753,6 @@ void DrawW_NightColorCalc(Draw_tGiveShelbyMoreCache *sd,POLY_GT4 *prim,CCOORD16 
                CCOORD16 *vt2,CCOORD16 *vt3)
 
 {
-  long d;
   VECTOR temp0;
   VECTOR tempnight;
   u_char uVar1;
@@ -801,11 +766,8 @@ void DrawW_NightColorCalc(Draw_tGiveShelbyMoreCache *sd,POLY_GT4 *prim,CCOORD16 
   u_char uVar9;
   u_char uVar10;
   u_char uVar11;
-  long color;
   CVECTOR CVar12;
-  long c;
   CVECTOR *pCVar13;
-  long b;
   CVECTOR *pCVar14;
   VECTOR *pVVar15;
   long a;
@@ -895,18 +857,18 @@ gte_swc2(0x19,&temp0);
     uVar10 = pCVar13->b;
     uVar11 = pCVar13->cd;
     CVar12 = Chunk_lightTable[vt2->light];
-    prim->r0 = pCVar16->r;
-    prim->g0 = uVar1;
-    prim->b0 = uVar2;
-    prim->code = uVar3;
-    prim->r1 = uVar4;
-    prim->g1 = uVar5;
-    prim->b1 = uVar6;
-    prim->p1 = uVar7;
-    prim->r2 = uVar8;
-    prim->g2 = uVar9;
-    prim->b2 = uVar10;
-    prim->p2 = uVar11;
+    prim->p[0].rgbc.r = pCVar16->r;
+    prim->p[0].rgbc.g = uVar1;
+    prim->p[0].rgbc.b = uVar2;
+    prim->p[0].rgbc.code = uVar3;
+    prim->p[1].rgbc.r = uVar4;
+    prim->p[1].rgbc.g = uVar5;
+    prim->p[1].rgbc.b = uVar6;
+    prim->p[1].rgbc.code = uVar7;
+    prim->p[2].rgbc.r = uVar8;
+    prim->p[2].rgbc.g = uVar9;
+    prim->p[2].rgbc.b = uVar10;
+    prim->p[2].rgbc.code = uVar11;
   }
   else {
     if ((sd->nightFlags & 1U) != 0) {
@@ -934,23 +896,23 @@ gte_swc2(0x19,&tempcop);
       Night_NightCopCalc(pVVar15,&vt1->x);
     }
     CVar12 = Chunk_lightTable[sd->light];
-    prim->r0 = CVar12.r;
-    prim->g0 = CVar12.g;
-    prim->b0 = CVar12.b;
-    prim->code = CVar12.cd;
-    prim->r1 = CVar12.r;
-    prim->g1 = CVar12.g;
-    prim->b1 = CVar12.b;
-    prim->p1 = CVar12.cd;
-    prim->r2 = CVar12.r;
-    prim->g2 = CVar12.g;
-    prim->b2 = CVar12.b;
-    prim->p2 = CVar12.cd;
+    prim->p[0].rgbc.r = CVar12.r;
+    prim->p[0].rgbc.g = CVar12.g;
+    prim->p[0].rgbc.b = CVar12.b;
+    prim->p[0].rgbc.code = CVar12.cd;
+    prim->p[1].rgbc.r = CVar12.r;
+    prim->p[1].rgbc.g = CVar12.g;
+    prim->p[1].rgbc.b = CVar12.b;
+    prim->p[1].rgbc.code = CVar12.cd;
+    prim->p[2].rgbc.r = CVar12.r;
+    prim->p[2].rgbc.g = CVar12.g;
+    prim->p[2].rgbc.b = CVar12.b;
+    prim->p[2].rgbc.code = CVar12.cd;
   }
-  prim->r3 = CVar12.r;
-  prim->g3 = CVar12.g;
-  prim->b3 = CVar12.b;
-  prim->p3 = CVar12.cd;
+  prim->p[3].rgbc.r = CVar12.r;
+  prim->p[3].rgbc.g = CVar12.g;
+  prim->p[3].rgbc.b = CVar12.b;
+  prim->p[3].rgbc.code = CVar12.cd;
 gte_SetRotMatrix(((char *)sd + 0x14));
 gte_SetTransMatrix(((char *)sd + 0x14));
   return;
@@ -960,70 +922,27 @@ gte_SetTransMatrix(((char *)sd + 0x14));
 void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
 
 {
-  int*z;
-  int p1;
-  int p2;
-  int p3;
-  int t2;
-  short tx;
-  short ty;
-  short tz;
-  long * dp0;
-  long * dp1;
-  long * dp2;
-  int newIndex;
-  DR_TWIN * aprim;
-  int p0;
   uint32 l1;
   uint32 l2;
   uint32 l3;
-  int dU;
-  short vert2_proj_x;
   uint32 l0;
-  short vert0_proj_x;
-  short tu27;
-  short vert1_proj_x;
-  short tu28;
-  short vert3_proj_x;
-  short tu29;
-  short tu30;
   int bfctResult;
   intptr tu24;
-  int dV;
   int ti5;
   short sVar1;
   short ts27;
   int iVar2;
-  u_int uVar3;
   int depth_avg;
   short ts31;
-  int uVar7_00;
   int ti18;
   Track_tMaterial *currentQuadMat;
-  u_char d;
   int vert_y_pack;
-  u_char c;
   int vert_x_pack;
   CCOORD16 *geomVertices;
   CCOORD16 *sourceVertex;
-  short vert0_proj_y;
-  short vert1_proj_y;
-  short vert2_proj_y;
-  short vert3_proj_y;
-  int t1;
-  short tu46;
-  short tu47;
-  short tu48;
-  short tu49;
-  int t3;
-  int zeroTransFlag;
   POLY_GT4 *prim;
   Draw_tPixMap *workPmx;
   uint32 *otEntry;
-  int save_pre_otz;
-  char flag;
-  int doSubdivision;
-  int face;
   int facetIdx;
   CCOORD16 vt0;
   CCOORD16 vt1;
@@ -1036,23 +955,15 @@ void DrawW_DrawQuad(Draw_tGiveShelbyMoreCache *sd,Trk_Quad *inQuad)
   long dvxy2;
   long bfct;
   int depthcue;
-  long a;
-  long b;
-  u_int uStack_28;
   long color;
   u_char bVar2;
   u_char tc3;
   u_char bVar4;
-  int tu5;
   u_char bVar1;
-  int tp6;
   u_char *tp20;
   u_char *p;
   u_char *tp18;
   u_char *tp19;
-  int tu1;
-  u_int tu2;
-  u_int tu18;
   
   geomVertices = sd->vertices;
   ts31 = (sd->trans).x;
@@ -1127,13 +1038,11 @@ gte_swc2(0xc,&dvxy1);
     gte_swc2(0xd,&dvxy3);
     gte_swc2(0xe,&dvxy2);
     bVar4 = 199 < sd->otz;
-#ifdef AP_WIN
     /* Observation only.  This is placed after the exact 0x800C67D4..67F4
        AVSZ4/SXY stores and before either 0x800C680C/6868 NCLIP, so it cannot
        influence the branch being diagnosed. */
     NFSHS_DIAGNOSTIC_CALL(NFSHS_HostTraceDrawQuadCandidate(sd,inQuad,currentQuadMat,
                                      dvxy0,dvxy1,dvxy2,dvxy3));
-#endif
     if (((bVar2 >> 3 & 2) == 0) && ((bool)bVar4)) {
       gte_nclip_b();
 gte_swc2(0x18,&bfct);
@@ -1196,14 +1105,14 @@ gte_swc2(0x8,&depthcue);
       else {
         prim = &sd->GT4Prim;
       }
-      prim->x0 = (u_short)dvxy0;
-      prim->y0 = (*(u_short *)((u_char *)&(dvxy0) + 2));
-      prim->x1 = (u_short)dvxy1;
-      prim->y1 = (*(u_short *)((u_char *)&(dvxy1) + 2));
-      prim->x2 = (u_short)dvxy2;
-      prim->y2 = (*(u_short *)((u_char *)&(dvxy2) + 2));
-      prim->x3 = (u_short)dvxy3;
-      prim->y3 = (*(u_short *)((u_char *)&(dvxy3) + 2));
+      prim->p[0].xy.x = (u_short)dvxy0;
+      prim->p[0].xy.y = (*(u_short *)((u_char *)&(dvxy0) + 2));
+      prim->p[1].xy.x = (u_short)dvxy1;
+      prim->p[1].xy.y = (*(u_short *)((u_char *)&(dvxy1) + 2));
+      prim->p[2].xy.x = (u_short)dvxy2;
+      prim->p[2].xy.y = (*(u_short *)((u_char *)&(dvxy2) + 2));
+      prim->p[3].xy.x = (u_short)dvxy3;
+      prim->p[3].xy.y = (*(u_short *)((u_char *)&(dvxy3) + 2));
       if (sd->nightFlags == '\0') {
         gte_lddp(depthcue);
         if (sd->light == -1) {
@@ -1213,7 +1122,7 @@ gte_swc2(0x8,&depthcue);
           nfs4_mips_copy_bytes(&l0,Chunk_lightTable + vt0.light,4);
           nfs4_mips_copy_bytes(&l1,Chunk_lightTable + vt1.light,4);
           nfs4_mips_copy_bytes(&l3,Chunk_lightTable + vt3.light,4);
-          gte_swc2(0x16,&prim->r3);
+          gte_swc2(0x16,&prim->p[3].rgbc.r);
           /* 0x800C6B28..0x800C6B34 loads RGB0/1/2 and RGBC directly
              from three stack words.  Express the values directly here:
              round-tripping `long` locals through `int*` invokes strict-
@@ -1223,51 +1132,51 @@ gte_swc2(0x8,&depthcue);
           gte_lwc2(22,(int)l3);
           gte_lwc2(6,(int)l3);
           gte_dpct();
-          gte_swc2(0x14,&prim->r0);
-          gte_swc2(0x15,&prim->r1);
-          gte_swc2(0x16,&prim->r2);
+          gte_swc2(0x14,&prim->p[0].rgbc.r);
+          gte_swc2(0x15,&prim->p[1].rgbc.r);
+          gte_swc2(0x16,&prim->p[2].rgbc.r);
         }
         else {
           nfs4_mips_copy_bytes(&color,Chunk_lightTable + sd->light,4);
           gte_lwc2(6,(int)color);
           gte_dpcs();
           gte_swc2(0x16,&color);
-          prim->r0 = (u_char)color;
-          prim->g0 = ((u_char *)&(color))[1];
-          prim->b0 = ((u_char *)&(color))[2];
-          prim->code = ((u_char *)&(color))[3];
-          prim->r1 = (u_char)color;
-          prim->g1 = ((u_char *)&(color))[1];
-          prim->b1 = ((u_char *)&(color))[2];
-          prim->p1 = ((u_char *)&(color))[3];
-          prim->r2 = (u_char)color;
-          prim->g2 = ((u_char *)&(color))[1];
-          prim->b2 = ((u_char *)&(color))[2];
-          prim->p2 = ((u_char *)&(color))[3];
-          prim->r3 = (u_char)color;
-          prim->g3 = ((u_char *)&(color))[1];
-          prim->b3 = ((u_char *)&(color))[2];
-          prim->p3 = ((u_char *)&(color))[3];
+          prim->p[0].rgbc.r = (u_char)color;
+          prim->p[0].rgbc.g = ((u_char *)&(color))[1];
+          prim->p[0].rgbc.b = ((u_char *)&(color))[2];
+          prim->p[0].rgbc.code = ((u_char *)&(color))[3];
+          prim->p[1].rgbc.r = (u_char)color;
+          prim->p[1].rgbc.g = ((u_char *)&(color))[1];
+          prim->p[1].rgbc.b = ((u_char *)&(color))[2];
+          prim->p[1].rgbc.code = ((u_char *)&(color))[3];
+          prim->p[2].rgbc.r = (u_char)color;
+          prim->p[2].rgbc.g = ((u_char *)&(color))[1];
+          prim->p[2].rgbc.b = ((u_char *)&(color))[2];
+          prim->p[2].rgbc.code = ((u_char *)&(color))[3];
+          prim->p[3].rgbc.r = (u_char)color;
+          prim->p[3].rgbc.g = ((u_char *)&(color))[1];
+          prim->p[3].rgbc.b = ((u_char *)&(color))[2];
+          prim->p[3].rgbc.code = ((u_char *)&(color))[3];
         }
       }
       else {
         DrawW_NightColorCalc(sd,prim,&vt0,&vt1,&vt2,&vt3);
       }
       ((u_char *)&prim->tag)[3] = 0xc;
-      prim->code = (u_char)workPmx->flag | 0x3c;
-      prim->u0 = workPmx->u0;
-      prim->v0 = workPmx->v0;
-      prim->clut = workPmx->clut;
-      prim->u1 = workPmx->u1;
-      prim->v1 = workPmx->v1;
-      prim->tpage = workPmx->tpage;
-      prim->u2 = workPmx->u2;
-      prim->v2 = workPmx->v2;
-      prim->pad2 = workPmx->pad2;
-      prim->u3 = workPmx->u3;
-      prim->v3 = workPmx->v3;
-      prim->pad3 = workPmx->flag;
-      if (prim->clut == 0xffff) {
+      prim->p[0].rgbc.code = (u_char)workPmx->flag | 0x3c;
+      prim->p[0].uv.u = workPmx->u0;
+      prim->p[0].uv.v = workPmx->v0;
+      prim->p[0].attr = workPmx->clut;
+      prim->p[1].uv.u = workPmx->u1;
+      prim->p[1].uv.v = workPmx->v1;
+      prim->p[1].attr = workPmx->tpage;
+      prim->p[2].uv.u = workPmx->u2;
+      prim->p[2].uv.v = workPmx->v2;
+      prim->p[2].attr = workPmx->pad2;
+      prim->p[3].uv.u = workPmx->u3;
+      prim->p[3].uv.v = workPmx->v3;
+      prim->p[3].attr = workPmx->flag;
+      if (prim->p[0].attr == 0xffff) {
         ti18 = nfs4_mips_srav_s32(
             nfs4_mips_sll_s32(nfs4_mips_subu_s32(
                 bfctResult,(int)sd->startfog),4),(int)sd->distfog);
@@ -1277,7 +1186,7 @@ gte_swc2(0x8,&depthcue);
         else if (0xf < ti18) {
           ti18 = 0xf;
         }
-        prim->clut = gClutDepth[workPmx->pad2][ti18];
+        prim->p[0].attr = gClutDepth[workPmx->pad2][ti18];
       }
       if (!(bool)bVar4) {
         tc3 = sd->zeroGTETransFlag;
@@ -1329,7 +1238,6 @@ gte_SetTransMatrix(((char *)sd + 0x14));
 void DrawW_kCtrlWorld_High(Draw_tGiveShelbyMoreCache *sd)
 
 {
-  int numQuads;
   u_int n_remaining;
   Trk_Quad *pquad;
   n_remaining = (u_int)sd->quadCount;
@@ -1348,17 +1256,10 @@ void DrawW_kCtrlWorld_High(Draw_tGiveShelbyMoreCache *sd)
 void DrawW_StripDraw_High(Draw_tGiveShelbyMoreCache *sd)
 
 {
-  int r0;
-  int r2;
   u_char bVar1;
   short sVar2;
-  int r1;
-  int r3;
-  int iquad;
   int iVar3;
-  Trk_NewStrip *stripPtr;
   Trk_NewStrip *pTVar4;
-  int numQuads;
   Trk_Quad newQuad;
   pTVar4 = sd->stripPtr;
   sd->doublelayer = 1;
@@ -1387,26 +1288,18 @@ void DrawW_StripDraw_High(Draw_tGiveShelbyMoreCache *sd)
 void DrawW_DoTrough(DRender_tView *Vi,tBuildEntry *buildList)
 
 {
-  int cx;
-  int cz;
-  Group * group;
   u_char bVar1;
   int iVar2;
   Chunk *pCVar3;
   int dist;
   int iVar4;
   int iVar5;
-  Group *pThis;
   Group *pGVar6;
   Draw_tGiveShelbyMoreCache *sd;
-  Chunk *chunkDat;
-  coorddef *pChunkCp;
   coorddef *pcVar7;
-  int buildInd;
   int iVar8;
   coorddef tmp;
   coorddef tmp2;
-  int chunkCount;
   sd = (Draw_tGiveShelbyMoreCache *)getScratchAddr(0);
   
   iVar2 = BWorld_gChunkCount;
@@ -1547,10 +1440,8 @@ void DrawW_WorldSetUpMatrix(matrixtdef *m,MATRIX *mat)
 
 {
   int r0;
-  int r1;
   int iVar1;
   int iVar2;
-  int r2;
   
   r0 = m->m[0];
   iVar1 = m->m[3];
@@ -1577,10 +1468,8 @@ void DrawW_WorldSetUpTranslation(coorddef *t,MATRIX *mat)
 
 {
   int tx;
-  int ty;
   int iVar1;
   int iVar2;
-  int tz;
   
   tx = t->x;
   iVar1 = t->y;
@@ -1613,10 +1502,8 @@ void DrawW_ResetAnimationTimer(void)
 int DrawW_GetAnimationTime(Trk_AnimateInst *animInst)
 
 {
-  int track;
   int iVar1;
   int iVar2;
-  int maxTick;
   
   if (((animInst->objectIndex != '\0') && (GameSetup_gData.track != 3)) &&
      (GameSetup_gData.track != 7)) {
@@ -1634,14 +1521,11 @@ int DrawW_GetAnimationTime(Trk_AnimateInst *animInst)
 void DrawW_SetAnimationTime(Trk_AnimateInst *animInst,int *table,int time)
 
 {
-  int objIndex;
   int iVar1;
   int *piVar2;
   int iVar3;
-  int slice;
   int iVar4;
   Car_tObj **ppCVar5;
-  int i;
   int iVar6;
   
   iVar1 = Cars_gNumHumanRaceCars;
@@ -1680,13 +1564,9 @@ void DrawW_DoObjectAnimations(void)
 
 {
   int time_00;
-  int track;
   Trk_AnimateInst **ppTVar1;
-  int i;
   int iVar2;
-  int *trackPtr;
   int (*table) [2];
-  int time;
   
   time_00 = simGlobal.gameTicks;
   if (GameSetup_gData.track == 0) {
@@ -1714,35 +1594,21 @@ void DrawW_DoObjectAnimations(void)
 int DrawW_BuildObjectFacets(DRender_tView *Vi,ChunkObjectInfo *gObjInfo)
 
 {
-  Group * group;
   u_char bVar1;
-  Group *pThis;
   int iVar2;
-  void *pvVar3;
   int iVar4;
   short *psVar5;
   int iVar6;
   int iVar7;
-  Trk_SimpleInst *objInstance;
   Trk_AnimateInst *animInst;
-  Trk_ObjectDef *objDef;
   Trk_ObjectDef *objDef_00;
-  int objectOffset;
   int iVar8;
-  int objectIndex;
   int iVar9;
-  int totalCount;
   int iVar10;
-  int zClipSq;
   int iVar11;
-  Draw_DCache *sd;
   matrixtdef matrix;
   coorddef cp;
   coorddef pt2;
-  int groupNumElements;
-  int offset;
-  int doFrustumClip;
-  short *visList;
   
   iVar10 = 0;
   animInst = (Trk_AnimateInst *)(gObjInfo->objInstanceBuf + 1);
@@ -1806,49 +1672,25 @@ gte_SetTransMatrix(&Render_gWorldMat);
 int DrawW_BuildCustomObjectFacets(DRender_tView *Vi,Draw_DCache *sd,Trk_SimObject *simObjs,Group *group,int zClipSq)
 
 {
-  Trk_CollideBoomInst * objCollideBoomInstance;
-  u_int uVar1;
-  u_int uVar2;
   int buildResult;
   int instData_p;
   int iVar3;
   int iVar11_emit;
   int iVar4;
   ObjectAnim *pOVar5;
-  Group *pThis;
   int iVar6;
-  int sx;
   int blend_x;
-  int sy;
   int blend_y;
-  int sz;
   int blend_z;
-  int t2;
-  Trk_SimpleInst *objInstance;
   u_char *groupBase_p;
-  int t1;
-  int objectOffset;
-  int objectIndex;
   int facetCount;
-  Trk_ObjectDef *objDef;
   Trk_ObjectDef *objDef_00;
-  int loc_70;
-  int loc_6c;
-  int loc_68;
   matrixtdef matrix;
   tQuat quat;
   int totalCount;
-  int groupNumElements;
-  int loc_28;
-  int loc_24;
-  int loc_20;
-  int tu6;
   u_char bVar7;
-  int tp2;
-  int pbVar3;
   u_char tc4;
   u_char tc5;
-  void *tp1;
   
   groupBase_p = (u_char *)(group + 1);
   totalCount = 0;
@@ -1905,8 +1747,7 @@ gte_SetTransMatrix(&CF_DVLC);
         }
         else {
           pOVar5 = Object_GetAnim(simObjs + groupBase_p[0x22]);
-          NFS4_VCALL_PTR_PTR_INT((*pOVar5->_vf)[2].pfn,
-                    (u_char *)pOVar5 + (*pOVar5->_vf)[2].delta,Vi,sd,(int)(char)tc4);
+          pOVar5->Draw(Vi,sd,(int)(char)tc4);
         }
       }
       groupBase_p += *(short *)groupBase_p;
@@ -2076,38 +1917,23 @@ gte_SetTransMatrix(&worldCache->matB);
 int DrawW_BuildChunkObjectFacets(DRender_tView *Vi,ChunkObjectInfo *gObjInfo)
 
 {
-  Group * instGroup;
-  u_char type;
-  int t2;
   u_char bVar1;
-  Group *pThis;
   int iVar2;
-  void *pvVar3;
   int iVar4;
   int iVar5;
   ObjectAnim *pOVar6;
   int iVar7;
   Trk_SimObject *pTVar8;
-  int sx;
   int iVar9;
   short light;
-  int sy;
   int iVar10;
-  int sz;
   int iVar11;
-  int t1;
   Trk_SimpleInst *objInstance;
   Trk_CollideBoomInst *extendedInst;
-  Trk_ObjectDef *objDef;
   Trk_ObjectDef *objDef_00;
-  int totalCount;
   int iVar13;
-  int objectOffset;
   int iVar14;
   matrixtdef matrix;
-  Trk_SimObject *simObjs;
-  int doFrustumClip;
-  int groupNumElements;
   int objectIndex;
   
   pTVar8 = gObjInfo->simObjs;
@@ -2198,9 +2024,7 @@ gte_SetTransMatrix(&Render_gWorldMat);
             goto DrawWChunkFacets_emitObj;
           }
           pOVar6 = Object_GetAnim(pTVar8 + extendedInst->simIndex);
-          NFS4_VCALL_PTR_PTR_INT((*pOVar6->_vf)[2].pfn,
-                    (u_char *)pOVar6 + (*pOVar6->_vf)[2].delta,Vi,
-                    NFSHS_WORLD_CACHE_AS(Draw_DCache),iVar14);
+          pOVar6->Draw(Vi,NFSHS_WORLD_CACHE_AS(Draw_DCache),iVar14);
         }
         else if (bVar1 == 9) {
           xformy(&matrix,(int)extendedInst->qx);
@@ -2274,7 +2098,6 @@ BOOL ObjectClipped(DRender_tView *Vi,int ind,coorddef *pCp,Draw_tGiveShelbyMoreC
   int iVar2;
   coorddef tmp;
   coorddef tmp2;
-  coorddef trans;
   
   bSphere = (tBoundingSphere *)(gPersistObjDefBoundingSpheres + 1) + ind;
   tmp.x = nfs4_mips_addu_s32(nfs4_mips_sll_s32((int)bSphere->cp.x,10),pCp->x);
@@ -2301,16 +2124,9 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
   int iVar2;
   Chunk *pCVar3;
   Group *pGVar4;
-  int chunkInd;
   int geomRez;
-  Chunk *chunkDat;
-  Trk_SimObject *simObjs;
-  int buildInd;
   int iVar5;
-  int thisChunkInd;
   int iVar6;
-  Draw_DCache *sd;
-  int chunkCount;
   
   iVar2 = BWorld_gChunkCount;
   iVar6 = gCurrContext->currentChunk;
@@ -2393,11 +2209,9 @@ void DrawW_DoObjects(DRender_tView *Vi,tBuildEntry *buildList)
 int Draw_CircleClip(coorddef *pt1,coorddef *pt2,int r)
 
 {
-  int dist;
   int dz;
   int iVar1;
   int iVar2;
-  int dx;
   
   dz = pt1->x;
   iVar2 = dz - pt2->x;
@@ -2421,33 +2235,17 @@ int Draw_CircleClip(coorddef *pt1,coorddef *pt2,int r)
 void Draw_kCtrlSkidmark(Draw_tCtrlSkidmark *fskid)
 
 {
-  int r0;
-  int r1;
-  int r2;
-  uint32 l1;
-  uint32 l0;
   int skidChunk_p;
   int vert_count;
   int vert_idx;
   uint32 l2;
-  uint32 l3;
-  POLY_GT4 *prim;
   POLY_GT4 *primPtr;
   Draw_tPixMap *pmx;
-  int type;
   int color_pack;
-  int save_pre_otz;
   int vt_y;
-  int depth_offset;
-  int i;
   int depth_skid;
-  int count;
-  Draw_DCache *sd;
   Skidmark_Chunk *sm;
-  matrixtdef *m;
-  int ccount;
   int ccount_local;
-  coorddef *t;
   coorddef td;
   coorddef ts;
   int ti2;
@@ -2547,25 +2345,25 @@ gte_swc2(0x7,PSYQ_SCRATCH_BYTES(0x094));
             return;
           }
           if (color_pack == 0) {
-            nfs4_mips_copy_bytes(&primPtr->r0,&seg->rgb,4);
-            nfs4_mips_copy_bytes(&primPtr->r1,&seg->rgb,4);
-            nfs4_mips_copy_bytes(&primPtr->r3,&seg->next->rgb,4);
-            nfs4_mips_copy_bytes(&primPtr->r2,&seg->next->rgb,4);
+            nfs4_mips_copy_bytes(&primPtr->p[0].rgbc.r,&seg->rgb,4);
+            nfs4_mips_copy_bytes(&primPtr->p[1].rgbc.r,&seg->rgb,4);
+            nfs4_mips_copy_bytes(&primPtr->p[3].rgbc.r,&seg->next->rgb,4);
+            nfs4_mips_copy_bytes(&primPtr->p[2].rgbc.r,&seg->next->rgb,4);
           }
           else {
             const u_int gray = 0x00404040;
-            nfs4_mips_copy_bytes(&primPtr->r0,&gray,4);
-            nfs4_mips_copy_bytes(&primPtr->r1,&gray,4);
-            nfs4_mips_copy_bytes(&primPtr->r3,&gray,4);
-            nfs4_mips_copy_bytes(&primPtr->r2,&gray,4);
+            nfs4_mips_copy_bytes(&primPtr->p[0].rgbc.r,&gray,4);
+            nfs4_mips_copy_bytes(&primPtr->p[1].rgbc.r,&gray,4);
+            nfs4_mips_copy_bytes(&primPtr->p[3].rgbc.r,&gray,4);
+            nfs4_mips_copy_bytes(&primPtr->p[2].rgbc.r,&gray,4);
           }
-          primPtr->code = 0x3e;
+          primPtr->p[0].rgbc.code = 0x3e;
           ((u_char *)&primPtr->tag)[3] = 0xc;
-          nfs4_mips_copy_bytes(&primPtr->u0,&pmx->u0,4);
-          nfs4_mips_copy_bytes(&primPtr->u1,&pmx->u1,4);
-          nfs4_mips_copy_bytes(&primPtr->u2,&pmx->u2,4);
-          nfs4_mips_copy_bytes(&primPtr->u3,&pmx->u3,4);
-          if ((short)primPtr->clut == -1) {
+          nfs4_mips_copy_bytes(&primPtr->p[0].uv.u,&pmx->u0,4);
+          nfs4_mips_copy_bytes(&primPtr->p[1].uv.u,&pmx->u1,4);
+          nfs4_mips_copy_bytes(&primPtr->p[2].uv.u,&pmx->u2,4);
+          nfs4_mips_copy_bytes(&primPtr->p[3].uv.u,&pmx->u3,4);
+          if ((short)primPtr->p[0].attr == -1) {
             vert_idx = nfs4_mips_sra_s32(
                 nfs4_mips_sll_s32(
                     nfs4_mips_subu_s32(vt_y,*(short *)getScratchAddr(0xdc / 4)),4),
@@ -2576,7 +2374,7 @@ gte_swc2(0x7,PSYQ_SCRATCH_BYTES(0x094));
             else if (0xf < vert_idx) {
               vert_idx = 0xf;
             }
-            primPtr->clut = gClutDepth[pmx->pad2][vert_idx];
+            primPtr->p[0].attr = gClutDepth[pmx->pad2][vert_idx];
           }
           ti3 = Skid_gCtrlScratch_94;
           *(u_int *)Render_gPacketPtr = 0x0c000000;
@@ -2592,26 +2390,14 @@ gte_swc2(0x7,PSYQ_SCRATCH_BYTES(0x094));
 void DrawW_SetUpSubdividFacet_Line(Draw_tGiveShelbyMoreCache *sd)
 
 {
-  POLY_GT4 * prim;
   u_char tpage_byte;
-  u_short a;
   u_char tu8;
   u_char tu9;
   u_char tu10;
-  u_short d;
-  u_short b;
   u_char tu12;
   u_char tu13;
   u_char uVar1;
   u_char tu14;
-  u_short c;
-  Draw_SVertex *v2;
-  Draw_SVertex *v3;
-  Draw_SVertex *v1;
-  Draw_SVertex *v0;
-  int loc_28;
-  int loc_24;
-  int loc_20;
   short ts1;
   short ts3;
   short ts4;
@@ -2634,14 +2420,14 @@ gte_lwc2(0,*(int *)(((char *)sd + 0x15c)));
   gte_lwc2(4,*(int *)(((char *)sd + 0x17c)));
   gte_lwc2(5,*(int *)(((char *)sd + 0x180)));
   gte_rtpt();
-  tpage_byte = (sd->GT4Prim).r1;
-  tu8 = (sd->GT4Prim).g1;
-  tu9 = (sd->GT4Prim).b1;
-  tu10 = (sd->GT4Prim).p1;
-  uVar1 = (sd->GT4Prim).r0;
-  tu12 = (sd->GT4Prim).g0;
-  tu13 = (sd->GT4Prim).b0;
-  tu14 = (sd->GT4Prim).code;
+  tpage_byte = (sd->GT4Prim).p[1].rgbc.r;
+  tu8 = (sd->GT4Prim).p[1].rgbc.g;
+  tu9 = (sd->GT4Prim).p[1].rgbc.b;
+  tu10 = (sd->GT4Prim).p[1].rgbc.code;
+  uVar1 = (sd->GT4Prim).p[0].rgbc.r;
+  tu12 = (sd->GT4Prim).p[0].rgbc.g;
+  tu13 = (sd->GT4Prim).p[0].rgbc.b;
+  tu14 = (sd->GT4Prim).p[0].rgbc.code;
   (sd->v2).r = tpage_byte;
   (sd->v2).g = tu8;
   (sd->v2).b = tu9;
@@ -2661,14 +2447,14 @@ gte_lwc2(0,*(int *)(((char *)sd + 0x15c)));
 gte_swc2(0xc,((char *)sd + 0x164));
   gte_swc2(0xd,((char *)sd + 0x174));
   gte_swc2(0xe,((char *)sd + 0x184));
-  (sd->v0).u = (sd->GT4Prim).u0;
-  (sd->v0).v = (sd->GT4Prim).v0;
-  (sd->v1).u = (sd->GT4Prim).u1;
-  (sd->v1).v = (sd->GT4Prim).v1;
-  (sd->v2).u = (sd->GT4Prim).u3;
-  (sd->v2).v = (sd->GT4Prim).v3;
-  (sd->v3).u = (sd->GT4Prim).u2;
-  (sd->v3).v = (sd->GT4Prim).v2;
+  (sd->v0).u = (sd->GT4Prim).p[0].uv.u;
+  (sd->v0).v = (sd->GT4Prim).p[0].uv.v;
+  (sd->v1).u = (sd->GT4Prim).p[1].uv.u;
+  (sd->v1).v = (sd->GT4Prim).p[1].uv.v;
+  (sd->v2).u = (sd->GT4Prim).p[3].uv.u;
+  (sd->v2).v = (sd->GT4Prim).p[3].uv.v;
+  (sd->v3).u = (sd->GT4Prim).p[2].uv.u;
+  (sd->v3).v = (sd->GT4Prim).p[2].uv.v;
   ts1 = (sd->v0).dvx;
   (sd->v0).a = '\0';
   if (ts1 < 0x3e9) {
@@ -2719,36 +2505,17 @@ DrW_SubSetupLine_callSubdiv:
 void DrawW_OnyxLinePrim(CCOORD16 *geomVertices,Trk_Line *lineQuad,int count,Draw_tGiveShelbyMoreCache *sd)
 
 {
-  int linetype;
-  int t1;
-  int t2;
-  long b;
-  uint32 l3;
   VECTOR temp0;
-  uint32 l0;
   int ot_addr_pack;
   int CVar19;
-  int vert_iter;
-  CVECTOR *tC8;
-  int color_pack;
-  uint32 l1;
   int depth_avg;
   int CVar23;
-  int uVar8_00;
-  uint32 l2;
-  u_int uVar1;
-  int depth_index;
-  u_int uVar2;
   int tpage_word;
-  int vert_y_pack;
   int v0_pack;
-  int vert_x_pack;
   int ti9;
   POLY_GT4 *prim;
   Draw_tPixMap *pmx;
-  int save_pre_otz;
   int save_pre_otz_l;
-  int lineQuadCount;
   int lineIdx;
   CCOORD16 vt0;
   CCOORD16 vt1;
@@ -2757,19 +2524,8 @@ void DrawW_OnyxLinePrim(CCOORD16 *geomVertices,Trk_Line *lineQuad,int count,Draw
   CVECTOR a;
   long bfct;
   int depthcue;
-  int loc_30;
-  int doSubdivision;
   u_char *tp17;
-  void *tp1;
-  int tp4;
-  int tp5;
   CCOORD16 *tC6;
-  int tu1;
-  int tp3;
-  int tp2;
-  u_char *tp6;
-  u_int tu2;
-  u_int tu4;
   int lineLimit;
   intptr previousStack;
   int positiveSideVisible;
@@ -2866,15 +2622,15 @@ gte_swc2(0x8,&depthcue);
               gte_lwc2(6,*(int *)&a);
               gte_lddp(depthcue);
               gte_dpcs();
-              gte_swc2(0x16,&prim->r2);
-              nfs4_mips_copy_bytes(&prim->r0,&prim->r2,4);
+              gte_swc2(0x16,&prim->p[2].rgbc.r);
+              nfs4_mips_copy_bytes(&prim->p[0].rgbc.r,&prim->p[2].rgbc.r,4);
 
               nfs4_mips_copy_bytes(&a,Chunk_lightTable + vt2.light,4);
               gte_lwc2(6,*(int *)&a);
               gte_lddp(depthcue);
               gte_dpcs();
-              gte_swc2(0x16,&prim->r3);
-              nfs4_mips_copy_bytes(&prim->r1,&prim->r3,4);
+              gte_swc2(0x16,&prim->p[3].rgbc.r);
+              nfs4_mips_copy_bytes(&prim->p[1].rgbc.r,&prim->p[3].rgbc.r,4);
             }
             else {
               if ((sd->nightFlags & 1U) != 0) {
@@ -2917,40 +2673,40 @@ gte_swc2(0x19,&temp0);
               }
               CVar19 = *(int *)(Chunk_lightTable + vt2.light);
               CVar23 = *(int *)(Chunk_lightTable + vt3.light);
-              prim->r3 = (char)CVar19;
-              prim->g3 = (char)((u_int)CVar19 >> 8);
-              prim->b3 = (char)((u_int)CVar19 >> 0x10);
-              prim->p3 = (char)((u_int)CVar19 >> 0x18);
-              prim->r1 = (char)CVar19;
-              prim->g1 = (char)((u_int)CVar19 >> 8);
-              prim->b1 = (char)((u_int)CVar19 >> 0x10);
-              prim->p1 = (char)((u_int)CVar19 >> 0x18);
-              prim->r2 = (char)CVar23;
-              prim->g2 = (char)((u_int)CVar23 >> 8);
-              prim->b2 = (char)((u_int)CVar23 >> 0x10);
-              prim->p2 = (char)((u_int)CVar23 >> 0x18);
-              prim->r0 = (char)CVar23;
-              prim->g0 = (char)((u_int)CVar23 >> 8);
-              prim->b0 = (char)((u_int)CVar23 >> 0x10);
-              prim->code = (char)((u_int)CVar23 >> 0x18);
+              prim->p[3].rgbc.r = (char)CVar19;
+              prim->p[3].rgbc.g = (char)((u_int)CVar19 >> 8);
+              prim->p[3].rgbc.b = (char)((u_int)CVar19 >> 0x10);
+              prim->p[3].rgbc.code = (char)((u_int)CVar19 >> 0x18);
+              prim->p[1].rgbc.r = (char)CVar19;
+              prim->p[1].rgbc.g = (char)((u_int)CVar19 >> 8);
+              prim->p[1].rgbc.b = (char)((u_int)CVar19 >> 0x10);
+              prim->p[1].rgbc.code = (char)((u_int)CVar19 >> 0x18);
+              prim->p[2].rgbc.r = (char)CVar23;
+              prim->p[2].rgbc.g = (char)((u_int)CVar23 >> 8);
+              prim->p[2].rgbc.b = (char)((u_int)CVar23 >> 0x10);
+              prim->p[2].rgbc.code = (char)((u_int)CVar23 >> 0x18);
+              prim->p[0].rgbc.r = (char)CVar23;
+              prim->p[0].rgbc.g = (char)((u_int)CVar23 >> 8);
+              prim->p[0].rgbc.b = (char)((u_int)CVar23 >> 0x10);
+              prim->p[0].rgbc.code = (char)((u_int)CVar23 >> 0x18);
 gte_SetRotMatrix(((char *)sd + 0x14));
 gte_SetTransMatrix(((char *)sd + 0x14));
             }
-            prim->code = '>';
+            prim->p[0].rgbc.code = '>';
             ((u_char *)&prim->tag)[3] = 0xc;
-            prim->u0 = pmx->u0;
-            prim->v0 = pmx->v0;
-            prim->clut = pmx->clut;
-            prim->u1 = pmx->u1;
-            prim->v1 = pmx->v1;
-            prim->tpage = pmx->tpage;
-            prim->u2 = pmx->u2;
-            prim->v2 = pmx->v2;
-            prim->pad2 = pmx->pad2;
-            prim->u3 = pmx->u3;
-            prim->v3 = pmx->v3;
-            prim->pad3 = pmx->flag;
-            if (prim->clut == 0xffff) {
+            prim->p[0].uv.u = pmx->u0;
+            prim->p[0].uv.v = pmx->v0;
+            prim->p[0].attr = pmx->clut;
+            prim->p[1].uv.u = pmx->u1;
+            prim->p[1].uv.v = pmx->v1;
+            prim->p[1].attr = pmx->tpage;
+            prim->p[2].uv.u = pmx->u2;
+            prim->p[2].uv.v = pmx->v2;
+            prim->p[2].attr = pmx->pad2;
+            prim->p[3].uv.u = pmx->u3;
+            prim->p[3].uv.v = pmx->v3;
+            prim->p[3].attr = pmx->flag;
+            if (prim->p[0].attr == 0xffff) {
               ti9 = nfs4_mips_srav_s32(
                   nfs4_mips_sll_s32(
                       nfs4_mips_subu_s32(save_pre_otz_l,sd->startfog),4),
@@ -2961,7 +2717,7 @@ gte_SetTransMatrix(((char *)sd + 0x14));
               else if (0xf < ti9) {
                 ti9 = 0xf;
               }
-              prim->clut = gClutDepth[pmx->pad2][ti9];
+              prim->p[0].attr = gClutDepth[pmx->pad2][ti9];
             }
             if (ot_addr_pack != 0) {
 gte_SetRotMatrix(((char *)sd + 0x74));
@@ -3012,28 +2768,13 @@ void DrawW_BuildChunkCenterLineFacets(Chunk *chunkDat,Group *group,Draw_tGiveShe
   short sVar13;
   short sVar14;
   Trk_NewSlice *pTVar15;
-  Group *pThis;
   Group *pGVar16;
   int iVar17;
-  short x;
-  short y;
-  short z;
   int vertexIndex;
-  short wz;
   CCOORD16 *chunkVertex;
-  short wx;
-  short wy;
   short *psVar19;
-  CCOORD16 *pts3d;
   CCOORD16 *pCVar20;
-  Trk_Line *lineQuad;
-  int i;
   int iVar21;
-  short tz;
-  short ty;
-  CCOORD16 *wpts;
-  int slice;
-  short tx;
   
   pTVar15 = BWorldSm_slices;
   pCVar20 = gVertex3d;
@@ -3082,18 +2823,12 @@ void DrawW_DoLines(DRender_tView *Vi,tBuildEntry *buildList,Draw_DCache *sd)
 {
   u_char bVar1;
   int iVar2;
-  int geomRez;
-  coorddef *pChunkCp;
   coorddef *pcVar3;
-  Chunk *chunkDat;
   Chunk *chunkDat_00;
-  Group *group;
-  int buildInd;
   int iVar4;
   COORD16 trans;
   coorddef tmp;
   coorddef tmp2;
-  int chunkCount;
   Draw_tGiveShelbyMoreCache *worldCache;
   
   worldCache = (Draw_tGiveShelbyMoreCache *)sd;
@@ -3275,25 +3010,6 @@ void DrawW_BuildSpikeBelt(DRender_tView *Vi,int scale,Draw_DCache *sd)
 void DepthCue_Init(void)
 
 {
-  int dist;
-  int i;
-  int slice;
-  int maxTick;
-  int z2;
-  int znear;
-  int objectOffset;
-  int save_pre_otz;
-  int objectIndex;
-  int totalCount;
-  matrixtdef matrix;
-  coorddef cp;
-  coorddef pt2;
-  int dvxy1;
-  int groupNumElements;
-  int offset;
-  int doFrustumClip;
-  short *visList;
-  int chunkCount;
   
   SetFogNear(TrackSpec_gSpec.depthcuespec.distance << 6,0xa0);
   SetFarColor((u_int)TrackSpec_gSpec.depthcuespec.color.r,(u_int)TrackSpec_gSpec.depthcuespec.color.g,

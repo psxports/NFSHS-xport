@@ -21,7 +21,6 @@ extern "C" { void DashHUD_HUDCalc(int player); }
 void DashHUD_InitHUD(void)
 
 {
-  int i;
   int iVar1;
   int iVar2;
   GameSetup_tData *pGVar3;
@@ -122,7 +121,6 @@ extern "C" void DashHUD_CheckWrongWay(int player)
 extern "C" void DashHUD_HUDCalc(int player)
 
 {
-  Car_tObj * car;
   int iVar1;
   Car_tObj *carObj;
   

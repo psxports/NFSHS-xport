@@ -17,15 +17,9 @@ extern "C" int disablecd;          /* 0x8013dc58 */
 extern tNfsSystemInfo nfs_sysInfo; /* 0x8013d2b4 */
 
 /* ---- link-time markers / scratch buffers (no SYM name; raw addresses) ---- */
-#ifdef AP_WIN
 extern char *gPlatformInitMem; /* 0x80054d10  end-of-init-memory marker (arena high) */
 extern char *gEAMemPoolBase;   /* 0x80148b0c  arena base = end of code/data */
 extern char *gDctBuffer;       /* 0x80124038  DCT scratch buffer base */
-#else
-extern char gPlatformInitMem[]; /* 0x80054d10  end-of-init-memory marker (arena high) */
-extern char gEAMemPoolBase[];   /* 0x80148b0c  arena base = end of code/data */
-extern char gDctBuffer[];       /* 0x80124038  DCT scratch buffer base */
-#endif
 
 /* ---- eaclib / syslib / sibling helpers ---- */
 extern void Draw_SetEnvironment(int w, int h, int a, int b, int c, int d, int e, int f);

@@ -82,9 +82,7 @@ void tTrackManager::LoadDescription()
   char *pcVar2;
   char *data;
   int iVar3;
-  uint32 i;
   u_int uVar4;
-  char *input;
   char filename [80];
   
   data = filename;
@@ -158,7 +156,6 @@ void tTrackManager::SetClassAvailable(tTrackClassType trackClass,bool avail)
 {
   char *pcVar1;
   u_int uVar2;
-  uint32 i;
   int iVar3;
   
   uVar2 = 0;
@@ -185,7 +182,6 @@ tTrackInformation * tTrackManager::GetTrackByID(short track)
 {
   tTrackInformation *ptVar1;
   u_int uVar2;
-  uint32 i;
   
   uVar2 = 0;
   if (this->fNumTracks != 0) {
@@ -298,13 +294,9 @@ void * tListIteratorTrack::ValidTrack(char track)
 
 {
   char cVar1;
-  tTrackInformation *trackInfo;
   tTrackInformation *ptVar2;
   tTrackManager *ptVar3;
-  u_char result;
   void *pvVar4;
-  char *input;
-  char filename [80];
   
   ptVar3 = this->fTrackManager;
   ptVar2 = ptVar3->fTracks + (u_char)track;

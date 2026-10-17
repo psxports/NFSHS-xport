@@ -13,9 +13,7 @@
  */
 #include "../../../nfs4_types.h"
 
-#if defined(AP_WIN)
     #include "psx_spu.h"
-#endif
 
 extern "C" int sndgs[];
 extern "C" unsigned char &sndpd;         /* voice/queue base @0x80147918 (shared) */
@@ -118,19 +116,10 @@ extern "C" void iSNDdmtransfer(void)
     if ((&DAT_80147934)[so] != 0 && (DAT_80147919 = 1, SND_dmaPreLoadCallback != 0))
         (*SND_dmaPreLoadCallback)();
     *(int *)(&DAT_80147938 + so) = sndgs[0x11] + 0xf; /* deadline */
-#if defined(AP_WIN)
     spu_upload((unsigned int)(&DAT_80147930)[slot * 10] << 3, (const void *)(intptr)(unsigned int)(&DAT_8014792c)[slot * 5], (unsigned int)(unsigned char)(&DAT_80147932)[so] << 6);
     wr_sr(sr);
     iSNDdmcallback();
     return;
-#else
-    *(unsigned short *)(DAT_80147e2c + 0x1a6) = (&DAT_80147930)[slot * 10];                                /* SPU transfer addr */
-    *(unsigned short *)(DAT_80147e2c + 0x1aa) = *(unsigned short *)(DAT_80147e2c + 0x1aa) & 0xffcf | 0x20; /* SPUCNT: DMA write */
-    *DAT_80147e14 = *DAT_80147e14 & 0xf0ffffff | 0x20000000;                                               /* DPCR */
-    *DAT_80147e18 = (&DAT_8014792c)[slot * 5];                                                             /* MADR */
-    *DAT_80147e1c = (unsigned int)(unsigned char)(&DAT_80147932)[so] << 0x10 | 0x10;                       /* BCR */
-    *DAT_80147e20 = 0x1000201;                                                                             /* CHCR: start */
-#endif
     wr_sr(sr);
 }
 
@@ -138,25 +127,12 @@ extern "C" void iSNDdmtransfer(void)
 extern "C" void iSNDdmcallback(void)
 {
     unsigned int sr = rd_sr();
-    int i, spin = 0;
+    int spin = 0;
 
     do
     {
         spin++;
     } while (spin < 0x2ee); /* settle delay */
-#if !defined(AP_WIN)
-    *(unsigned short *)(DAT_80147e2c + 0x1aa) = *(unsigned short *)(DAT_80147e2c + 0x1aa) & 0xffcf;
-    if ((*(unsigned short *)(DAT_80147e2c + 0x1aa) & 0x30) != 0)
-    {
-        i = 1;
-        do
-        {
-            if (4000 < i)
-                break;
-            i++;
-        } while ((*(unsigned short *)(DAT_80147e2c + 0x1aa) & 0x30) != 0);
-    }
-#endif
     wr_sr(rd_sr() & 0xfffffbfe);
     if ((&DAT_80147928)[DAT_80147925 * 5] != 0)
     { /* active entry present */

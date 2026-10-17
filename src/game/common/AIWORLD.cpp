@@ -39,8 +39,6 @@ void AIWorld_FindBarrierLessLaneAndPosition(Car_tObj *carObj,int *goodLane,int *
 /* ---- AIWorld_ZSplineDistance__FP8Car_tObjT0  [@0x80072f90] ---- */
 int AIWorld_ZSplineDistance(Car_tObj *carObj,Car_tObj *otherCarObj)
 {
-  coorddef relPos;
-  coorddef forward;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -58,8 +56,6 @@ int AIWorld_ZSplineDistance(Car_tObj *carObj,Car_tObj *otherCarObj)
 /* ---- AIWorld_ZSplineDistance__FP8coorddefT0P10matrixtdef  [@0x80073024] ---- */
 int AIWorld_ZSplineDistance(coorddef *pos1,coorddef *pos2,matrixtdef *roadMatrix)
 {
-  coorddef relPos;
-  coorddef forward;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -76,10 +72,6 @@ int AIWorld_ZSplineDistance(coorddef *pos1,coorddef *pos2,matrixtdef *roadMatrix
 /* ---- AIWorld_ApxSplineDistance__FP8Car_tObjT0  [@0x800730b8] ---- */
 int AIWorld_ApxSplineDistance(Car_tObj *carObj,Car_tObj *otherCarObj)
 {
-  int diff;
-  int halfTrack;
-  int a;
-  int b;
   int iVar1;
   int iVar2;
   
@@ -102,9 +94,6 @@ LAB_8007311c:
 /* ---- AIWorld_ApxSplineDistance__FP8Car_tObji  [@0x80073128] ---- */
 int AIWorld_ApxSplineDistance(Car_tObj *carObj,int location)
 {
-  int diff;
-  int halfTrack;
-  int a;
   int iVar1;
   int iVar2;
   
@@ -136,8 +125,6 @@ int AIWorld_ApxSplineDistance(int location,Car_tObj *carObj)
 /* ---- AIWorld_ApxSplineDistance__Fii  [@0x800731bc] ---- */
 int AIWorld_ApxSplineDistance(int locationA,int locationB)
 {
-  int diff;
-  int halfTrack;
   int iVar1;
   int iVar2;
   
@@ -160,7 +147,6 @@ LAB_80073218:
 /* ---- AIWorld_SplineDistance__FP8Car_tObjT0  [@0x80073224] ---- */
 int AIWorld_SplineDistance(Car_tObj *carObj,Car_tObj *otherCarObj)
 {
-  int distance;
   int iVar1;
   
   iVar1 = AIWorld_ApxSplineDistance(carObj,otherCarObj);
@@ -173,7 +159,6 @@ int AIWorld_SplineDistance(Car_tObj *carObj,Car_tObj *otherCarObj)
 /* ---- AIWorld_SplineDistance__FP8Car_tObjiP8coorddef  [@0x8007327c] ---- */
 int AIWorld_SplineDistance(Car_tObj *carObj,int location,coorddef *position)
 {
-  int distance;
   int iVar1;
   
   iVar1 = AIWorld_ApxSplineDistance(carObj,location);
@@ -192,11 +177,6 @@ int AIWorld_GameOdometer(Car_tObj *carObj)
 /* ---- AIWorld_IsDriveableLaneInSliceRange__Fiiii  [@0x800732f0] ---- */
 int AIWorld_IsDriveableLaneInSliceRange(int startSlice,int numSlicesToCheck,int direction,int laneIndex)
 {
-  int profileIndex;
-  int laneOffset;
-  int mask;
-  int checkSliceOffset;
-  int checkSlice;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -243,9 +223,6 @@ LAB_80073374:
 /* ---- AIWorld_IsDriveableLane__Fii  [@0x800733a8] ---- */
 int AIWorld_IsDriveableLane(int slice,int laneIndex)
 {
-  int profileIndex;
-  int laneOffset;
-  int mask;
   int iVar1;
   
   iVar1 = 8 - (7 - laneIndex);
@@ -261,8 +238,6 @@ int AIWorld_IsDriveableLane(int slice,int laneIndex)
 /* ---- AIWorld_GetProfileMask__Fi  [@0x800733fc] ---- */
 int AIWorld_GetProfileMask(int laneIndex)
 {
-  int profileIndex;
-  int laneOffset;
   int iVar1;
   int iVar2;
   
@@ -286,9 +261,6 @@ int AIWorld_IsDriveableLane_UsingMask(int slice,int mask)
 /* ---- AIWorld_CheckForBarrierBetweenLanes__Fiii  [@0x80073458] ---- */
 int AIWorld_CheckForBarrierBetweenLanes(int slice,int lane0,int lane1)
 {
-  int profileLane0;
-  int profileLane1;
-  int profile;
   u_int uVar1;
   u_int uVar2;
   u_int uVar3;
@@ -305,8 +277,6 @@ int AIWorld_CheckForBarrierBetweenLanes(int slice,int lane0,int lane1)
 /* ---- AIWorld_LaneIndex__Fii  [@0x800734cc] ---- */
 int AIWorld_LaneIndex(int slice,int position)
 {
-  int laneWidth;
-  int li;
   u_char bVar1;
   int iVar2;
   int iVar3;
@@ -337,9 +307,6 @@ int AIWorld_LaneIndex(int slice,int position)
 /* ---- AIWorld_CalculateLaneInfo__FP8Car_tObj  [@0x80073594] ---- */
 void AIWorld_CalculateLaneInfo(Car_tObj *carObj)
 {
-  int rightEdgeIndex;
-  int leftEdgeIndex;
-  int laneLoop;
   short sVar1;
   int iVar2;
   u_int uVar3;
@@ -365,8 +332,6 @@ void AIWorld_CalculateLaneInfo(Car_tObj *carObj)
 /* ---- AIWorld_CalculateDeltaRoadYaw__FP8Car_tObj  [@0x80073658] ---- */
 int AIWorld_CalculateDeltaRoadYaw(Car_tObj *carObj)
 {
-  int delta;
-  int yaw0;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -394,8 +359,6 @@ int AIWorld_CalculateDeltaRoadYaw(Car_tObj *carObj)
 /* ---- AIWorld_CalcRoadBend__FP8Car_tObji  [@0x800736e0] ---- */
 int AIWorld_CalcRoadBend(Car_tObj *carObj,int lookAhead)
 {
-  int thisSlice;
-  int nextSlice;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -438,9 +401,6 @@ int AIWorld_CalcRoadBend(Car_tObj *carObj,int lookAhead)
 /* ---- AIWorld_CalcFutureLateralVel__FP8Car_tObji  [@0x800737bc] ---- */
 int AIWorld_CalcFutureLateralVel(Car_tObj *carObj,int slicesAhead)
 {
-  coorddef right;
-  int futureSlice;
-  int currentSlice;
   char cVar1;
   char cVar2;
   int iVar3;
@@ -477,8 +437,6 @@ int AIWorld_CalcFutureLateralVel(Car_tObj *carObj,int slicesAhead)
 /* ---- AIWorld_CalcSpeed__FP8Car_tObj  [@0x800738d4] ---- */
 void AIWorld_CalcSpeed(Car_tObj *carObj)
 {
-  int optVar1;
-  int optVar2;
   int iVar1;
   int iVar2;
   
@@ -501,7 +459,6 @@ void AIWorld_CalcSpeed(Car_tObj *carObj)
 /* ---- AIWorld_CalcLateralVelocity__FP8Car_tObj  [@0x8007391c] ---- */
 int AIWorld_CalcLateralVelocity(Car_tObj *carObj)
 {
-  int temp;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -515,22 +472,10 @@ int AIWorld_CalcLateralVelocity(Car_tObj *carObj)
 /* ---- AIWorld_FindBarrierLessLaneAndPosition__FP8Car_tObjPiT1  [@0x80073978] ---- */
 void AIWorld_FindBarrierLessLaneAndPosition(Car_tObj *carObj,int *goodLane,int *goodPosition)
 {
-  int laneWidth;
-  int laneLoop;
   u_char bVar1;
   int iVar2;
-  int currentSlice;
   int iVar3;
-  int optVar2;
-  int delta;
-  int optVar1;
-  int thisSlice;
-  int checkSlice;
-  int checkSliceOffset;
-  int temp;
   int iVar4;
-  int roadSide;
-  coorddef right;
   
   iVar2 = carObj->direction * AITune_driveSide;
   iVar4 = 0;

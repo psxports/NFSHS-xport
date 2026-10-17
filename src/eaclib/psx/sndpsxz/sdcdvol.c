@@ -13,13 +13,6 @@ extern "C" void iSNDplatformcdpanvol(int pan, int vol); /* @0x801094EC */
  *   scaling each by 0x102 and clamping to 15-bit. */
 extern "C" void iSNDplatformcdpanvol(int pan, int vol)
 {
-#if defined(AP_WIN)
     /* The MIPS implementation writes the PSX SPU MMIO registers at base+0x1b0/0x1b2 */
     return;
-#else
-    int outL = 0, outR = 0;
-    iSNDpvtolrv(pan, vol, &outL, &outR);
-    *(unsigned short *)(DAT_80147e2c + 0x1b0) = (unsigned short)(outL * 0x102 & 0x7fff);
-    *(unsigned short *)(DAT_80147e2c + 0x1b2) = (unsigned short)(outR * 0x102 & 0x7fff);
-#endif
 }

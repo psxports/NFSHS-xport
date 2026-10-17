@@ -59,8 +59,6 @@ void AudioClc_SndError(int shandle)
 /* ---- AudioClc_SetHorn__FP8Car_tObji  [@0x80074738] ---- */
 void AudioClc_SetHorn(Car_tObj *car,int state)
 {
-  AudioClc_tSource*s;
-  int i;
   int *piVar1;
   AudioClc_tSource *pAVar2;
   int iVar3;
@@ -92,8 +90,6 @@ void AudioClc_SetHorn(Car_tObj *car,int state)
 /* ---- AudioClc_HonkHorn__FP8Car_tObjiii  [@0x800747a8] ---- */
 void AudioClc_HonkHorn(Car_tObj *car,int numBeeps,int ticksOn,int ticksOff)
 {
-  AudioClc_tSource*s;
-  int i;
   int *piVar1;
   AudioClc_tSource *pAVar2;
   int iVar3;
@@ -133,9 +129,6 @@ void AudioClc_InitSource(AudioClc_tSource *s,Car_tObj *car)
 /* ---- AudioClc_StartUp__Fv  [@0x80074838] ---- */
 extern "C" void AudioClc_StartUp(void)
 {
-  AudioClc_tPlayer*p;
-  AudioClc_tSource*c;
-  int i;
   AudioClc_tPlayer *pAVar1;
   int iVar2;
   AudioClc_tSource *s;
@@ -187,10 +180,6 @@ extern "C" void AudioClc_StartUp(void)
 /* ---- AudioClc_CalcDopplerShiftRatio__FP8coorddefT0  [@0x80074994] ---- */
 int AudioClc_CalcDopplerShiftRatio(coorddef *objectPos,coorddef *objectVel)
 {
-  coorddef*cameraPos;
-  coorddef*cameraVel;
-  coorddef vectorToSound;
-  int relativeVelocity;
   coorddef *pcVar1;
   int iVar2;
   int iVar3;
@@ -272,11 +261,6 @@ int AudioClc_CalcDopplerShiftRatio(coorddef *objectPos,coorddef *objectVel)
 /* ---- AudioClc_CalcDistance__FP17DRender_tCalcViewP8coorddef  [@0x80074b60] ---- */
 int AudioClc_CalcDistance(DRender_tCalcView *view,coorddef *object)
 {
-  int x;
-  int y;
-  int z;
-  int length;
-  int length1;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -308,9 +292,6 @@ int AudioClc_CalcDistance(DRender_tCalcView *view,coorddef *object)
 /* ---- AudioClc_CalcAzimuth__FP17DRender_tCalcViewP8coorddef  [@0x80074be8] ---- */
 int AudioClc_CalcAzimuth(DRender_tCalcView *view,coorddef *object)
 {
-  coorddef temp;
-  int x;
-  int y;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -374,7 +355,6 @@ int AudioClc_CalcAzimuth(DRender_tCalcView *view,coorddef *object)
 /* ---- AudioClc_CalcCarDirection__FP17DRender_tCalcViewP8Car_tObj  [@0x80074d50] ---- */
 int AudioClc_CalcCarDirection(DRender_tCalcView *view,Car_tObj *car)
 {
-  coorddef temp;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -412,8 +392,6 @@ int AudioClc_CalcCarDirection(DRender_tCalcView *view,Car_tObj *car)
 /* ---- AudioClc_CalcTrackAzimuth__FP17DRender_tCalcViewP8Car_tObj  [@0x80074e24] ---- */
 int AudioClc_CalcTrackAzimuth(DRender_tCalcView *view,Car_tObj *car)
 {
-  int x;
-  int y;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -472,11 +450,7 @@ int AudioClc_CalcTrackAzimuth(DRender_tCalcView *view,Car_tObj *car)
 /* ---- AudioClc_SoundOpponentHorn__Fiiii  [@0x80074f5c] ---- */
 void AudioClc_SoundOpponentHorn(int closestIndex,int azimuth,int dop,int dsquare)
 {
-  AudioClc_tSource*source;
-  int cartype;
-  int carhornSFX;
   static char trafficFreqs[50];
-  int iamp;
   int iSFXnum;
   int iVar1;
   
@@ -500,13 +474,6 @@ void AudioClc_SilenceOpponentHorn(int closestIndex)
 /* ---- AudioClc_SoundCloseCar__Fii  [@0x80075028] ---- */
 void AudioClc_SoundCloseCar(int playerIndex,int closestIndex)
 {
-  AudioClc_tSource*source;
-  int distSq;
-  int dop;
-  int dst;
-  int dir;
-  int c;
-  int iamp;
   int doppler;
   int iVar1;
   int iVar2;
@@ -590,7 +557,7 @@ LAB_800750fc:
   if (iVar4 == 0) {
     trap(0x1c00);
   }
-  if ((iVar4 == -1) && (iVar5 == -0x80000000)) {
+  if ((iVar4 == -1) && (iVar5 == 0x80000000)) {
     trap(0x1800);
   }
   relvel = (car->linearVel_ch).z;
@@ -681,20 +648,6 @@ LAB_800753f8:
 /* ---- AudioClc_SoundPlayersCar__Fi  [@0x80075508] ---- */
 void AudioClc_SoundPlayersCar(int playerIndex)
 {
-  DRender_tCalcView*view;
-  AudioClc_tSource*previous;
-  int azimuth;
-  int dsquare;
-  int frequency;
-  int dop;
-  int dst;
-  int facing;
-  int cardir;
-  int trkazi;
-  int revLimit;
-  int c;
-  int channel;
-  int iamp;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -795,7 +748,7 @@ LAB_80075824:
   if (iVar6 == 0) {
     trap(0x1c00);
   }
-  if ((iVar6 == -1) && (iVar1 == -0x80000000)) {
+  if ((iVar6 == -1) && (iVar1 == 0x80000000)) {
     trap(0x1800);
   }
   if (AudioClc_gCameraVelocity == (coorddef *)0x0) {

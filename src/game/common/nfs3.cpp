@@ -3,11 +3,9 @@
 #include "../../nfs4_types.h"
 #include "nfs3_externs.h"
 
-#ifdef AP_WIN
 extern "C" int NFSHS_HostTestRaceRequested(void);
 extern "C" int NFSHS_HostTestRaceParam(const char *, int);
 extern "C" int ticks;
-#endif
 
 /* ---- owning-TU defs for link-harness (extern-declared, never defined; BSS) ---- */
 int *gFileMem; int *gFileHandleTable;
@@ -25,10 +23,8 @@ char         gTournamentFinishOrder[12];   /* @0x80115c30  (bss(zero)) */
 char         befuddleTemp[10];   /* @0x80115c3c  (bss(zero)) */
 char         gMusicInSimIsOn = 1;   /* @0x8013d270 */
 int          gUseFrontend = 1;   /* @0x8013d274 */
-#ifdef AP_WIN
 extern "C" void NFSHS_HostLog(const char *fmt); /* explicit TEST_DIRECT_RACE boundary */
 extern "C" { extern void Front_InitialMemCardCheck(void); }
-#endif
 extern "C" { uint32       gFECheats; } /* @0x8013d278  (bss(zero)) */
 extern "C" { uint32       gFEBonus; } /* @0x8013d27c  (bss(zero)) */
 int          gFEBigHandle;   /* @0x8013d280  (bss(zero)) */
@@ -55,9 +51,7 @@ void Nfs2_SystemNLibStartUp(void)
   Platform_SysStartUp();
   Loading_GetInitialMemory();
   if (_6Speech_fgUndefined == (Speaker *)0x0) {
-    _6Speech_fgUndefined = (Speaker *)__builtin_new(sizeof(Speaker));
-    _6Speech_fgUndefined->_vf = (__vtbl_ptr_type (*)[31])Speaker_vtable;
-    _6Speech_fgUndefined->fSub = (Speaker *)0x0;
+    _6Speech_fgUndefined = new(__builtin_new(sizeof(Speaker))) Speaker();
   }
   Render_InitLibRender();
   return;
@@ -115,24 +109,16 @@ void NFS4_LoadPerps(void)
   u_char bVar1;
   int *addr;
   u_int *addr_00;
-  uint32 numTiers;
   tCarInfo *carCandidate;
-  uint32 j;
   u_int uVar4;
   const char *pcVar6;
   u_char *pbVar7;
-  char *data;
   u_char *pbVar8;
-  uint32 numCars;
   int numMissions;
   u_int uVar9;
-  tCarInfo *carData;
   tCarInfo *cars;
-  GameSetup_tPerpData *perpInfo;
   GameSetup_tPerpData *pGVar11;
-  short i;
   int iVar12;
-  char *buffer;
   char filename [64];
   
   if (0 < GameSetup_gData.numPerps) {
@@ -232,7 +218,7 @@ void Nfs2_GameModuleStartUp(int *FrontEndDataStream)
   CopSpeak_StartUp();
   if ((GameSetup_gData.raceType == 1) && (_6Speech_fgSpeech == (Speech *)0x0)) {
     pThis = __builtin_new(0x3a4);
-    _6Speech_fgSpeech = Speech_ct((Speech *)pThis);
+    _6Speech_fgSpeech = new(pThis) Speech();
   }
   Render_InitPauseMenu();
   Render_InitTrackRender();
@@ -311,7 +297,8 @@ void Nfs2_CleanUpGameModule(void)
   Replay_StoringReplay();
   AudioCmn_DeInit();
   if (_6Speech_fgSpeech != (Speech *)0x0) {
-    Speech_dt(_6Speech_fgSpeech,3);
+    _6Speech_fgSpeech->~Speech();
+    __builtin_delete(_6Speech_fgSpeech);
     _6Speech_fgSpeech = (Speech *)0x0;
   }
   CopSpeak_CleanUp();
@@ -410,7 +397,6 @@ void NFS4_LoadingIcon(void)
 void NFS3_CheckForFileOperations(void)
 
 {
-  int *p;
   int *piVar1;
   
   for (piVar1 = gFileMem; piVar1 < gFileHandleTable; piVar1 = piVar1 + 1) {
@@ -438,9 +424,7 @@ void xport_main(void)
   static char losePattern[] = "lose*";
   char *pattern;
   short oldReplayMode;
-#ifdef AP_WIN
   int hostDirectRace;
-#endif
 
   __main();
   oldReplayMode = 0;
@@ -466,7 +450,6 @@ void xport_main(void)
   (&trackManager)->Initialize();
   (&tournamentManager)->LoadDescription();
   (&trackManager)->LoadDescription();
-#ifdef AP_WIN
   hostDirectRace = NFSHS_HostTestRaceRequested();
   if (hostDirectRace) {
     /* Retail main reaches this initialization through Front_InitGraphics ->
@@ -496,23 +479,17 @@ void xport_main(void)
                   track,car,color,opponents,(int)frontEnd.raceType,(int)frontEnd.skillLevel,
                   (int)frontEnd.traffic[0],(int)frontEnd.laps); NFSHS_HostLog(nfshsLogLine); }()));
   }
-#endif
   if (gUseFrontend != 0
-#ifdef AP_WIN
       && !hostDirectRace
-#endif
      )
     Front_InitGraphics();
   if (gUseFrontend != 0
-#ifdef AP_WIN
       && !hostDirectRace
-#endif
      )
     Front_Menu((tFront_ProcessingType)0);
   do {
     NFS3_CheckForFileOperations();
     setup = (int *)MinFront_ParseOptions();
-#ifdef AP_WIN
     if (hostDirectRace) {
       /* Retail Front_BuildStream MIPS 0x8002A7A4..0x8002A7B8 loads ticks,
          sign-extends its low 16 bits, stores frontEnd.randomSeed, and passes
@@ -522,7 +499,6 @@ void xport_main(void)
       int referenceTicks=NFSHS_HostTestRaceParam("seed",-1);
       if (referenceTicks>=0) ticks=referenceTicks;
     }
-#endif
     if (gUseFrontend != 0) {
       setup = (int *)Front_BuildStream(setup);
     }
@@ -532,7 +508,6 @@ void xport_main(void)
     (&carManager)->ReleaseDescription();
     initlinkmode(0,1,1);
     NFS3_CheckForFileOperations();
-#ifdef AP_WIN
     if (hostDirectRace) {
       /* Slot-2 PSX RAM[0x9010] is 0x41B234D8 at the simulation boundary.
          BWorld_Init MIPS 0x8007E608/620/668 makes the only three BIOS rand
@@ -542,7 +517,6 @@ void xport_main(void)
       int referenceCRTSeed=NFSHS_HostTestRaceParam("crtseed",0);
       if (referenceCRTSeed!=0) srandPSX((unsigned int)referenceCRTSeed);
     }
-#endif
     Nfs2_GameModuleStartUp(setup);
     NFS3_CheckForFileOperations();
     while (simVar.restartGame != 0) {

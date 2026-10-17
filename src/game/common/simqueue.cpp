@@ -121,8 +121,6 @@ void SimQueue_SetLag(void)
 int SimQueue_IsBlocking(int pIndex)
 
 {
-  int i;
-  int tail;
   
   if (pIndex != 0) {
     return 0;

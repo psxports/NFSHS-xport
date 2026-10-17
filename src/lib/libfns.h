@@ -75,7 +75,6 @@ extern "C"
 #else
     void __main(void); /* (void) */
 #endif
-    int addsystemtask(intptr taskFn, int period, int delay);
     void addtimer(void (*proc)(void));
     int asyncidle(void); /* nullfunc.asm @0x800F6114: delay slot clears v0 */
     int asyncloadfile(char *name, int memclass);
@@ -88,7 +87,6 @@ extern "C"
     int cancelasyncload(int requestId);
     unsigned int crc16(const void *data, int length);
     void crossproduct(int *a, int *b, int *out); /* (coorddef *, coorddef *, coorddef *) */
-    intptr delsystemtask(intptr taskFn);
     void deltimer(void (*proc)(void));
     int fastintcos(int angle); /* (int angle) */
     int fastintsin(int angle); /* (int angle) */

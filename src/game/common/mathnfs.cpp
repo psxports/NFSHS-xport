@@ -3,7 +3,7 @@
  *   NormalizeVector/NormalizeShortVector/QDNormalizeVector/fasttransmult. Full SYM-locals applied.
  */
 #include "../../nfs4_types.h"
-#include "mathnfs_externs.h"
+#include "../../lib/libfns.h"
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 int Math_DistXZ(coorddef *a,coorddef *b);
@@ -22,14 +22,9 @@ void Math_fasttransmult(matrixtdef *m1,matrixtdef *m2,matrixtdef *mr);
 int Math_DistXZ(coorddef *a,coorddef *b)
 
 {
-  int dist;
-  int ax;
-  int bx;
   int z;
   int iVar1;
-  int bz;
   int x;
-  int az;
   
   z = a->x;
   x = z - b->x;
@@ -50,14 +45,10 @@ int Math_DistXZ(coorddef *a,coorddef *b)
 int Math_Dist3D(coorddef *a,coorddef *b)
 
 {
-  int dist;
-  int dist2;
   int y;
   int iVar1;
-  int z;
   int iVar2;
   int iVar3;
-  int x;
   
   y = a->x;
   iVar3 = y - b->x;
@@ -88,8 +79,6 @@ int Math_Dist3D(coorddef *a,coorddef *b)
 int Math_BetterDist(int a,int b)
 
 {
-  int x;
-  int y;
   int iVar1;
   int iVar2;
   int iVar5;
@@ -135,9 +124,6 @@ int Math_BetterDist(int a,int b)
 void Math_ResolveRotatedVector(int x,int y,int angle,int *newx,int *newy)
 
 {
-  int ds;
-  int dc;
-  int a;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -161,25 +147,14 @@ void Math_ResolveRotatedVector(int x,int y,int angle,int *newx,int *newy)
 int Math_VectorLength(coorddef *v)
 
 {
-  u_int vx2s;
-  int length;
   u_int uVar1;
   u_int uVar2;
   u_int uVar3;
-  u_int vy2s;
   int iVar4;
-  u_int vz2s;
-  u_int vz2;
-  int vz;
   int a;
-  int vy;
   int a_00;
-  int vx;
   int a_01;
-  int shifts;
   int iVar5;
-  u_int vy2;
-  u_int vx2;
   
   iVar5 = 0;
   a_01 = v->x;
@@ -239,25 +214,14 @@ int Math_VectorLength(coorddef *v)
 int Math_VectorLength2(coorddef *v)
 
 {
-  u_int vx2s;
-  int length2;
   u_int uVar1;
   u_int uVar2;
   u_int uVar3;
   int iVar4;
-  u_int vy2s;
-  u_int vz2s;
-  u_int vz2;
-  int vz;
   int a;
-  int vy;
   int a_00;
-  int vx;
   int a_01;
-  int shifts;
   int iVar5;
-  u_int vy2;
-  u_int vx2;
   
   iVar5 = 0;
   a_01 = v->x;
@@ -317,24 +281,14 @@ int Math_VectorLength2(coorddef *v)
 void Math_NormalizeVector(coorddef *v)
 
 {
-  u_int vy2;
-  u_int vx2s;
   u_int uVar1;
   u_int uVar2;
   u_int uVar3;
   int iVar4;
   u_int uVar5;
-  u_int vy2s;
-  u_int vz2s;
-  u_int vz2;
-  int vx;
   int iVar6;
-  int vy;
   int a;
-  int vz;
   int a_00;
-  int length;
-  u_int vx2;
   
   iVar6 = v->x;
   a = v->y;
@@ -395,13 +349,11 @@ void Math_NormalizeVector(coorddef *v)
 void Math_NormalizeShortVector(coorddef *v)
 
 {
-  int length;
   int len_or_inv;
   int tmp;
   int z_sq;
   int iVar1;
   int iVar2;
-  int inverse;
   
   len_or_inv = fixedmult(v->x,v->x);
   tmp = fixedmult(v->y,v->y);
@@ -423,9 +375,6 @@ void Math_NormalizeShortVector(coorddef *v)
 void Math_QDNormalizeVector(coorddef *v)
 
 {
-  coorddef temp;
-  int length;
-  int inverse;
   u_int uVar1;
   int iVar2;
   int iVar3;
@@ -477,28 +426,16 @@ void Math_QDNormalizeVector(coorddef *v)
 void Math_fasttransmult(matrixtdef *m1,matrixtdef *m2,matrixtdef *mr)
 
 {
-  int val;
-  int tb;
-  int tf;
   int iVar1;
   int *piVar2;
-  int te;
   int ta;
   int iVar3;
-  int td;
-  int tc;
-  int j;
   int iVar4;
   int *piVar5;
   int iVar6;
   int iVar7;
-  int i;
   int iVar8;
   int *piVar9;
-  int inverse;
-  int shifts;
-  u_int vy2;
-  u_int vx2;
   int iVar10;
   int iVar11;
   matrixtdef mtmp;

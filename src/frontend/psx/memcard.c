@@ -197,7 +197,6 @@ extern "C" void MCRD_setopts(MCRDOPTS_def *pOPT)
 extern "C" void MCRD_loadfile(int card, MCRDFILE_def *pFILE, int bNameHasProductCode)
 
 {
-    MCRDFILEINFO_def *pMFI;
 
     blockclear(&gMemCardInfo.fileinfo, 0x23c);
 
@@ -427,7 +426,6 @@ extern "C" int MCRD_savefile(int card, MCRDFILE_def *pFILE)
 
     int nIcons;
 
-    MCRDFILEINFO_def *pMFI;
     int ret;
     u_short *titleCursor;
 
@@ -938,7 +936,6 @@ extern "C" int MCRD_fileexists(int card, char *name)
 
     int i;
 
-    DIRENTRY *pDir;
 
     DIRENTRY *s1;
 
@@ -1356,7 +1353,6 @@ static short ascii2sjis(u_char ascii_code)
 
     uint code;
 
-    byte stmp2;
 
     int kind;
 
@@ -1425,31 +1421,20 @@ static short ascii2sjis(u_char ascii_code)
 static u_char sjis2ascii(short sjis_code)
 
 {
-    int error;
 
-    uchar stmp;
 
     uint hi;
 
     int kind;
 
-    int idx;
 
-    byte bottom;
 
-    int numberoftries;
 
-    int result;
 
-    int nIcons;
 
-    int code;
 
-    int cmd;
 
-    int res;
 
-    char fullname[24];
 
     kind = 0;
 

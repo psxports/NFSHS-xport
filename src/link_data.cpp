@@ -4,6 +4,7 @@
  * were declared `extern` but never defined. Surfaced by the link harness.
  * Types from each symbol's extern decl. (Non-zero INIT globals -> Stage 2b.) */
 #include "nfs4_types.h"
+#include "eaclib/psx/spchpsxz/spch_callbacks.h"
 
 extern "C" {
 
@@ -126,8 +127,8 @@ Track_tArtresource gInitialArt;                                /* @8011e158 24B 
 int gLoop;                                                     /* @8013d7b8 4B */
 intptr gLowMemory;                                        /* @8013dab0 4B on PSX */
 tMdecHandle gMDECinfo;                                         /* @80052b28 8B */
-intptr gMemAlloc;                                            /* @801370a8 4B on PSX; callback pointer carrier */
-intptr gMemFree;                                             /* @801370ac 4B on PSX; callback pointer carrier */
+NFSHS_SpeechAllocator gMemAlloc;                              /* @801370a8 */
+NFSHS_SpeechFree gMemFree;                                    /* @801370ac */
 int gMenuRotate[2];                                            /* @80051264 8B */
 int gNumBanks;                                                 /* @801370b8 4B */
 Group                  * gObjDefOffsetsGroup;                  /* @8013d4e0 4B */
@@ -138,11 +139,11 @@ Group              * gPersistObjInst;                          /* @8013d4c0 4B *
 tSkid gPrevSkidSm[8][4];                                       /* @8011e2f0 896B */
 Camera_tCamSlot gReplayCameraSlots[32];                        /* @8011dbdc 1024B */
 int gSPCH_Initialized;                                         /* @801370b0 4B */
-intptr gSampleRequest;                                       /* @80137094 4B on PSX; callback pointer */
+NFSHS_SpeechSampleRequest gSampleRequest;                     /* @80137094 */
 int gSaveChunk[8][4];                                          /* @8011e770 128B */
 Skidmark_Segment * gSaveSeg[8][4];                             /* @8011e6f0 128B */
-intptr gSentenceRuleSet;                                     /* @8013709c 4B on PSX; callback pointer */
-intptr gSentenceRuleTest;                                    /* @80137098 4B on PSX; callback pointer */
+NFSHS_SpeechRuleSet gSentenceRuleSet;                         /* @8013709c */
+NFSHS_SpeechRuleTest gSentenceRuleTest;                       /* @80137098 */
 int gShowroomLights;                                           /* @800514b4 4B */
 int gStatusSm[8][4];                                           /* @8011e670 128B */
 int gSteerRatio;                                               /* @8013d2f8 4B */

@@ -22,7 +22,6 @@ extern "C" { void Clock_SystemCleanUp(void); }
 /* ---- Clock_MasterInterruptHandler__Fv  [@0x8008b938] ---- */
 void Clock_MasterInterruptHandler(void)
 {
-  long gp;
   u_int local_10 [2];
   
   savegp(local_10);
@@ -64,7 +63,6 @@ extern "C" void Clock_SystemStartUp(void)
 /* ---- Clock_SystemCleanUp__Fv  [@0x8008ba40] ---- */
 extern "C" void Clock_SystemCleanUp(void)
 {
-  int gp;
   
   if (clock_InterruptStarted != 0) {
     clock_InterruptStarted = 0;

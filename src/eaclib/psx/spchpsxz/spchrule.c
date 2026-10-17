@@ -11,9 +11,7 @@
  */
 
 #include "../../../nfs4_types.h"
-
-extern "C" intptr gSentenceRuleSet;  /* sentence rule-set callback */
-extern "C" intptr gSentenceRuleTest; /* sentence rule-test callback */
+#include "spch_callbacks.h"
 
 /* ---- per-TU static copies of the shared Vox accessors (canonical versions in spchdata.obj) ---- */
 static int VoxSentence_GetNumPhrases(intptr sentence) /* @0x8010B100 */
@@ -91,7 +89,7 @@ extern "C" void iSPCH_RuleSet(short *sentence, int rule, int *values)
 {
     if (gSentenceRuleSet != 0)
     {
-        char numRules = *(char *)((intptr)sentence + 7);
+        signed char numRules = *(signed char *)((intptr)sentence + 7);
         int i = 0;
         unsigned char *rd = (unsigned char *)iSPCH_GetRuleDataAddr((intptr)sentence);
         intptr offSent = iSPCH_GetOffset16((intptr)sentence, (intptr)(sentence + 6), rule);
@@ -106,7 +104,7 @@ extern "C" void iSPCH_RuleSet(short *sentence, int rule, int *values)
                 {
                     if (iSPCH_SentenceUsesParm(offSent, paramIdx) != 0)
                     {
-                        ((void (*)(int, int, int))gSentenceRuleSet)((int)(unsigned short)*sentence, (int)(unsigned int)ruleByte, values[paramIdx]);
+                        gSentenceRuleSet((int)(unsigned short)*sentence, (int)(unsigned int)ruleByte, values[paramIdx]);
                     }
                 }
                 i = i + 1;
@@ -120,7 +118,7 @@ extern "C" void iSPCH_RuleSet(short *sentence, int rule, int *values)
  *   callback (using values[] for the typed ones) and pack the pass/fail bits into *out. */
 extern "C" unsigned int iSPCH_GetRuleSettings(short *sentence, int *values, char *out)
 {
-    char numRules = *(char *)((intptr)sentence + 7);
+    signed char numRules = *(signed char *)((intptr)sentence + 7);
     unsigned int failed = 0;
     unsigned int passed = 0;
     unsigned char *ruleData = (unsigned char *)iSPCH_GetRuleDataAddr((intptr)sentence);
@@ -162,7 +160,7 @@ extern "C" unsigned int iSPCH_GetRuleSettings(short *sentence, int *values, char
                         if (gSentenceRuleTest == 0)
                             r = -1;
                         else
-                            r = ((int (*)(int, int, int))gSentenceRuleTest)((int)(unsigned short)*sentence, (int)*p, v);
+                            r = gSentenceRuleTest((int)(unsigned short)*sentence, (int)*p, v);
                         if (0 < r)
                             passed |= bit;
                         else if (r < 0)

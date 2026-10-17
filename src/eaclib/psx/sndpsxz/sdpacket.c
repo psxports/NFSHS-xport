@@ -123,9 +123,9 @@ extern "C" void iSNDpacketgetirq(void)
     if (note < 0)
         return;
     SndPacketVoice *voice = sdpacket_voice(note);
-    if ((voice->bytePos >> 0xc <= (unsigned)ctx->blockFrames) || ((unsigned)(ctx->totalBytes - (unsigned)ctx->blockFrames) <= voice->bytePos >> 0xc))
+    if ((((unsigned)voice->bytePos >> 0xc) <= (unsigned)ctx->blockFrames) || ((unsigned)(ctx->totalBytes - (unsigned)ctx->blockFrames) <= ((unsigned)voice->bytePos >> 0xc)))
     {
-        if ((unsigned)(voice->bytePos >> 0xb) < (unsigned)ctx->totalBytes)
+        if (((unsigned)voice->bytePos >> 0xb) < (unsigned)ctx->totalBytes)
         {
             voice->servedPos = voice->bytePos;
             if (voice->link >= 0)
@@ -160,9 +160,6 @@ extern "C" void iSNDpacketsetirq(void)
             SndPacketContext *ctx = sdpacket_context(sndpp);
             if (ctx != 0 && ctx->activeNote >= 0)
             {
-#if !defined(AP_WIN)
-                *(short *)(DAT_80147e2c + 0x1a4) = (short)((ctx->spuAddr + 8) >> 3);
-#endif
                 InterruptCallback(9, iSNDpacketirqcallback);
                 iSNDpsxenablespuirq();
                 return;

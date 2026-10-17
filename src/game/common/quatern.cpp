@@ -4,7 +4,7 @@
  */
 #include "../../nfs4_types.h"
 #include "../../mips_semantics.h"
-#include "quatern_externs.h"
+#include "../../lib/libfns.h"
 
 /* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
 void Quatern_VecInterpolate(coorddef *cp0,coorddef *cp1,int weight,coorddef *cp);
@@ -52,25 +52,12 @@ void Quatern_QuatToMat(tQuat *q,matrixtdef *matrix)
 {
   int iVar1;
   int iVar2;
-  int x;
-  int y;
-  int zz;
-  int one;
   int iVar3;
   int iVar4;
-  int xz;
   int iVar5;
-  int yz;
-  int xy;
-  int z;
   int iVar6;
-  int wz;
   int iVar7;
-  int yy;
   int iVar8;
-  int wy;
-  int wx;
-  int xx;
   
   iVar4 = (int)q->x;
   iVar7 = (int)q->w;
@@ -105,21 +92,9 @@ void Quatern_QuatToMat(tQuat *q,matrixtdef *matrix)
 void Quatern_MatToQuat(matrixtdef *matrix,tQuat *q)
 
 {
-  int tr;
   int iVar1;
-  int i;
   u_int uVar2;
   int iVar3;
-  int xz;
-  int yz;
-  int xy;
-  int z;
-  int wz;
-  int yy;
-  int wy;
-  int wx;
-  int xx;
-  int s;
   
   if ((((((matrix->m[0] == 0x10000) && (matrix->m[1] == 0)) && (matrix->m[2] == 0)) &&
        ((matrix->m[3] == 0 && (matrix->m[4] == 0x10000)))) &&

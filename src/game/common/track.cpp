@@ -49,8 +49,6 @@ void Track_AnimateTrackLighting(void);
 char * KillFile_OpenRead(void);
 void KillFile_ReadEntry(char *filePtr,int entryInd,int *chunkInd,int *objectInd);
 void Track_LoadObjectKillData(void);
-void Save(SaveSurface *pThis,Trk_NewSimQuad *simQuad);
-void RestoreAll(SaveSurface *pThis);
 
 
 /* ---- Track_SetTrackNumber__Fi  [TRACK.CPP:95-96] SLD-VERIFIED ---- */
@@ -116,29 +114,17 @@ void DeInitArtResources(void)
 void LoadShapesAndMakePmx(char *shapefile,Draw_tPixMap *pmxList,int loadFlags,int x,int y)
 
 {
-  int palnum;
   Track_MultiPalette *pTVar1;
   int shapeCount;
   u_char *n;
-  int pcnt;
   int iVar3;
   Track_MipMap *pTVar4;
-  int cnt;
   int iVar5;
   Track_MultiPalette *pTVar6;
-  int j;
-  int tempclut;
   int iVar7;
-  int i;
-  shapetbl *shape;
-  int mipmapcounter;
   int iVar8;
-  Draw_tPixMap *pPmx;
-  int cluttype;
   int iVar9;
-  int recolor_flag;
   char name [4];
-  short icode [2];
   
   iVar9 = -1;
   gTempMipMapInfo = (Track_MipMap *)0x0;
@@ -235,13 +221,9 @@ void LoadShapesAndMakePmx(char *shapefile,Draw_tPixMap *pmxList,int loadFlags,in
 void LoadShapesAndMakePmx_EnvMap(char *shapefile,Draw_tPixMap *pmxList,int x,int y)
 
 {
-  shapetbl *shape;
   int shapeCount;
   char *n;
-  int i;
   int idx;
-  Draw_tPixMap *pPmx;
-  int recolor_flag;
   
   for (idx = 0; shapeCount = shapecount(shapefile), idx < shapeCount;
       idx = idx + 1) {
@@ -259,31 +241,10 @@ void LoadShapesAndMakePmx_EnvMap(char *shapefile,Draw_tPixMap *pmxList,int x,int
 void TexturesLoadInitial(void)
 
 {
-  u_int *puVar1;
-  u_char *puVar2;
-  int success;
   char *shape_path;
   Draw_tPixMap *pDVar3;
   char *pcVar4;
   const char *track_path;
-  int reg_t0;
-  u_int uVar5;
-  int reg_t1;
-  u_int uVar6;
-  int reg_t2;
-  u_int uVar7;
-  int reg_t3;
-  char *tmpShapes;
-  int tu3;
-  int tu4;
-  void *tp1;
-  void *tp3;
-  int tu5;
-  u_int tu6;
-  int tp2;
-  u_char *tp4;
-  u_int tu7;
-  u_int tu8;
   
   if (GameSetup_gData.Time == 0) {
     if (GameSetup_gData.Weather == 0) {
@@ -340,7 +301,7 @@ void Track_AnimateTextures(void)
       if (interval == 0) {
         trap(0x1c00);
       }
-      if ((interval == 0xffffffff) && (simGlobal.gameTicks == -0x80000000)) {
+      if ((interval == 0xffffffff) && (simGlobal.gameTicks == 0x80000000)) {
         trap(0x1800);
       }
       u_int textureMax = controller->textureMax;
@@ -348,7 +309,7 @@ void Track_AnimateTextures(void)
         trap(0x1c00);
       }
       if ((textureMax == 0xffffffff) &&
-          (simGlobal.gameTicks / (int)interval == -0x80000000)) {
+          (simGlobal.gameTicks / (int)interval == 0x80000000)) {
         trap(0x1800);
       }
       short pmxIndex = controller->matPtr->pmxIndex;
@@ -364,7 +325,7 @@ void Track_AnimateTextures(void)
       if (interval == 0) {
         trap(0x1c00);
       }
-      if ((interval == 0xffffffff) && (simGlobal.gameTicks == -0x80000000)) {
+      if ((interval == 0xffffffff) && (simGlobal.gameTicks == 0x80000000)) {
         trap(0x1800);
       }
       u_int textureCount = (u_char)controller->textureCount;
@@ -372,7 +333,7 @@ void Track_AnimateTextures(void)
         trap(0x1c00);
       }
       if ((textureCount == 0xffffffff) &&
-          (simGlobal.gameTicks / (int)interval == -0x80000000)) {
+          (simGlobal.gameTicks / (int)interval == 0x80000000)) {
         trap(0x1800);
       }
       controller->matPtr->pmxIndex =
@@ -390,7 +351,6 @@ int Track_GetProperMultiPalShapeIndex(int shapeindex,int paletteindex)
 {
   Track_MultiPalette *pTVar1;
   int iVar2;
-  int t;
   
   iVar2 = 0;
   pTVar1 = gTempMultiPalInfo;
@@ -495,20 +455,12 @@ void Track_AssociateSingleMaterial(Trk_Material *inputMat,Track_tMaterial *outpu
 void Track_LinkMaterials(SerializedGroup *group,int length,Track_tMaterial *matList)
 
 {
-  Draw_tPixMap * pmx;
-  u_char *puVar1;
   u_char bVar2;
   short sVar3;
-  u_int uVar4;
-  u_int uVar5;
-  u_int *puVar6;
-  int d;
   Track_tMaterialController *pTVar7;
   Draw_tPixMap *pDVar8;
-  int mipmap_offset;
   Trk_Material *pSVar9;
   int iVar10;
-  SerializedGroup *pThis;
   Track_MipMap *mipMapInfo;
   int iVar12;
   int shapeIndex;
@@ -517,18 +469,12 @@ void Track_LinkMaterials(SerializedGroup *group,int length,Track_tMaterial *matL
   u_int uVar15;
   u_int pmxLnkW2;
   u_int uVar16;
-  u_int pmxLnkW0;
-  Trk_Material *mats;
   Trk_Material *inputMat;
   int iVar17;
-  int mm;
-  int i;
   int iVar18;
   int iVar19;
-  int controlIndex;
   int iVar20;
   Draw_tPixMap originalPmx;
-  int matCount;
   
   if (group != (SerializedGroup *)0x0) {
     iVar18 = 0;
@@ -642,16 +588,12 @@ void ReduceObjectPrecision(Group *instGroup,Group *defGroup,int bits)
   short sVar1;
   short sVar2;
   Trk_ObjectDef **ppTVar3;
-  Trk_ObjectDef *objDef;
   Trk_ObjectDef *pTVar4;
   short tu5;
-  Group *pThis;
   Trk_ObjectDef *pTVar5;
-  CCOORD16 *pts;
   Trk_ObjectDef *pTVar6;
   u_int uVar7;
   Trk_SimpleInst *inst;
-  int count;
   int iVar8;
   
   ppTVar3 = Track_gObjDefs;
@@ -692,9 +634,7 @@ void InvalidatePersistentCollideBoomObjects(Group *instGroup,Group *defGroup)
 
 {
   Trk_SimpleInst *inst;
-  Group *pThis;
   int iVar2;
-  int count;
   
   if ((instGroup != (Group *)0x0) && (defGroup != (Group *)0x0)) {
     iVar2 = instGroup->m_num_elements;
@@ -713,7 +653,6 @@ void InvalidatePersistentCollideBoomObjects(Group *instGroup,Group *defGroup)
 void CalcObjectBoundingSphere(Group *defGroup,Group *boundingSphereGroup)
 
 {
-  Trk_ObjectDef * objDef;
   short sVar1;
   short sVar2;
   short *psVar3;
@@ -722,20 +661,14 @@ void CalcObjectBoundingSphere(Group *defGroup,Group *boundingSphereGroup)
   int iVar6;
   int iVar7;
   int iVar8;
-  int diff;
   Trk_ObjectDef *pTVar9;
-  int ptCount;
   u_int uVar10;
   u_int uVar11;
-  CCOORD16 *pts;
   Trk_ObjectDef *pTVar12;
   Trk_ObjectDef *pTVar13;
-  int radius;
   int iVar14;
-  int i;
   int iVar15;
   tBoundingSphere *bSphere;
-  int objCount;
   int iVar17;
   coorddef cp;
   
@@ -763,21 +696,21 @@ void CalcObjectBoundingSphere(Group *defGroup,Group *boundingSphereGroup)
     if (uVar10 == 0) {
       trap(0x1c00);
     }
-    if ((uVar10 == 0xffffffff) && (cp.x == -0x80000000)) {
+    if ((uVar10 == 0xffffffff) && (cp.x == 0x80000000)) {
       trap(0x1800);
     }
     uVar4 = (u_int)pTVar9->vertexCount;
     if (uVar4 == 0) {
       trap(0x1c00);
     }
-    if ((uVar4 == 0xffffffff) && (cp.y == -0x80000000)) {
+    if ((uVar4 == 0xffffffff) && (cp.y == 0x80000000)) {
       trap(0x1800);
     }
     uVar5 = (u_int)pTVar9->vertexCount;
     if (uVar5 == 0) {
       trap(0x1c00);
     }
-    if ((uVar5 == 0xffffffff) && (cp.z == -0x80000000)) {
+    if ((uVar5 == 0xffffffff) && (cp.z == 0x80000000)) {
       trap(0x1800);
     }
     pTVar13 = pTVar9 + 1;
@@ -821,10 +754,8 @@ void CalcObjDefPtrs(void)
 {
   bool bVar1;
   Group *pGVar2;
-  Group *pThis;
   Group *pGVar3;
   int iVar4;
-  int i;
   
   pGVar2 = gPersistObjDef;
   iVar4 = 1;
@@ -854,11 +785,11 @@ void Track_InitPersistentData(SerializedGroup *perGroup)
       ((perGroup->m_num_elements * sizeof(*persistentGroups) + 7) & ~(size_t)7);
   if (0 < perGroup->m_num_elements) {
     do {
-      persistentGroups[iVar2] = LocateGroupNum(perGroup,iVar2);
+      persistentGroups[iVar2] = (perGroup)->LocateGroupNum(iVar2);
       iVar2 = iVar2 + 1;
     } while (iVar2 < perGroup->m_num_elements);
   }
-  LocateGroupType(perGroup,8,0);
+  (perGroup)->LocateGroupType(8,0);
   iVar3 = perGroup->m_num_elements;
   iVar2 = 0;
   do {
@@ -874,20 +805,20 @@ void Track_InitPersistentData(SerializedGroup *perGroup)
       Track_LinkMaterials(group,group->m_length + -0x10,Track_materials);
       break;
     case 7:
-      gPersistObjInst = CreateLiteGroup(group,group,Track_mem);
+      gPersistObjInst = (group)->CreateLiteGroup(group,Track_mem);
       break;
     case 8:
-      gPersistObjDef = CreateLiteGroup(group,group,Track_mem);
+      gPersistObjDef = (group)->CreateLiteGroup(group,Track_mem);
       break;
     case 0xf:
-      simGroup = CreateLiteGroup(group,group,Track_mem);
+      simGroup = (group)->CreateLiteGroup(group,Track_mem);
       BWorldSm_Init(simGroup);
       break;
     case 0x24:
-      gPersistMidgroundObjInst = CreateLiteGroup(group,group,Track_mem);
+      gPersistMidgroundObjInst = (group)->CreateLiteGroup(group,Track_mem);
       break;
     case 0x26:
-      gObjDefOffsetsGroup = CreateLiteGroup(group,group,Track_mem);
+      gObjDefOffsetsGroup = (group)->CreateLiteGroup(group,Track_mem);
     default: break;
     }
     iVar2 = iVar2 + 1;
@@ -898,14 +829,6 @@ void Track_InitPersistentData(SerializedGroup *perGroup)
 void Track_Init(char *tempName)
 
 {
-  SerializedGroup * trackGroup;
-  SerializedGroup * chunkGroup;
-  int trackFileSize;
-  SerializedGroup * group;
-  u_int uVar1;
-  u_char *puVar2;
-  u_int *puVar3;
-  Group *pThis;
   int loadResult;
   SimpleMem *this_00;
   void *loadBuf;
@@ -918,62 +841,19 @@ void Track_Init(char *tempName)
   SerializedGroup *perGroup;
   SerializedGroup *pSVar4;
   SaveSurface *newSaveSurface;
-  short *visList;
   void *tp7;
   short *viewRow;
   short *elemNext;
   u_short *serializedView;
-  CVECTOR *pCVar5;
-  int j;
-  u_int uVar6;
   int elemIdx;
-  Group *size;
-  int matCount;
-  int srcDataInd;
   int iVar43_field;
-  int count;
   int iVar44_field;
-  int reg_t3;
-  int reg_t4;
-  int tu9;
-  int reg_t5;
-  int tu10;
-  int reg_t6;
-  int tu11;
-  Chunk *chunkDat;
   int chunkCount;
-  int i;
   int groupOffset;
-  SerializedGroup *nextChunkGroup;
   SerializedGroup *matInfo_p;
-  SerializedGroup *persistentGroup;
   char trackName [128];
-  int tp5;
-  int tp6;
-  int tp2;
   u_short tu3;
-  int tu4;
-  int tp4;
   TrackHeader *tT33;
-  int tu1;
-  int tu2;
-  int tp3;
-  u_char uVar7_00;
-  u_char tu26;
-  u_char tu27;
-  u_char tu28;
-  u_char tu29;
-  u_char tu22;
-  u_char tu23;
-  u_char tu24;
-  u_char tu25;
-  u_char tu34;
-  u_char tu35;
-  u_char tu30;
-  u_char tu31;
-  u_char tu32;
-  u_char tu33;
-  void *tp1;
   
   Track_gSaveSurface = (SaveSurface *)0x0;
   Track_gObjDefs = (Trk_ObjectDef **)0x0;
@@ -993,30 +873,30 @@ void Track_Init(char *tempName)
   }
   this_00->freeMemSize = chunkCount;
   Track_mem = this_00;
-  scratchAlloc = (u_char *)FeignAlloc(this_00,loadResult);
+  scratchAlloc = (u_char *)(this_00)->FeignAlloc(loadResult);
   rootSerGroup = (SerializedGroup *)loadfileatadr(trackName,scratchAlloc + 0x9080);
-  headerGroup = (Group *)LocateCreateGroupType(rootSerGroup,0x1f,Track_mem,0);
+  headerGroup = (Group *)(rootSerGroup)->LocateCreateGroupType(0x1f,Track_mem,0);
   Track_header = (TrackHeader *)(headerGroup + 1);
-  chunkCenterGroup = (Group *)LocateCreateGroupType(rootSerGroup,0x20,Track_mem,0);
+  chunkCenterGroup = (Group *)(rootSerGroup)->LocateCreateGroupType(0x20,Track_mem,0);
   Chunk_chunkCenters = (coorddef *)(chunkCenterGroup + 1);
-  lightGroup = LocateGroupType(rootSerGroup,0x23,0);
+  lightGroup = (rootSerGroup)->LocateGroupType(0x23,0);
   tp7 = (void *)(lightGroup + 1);
   nfs4_mips_copy_bytes(Chunk_lightTable,tp7,0x400);
-  lightCountGroup = LocateGroupType(rootSerGroup,0x23,0);
+  lightCountGroup = (rootSerGroup)->LocateGroupType(0x23,0);
   Chunk_numLight = (lightCountGroup->m_length - 0x10U) >> 2;
-  Track_gInViewList = (short *)Alloc(Track_mem,Track_header->chunkCount * 0x48,0);
-  Track_gInViewCount = (u_char *)Alloc(Track_mem,Track_header->chunkCount,0);
-  Track_chunkList = (Chunk *)Alloc(Track_mem,Track_header->chunkCount * 0x70,0);
+  Track_gInViewList = (short *)(Track_mem)->Alloc(Track_header->chunkCount * 0x48,0);
+  Track_gInViewCount = (u_char *)(Track_mem)->Alloc(Track_header->chunkCount,0);
+  Track_chunkList = (Chunk *)(Track_mem)->Alloc(Track_header->chunkCount * 0x70,0);
   Chunk_Init();
-  perGroup = LocateGroupType(rootSerGroup,0x21,0);
-  pSVar4 = LocateGroupType(rootSerGroup,0x1d,0);
+  perGroup = (rootSerGroup)->LocateGroupType(0x21,0);
+  pSVar4 = (rootSerGroup)->LocateGroupType(0x1d,0);
   for (groupOffset = 0; groupOffset < Track_header->chunkCount; groupOffset = groupOffset + 1) {
     matInfo_p = (SerializedGroup *)0x0;
     if (groupOffset < Track_header->chunkCount + -1) {
-      matInfo_p = (SerializedGroup *)LocateNextGroupType(pSVar4,0x1d);
+      matInfo_p = (SerializedGroup *)(pSVar4)->LocateNextGroupType(0x1d);
     }
-    InstanceGroup(Track_chunkList + groupOffset,pSVar4,Track_mem);
-    pSVar4 = LocateGroupType(pSVar4,4,0);
+    (Track_chunkList + groupOffset)->InstanceGroup(pSVar4,Track_mem);
+    pSVar4 = (pSVar4)->LocateGroupType(4,0);
     tT33 = Track_header;
     iVar44_field = pSVar4->m_num_elements;
     serializedView = (u_short *)(pSVar4 + 1);
@@ -1050,7 +930,7 @@ void Track_Init(char *tempName)
     pSVar4 = matInfo_p;
   }
   Track_InitPersistentData(perGroup);
-  ResizeToFit(Track_mem);
+  (Track_mem)->ResizeToFit();
   Track_MakeTrackPathName(".grp");
   gPersistObjDefBoundingSpheres =
        (Group *)reservememadr("bsphere",gPersistObjDef->m_num_elements << 3 | 4,0);
@@ -1058,7 +938,7 @@ void Track_Init(char *tempName)
   ReduceObjectPrecision(gPersistMidgroundObjInst,gPersistObjDef,2);
   InvalidatePersistentCollideBoomObjects(gPersistObjInst,gPersistObjDef);
   newSaveSurface = (SaveSurface *)__builtin_new(sizeof(SaveSurface));
-  Track_gSaveSurface = SaveSurface_ct(newSaveSurface,0x30);
+  Track_gSaveSurface = new(newSaveSurface) SaveSurface(0x30);
   Track_LoadObjectKillData();
   return;
 }
@@ -1076,7 +956,8 @@ void Track_DeInit(void)
     __builtin_delete(deleteMe);
   }
   if (Track_gSaveSurface != (SaveSurface *)0x0) {
-    SaveSurface_dt(Track_gSaveSurface,3);
+    Track_gSaveSurface->~SaveSurface();
+    __builtin_delete(Track_gSaveSurface);
     Track_gSaveSurface = (SaveSurface *)0x0;
   }
   if (gInitialArt.shapeFile != (char *)0x0) {
@@ -1131,24 +1012,14 @@ void KillFile_ReadEntry(char *filePtr,int entryInd,int *chunkInd,int *objectInd)
 void Track_LoadObjectKillData(void)
 
 {
-  Group * group;
-  Group *simGroup;
   int *filePtr_00;
   int iVar1;
-  int index;
   int iVar2;
   Trk_SimObject *simObjs;
-  Group *pThis;
   Group *pGVar3;
-  Chunk *chunkDat;
-  int j;
-  Trk_SimpleInst *inst;
   Group *pGVar4;
-  int numElements;
   int iVar5;
-  int i;
   int entryInd;
-  char *filePtr;
   int chunkInd;
   int objInd;
   
@@ -1191,14 +1062,14 @@ void Track_LoadObjectKillData(void)
 }
 
 /* ---- Save  [TRACK.CPP:1831-1850] SLD-VERIFIED ---- */
-void Save(SaveSurface *pThis,Trk_NewSimQuad *simQuad)
+void SaveSurface::Save(Trk_NewSimQuad *simQuad)
 
 {
   
-  if ((pThis->fCount <= pThis->fMaxCount) && (simQuad != (Trk_NewSimQuad *)0x0)) {
-    pThis->fStack[pThis->fCount].fSimQuad = simQuad;
-    pThis->fStack[pThis->fCount].fSurface = simQuad->surface;
-    pThis->fCount = pThis->fCount + 1;
+  if ((this->fCount <= this->fMaxCount) && (simQuad != (Trk_NewSimQuad *)0x0)) {
+    this->fStack[this->fCount].fSimQuad = simQuad;
+    this->fStack[this->fCount].fSurface = simQuad->surface;
+    this->fCount = this->fCount + 1;
   }
   return;
 }
@@ -1222,16 +1093,15 @@ void Save(SaveSurface *pThis,Trk_NewSimQuad *simQuad)
    Build date: 1999-02-22.
    See PROJECT_AUDIT_2026-05-05.md and SESSION_2026-05-07_SUMMARY.md. */
 
-SaveSurface * SaveSurface_ct(SaveSurface *pThis,int numEntries)
+SaveSurface::SaveSurface(int numEntries)
 
 {
   tSaveSurface *ptVar1;
   
-  pThis->fMaxCount = (short)numEntries;
-  pThis->fCount = 0;
+  this->fMaxCount = (short)numEntries;
+  this->fCount = 0;
   ptVar1 = (tSaveSurface *)reservememadr("Surface Save",numEntries << 3,0);
-  pThis->fStack = ptVar1;
-  return pThis;
+  this->fStack = ptVar1;
 }
 
 /* ---- ~SaveSurface  [TRACK.CPP:1864-1865] SLD-VERIFIED ---- */
@@ -1252,34 +1122,30 @@ SaveSurface * SaveSurface_ct(SaveSurface *pThis,int numEntries)
    Build date: 1999-02-22.
    See PROJECT_AUDIT_2026-05-05.md and SESSION_2026-05-07_SUMMARY.md. */
 
-void SaveSurface_dt(SaveSurface *pThis,int __in_chrg)
+SaveSurface::~SaveSurface()
 
 {
   
-  purgememadr(pThis->fStack);
-  if ((__in_chrg & 1U) != 0) {
-    __builtin_delete(pThis);
-  }
+  purgememadr(this->fStack);
   return;
 }
 
 /* ---- RestoreAll  [TRACK.CPP:1871-1879] SLD-VERIFIED ---- */
-void RestoreAll(SaveSurface *pThis)
+void SaveSurface::RestoreAll()
 
 {
   int iVar1;
-  int i;
   
   iVar1 = 0;
-  if (0 < pThis->fCount) {
+  if (0 < this->fCount) {
     do {
-      (pThis->fStack[iVar1].fSimQuad)->surface = pThis->fStack[iVar1].fSurface;
-      pThis->fStack[iVar1].fSimQuad = (Trk_NewSimQuad *)0x0;
-      pThis->fStack[iVar1].fSurface = '\0';
+      (this->fStack[iVar1].fSimQuad)->surface = this->fStack[iVar1].fSurface;
+      this->fStack[iVar1].fSimQuad = (Trk_NewSimQuad *)0x0;
+      this->fStack[iVar1].fSurface = '\0';
       iVar1 = iVar1 + 1;
-    } while (iVar1 < pThis->fCount);
+    } while (iVar1 < this->fCount);
   }
-  pThis->fCount = 0;
+  this->fCount = 0;
   return;
 }
 

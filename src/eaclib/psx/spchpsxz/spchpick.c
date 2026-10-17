@@ -14,6 +14,8 @@
  */
 
 #include "../../../nfs4_types.h"
+#include "spch_callbacks.h"
+#include "spchsamp.h"
 
 extern "C" short ispch_gChoice;              /* short[6]/phrase choice records */
 extern "C" unsigned char ispch_gPickSamples; /* chosen sample-index pool */
@@ -24,8 +26,7 @@ extern "C" short DAT_801484ea; /* choice template field (IterateChoice) */
 
 extern "C" intptr *gVoxBanks;       /* spchbank */
 extern "C" int gDataRate;           /* spchinit */
-extern "C" intptr gSampleRequest;   /* spchinit callback */
-extern "C" intptr gSentenceRuleSet; /* spchinit callback */
+extern "C" const unsigned char gClearCycle[4];
 extern "C" int &gVoxInGame;         /* spchinit */
 extern "C" int &gRepeatCount;       /* spchinit */
 extern "C" int gFilterSetting;      /* spchevnt-shared */
@@ -40,7 +41,6 @@ extern "C" intptr iSPCH_GetOffset16(intptr base, intptr tableBase, int index);  
 extern "C" int VoxEvent_GetFilterLengthFlag(intptr e);                                  /* spchdata */
 extern "C" int iSPCH_FindBank(int key);                                                 /* spchbank (returns bank index) */
 extern "C" unsigned int iSPCH_TestSubBankBounds(int bankIdx, int subIdx);               /* spchbank */
-extern "C" int iSPCH_UnPackSample(intptr bank, unsigned int sampleIdx, int *out);       /* spchsamp */
 extern "C" int iSPCH_Rand(int n);                                                       /* spchrand */
 extern "C" unsigned int iSPCH_GetRuleID(intptr sentence, int index);                    /* spchrule */
 extern "C" void iSPCH_RuleSet(short *sentence, int rule, int *values);                  /* spchrule */
@@ -565,10 +565,11 @@ extern "C" void iSPCH_ConstantRuleSet(short *sentence, intptr rule)
                     if (ruleType != 0xf)
                     {
                         unsigned int rid = iSPCH_GetRuleID((intptr)sentence, (int)ruleType);
-                        int tmp[3];
+                        int tmp[4];
                         int r = iSPCH_UnPackSample(gVoxBanks[*choice], (unsigned int)PICK(choice[4]), tmp);
                         if (r != 0)
-                            ((void (*)(int, int, int))gSentenceRuleSet)((int)(unsigned short)*sentence, (int)rid, 1 << (((unsigned char *)tmp)[j] & 0x1f));
+                            gSentenceRuleSet((int)(unsigned short)*sentence, (int)rid,
+                                (sint32)(1u << (((unsigned char *)tmp)[12 + j] & 0x1f)));
                     }
                     j = j + 1;
                     p = ruleEntry + j;
@@ -595,14 +596,20 @@ extern "C" int iSPCH_MakeSampleRequests(intptr sentence, int paramTable)
             unsigned char idx = PICK(choice[4]);
             int tmp[4];
             if ((*(unsigned char *)(bank + 2) & 0xf0) != 0)
-                iSPCH_ClearCycleBit(bank, (int)(unsigned int)idx);
+            {
+                uint32 clearCycle = (uint32)gClearCycle[0] | ((uint32)gClearCycle[1] << 8)
+                    | ((uint32)gClearCycle[2] << 16) | ((uint32)gClearCycle[3] << 24);
+                if (clearCycle != 0)
+                    iSPCH_ClearCycleBit(bank, (int)(unsigned int)idx);
+            }
             if (iSPCH_UnPackSample(bank, (unsigned int)idx, tmp) != 0)
             {
                 int spuAddr = tmp[1];
                 if (choice[1] != -1)
-                    spuAddr = tmp[1] + (int)choice[1] * (int)(unsigned int)*(unsigned short *)(bank + 4) * 0x100;
-                samples = samples + tmp[0];
-                ((void (*)(int, int, int, int))gSampleRequest)((int)*choice, spuAddr, tmp[0], paramTable);
+                    spuAddr = (int)((uint32)tmp[1] + (uint32)(int)choice[1]
+                        * (uint32)*(unsigned short *)(bank + 4) * 0x100u);
+                samples = (int)((uint32)samples + (uint32)tmp[0]);
+                gSampleRequest((int)*choice, spuAddr, tmp[0], paramTable);
             }
             i = i + 1;
             choice = choice + 6;

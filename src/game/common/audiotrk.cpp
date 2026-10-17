@@ -24,7 +24,6 @@ void AudioTrk_CleanUp(void);
 /* ---- AudioTrk_Reset__Fv  [@0x8007c614] ---- */
 void AudioTrk_Reset(void)
 {
-  int i;
   AudioTrk_tAmbientChannel *pAVar1;
   CAudioList *pCVar2;
   u_char *puVar3;
@@ -61,7 +60,6 @@ void AudioTrk_Reset(void)
 /* ---- AudioTrk_StartUp__Fv  [@0x8007c6f4] ---- */
 void AudioTrk_StartUp(void)
 {
-  int i;
   AudioTrk_tAmbientChannel *pAVar1;
   int iVar2;
   
@@ -82,21 +80,6 @@ void AudioTrk_StartUp(void)
 /* ---- AudioTrk_AddCustomObject__FP9AudioElemiP8coorddefiP8Car_tObji  [@0x8007c750] ---- */
 void AudioTrk_AddCustomObject(AudioElem *se,int tck,coorddef *vel,int fade,Car_tObj *car,int trkazi)
 {
-  int dst;
-  AudioTrk_tAmbientChannel*c;
-  int n;
-  int i;
-  int maxind;
-  int maxdst;
-  int chkdst;
-  bool repeatnow;
-  u_short azimuth;
-  int dop;
-  char vol;
-  BWorldSm_Pos slicePos;
-  int rangesq;
-  int range;
-  int ambdist;
   u_char bVar1;
   bool bVar2;
   int iVar3;
@@ -326,29 +309,6 @@ void AudioTrk_AddCustomObject(AudioElem *se,int tck,coorddef *vel,int fade,Car_t
 /* ---- AudioTrk_SoundTrack__FP8Car_tObji  [@0x8007cdc4] ---- */
 void AudioTrk_SoundTrack(Car_tObj *car,int trkazi)
 {
-  int numelems;
-  int quater;
-  int gtck;
-  int vx;
-  int vz;
-  coorddef v;
-  int start;
-  int end;
-  int i;
-  int tck;
-  int cur;
-  int max;
-  Trk_AnimateInst*anim;
-  int x;
-  int z;
-  int d;
-  int randtick;
-  int fade;
-  int fadeIn;
-  int fadeOut;
-  coorddef nextcp;
-  int next;
-  int time;
   u_int uVar1;
   int iVar2;
   short sVar3;
@@ -390,7 +350,7 @@ void AudioTrk_SoundTrack(Car_tObj *car,int trkazi)
     pcVar9 = &se->type;
     for (; iVar7 = local_38, iVar4 < iVar8; iVar4 = iVar4 + 1) {
       if ((pcVar9[1] != -1) && (AudioTrk_g->chan[pcVar9[1]].se != se)) {
-        pcVar9[1] = 0xff;
+        pcVar9[1] = -1;
       }
       animInst = (Trk_AnimateInst *)0x0;
       if ((u_char)*pcVar9 - 4 < 0x20) {
@@ -472,7 +432,7 @@ void AudioTrk_SoundTrack(Car_tObj *car,int trkazi)
                 if (iVar5 == 0) {
                   trap(0x1c00);
                 }
-                if ((iVar5 == -1) && (iVar2 == -0x80000000)) {
+                if ((iVar5 == -1) && (iVar2 == 0x80000000)) {
                   trap(0x1800);
                 }
                 iVar2 = (local_50.y - *(int *)(pcVar9 + -0x10)) * 0x40;
@@ -480,7 +440,7 @@ void AudioTrk_SoundTrack(Car_tObj *car,int trkazi)
                 if (iVar5 == 0) {
                   trap(0x1c00);
                 }
-                if ((iVar5 == -1) && (iVar2 == -0x80000000)) {
+                if ((iVar5 == -1) && (iVar2 == 0x80000000)) {
                   trap(0x1800);
                 }
                 iVar2 = (local_50.z - *(int *)(pcVar9 + -0xc)) * 0x40;
@@ -488,7 +448,7 @@ void AudioTrk_SoundTrack(Car_tObj *car,int trkazi)
                 if (iVar5 == 0) {
                   trap(0x1c00);
                 }
-                if ((iVar5 == -1) && (iVar2 == -0x80000000)) {
+                if ((iVar5 == -1) && (iVar2 == 0x80000000)) {
                   trap(0x1800);
                 }
               }
@@ -501,7 +461,7 @@ LAB_8007d294:
               if (local_3c == 0) {
                 trap(0x1c00);
               }
-              if ((local_3c == -1) && (iVar7 == -0x80000000)) {
+              if ((local_3c == -1) && (iVar7 == 0x80000000)) {
                 trap(0x1800);
               }
             }
@@ -523,17 +483,6 @@ LAB_8007d31c:
 /* ---- AudioTrk_PreLoad__Fv  [@0x8007d35c] ---- */
 int AudioTrk_PreLoad(void)
 {
-  int vx;
-  int vz;
-  int tick;
-  bool loaded;
-  int check;
-  int numelems;
-  AudioElem*se;
-  int i;
-  int x;
-  int z;
-  int d;
   bool bVar1;
   bool bVar2;
   u_int uVar3;
@@ -609,26 +558,7 @@ int AudioTrk_PreLoad(void)
 /* ---- AudioTrk_CleanUp__Fv  [@0x8007d52c] ---- */
 void AudioTrk_CleanUp(void)
 {
-  int i;
-  CAudioList *pThis;
-  int fadeIn;
-  int fadeOut;
-  int time;
-  int numelems;
-  int next;
   int iVar1;
-  AudioTrk_tAmbientChannel *c;
-  Trk_AnimateInst *anim;
-  u_short azimuth;
-  int n;
-  int tick;
-  coorddef v;
-  coorddef nextcp;
-  int cur;
-  int max;
-  int gtck;
-  int vx;
-  int check;
   
   AudioTrk_Reset();
   iVar1 = 0;

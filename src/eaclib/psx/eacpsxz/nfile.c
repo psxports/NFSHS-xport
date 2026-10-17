@@ -43,13 +43,12 @@
 #include "../../../lib/nfile.h"
 #include "../../../nfs4_types.h"
 #include "cdfs.h"
+#include "nfile_atomic.h"
 
-#ifdef AP_WIN
 /* Platform_InitMemory resets the emulated PSX game heap between frontend and
  * race overlays.  FILE is a resident service on the console, so its pool must
  * not come from that resettable heap in the native process. */
 static unsigned char gNfshsHostFilePool[65536];
-#endif
 
 /* freeop @0x800ED1F8 : clear a 0x30-byte op slot (release it back to the pool). */
 extern "C" void freeop(FileOp *op)
@@ -152,11 +151,7 @@ extern "C" int FILE_init(int handlecount, int memsize, int opcount)
     void *buf;
     if (gFileMgr.opcount != 0) /* gFileDevice != 0 -> already initialised */
         return 0;
-#ifdef AP_WIN
     buf = gNfshsHostFilePool;
-#else
-    buf = reservememadr("File Sys", FILE_overhead(handlecount, memsize, opcount), 0);
-#endif
     return FILE_initwithmem(handlecount, memsize, opcount, buf);
 }
 
@@ -198,20 +193,18 @@ extern "C" int FILE_completeop(unsigned int id)
     return result;
 }
 
-/* FILE_callbackop @0x800EBE4C : if the op has a (non-zero) status, store the callback and fire it
- *   immediately with (status, param), bracketed by the manager's pending-callback counter.  A status
- *   of 0 (op not started/no result yet) does nothing. */
-extern "C" void FILE_callbackop(unsigned int id, void (*callback)(int id, int status, int param))
+/* Store the callback and invoke completed operations with the supplied id */
+extern "C" void FILE_callbackop(unsigned int id, NFSHS_FileCompletion callback)
 {
     FileOp *op = (FileOp *)((char *)gFileMgr.oparray + (id >> 0x18) * 0x30);
     /* Arm pending operations too.  Completion may happen later in the device
      * system task; only the immediate invocation is conditional on status. */
-    op->callback = (void (*)(void))callback;
+    op->callback = callback;
     if (op->status != 0)
     {
-        gFileMgr.cbpending++;
-        callback((int)op->id, op->status, op->param);
-        gFileMgr.cbpending--;
+        gFileMgr.cbpending = (int)((uint32)gFileMgr.cbpending + 1u);
+        callback(id, op->status, op->param);
+        gFileMgr.cbpending = (int)((uint32)gFileMgr.cbpending - 1u);
     }
 }
 
@@ -357,16 +350,13 @@ extern "C" int FILE_waitop(unsigned int id)
     return op->status;
 }
 
-/* FILE_atomic @0x800ECB40 : run `fn(a3, a4)` (fn takes the 3rd/4th args -- $a2/$a3), flush the FILE
- *   command queue (iFILE_ExecCommand), and return fn's result.  The manager's +0x08 word (idmask) is
- *   saved and restored around the call -- a net no-op as written (the intermediate write is overwritten).
- *   The return value is fn's result, captured in ExecCommand's branch delay slot ($s0=$v0) before the
- *   call clobbers $v0; the 2nd arg is unused. */
-extern "C" intptr FILE_atomic(intptr fn, int unused, int a3, void *a4)
+/* FILE_atomic @0x800ECB40 publishes retry during the worker, restores idmask and preserves its result */
+extern "C" intptr FILE_atomic(NFSHS_FileAtomic fn, int unused, int a3, void *a4)
 {
     int saved = gFileMgr.idmask; /* mgr+0x08 */
     intptr result;
-    result = ((intptr(*)(int, void *))fn)(a3, a4);
+    gFileMgr.idmask = a3;
+    result = fn(a3, a4);
     gFileMgr.idmask = saved; /* restore (the asm's intermediate +0x08 write is overwritten) */
     iFILE_ExecCommand((void *)0);
     return result;
@@ -512,7 +502,7 @@ extern "C" void FILE_cancelop(unsigned int id)
             gFileMgr.queuehead = op->qnext;
         else
             prev->qnext = op->qnext;
-        gFileMgr.state--; /* one fewer queued op */
+        gFileMgr.state = (int)((uint32)gFileMgr.state - 1u);
         op->status = -1;  /* mark cancelled */
         action = 2;
     }
@@ -529,12 +519,7 @@ extern "C" void FILE_cancelop(unsigned int id)
     { /* removed from queue -> notify */
         if (op->callback)
         {
-            /* @0x800EC198-1A4: callback(op->id, -1, op->param) -- $a0=*op(id), $a2=*(20+op)(param),
-             * and $a1=-1 (status) in the JAL delay slot. The recon called the 2-arg form cb(id,param),
-             * putting param in the status slot and dropping the real 3rd param arg (M02). 3-arg
-             * (id,status,param) convention per iFILE_CommandCompleteCallback (see line 462). */
-            void (*cb)(int, int, int) = (void (*)(int, int, int))op->callback;
-            cb((int)op->id, -1, op->param);
+            op->callback(op->id, -1, op->param);
         }
     }
     FILE_leaveCS();
@@ -570,10 +555,9 @@ extern "C" int iFILE_CommandCompleteCallback(int result)
     gFileMgr.curop = 0;
     if (cmd->callback)
     {
-        void (*cb)(int, int, int) = (void (*)(int, int, int))cmd->callback;
-        gFileMgr.cbpending++;
-        cb((int)cmd->id, cmd->status, cmd->param);
-        gFileMgr.cbpending--;
+        gFileMgr.cbpending = (int)((uint32)gFileMgr.cbpending + 1u);
+        cmd->callback(cmd->id, cmd->status, cmd->param);
+        gFileMgr.cbpending = (int)((uint32)gFileMgr.cbpending - 1u);
     }
     if (gFileMgr.cbpending == 0)
         iFILE_ExecCommand((void *)0); /* kick the next queued command */
@@ -619,7 +603,7 @@ extern "C" void iFILE_addbigreadcallback(unsigned int id, int status, int *node)
         purgememadr((void *)(size_t)(unsigned int)node[0]);
         node[0] = (int)(size_t)newbuf;
         rid = FILE_read((intptr)(intptr)handle, 0x800, (unsigned int)(size_t)((char *)newbuf + 0x800), hdrsize - 0x800, prio, (unsigned int)(size_t)node);
-        FILE_callbackop(rid, (void (*)(int, int, int))iFILE_addbigreadcallback);
+        FILE_callbackop(rid, NFSHS_FILE_COMPLETION(iFILE_addbigreadcallback));
     }
     else
     {                                               /* header complete -> publish the device */
@@ -647,7 +631,7 @@ extern "C" void iFILE_addbigopencallback(unsigned int id, int status, int *node)
     else
     { /* open ok -> read the first header block */
         unsigned int rid = FILE_read((intptr)(intptr)handle, 0, (unsigned int)node[0], 0x800, prio, (unsigned int)(size_t)node);
-        FILE_callbackop(rid, (void (*)(int, int, int))iFILE_addbigreadcallback);
+        FILE_callbackop(rid, NFSHS_FILE_COMPLETION(iFILE_addbigreadcallback));
     }
 }
 
@@ -685,7 +669,7 @@ extern "C" unsigned int FILE_addbig(char *name, unsigned int a1, unsigned int da
     {
         unsigned int oid = FILE_open(name, 1, datatype, (unsigned int)(size_t)node);
         node[0] = (int)(size_t)databuf; /* node->databuf (asm: FILE_open delay slot) */
-        FILE_callbackop(oid, (void (*)(int, int, int))iFILE_addbigopencallback);
+        FILE_callbackop(oid, NFSHS_FILE_COMPLETION(iFILE_addbigopencallback));
     }
     return op->id; /* asm: v0 = *op = op->id */
 }
@@ -757,7 +741,7 @@ extern "C" unsigned int FILE_delbig(int delHandle, unsigned int a2, unsigned int
     purgememadr(node);                                  /* free the node */
     {
         unsigned int cid = FILE_close((void *)(size_t)(unsigned int)closeHandle, a2, (unsigned int)(size_t)op); /* close op param = this command op */
-        FILE_callbackop(cid, (void (*)(int, int, int))iFILE_delbigclosecallback);
+        FILE_callbackop(cid, NFSHS_FILE_COMPLETION(iFILE_delbigclosecallback));
     }
     return op->id;
 }
@@ -1007,7 +991,6 @@ extern "C"
     int gFileOpSeq;
 } /* owning-TU defs (BSS) */
 
-#ifdef AP_WIN
 extern "C" void NFSHS_HostResetDeferredRead(void);
 
 extern "C" void NFSHS_HostResetFileOperations(void)
@@ -1020,4 +1003,3 @@ extern "C" void NFSHS_HostResetFileOperations(void)
     gFileMgr.queuehead = 0;
     NFSHS_HostResetDeferredRead();
 }
-#endif

@@ -18,10 +18,6 @@ AIHigh_Traffic::CheckForCops(int *closestDistance)
 
 
 {
-  int copLoop;
-  Car_tObj*closestCop;
-  Car_tObj*cop;
-  int sliceDistance;
 
   int iVar1;
 
@@ -88,10 +84,6 @@ AIHigh_Traffic::CopCheck(int *blockade)
 
 
 {
-  Car_tObj*closest;
-  int closestDistance;
-  int speed;
-  AIHigh_Cop*cop;
 
   Car_tObj *pCVar1;
 
@@ -173,14 +165,6 @@ void AIHigh_Traffic::HighExecute()
 
 
 {
-  trigger_t *pNewTrigger;
-  coorddef trafficOffset;
-  AIState_Base*newState;
-  BWorldSm_Pos spos;
-  int blockade;
-  int cRand;
-  AIState_Idle*idleState;
-  int slice;
 
   bool bVar1;
 
@@ -752,21 +736,6 @@ trigger_t * AIHigh_Traffic::CheckForNewTriggers()
 
 
 {
-  int sortedLoop;
-  Car_tObj*testCar;
-  int dir;
-  AIHigh_Base*thisPlayer;
-  int thisSlice;
-  int startSlice;
-  int endSlice;
-  int fRandomChance;
-  int newSlice;
-  int temp;
-  int sliceLoop;
-  int triggerHere;
-  int iRandomChance;
-  int randomValue;
-  int unused;
 
   int trigger;
 

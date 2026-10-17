@@ -257,7 +257,6 @@ void Night_DoLightningEffect(DRender_tView *Vi)
 void Night_SetCopColor(GameSetup_tCarData *carinfo)
 
 {
-  u_char*copColors[2][256][8];
   int cartype;
   int country;
   int col1;

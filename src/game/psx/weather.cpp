@@ -21,9 +21,6 @@ int Weather_GetNumParticles(int player)
 /* ---- Weather_SetMatrix__FP10matrixtdef  [WEATHER.CPP:112-123] SLD-VERIFIED ---- */
 void Weather_SetMatrix(matrixtdef *m)
 {
-  int r0;
-  int r1;
-  int r2;
   MATRIX mpsx;
 
   mpsx.m[0][0] = (short)((int)m->m[0] >> 4);
@@ -107,9 +104,7 @@ void Weather_InitSplats(void)
 {
   u_int rnd;
   u_int uVar1;
-  int ySize;
   u_int y_max;
-  int i;
   int splat_i;
   
   for (splat_i = 0; splat_i < 0x13; splat_i = splat_i + 1) {
@@ -136,7 +131,6 @@ int Weather_GetNewState(void)
 {
   u_int uVar1;
   int iVar2;
-  int randseed;
   
   uVar1 = random();
   iVar2 = 0;
@@ -244,7 +238,6 @@ WeatherIntensity_velYUpdate:
 void Weather_InitStateControls(void)
 
 {
-  int track;
   
   Weather_gTrackIntensityLimit = Weather_gTrackIntensityLimitTbl[GameSetup_gData.track];
   if ((GameSetup_gData.track == 0) || (GameSetup_gData.track == 4)) {
@@ -272,7 +265,6 @@ extern "C" void Weather_Restart(void)
 
 {
   char *pcVar1;
-  int i;
   int iVar2;
   
   if (GameSetup_gData.Weather != 0) {
@@ -300,7 +292,6 @@ extern "C" void Weather_Init(void)
   int iVar6;
   int i;
   short *psVar9;
-  SVECTOR *sv;
   SVECTOR *pSVar10;
   u_int remainder;
   
@@ -420,9 +411,6 @@ extern "C" void Weather_DeInit(void)
 /* ---- Weather_TransformVertex__FP10matrixtdefiP7SVECTOR  [WEATHER.CPP:581-615] SLD-VERIFIED ---- */
 void Weather_TransformVertex(matrixtdef *m,int n,SVECTOR *s)
 {
-  int r0;
-  int r1;
-  int r2;
   VECTOR tv;
   SVECTOR *next;
   int i;
@@ -456,9 +444,7 @@ short Weather_CheckAndResetParticles(SVECTOR *pt)
   u_int rnd;
   u_int uVar1;
   u_int uVar2;
-  short flag;
   short sVar3;
-  SVECTOR *pt_reg;
   short z_off;
   short sVar4;
   short reset_flag;
@@ -569,13 +555,7 @@ void Weather_QuickReOrthogonalize
   int iVar4;
   int iVar5;
   int iVar6;
-  coorddef *rotz;
-  coorddef *nrotz;
   coorddef *v;
-  coorddef *nrotx;
-  matrixtdef *rot_reg;
-  coorddef *nroty;
-  coorddef *roty;
   coorddef upvector;
   
   iVar4 = prevCameraMode[0];
@@ -745,22 +725,22 @@ void Weather_CreateSnow(SVECTOR *pt)
   AddPrim(Render_gPalettePtr,prim);
   Render_gPacketPtr = Render_gPacketPtr + 0x28;
   *((char *)prim + 3) = 9;                                  /* OT tag length (9 words) */
-  gte_stsxy3(&prim->x0,&prim->x1,&prim->x2);
+  gte_stsxy3(&prim->p[0].xy.x,&prim->p[1].xy.x,&prim->p[2].xy.x);
 
   /* project the 4th corner, set colour+code, copy the per-vertex texture coords from the pixmap */
   gte_ldv0(&gv[3]);
   gte_rtps();
-  *(u_int *)&prim->r0 = 0x2e202020;                         /* r0=g0=b0=0x20, code=0x2e (textured FT4) */
-  gte_stsxy(&prim->x3);
+  *(u_int *)&prim->rgbc.r = 0x2e202020;                         /* r0=g0=b0=0x20, code=0x2e (textured FT4) */
+  gte_stsxy(&prim->p[3].xy.x);
   pmx = *(Draw_tPixMap **)((char *)gWeatherPixmap + ((int)pt & 4));
   l0 = *(u_int *)pmx;
   l1 = *(u_int *)((char *)pmx + 4);
   l2 = *(u_int *)((char *)pmx + 8);
   l3 = *(u_int *)((char *)pmx + 0xc);
-  *(u_int *)&prim->u0 = l0;
-  *(u_int *)&prim->u1 = l1;
-  *(u_int *)&prim->u2 = l2;
-  *(u_int *)&prim->u3 = l3;
+  *(u_int *)&prim->p[0].uv.u = l0;
+  *(u_int *)&prim->p[1].uv.u = l1;
+  *(u_int *)&prim->p[2].uv.u = l2;
+  *(u_int *)&prim->p[3].uv.u = l3;
 }
 
 /* ---- Weather_CreateRain__FP7SVECTORP7DVECTORPc  [WEATHER.CPP:967-1005] SLD-VERIFIED ---- */
@@ -782,11 +762,11 @@ void Weather_CreateRain(SVECTOR *pt0,DVECTOR *pt1,char *wd)
     AddPrim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x14;
     *((char *)prim + 3) = 4;                       /* OT tag length (4 words) */
-    *(u_int *)&prim->r0 = 0x52000000;              /* rgb0=0, code=0x52 (LINE_G2) */
-    *(u_int *)&prim->r1 = 0x402020;                /* r1=0x20,g1=0x20,b1=0x40 */
-    gte_stsxy(&prim->x1);                          /* current projected pos -> streak end */
-    prim->x0 = (short)((nx + prim->x1 * 3) / 4);   /* streak start: weighted toward the end */
-    prim->y0 = (short)((ny + prim->y1) / 2);
+    *(u_int *)&prim->p[0].rgbc.r = 0x52000000;              /* rgb0=0, code=0x52 (LINE_G2) */
+    *(u_int *)&prim->p[1].rgbc.r = 0x402020;                /* r1=0x20,g1=0x20,b1=0x40 */
+    gte_stsxy(&prim->p[1].xy.x);                          /* current projected pos -> streak end */
+    prim->p[0].xy.x = (short)((nx + prim->p[1].xy.x * 3) / 4);   /* streak start: weighted toward the end */
+    prim->p[0].xy.y = (short)((ny + prim->p[1].xy.y) / 2);
   }
   else {
     /* first frame for this drop -> zero-length line at the current point */
@@ -796,13 +776,13 @@ void Weather_CreateRain(SVECTOR *pt0,DVECTOR *pt1,char *wd)
     AddPrim(Render_gPalettePtr,prim);
     Render_gPacketPtr = Render_gPacketPtr + 0x14;
     *((char *)prim + 3) = 4;
-    *(u_int *)&prim->r0 = 0x52000000;
-    *(u_int *)&prim->r1 = 0x402020;
-    gte_stsxy(&prim->x1);
-    *(u_int *)&prim->x0 = *(u_int *)&prim->x1;
+    *(u_int *)&prim->p[0].rgbc.r = 0x52000000;
+    *(u_int *)&prim->p[1].rgbc.r = 0x402020;
+    gte_stsxy(&prim->p[1].xy.x);
+    *(u_int *)&prim->p[0].xy.x = *(u_int *)&prim->p[1].xy.x;
   }
   *wd = 1;
-  *(u_int *)pt1 = *(u_int *)&prim->x1;             /* save current screen pos as next frame's prev */
+  *(u_int *)pt1 = *(u_int *)&prim->p[1].xy.x;             /* save current screen pos as next frame's prev */
 }
 
 /* ---- Weather_CreateSplat__FP18Weather_tSplatInfo  [WEATHER.CPP:1009-1035] SLD-VERIFIED ---- */
@@ -812,21 +792,14 @@ void Weather_CreateSplat
 {
   short screen_x;
   u_char splat_glyph;
-  uint32 l3;
   int color_pack;
-  uint32 l0;
   short screen_y;
   int splatTick;
-  uint32 l1;
   short size_y;
   int pkt_addr24;
-  uint32 l2;
   short splat_size;
   int tpage_pack;
   short size_x;
-  int size;
-  short vx;
-  short vy;
   u_char *prim;
   u_char *tp3;
   short ts2;
@@ -881,10 +854,7 @@ void Weather_DoSplats
   short y_pos;
   u_int rnd;
   u_int uVar1;
-  Weather_tSplatInfo *in_t1_local;
-  int i;
   int local_s1_64;
-  int num_reg;
   int new_count;
   
   if (gCurrentNumSplats < num) {
@@ -1012,25 +982,7 @@ void Weather_DoWeather(DRender_tView *Vi)
 void Weather_BuildWeather(DRender_tView *Vi)
 
 {
-  u_int l3;
   void *pvVar1;
-  int splatTick;
-  u_int l2;
-  int size;
-  int nx;
-  short vx;
-  short vy;
-  DRender_tView *Vi_reg;
-  int ySize;
-  DVECTOR *wprevpt;
-  matrixtdef matdiff;
-  matrixtdef orthoMat;
-  SVECTOR velocity_vector_change;
-  SVECTOR total_vector_change;
-  SVECTOR temp_vector;
-  VECTOR result;
-  SVECTOR Weather_gTransformedRandomVelocityVectors [12];
-  SVECTOR gv [4];
   
   if ((GameSetup_gData.Weather != 0) &&
      (pvVar1 = BWorldSm_TunnelFlagSm

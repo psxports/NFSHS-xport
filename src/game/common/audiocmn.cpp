@@ -198,7 +198,6 @@ void AudioCmn_UpdateThunder(void)
 /* ---- AudioCmn_InitAsyncSfx__Fv  [@0x8007657c] ---- */
 void AudioCmn_InitAsyncSfx(void)
 {
-  int i;
   bool bVar1;
   AudioCmn_tAsyncSfxSlot *pAVar2;
   int iVar3;
@@ -217,7 +216,6 @@ void AudioCmn_InitAsyncSfx(void)
 /* ---- AudioCmn_RemoveAsyncSfx__Fi  [@0x800765b4] ---- */
 void AudioCmn_RemoveAsyncSfx(int slot)
 {
-  AudioCmn_tAsyncSfxSlot*s;
   char *ptr;
   
   if (AudioCmn_gSfxSlot[slot].patch != -1) {
@@ -239,7 +237,6 @@ void AudioCmn_RemoveAsyncSfx(int slot)
 /* ---- AudioCmn_DeInitAsyncSfx__Fv  [@0x8007663c] ---- */
 void AudioCmn_DeInitAsyncSfx(void)
 {
-  int i;
   int slot;
   
   slot = 0;
@@ -253,9 +250,6 @@ void AudioCmn_DeInitAsyncSfx(void)
 /* ---- AudioCmn_RemoveOldestAsyncSfx__Fi  [@0x80076674] ---- */
 int AudioCmn_RemoveOldestAsyncSfx(int bank)
 {
-  int oldest;
-  int ticks;
-  int i;
   int iVar1;
   AudioCmn_tAsyncSfxSlot *pAVar2;
   int iVar3;
@@ -290,8 +284,6 @@ int AudioCmn_RemoveOldestAsyncSfx(int bank)
 /* ---- AudioCmn_LoadAsyncSfx__FiiPvi  [@0x8007675c] ---- */
 extern "C" void AudioCmn_LoadAsyncSfx(int bank,int patch,void *pbank,int size)
 {
-  int slot;
-  int check;
   u_int name;
   void *pThis;
   int iVar1;
@@ -351,9 +343,6 @@ LAB_800768bc:
 /* ---- AudioCmn_GetAsyncSfx__Fiib  [@0x80076900] ---- */
 extern "C" int AudioCmn_GetAsyncSfx(int bank,int patch,bool checkonly)
 {
-  int slot;
-  CopSpeak_tRequest r;
-  AudioCmn_tAsyncSfxSlot*s;
   bool bVar1;
   AudioCmn_tAsyncSfxSlot *pAVar2;
   int iVar3;
@@ -406,8 +395,6 @@ extern "C" int AudioCmn_GetAsyncSfx(int bank,int patch,bool checkonly)
 /* ---- AudioCmn_Init__Fv  [@0x80076a74] ---- */
 void AudioCmn_Init(void)
 {
-  int j;
-  int temptrack;
   int (*paiVar1) [2];
   int iVar2;
   AudioCmn_tReTrig *pAVar3;
@@ -488,9 +475,7 @@ void AudioCmn_SetLevels(void)
 /* ---- AudioCmn_GetTimePhrase__Fi  [@0x8007706c] ---- */
 int AudioCmn_GetTimePhrase(int time)
 {
-  int seconds;
   static char compareTimes[25];
-  int index;
   int iVar1;
   u_char *puVar2;
   int iVar3;
@@ -682,7 +667,6 @@ LAB_800774e0:
 /* ---- AudioCmn_LoadFESamples__Fv  [@0x80077738] ---- */
 extern "C" void AudioCmn_LoadFESamples(void)
 {
-  char filename[100];
   char acStack_70 [104];
   
   strcpy(acStack_70, gAudioBasePath);
@@ -694,7 +678,6 @@ extern "C" void AudioCmn_LoadFESamples(void)
 /* ---- AudioCmn_LoadGameSamples__Fv  [@0x8007777c] ---- */
 void AudioCmn_LoadGameSamples(void)
 {
-  char filename[100];
   const char *languageSuffix;
   char acStack_a8 [104];
   
@@ -722,7 +705,6 @@ void AudioCmn_LoadGameSamples(void)
 /* ---- AudioCmn_InitChannelArray__Fv  [@0x800778b0] ---- */
 void AudioCmn_InitChannelArray(void)
 {
-  int i;
   Channels_t *pCVar1;
   int iVar2;
   
@@ -741,7 +723,6 @@ void AudioCmn_InitChannelArray(void)
 /* ---- scaleFrequency__Fiii  [@0x800778e8] ---- */
 int scaleFrequency(int sndPlayer,int iSFXnum,int tweakedForce)
 {
-  int scaledFreq;
   u_int uVar1;
   u_int uVar2;
   
@@ -770,7 +751,6 @@ int scaleFrequency(int sndPlayer,int iSFXnum,int tweakedForce)
 int ChooseImpactSample(int force,s_type surface1,s_type surface2)
 {
   static int lastImpactSample;
-  int iSFXnum;
   u_int uVar1;
   int iVar2;
   
@@ -862,7 +842,6 @@ LAB_80077b80:
 /* ---- ChooseLoopedSample__F6s_typeT0  [@0x80077c94] ---- */
 int ChooseLoopedSample(s_type surface1,s_type surface2)
 {
-  int SFXnum;
   int iVar1;
   
   iVar1 = 0x2c;
@@ -903,11 +882,6 @@ LAB_80077cec:
 void AudioCmn_SFX(int sndPlayer,s_type surface1,s_type surface2,int tweakedForce,int Distsq,
                int azimuth)
 {
-  int iSFXnumber;
-  int amplitude;
-  int frequency;
-  int tempAmp;
-  Car_tObj*c;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -1013,7 +987,6 @@ void freeVoiceChannel(int sndPlayer)
 /* ---- AudioCmn_PlayDoppleredSound__Fiiiiii  [@0x80078140] ---- */
 int AudioCmn_PlayDoppleredSound(int bhandle,int patchNum,int azimuth,int vol,int bend,int doppler)
 {
-  int shandle;
   SNDPLAYOPTS playopts;
   int iVar1;
   int iVar2;
@@ -1110,10 +1083,6 @@ extern "C" int AudioCmn_PlaySound(int bhandle,int patchNum,int azimuth,int vol,i
 /* ---- AudioCmn_PlaySFX__Fiiiiii  [@0x800783cc] ---- */
 int AudioCmn_PlaySFX(int sndPlayer,int iSFXnum,int iFreqIn,int iDopplerIn,int iAmpIn,int azimuth)
 {
-  int iPartial;
-  int iFreq;
-  int iAmp;
-  long PatchBank;
   u_int uVar1;
   int iVar2;
   int iVar3;
@@ -1246,25 +1215,8 @@ LAB_8007887c:
 void AudioCmn_SoundCar(Car_tObj *car,int dst,int iFreqIn,int doppler,int azimuth,int trackazim,int relvel,
                int cardir)
 {
-  int CurCarGasLevel;
-  int freq;
-  int roadSurface;
-  int cobbleMod;
-  int cobblestoneAmp;
-  char SPSC;
-  int PlayerPan;
   static char cobbleCount;
-  int loadAmp;
-  int amplitude;
-  int roadNoiseAmp;
-  int wetNoiseAmp;
-  int roadNoiseFreq;
-  int wetNoiseFreq;
-  int iAmpIn;
   int tuntrig;
-  int cam;
-  int roadNoisePatch;
-  int gas;
   u_char bVar1;
   short sVar2;
   bool bVar3;
@@ -1539,9 +1491,6 @@ LAB_80078d54:
 /* ---- AudioCmn_TrafficSFX__Fiiiiiiii  [@0x80079104] ---- */
 void AudioCmn_TrafficSFX(int iChan,int iSFXnum,int freq,int doppler,int dst,int azimuth,int relvel,int dir)
 {
-  int iAmpIn;
-  int player;
-  int pitchmult;
   int iSFXnum_00;
   u_int uVar1;
   int iVar2;
@@ -1597,7 +1546,6 @@ void AudioCmn_TrafficSFX(int iChan,int iSFXnum,int freq,int doppler,int dst,int 
 /* ---- AudioCmn_TrafficSkidSFX__Fi6s_typeT1iii  [@0x80079390] ---- */
 void AudioCmn_TrafficSkidSFX(int sndPlayer,s_type surface1,s_type surface2,int force,int Distsq,int azimuth)
 {
-  int iAmpIn;
   int iVar1;
   
   if (Distsq < 0x1324) {
@@ -1620,8 +1568,6 @@ void AudioCmn_TrafficSkidSFX(int sndPlayer,s_type surface1,s_type surface2,int f
 /* ---- AudioCmn_PlayerHornOn__Fiiiii  [@0x80079444] ---- */
 void AudioCmn_PlayerHornOn(int carIndex,int Distsq,int iFreqIn,int azimuth,int doppler)
 {
-  int sfx;
-  int player;
   u_int uVar1;
   int sndPlayer;
   int iSFXnum;
@@ -1654,7 +1600,6 @@ void AudioCmn_PlayerHornOn(int carIndex,int Distsq,int iFreqIn,int azimuth,int d
 /* ---- AudioCmn_PlayerHornOff__Fi  [@0x80079548] ---- */
 int AudioCmn_PlayerHornOff(int carIndex)
 {
-  int player;
   u_int uVar1;
   int sndPlayer;
   
@@ -1718,7 +1663,6 @@ void AudioCmn_PlayPauseSound(int patch)
 /* ---- quickSirenOn__Fi  [@0x8007971c] ---- */
 void quickSirenOn(int sirennum)
 {
-  int patch;
   int iVar1;
   
   iVar1 = 8;
@@ -1777,7 +1721,6 @@ void SirenOff(int sirennum)
 /* ---- UpdateSiren__Fiiiii  [@0x8007995c] ---- */
 void UpdateSiren(int sirennum,int amp,int dop,int azimuth,int supercop)
 {
-  int iFreq;
   u_int uVar1;
   int bend;
   int iVar2;

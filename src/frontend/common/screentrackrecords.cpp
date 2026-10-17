@@ -251,7 +251,7 @@ void tScreenTrackRecords::DrawBackground()
   if (gCurrentShapes[0x26].width == 0) {
     trap(0x1c00);
   }
-  if ((gCurrentShapes[0x26].width == -1) && (ticks == -0x80000000)) {
+  if ((gCurrentShapes[0x26].width == -1) && (ticks == 0x80000000)) {
     trap(0x1800);
   }
   {

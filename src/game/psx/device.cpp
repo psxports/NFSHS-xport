@@ -157,7 +157,6 @@ void * Device_ReadPad(int port,uint32 param)
   int iVar1;
   void *pvVar2;
   u_int uVar3;
-  char *analogs;
   
   iVar1 = Device_VerifyType(port);
   if (iVar1 == 0) {
@@ -265,12 +264,9 @@ int Device_Analog(uint32 param)
 
 {
   int iVar1;
-  int v;
   u_int uVar2;
   int iVar3;
-  int max;
   u_int uVar4;
-  int min;
   u_int uVar5;
   int iVar6;
   
@@ -296,7 +292,7 @@ DevAnalog_scaledByteCalc:
         trap(0x1c00);
       }
       if (iVar3 == -1) {
-        if (iVar1 * 0xff == -0x80000000) {
+        if (iVar1 * 0xff == 0x80000000) {
           trap(0x1800);
           return iVar6;
         }

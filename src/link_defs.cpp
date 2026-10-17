@@ -18,16 +18,8 @@ fMemCardInfo_def gMemCardInfo;                             /* @80052d68 6112B */
 tPadModuleState gPadinfo;                                  /* @8013e89c 84B */
 int gPreLoadTicks;                                         /* @80148044 4B */
 SPCHChosenSentence NFSHS_gSentenceChoice_storage;           /* backing for @8014843c */
-#ifdef AP_WIN
 unsigned char NFSHS_gVoxEvents_storage[968];               /* backing for @80148060 */
-#else
-int gVoxEvents;                                            /* @80148060 */
-#endif
-#ifdef AP_WIN
 unsigned char NFSHS_gVoxInGame_storage[8];                 /* backing for @80148058 */
-#else
-int gVoxInGame;                                            /* @80148058 */
-#endif
 short ispch_gChoice[72];                                   /* @801484e4 144B */
 unsigned char ispch_gPickSamples[100];                     /* @8014847c 100B */
 int maxot;                                                 /* @8013de7c 4B */
@@ -46,21 +38,11 @@ int sndgs[47];   /* @80147860 : sized to full SndState 0xBC=188B (47*4); SND cas
  *   load/overlay buffer (asyncloadfileat target; speech-bank-pool overlay), NOT the MDEC table.
  *   psxfront/video/nfs3/draww take its address; zero-init BSS is faithful. */
 extern unsigned char CF_DVLC[];                     /* Owned by initialized link data */
-#ifdef AP_WIN
 unsigned char NFSHS_sndmm_storage[588];                    /* backing for @80148780 */
 unsigned char NFSHS_sndpd_storage[1836];                   /* backing for @80147918 */
-#else
-int sndmm;                                                 /* @80148780 */
-unsigned char sndpd;                                       /* @80147918 */
-#endif
 int sndpp;                                                 /* @80148578 4B */
 intptr sndpps[1];                                        /* @80148574 pointer slot */
-#ifdef AP_WIN
 unsigned char NFSHS_snd_stream_registry_storage[8];        /* sndss @+0, sndStreamMap @+4 */
-#else
-intptr sndss[1];                                         /* @8013ea80 pointer slot */
-signed char sndStreamMap[4];                               /* @8013ea84 4B */
-#endif
 int timerevent;                                            /* @8013dec4 4B */
 
 }

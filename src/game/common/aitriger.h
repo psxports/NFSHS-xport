@@ -11,7 +11,7 @@ int CheckForTriggerAtSlice__24AITrigger_TriggerManagerii(AITrigger_TriggerManage
 void *GetTrigger__24AITrigger_TriggerManageriPi(AITrigger_TriggerManager *self, int trigger, int *used);                                         /* :192 */
 int CheckForClosestTriggerOfType__24AITrigger_TriggerManageri11triggerTypei(AITrigger_TriggerManager *self, int slice, int type, int direction); /* :206 */
 void DescribeTrigger__24AITrigger_TriggerManagerP9trigger_t(AITrigger_TriggerManager *self, trigger_t *trigger);                                 /* :278 */
-int AITrigger_Compare__FPCvT0(void *op1, void *op2);                                                                                             /* :289 */
+int AITrigger_Compare__FPCvT0(const void *op1, const void *op2);                                                                                 /* :289 */
 void Sort__24AITrigger_TriggerManager(AITrigger_TriggerManager *self);                                                                           /* :298 */
 
 #endif /* _GAME_COMMON_AITRIGER_H_ */

@@ -64,31 +64,9 @@ extern "C" int &CD_lastSector; /* @0x80146CD4 (ctx+0x10) completion/prefetch loo
 /* ---- cdfs.obj-OWNED storage definitions for non-host reconstruction builds.
  * On 32-bit Windows these names are linker aliases into the single Cdinfo
  * backing block, preserving the original PSX absolute layout. */
-#ifndef AP_WIN
-extern "C"
-{
-    int CD_maxOpen;
-    int CD_dirEntryCount;
-    void **CD_handleTable;
-    void *CD_dirEntryArray;
-    int CD_curOff;
-    int CD_curLen;
-    int CD_remLen;
-    int CD_ringIdx;
-    int CD_curSector;
-    int CD_timeout;
-    void *CD_curDst;
-    NFSHS_CdCompletion CD_completionCallback;
-    int CD_cachedSector;
-    unsigned char CD_sectorCache[0x800]; /* @0x80146D00 : the cached 0x800-byte sector */
-    int CD_lastSector;
-}
-#endif
 
 /* ---- syslib / PsyQ libcd backend (toolchain-provided; declared, not reconstructed) ---- */
 
-extern "C" int addsystemtask(intptr fn, int period, int delay); /* @ systask */
-extern "C" intptr delsystemtask(intptr fn);                     /* @ systask */
 extern "C" void addexit(void (*fn)(void));                      /* @0x800F1CF8 (exit) */
 extern "C" void blockclear(void *dst, int n);                   /* @0x800F17A0 (blkfill) */
 
@@ -381,7 +359,7 @@ extern "C" int CD_Restart(int startSector)
 /* CD_systaskfunc @0x800F9AE8 : disc-swap recovery system task.  Polls CdDiskReady; on a stable disc
  *   (or a timed-out error) it resets the drive, re-arms the read mode + CdReadyHandler, and resumes the
  *   in-flight transfer if one was pending. */
-extern "C" unsigned int CD_systaskfunc(int taskArg, int elapsed)
+extern "C" int CD_systaskfunc(int taskArg, int elapsed)
 {
     unsigned char mode[8];
     unsigned char result[8];
@@ -410,7 +388,7 @@ extern "C" unsigned int CD_systaskfunc(int taskArg, int elapsed)
 
     if (done)
     {
-        delsystemtask((intptr)CD_systaskfunc); /* remove ourselves */
+        delsystemtask(CD_systaskfunc); /* remove ourselves */
         CdReset(0);
         mode[0] = 0xA0;
         CdControlB(0x0E, mode, result);
@@ -439,7 +417,7 @@ extern "C" void CD_timerfunc(void)
         CD_timeout = nfs4_mips_addu_s32(CD_timeout, -1);
         if (CD_timeout == 0)
         {
-            addsystemtask((intptr)CD_systaskfunc, 0, 0);
+            addsystemtask(CD_systaskfunc, 0, 0);
             CD_timeout = 0;
             deltimer(CD_timerfunc);
         }
@@ -468,7 +446,7 @@ extern "C" void CdReadyHandler(unsigned char intr, unsigned char *result)
     if ((*result & 0x10) != 0)
     { /* shell open / hard error -> hand off to the recovery task */
         deltimer(CD_timerfunc);
-        addsystemtask((intptr)CD_systaskfunc, 0, 0);
+        addsystemtask(CD_systaskfunc, 0, 0);
         return;
     }
 

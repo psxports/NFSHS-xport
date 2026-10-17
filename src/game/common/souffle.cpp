@@ -69,14 +69,10 @@ Souffle_tISouffle *
 Souffle_Add(coorddef *soufflept,int type,coorddef *vec,int velVX,int ground,int colour)
 
 {
-  int i;
   int iVar1;
   u_char bVar2;
-  int maxc;
-  int inserti;
   int iVar3;
   int iVar4;
-  Souffle_tISouffle *is;
   Souffle_tISouffle *pSVar5;
   coorddef vempty;
   
@@ -160,16 +156,12 @@ void Souffle_DoSouffle(void)
   char cVar1;
   int iVar2;
   Souffle_tISouffle *pSVar3;
-  int speed;
   u_int uVar4;
   int iVar5;
   int iVar6;
-  int wave;
   int *piVar7;
   int iVar8;
-  Souffle_tISouffle *is;
   Souffle_tISouffle *pSVar9;
-  int i;
   int iVar10;
   coorddef w;
   coorddef motion;
@@ -321,11 +313,9 @@ void Souffle_DoSouffle(void)
 int Souffle_CircleClip(coorddef *pt1,coorddef *pt2,int r)
 
 {
-  int dist;
   int dz;
   int iVar1;
   int iVar2;
-  int dx;
   
   dz = pt1->x;
   iVar2 = dz - pt2->x;
@@ -351,10 +341,8 @@ void Souffle_InsertFacet(DRender_tView *Vi)
 {
   int inCircle;
   int iVar1;
-  Souffle_tISouffle *is;
   Souffle_tISouffle *is_2;
   int off;
-  int i;
   int i_2;
   
   i_2 = 0;
@@ -407,18 +395,6 @@ void Souffle_RestartTrackSouffle(void)
 void Souffle_KillTrackSouffle(void)
 
 {
-  int dist;
-  int dz;
-  int speed;
-  int wave;
-  int dx;
-  int i;
-  int maxc;
-  int inserti;
-  coorddef w;
-  coorddef motion;
-  coorddef extramotion;
-  coorddef vempty;
   
   if (gISouffle != (Souffle_tISouffle *)0x0) {
     purgememadr(gISouffle);

@@ -142,10 +142,6 @@ void BWorld_BuildGlareEffects(DRender_tView *Vi,Draw_DCache *sd,Group *group)
 /* ---- BWorld_InitSpikeBelt__Fv  [@0x8007d818] ---- */
 void BWorld_InitSpikeBelt(void)
 {
-  int leastDist;
-  int leastDistInd;
-  int i;
-  int dist;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -202,18 +198,6 @@ int BWorld_GetSpikeBelt(int *slice,int *x,int *width)
 /* ---- SetupBuildMatrices__FP13DRender_tViewP11Draw_DCache  [@0x8007d940] ---- */
 void SetupBuildMatrices(DRender_tView *Vi,Draw_DCache *sd)
 {
-  int t1;
-  int t2;
-  int t3;
-  matrixtdef tm;
-  int i;
-  int maxdist;
-  Car_tObj*theCar;
-  coorddef*campos;
-  int dx;
-  int dz;
-  int diff;
-  matrixtdef rotY;
   static int cop_angle;
   int iVar1;
   int iVar2;
@@ -298,13 +282,6 @@ void SetupBuildMatrices(DRender_tView *Vi,Draw_DCache *sd)
 /* ---- BWorld_CheckChunkVisible__FP12BWorldSm_PosT0  [@0x8007dc14] ---- */
 int BWorld_CheckChunkVisible(BWorldSm_Pos *slicePosSource,BWorldSm_Pos *slicePosTest)
 {
-  int sourceChunkInd;
-  int testChunkIndFwd;
-  int testChunkIndBwd;
-  short*chunkViewList;
-  int chunkInd;
-  int count;
-  int vis;
   u_short uVar1;
   int iVar2;
   u_int uVar3;
@@ -434,8 +411,6 @@ int SetupChunkBuildList(DRender_tView *Vi)
 /* ---- BWorld_IsSliceInBuildList__Fi  [@0x8007e0a0] ---- */
 extern "C" void * BWorld_IsSliceInBuildList(int slice)
 {
-  int chunk;
-  int bi;
   int *piVar1;
   int iVar2;
   
@@ -460,14 +435,6 @@ extern "C" void * BWorld_IsSliceInBuildList(int slice)
 void BWorld_OnyxBuildFacets(DRender_tView *Vi)
 {
   Draw_DCache*sd;
-  short a;
-  u_char ac;
-  u_char bc;
-  u_char cc;
-  u_char dc;
-  int buildInd;
-  Chunk*chunkPtr;
-  int chunkInd;
   u_short uVar1;
   uint32 uVar2;
   void *pvVar3;
@@ -585,7 +552,6 @@ void SetContext(int contextHandle)
 /* ---- BWorld_OpenContext__Fii  [@0x8007e4ac] ---- */
 int BWorld_OpenContext(int contextType,int client)
 {
-  BW_tContext*context;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -645,7 +611,6 @@ extern "C" void BWorld_Init(void)
   static char nightGroupExtension[] = "N.grp";
   static char nightWeatherGroupExtension[] = "S.grp";
   static char emptyExtension[] = "";
-  int AudioScene;
   bool bVar1;
   int iVar2;
   char *pcVar3;

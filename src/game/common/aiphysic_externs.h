@@ -9,7 +9,7 @@ extern "C"
 {
     CARDINFO_def *MCRD_getcard(int card);
 }
-extern AIDataRecord_TrackCurve_t AIDataRecord_TrackCurve[];
+extern AIDataRecord_TrackCurve_t *AIDataRecord_TrackCurve;
 extern AIScript_tReactionDetails AIPerson_ScriptData[];
 extern Car_tObj *Cars_gHumanRaceCarList[9]; /* cars.obj */
 extern "C" GameSetup_tData GameSetup_gData;

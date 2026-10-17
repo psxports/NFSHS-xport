@@ -90,7 +90,6 @@ void tCreditManager::Draw(bool selected)
   int iVar2;
   uint uVar3;
   tScreenMain *ptVar4;
-  int i;
   
   if (selected == 0) {
     iVar1 = this->fTVFade + -4;
@@ -145,7 +144,6 @@ void tCreditManager::SetupCurrCredit()
   bool bVar1;
   int iVar2;
   void *pvVar3;
-  int NNNNN;
   
   if (((0xc < ticks - FECredits_lastFadeTick) && (this->fTextFade == 0)) &&
      (bVar1 = false, this->fCurrCredit == this->fShowCreditNum)) {
@@ -241,23 +239,13 @@ void tCreditManager::DrawCurrCredit()
   byte tagByte;
   byte bVar5;
   short lineY;
-  int i;
   int iVar6;
-  int dist;
-  byte *s, *p;
-  int rtd;
-  int height;
+  byte *s;
   tCredit *fShowCred;
   int arg5;
-  int width;
   int w;
-  short y;
   int fadeAlpha;
   int fadeAlpha_2;
-  char *lineText;
-  byte isJaguarLine;
-  byte isHiddenLine;
-  int textColor;
   tDrawShapeExtended drawFlags;
   PSX_RECT r;
   char buffer [292];

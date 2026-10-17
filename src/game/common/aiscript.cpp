@@ -3,7 +3,6 @@
  *   NOT original source; SYM-faithful, recompilable C++.
  */
 #include "../../nfs4_types.h"
-#include "aiscript_externs.h"
 
 
 /* ---- intra-TU forward declarations ---- */
@@ -26,7 +25,6 @@ void AIScript_Assign(AIScript_t *aiscriptt,AIScript_tReactionDetails (*arg2) [7]
 /* ---- AIScript_ClearLastReactionIndex__FP10AIScript_t  [@0x8006f700] ---- */
 void AIScript_ClearLastReactionIndex(AIScript_t *script)
 {
-  int initLoop;
   int iVar1;
   AIScript_tAIReaction *pAVar2;
   
@@ -144,7 +142,6 @@ void AIScript_ProcessActionsAndReactions(AIScript_t *script,int elapsedTicks)
 /* ---- AIScript_DoReAction__FP10AIScript_t20AIScript_tAIReaction  [@0x8006f958] ---- */
 int AIScript_DoReAction(AIScript_t *script,AIScript_tAIReaction testReaction)
 {
-  int humCarIndex;
   int iVar1;
   
   iVar1 = -1;

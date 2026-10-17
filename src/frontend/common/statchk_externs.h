@@ -18,8 +18,6 @@ extern "C"
 }
 tCarInfo *GetCarFromSimID(tCarManager *mgr, short carID); /* tCarManager:: method (external) */
 
-extern "C"
-{
-}
+
 
 #endif

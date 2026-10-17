@@ -48,9 +48,7 @@ void DrawC_ReadLightingData(void)
   int val;
   int iVar1;
   int iVar2;
-  int i;
   int i_2;
-  char *RenderingFileData;
   char name [256];
   char *ScaneData;
   
@@ -136,11 +134,9 @@ void DrawC_KillRenderingData(void)
 void DrawC_NightHeadlight(Car_tObj *carObj)
 
 {
-  int i;
   short newB;
   Car_tObj **ppCVar1;
   VECTOR *v;
-  coorddef *pos;
   short newG;
   short newR;
   MATRIX nightMat;
@@ -202,15 +198,12 @@ gte_swc2(0x19,&nightV);
 extern "C" void DrawC_MenuColorData(int color,Car_tObj *carObj,int player)
 
 {
-  int menuColor;
   short sVar1;
-  int carType;
   u_int uVar2;
   int iVar3;
   GameSetup_tCarData *pGVar4;
   Texture_pal8bit *palCopy;
   char *pcVar5;
-  char *shpfile;
   char filename [10];
   char infilename [100];
   
@@ -279,73 +272,33 @@ extern "C" void DrawC_MenuColorData(int color,Car_tObj *carObj,int player)
 int DrawC_PrimStart(Draw_tVertex *center,Car_tObj *carObj,int lightAvg,Draw_CarCache *sd)
 
 {
-  int i;
-  int cop_flag;
-  int half;
-  int mirror;
-  int overlay;
-  SVECTOR r;
-  int eSpeed;
-  int quad;
-  short envMap;
-  int eColor;
-  int eColor2;
-  u_int uVar1;
-  Draw_tPixMap *pDVar2;
   short tu12;
-  int envColor2;
   uint32 *sub_ot_p;
   int sub_otz_x4;
   u_short *lightTable;
   DRAWENV *drawEnv_p;
-  int envTexShape;
   int tunnelFlag;
   DRAWENV *shapeData_p;
-  short extraShadow;
   int sub_otz_h2;
   int sub_otOffset;
-  short extraEnvMap;
   int iVar3;
-  short shadow;
   u_char *puVar4;
   int lightAvgScaled;
-  int envColor;
   u_int uVar5;
-  int shadowQuad;
-  int menuPmx_w2;
-  int menuPmx_w3;
-  int menuPmx_w0;
-  int menuPmx_w1;
-  int sub_otz;
   int shapeIdx;
   Draw_tPixMap *vertBuf_p;
-  int carType;
   int vertCount;
-  DRAWENV *LEnv;
-  int tpageShadow;
   int nabr_blend;
-  int envSpeed;
   int shadowAbsOffs;
-  int halfTransp;
   PSX_RECT tw;
-  u_int shadowTex;
-  Draw_tPixMap *reflMap_iter;
-  u_int envMapTex;
-  u_int shadow_align_a;
-  u_int envMap_w0;
   short eIndexEnvMap;
-  u_int envMap_w3;
   short eIndexShadow;
   short headLight_bits;
   u_char envMapBigBit;
   short ts13;
   short tu14;
   short tu15;
-  u_int envMap_align_a;
-  u_int shadowMap_w1;
   u_char carTypeOffRange;
-  u_int envMap_align_b;
-  u_int shadowMap_w2;
   long sub_otSize_local;
   u_int shadow_align_b;
   u_short tu27;
@@ -764,58 +717,15 @@ void DrawC_Prim(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_zOve
                int envmap,Draw_CarCache *sd)
 
 {
-  COORD16 * Nvertice;
-  COORD16 * vt;
-  int u;
-  short t1;
-  short t2;
-  short t3;
-  int r0;
-  int r1;
-  int r2;
-  PCOORD16 * tV;
-  POLY_FT3 * prim;
-  Transformer_zFacet * facet;
-  int id0;
-  int id1;
-  int id2;
-  int bfct;
-  uint32 color;
-  Draw_tPixMap * pmx;
-  u_char offsetU;
-  u_char offsetV;
-  u_char u0;
-  u_char u1;
-  u_char u2;
-  u_char v0;
-  u_char v1;
-  u_char v2;
-  u_short uv0;
-  u_short uv1;
-  short * z;
-  long xy0;
-  long xy1;
-  long xy2;
-  int overlayFlag;
-  int facet_flag;
-  int sd_otz;
-  int index;
-  int which;
-  Transformer_zOverlay * facetOverlay;
   char cVar1;
   u_char bVar2;
   u_char uVar3;
-  u_int uVar4;
-  u_int *puVar5;
   u_char primTypeByte_d;
-  u_short clut;
   int absZ;
   short matRow1_x;
   int vertA_matBPtr;
-  short *vert_xyz_iter;
   short *psVar6;
   int otz_check_a;
-  u_short tpage;
   int matRow0_w1;
   int matRow_temp;
   int envmapMode;
@@ -827,21 +737,17 @@ void DrawC_Prim(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_zOve
   int bfctResult_a;
   u_int facetIdx_dec;
   int dvx1_word;
-  u_short uv2;
   u_int ot_offs_alt;
   u_char primTypeByte_b;
-  u_char code;
   int iVar7;
   int facetByteOff;
   int iVar8;
   u_int uVar9;
   u_int uVar10;
-  u_char v;
   int iVar11;
   u_int *primOut;
   char *envmapUV_dst;
   int iVar13;
-  int iVar14;
   Transformer_zFacet *facet_p_v1;
   Transformer_zOverlay *overlay_entry;
   u_int ot_offs_byte;
@@ -858,12 +764,9 @@ void DrawC_Prim(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_zOve
   Draw_CarVertex *facet_vertex1;
   Draw_CarVertex *facet_vertex2;
   Draw_tPixMap *facet_pmx;
-  short facetFlag;
-  int i;
   int remVerts;
   int vertCounter;
   u_int facetIdx;
-  int vertIdx2;
   int loopDoneTag;
   int primTypeByte_c;
   u_int *ot_stitch_p;
@@ -888,10 +791,7 @@ void DrawC_Prim(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_zOve
   uint32 drmode_w1;
   int drmodeOff_w2;
   int drmodeOn_w1;
-  COORD16 *Nvertex_buf;
   COORD16 *Nvertex_p;
-  int vertIdx1;
-  int vertIdx0;
   short tu8;
   short tu9;
   u_char tc7;
@@ -901,8 +801,6 @@ void DrawC_Prim(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_zOve
   u_char tu4;
   u_char vert_c_idx;
   short tu19;
-  int tu20;
-  int ot_stitch_pb;
   short tu11;
   short tu12;
   short tu14;
@@ -912,15 +810,12 @@ void DrawC_Prim(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_zOve
   u_char vert_c_idx2;
   u_char tu2;
   short tu7;
-  int tu10;
-  int ot_stitch_pa;
   u_char vert_a_idx;
   char tc6;
   short ts24;
   short ts7;
   u_short tu21;
   u_short tu23;
-  u_int tu26;
   u_short tu27;
   u_char tu5;
   u_short uVar8_00;
@@ -1744,29 +1639,14 @@ void DrawC_DividePrim(COORD16 *vt0,COORD16 *vt1,COORD16 *vt2,u_short *u0,u_short
                Draw_tPixMap *pmx,Draw_CarCache *sd)
 
 {
-  POLY_FT3 * prim;
-  int bfct;
-  long xy0;
-  long xy1;
-  long xy2;
-  uint32 color;
-  u_char code;
-  u_short uv1;
-  u_short uv2;
   short sVar1;
   short sVar2;
   u_short uVar3;
   u_short uVar4;
-  u_int *puVar5;
-  u_short clut;
-  int clipW;
-  u_short tpage;
   int iVar6;
   u_int *puVar7;
-  u_short uv0;
   u_int uVar8;
   u_int uVar9;
-  int clipH;
   uint32 *puVar10;
   
   if ((sd->head).cprim.PrimPtr < (sd->head).cprim.MPrimPtr) {
@@ -1832,65 +1712,20 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
                int envmap,Draw_CarCache *sd)
 
 {
-  COORD16 * Nvertice;
-  COORD16 * vt;
-  short t1;
-  short t2;
-  short t3;
-  int r0;
-  int r1;
-  int r2;
-  PCOORD16 * tV;
-  int x;
-  int y;
-  int z;
-  POLY_FT3 * prim;
-  Transformer_zFacet * facet;
-  int id0;
-  int id1;
-  int id2;
-  int bfct;
-  int clipW;
-  int clipH;
-  long xy0;
-  long xy1;
-  long xy2;
-  uint32 color;
-  Draw_tPixMap * pmx;
-  u_char u0;
-  u_char v0;
-  u_char v1;
-  u_char v2;
-  u_char offsetU;
-  u_char offsetV;
-  u_short uv0;
-  u_short uv1;
-  int overlayFlag;
-  short facetFlag;
-  int facet_flag;
-  int sd_otz;
-  int index;
-  int which;
-  Transformer_zOverlay * facetOverlay;
   char cVar1;
   u_char bVar3;
   short sVar4;
   short sVar5;
   u_short uVar6;
-  u_int *puVar7;
-  u_short clut;
   int absZ_envmap;
   int tu20;
   Draw_CarVertex *tD21;
   int ePmx1_pack;
   int ePmx0_pack;
   int absZ;
-  int tps22;
-  short *vert_xyz_iter;
   u_char primTypeByte;
   short *psVar8;
   int ti16;
-  u_short tpage;
   int matRow0_w1;
   int matRow_temp;
   int vy_word;
@@ -1903,11 +1738,9 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   Draw_CarVertex *tD23;
   int bfctResult_a;
   int tu25;
-  u_short uv2;
   u_int tu40;
   u_int uVar9;
   u_char uVar10;
-  u_char u;
   int iVar11;
   int iVar12;
   int vz_word;
@@ -1917,7 +1750,6 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   u_int uVar16;
   u_char uVar17;
   u_char bVar18;
-  u_char v;
   Draw_tPixMap *pDVar19;
   int iVar20;
   char *envmapUV_dst;
@@ -1934,16 +1766,12 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   u_int *facet_p_v4;
   u_int *primOut;
   u_int *puVar27;
-  Transformer_zFacet *facet_iter;
   COORD16 *vertex_p;
   Transformer_zFacet *facet_p_v2;
   Transformer_zFacet *facet_p_v1;
-  int vertIdx2;
   int tu41;
-  int vertIdx1;
   int loopDoneTag;
   int loopDoneTag2;
-  int vertIdx0;
   u_int *primOut_drm;
   u_int *primOut_drmOn;
   u_int *primOut_drmOff;
@@ -1962,14 +1790,11 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   uint32 drmodeOn_w0;
   int tu49;
   uint32 drmodeOn_w1;
-  int i;
   int facetCount;
   int vertCounter;
   u_int facetIdx;
-  COORD16 *Nvertex_buf;
   COORD16 *Nvertex_p;
   u_char *u2;
-  u_char code;
   COORD16 *vt2_00;
   u_char *u2_00;
   u_char *u1;
@@ -1989,7 +1814,6 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   short ts4;
   short matRow_y;
   u_char bVar1;
-  int ot_stitch_p;
   short matRow_z;
   short tu7;
   short ts8;
@@ -2003,7 +1827,6 @@ void DrawC_PrimClip(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   u_char tu5;
   short tu15;
   short tu16;
-  int ot_stitch_pa;
   u_short tu19;
   short ts11;
   short vert_y;
@@ -2929,36 +2752,6 @@ void DrawC_PrimMenu(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
                int envmap,Draw_CarCache *sd)
 
 {
-  COORD16 * Nvertice;
-  COORD16 * vt;
-  short t1;
-  short t2;
-  short t3;
-  int r0;
-  int r1;
-  int r2;
-  PCOORD16 * tV;
-  POLY_FT3 * prim;
-  int overlayFlag;
-  int id2;
-  int bfct;
-  long xy0;
-  long xy1;
-  long xy2;
-  uint32 color;
-  u_char code;
-  int index;
-  int which;
-  Transformer_zOverlay * facetOverlay;
-  Draw_tPixMap * pmx;
-  u_char u0;
-  u_char u1;
-  u_char u2;
-  u_char v0;
-  u_char v1;
-  u_char v2;
-  u_short uv0;
-  u_short uv1;
   u_char bVar1;
   u_char bVar2;
   u_char bVar3;
@@ -2967,40 +2760,28 @@ void DrawC_PrimMenu(matrixtdef *m,coorddef *t,Transformer_zObj *obj,Transformer_
   u_char uVar6;
   short sVar7;
   u_short uVar8;
-  u_int uVar9;
-  u_int *puVar10;
   short *psVar11;
-  u_short clut;
   short sVar12;
   u_short uVar13;
   int iVar14;
-  u_short tpage;
-  u_short uv2;
   COORD16 *pCVar15;
-  u_char u;
   int iVar16;
   u_char uVar17;
-  u_char v;
   short *psVar18;
   int iVar19;
   u_int uVar20;
   char *pcVar21;
   short *psVar22;
   Transformer_zOverlay *pTVar23;
-  Transformer_zFacet *facet;
   Draw_CarVertex *pDVar24;
   Transformer_zFacet *puVar25;
-  int id1;
-  int id0;
   u_int uVar26;
-  short facetFlag;
   u_int *puVar27;
   u_int *puVar28;
   uint32 *puVar29;
   char cVar30;
   uint32 *puVar31;
   u_int uVar32;
-  int i;
   u_int uVar33;
   
   pCVar15 = obj->Nvertex;
@@ -3274,33 +3055,17 @@ void DrawC_PrimHalo(matrixtdef *m,coorddef *t,Transformer_zObj *obj,int type,int
                Draw_CarCache *sd)
 
 {
-  int r0;
-  int r1;
-  int r2;
   Transformer_zFacet * facet;
-  u_short id0;
-  short * z;
-  short t1;
-  int bfct;
   short sVar1;
-  short t3;
   short sVar2;
   short *psVar3;
-  int overlayFlag;
-  short t2;
   int iVar4;
   u_int uVar5;
-  u_short id1;
   int iVar6;
   u_int uVar8;
-  u_short id2;
   u_int uVar9;
-  int real_type;
-  uint32 *copyLastPrim;
   uint32 *puVar11;
-  int i;
   u_int uVar12;
-  COORD16 *vertice;
   int iVar7;
   
   TrsProj_SetTransPrecision(8);
@@ -3428,21 +3193,15 @@ gte_SetTransMatrix(((char *)sd + 0x14));
 void DrawC_ShadowPrim(Draw_tVertex *shadowVT,Draw_CarCache *sd)
 
 {
-  POLY_FT4 * prim;
-  uint32 * ot;
-  uint32 l0;
-  uint32 l1;
   int iVar1;
   u_int uVar2;
   uint32 l2;
   uint32 *puVar3;
   u_int *puVar4;
   u_int uVar5;
-  uint32 l3;
   u_int uVar6;
   void *prim_pre_rtpt;
   u_int *puVar7;
-  Draw_tPixMap *shadowPmx;
   Draw_tPixMap *pDVar8;
   
   pDVar8 = gShadowPixmap[0];
@@ -3504,19 +3263,11 @@ void DrawC_DivideShadowPrim(COORD16 *vt0,COORD16 *vt1,COORD16 *vt2,COORD16 *vt3,
                ,u_short *u3,Draw_tPixMap *pmx,Draw_CarCache *sd)
 
 {
-  POLY_FT4 * prim;
-  uint32 * ot;
-  u_short uv2;
-  u_short uv3;
   u_short uVar1;
   u_short uVar2;
   u_short uVar3;
-  u_short clut;
-  u_short tpage;
   int iVar4;
   u_int uVar5;
-  u_short uv1;
-  u_short uv0;
   uint32 *puVar6;
   u_int *puVar7;
   void *tp8;
@@ -3586,8 +3337,6 @@ gte_lwc2(0,*(int *)(vt1));
 void DrawC_ShadowPrimClip(Draw_tVertex *shadowVT,Draw_CarCache *sd)
 
 {
-  short t3;
-  short * z;
   short sVar1;
   short sVar2;
   short sVar3;
@@ -3600,15 +3349,8 @@ void DrawC_ShadowPrimClip(Draw_tVertex *shadowVT,Draw_CarCache *sd)
   u_char uVar10;
   u_char uVar11;
   u_char uVar12;
-  u_short uv0;
-  u_short uv1;
-  short t2;
-  short t1;
-  u_short uv2;
-  u_short uv3;
   u_char *u2;
   COORD16 *vt2;
-  Draw_tPixMap *shadowPmx;
   Draw_tPixMap *pmx;
   
   pmx = gShadowPixmap[0];
@@ -3739,26 +3481,16 @@ gte_SetTransMatrix(&DrawC_gScreenMat);
 void DrawC_SpotPrims(matrixtdef *m,coorddef *t,Draw_CarCache *sd)
 
 {
-  int r0;
-  int r1;
-  int r2;
-  short * z;
-  short t2;
   short sVar1;
-  short t3;
   short sVar2;
   COORD16 *pCVar3;
-  short t1;
   int iVar4;
   u_int uVar5;
-  DR_MODE *prim;
   int iVar6;
   DR_MODE *pDVar7;
   u_int *puVar8;
   int iPlus;
   u_int *puVar9;
-  int i;
-  uint32 *ot;
   uint32 *puVar10;
   u_int uVar11;
   u_int uVar12;
@@ -3866,55 +3598,30 @@ gte_lwc2(0,*(int *)(((char *)sd + 0xac)));
 void DrawC_ShowroomPrims(matrixtdef *m,coorddef *t,Draw_CarCache *sd)
 
 {
-  int index;
-  int r0;
-  int r1;
-  int r2;
-  int iPlus;
-  short t1;
-  short t2;
-  short t3;
-  short * z;
-  uint32 * ot;
   short sVar1;
   Draw_tPixMap *pDVar2;
   short sVar3;
-  uint32 l0;
   int iVar4;
   int iVar5;
   char *pcVar6;
   COORD16 *pCVar7;
   u_int uVar8;
-  uint32 l1;
-  uint32 l2;
   u_int *puVar9;
   u_int uVar10;
-  uint32 l3;
   int iVar11;
   u_int uVar12;
   int *prim;
   u_int *puVar13;
-  int j;
-  int i;
-  int clipH;
   int *piVar14;
   char *pcVar15;
-  u_char code;
   COORD16 *pCVar16;
   u_int uVar17;
   uint32 *puVar18;
-  Draw_tPixMap *lightPmx;
-  u_int *copyLastPrim;
-  int tpageShadow;
-  int eSpeed;
-  int half;
   COORD16 *pCVar19;
   COORD16 *pCVar20;
-  char filename [10];
   char hilight_state [32];
   int hilight [2];
   int hilight_direction [2];
-  int *light;
   
   pDVar2 = gMenuPixmap[3];
   if (gShowroomLights != 0) {

@@ -40,7 +40,6 @@ int AIInit_IsNonStandardCarFile(int index);
 /* ---- AIInit_StartUp1__Fv  [@0x80066bb0] ---- */
 void AIInit_StartUp1(void)
 {
-  int i;
   int iVar1;
   int iVar2;
   int *piVar3;
@@ -64,8 +63,6 @@ void AIInit_StartUp1(void)
 /* ---- AIInit_StartUp2__Fv  [@0x80066c24] ---- */
 void AIInit_StartUp2(void)
 {
-  int carLoop;
-  Car_tObj*carObj;
   bool bVar1;
   Car_tObj *pCVar2;
   int iVar3;
@@ -108,7 +105,6 @@ void AIInit_Reset1(void)
 /* ---- AIInit_Reset2__Fv  [@0x80066d08] ---- */
 void AIInit_Reset2(void)
 {
-  int carLoop;
   Car_tObj *pCVar1;
   int iVar2;
   Car_tObj **ppCVar3;
@@ -162,7 +158,6 @@ void AIInit_CleanUp1(void)
 /* ---- AIInit_CleanUp2__Fv  [@0x80066e44] ---- */
 void AIInit_CleanUp2(void)
 {
-  int carLoop;
   Car_tObj *carObj;
   Car_tObj **ppCVar1;
   int iVar2;
@@ -196,7 +191,6 @@ void AIInit_CleanUp2(void)
 /* ---- AI_TrafficStartUp__Fv  [@0x80066f0c] ---- */
 void AI_TrafficStartUp(void)
 {
-  char filename[100];
   char *rawTriggers;
   char acStack_70 [104];
   
@@ -232,7 +226,6 @@ void AI_TrafficCleanUp(void)
 /* ---- AIInit_LoadConfigs__Fv  [@0x80066ff8] ---- */
 void AIInit_LoadConfigs(void)
 {
-  char pathname[100];
   Udff_tInfo *handle;
   char acStack_70 [104];
   
@@ -246,8 +239,6 @@ void AIInit_LoadConfigs(void)
 /* ---- AIInit_LoadPhysicsConfig__FP10Udff_tInfo  [@0x80067054] ---- */
 void AIInit_LoadPhysicsConfig(Udff_tInfo *handle)
 {
-  AIPhysic_ModelConfig_t*model;
-  int loop;
   int iVar1;
   AIPhysic_ModelConfig_t *pAVar2;
   int iVar3;
@@ -387,9 +378,6 @@ void AIInit_RestartAICar(Car_tObj *carObj)
 /* ---- AIInit_InitAICar__FP8Car_tObjP10Udff_tInfo  [@0x80067314] ---- */
 void AIInit_InitAICar(Car_tObj *carObj,Udff_tInfo *handle)
 {
-  int gearLoop;
-  int accelerationScale;
-  int carType;
   int iVar1;
   int iVar2;
   AIDataRecord_AccTable_t *pAVar3;
@@ -459,22 +447,17 @@ void AIInit_InitAICar(Car_tObj *carObj,Udff_tInfo *handle)
 /* ---- AIInit_DeInitAICar__FP8Car_tObj  [@0x800674e8] ---- */
 void AIInit_DeInitAICar(Car_tObj *carObj)
 {
-  __vtbl_ptr_type (*pa_Var1) [3];
   AIDataRecord_CurveSpeedTable_t *pAVar2;
   AIDataRecord_AccTable_t *pAVar3;
   
   pAVar2 = carObj->curveSpeedTable;
   if (pAVar2 != (AIDataRecord_CurveSpeedTable_t *)0x0) {
-    pa_Var1 = (pAVar2->_base_AIDataRecord_t)._vf;
-    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
-        ((char *)pAVar2 + (*pa_Var1)[1].delta,3);
+    delete pAVar2;
     carObj->curveSpeedTable = (AIDataRecord_CurveSpeedTable_t *)0x0;
   }
   pAVar3 = carObj->accelerationRecord;
   if (pAVar3 != (AIDataRecord_AccTable_t *)0x0) {
-    pa_Var1 = pAVar3->_vf;
-    ((void (NFS4_VT_THUNK *)(void *, int))(*pa_Var1)[1].pfn)
-        ((char *)pAVar3 + (*pa_Var1)[1].delta,3);
+    delete pAVar3;
     carObj->accelerationRecord = (AIDataRecord_AccTable_t *)0x0;
   }
   return;
@@ -507,17 +490,12 @@ int AIInit_IsNonStandardCarFile(int index)
 {
   u_int *puVar1;
   int *piVar2;
-  int carType;
   u_int *puVar3;
   int iVar4;
   u_int *puVar5;
   u_int uVar6;
   u_int uVar7;
   u_int uVar8;
-  AIPhysic_ModelConfig_t *model;
-  int gearLoop;
-  int loop;
-  int accelerationScale;
   int nonStandardList [50];
   
   puVar1 = (u_int *)kAIInitNonStandardTable;

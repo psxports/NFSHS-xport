@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -52,6 +52,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>NFSHS</TargetName>
+    <LinkIncremental>false</LinkIncremental>
     <LocalDebuggerCommand>$(NativeOutDir)NFSHS.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -64,7 +65,7 @@
       <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>AP_WIN=1;_DEBUG;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=1;WND_TITLE=&quot;Need For Speed: High Stakes (xport)&quot;;WND_WIDTH=640;WND_HEIGHT=480;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAPI_OGL;AP_WIN=1;XPORT_PAD_STATE_PSYQ43=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=1;WND_TITLE="Need For Speed: High Stakes (xport)";WND_WIDTH=960;WND_HEIGHT=720;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ReconRoot);$(XportRoot)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ReconRoot)host\diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -87,7 +88,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
-      <AdditionalDependencies>user32.lib;gdi32.lib;winmm.lib;shell32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;shell32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -97,7 +98,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>AP_WIN=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=0;NDEBUG;WND_TITLE=&quot;Need For Speed: High Stakes (xport)&quot;;WND_WIDTH=640;WND_HEIGHT=480;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAPI_OGL;AP_WIN=1;XPORT_PAD_STATE_PSYQ43=1;_CRT_SECURE_NO_WARNINGS;NOMINMAX;NFSHS_DIAGNOSTICS=0;WND_TITLE="Need For Speed: High Stakes (xport)";WND_WIDTH=960;WND_HEIGHT=720;FIELD_RATE=60;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ReconRoot);$(XportRoot)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ReconRoot)host\diagnostics.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -119,7 +120,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
-      <AdditionalDependencies>user32.lib;gdi32.lib;winmm.lib;shell32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;shell32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -137,6 +138,7 @@
     </ClCompile>
     <ClCompile Include="$(ReconRoot)address.cpp;$(ReconRoot)bigbuf.cpp;$(ReconRoot)materialized_data.cpp;$(ReconRoot)link_data.cpp;$(ReconRoot)link_dat.cpp;$(ReconRoot)link_defs.cpp;$(ReconRoot)link_ida.cpp;$(ReconRoot)link_init.cpp;$(ReconRoot)link_ptr.cpp" />
     <ClCompile Include="$(XportRoot)src\platform\win\main.c">
+      <PreprocessorDefinitions>SHORT_NAME="NFSHS";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)xport_main.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="$(ReconRoot)host\link_hwreg.cpp;$(ReconRoot)host\link_runtime.cpp;$(ReconRoot)host\link_stubs.cpp;$(ReconRoot)host\link_trampolines.cpp;$(ReconRoot)host\psx_host.cpp;$(ReconRoot)host\psx_crt_compat.cpp;$(ReconRoot)host\host_runtime.cpp;$(ReconRoot)host\host_sim_telemetry.cpp;$(ReconRoot)host\psx_memory.cpp" />
@@ -148,22 +150,26 @@
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx_xa.obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="$(XportRoot)src\xport_trace.c"><CompileAs>CompileAsC</CompileAs></ClCompile>
+    <ClCompile Include="$(XportRoot)src\vid_ogl.c;$(XportRoot)src\psx_font.c">
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="$(XportRoot)src\xport_trace.c">
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="$(XportRoot)src\psx_mdec.c;$(XportRoot)src\psx_press.c;$(XportRoot)src\psx_vlc.c;$(XportRoot)src\psx_stream.c">
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
-    
     <ClCompile Include="$(XportRoot)src\psx_gpu.c">
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx_gpu.obj</ObjectFileName>
-      <Optimization Condition="'$(Configuration)'=='Debug'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)'=='Debug'">Disabled</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)'=='Debug'">Default</BasicRuntimeChecks>
     </ClCompile>
-<ClCompile Include="$(XportRoot)src\psx.c">
+    <ClCompile Include="$(XportRoot)src\psx.c">
       <CompileAs>CompileAsC</CompileAs>
       <ObjectFileName>$(IntDir)xport_psx.obj</ObjectFileName>
     </ClCompile>
-<ClCompile Update="$(ReconRoot)game\common\spchevnt.c">
+    <ClCompile Update="$(ReconRoot)game\common\spchevnt.c">
       <ObjectFileName>$(IntDir)game_spchevnt.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Update="$(ReconRoot)eaclib\psx\spchpsxz\spchevnt.c">
@@ -176,10 +182,121 @@
     <ClInclude Include="$(XportRoot)src\psx_spu.h" />
     <ClInclude Include="$(XportRoot)src\psx.h" />
   </ItemGroup>
-  <Target Name="PublishNativeExecutable" AfterTargets="Build">
+  <Target Name="PublishNativeExecutable" AfterTargets="Build" Condition="'$(TargetPath)'!='$(NativeOutDir)$(TargetFileName)'">
     <MakeDir Directories="$(NativeOutDir)" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(NativeOutDir)NFSHS.exe" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(NativeOutDir)$(TargetFileName)" SkipUnchangedFiles="false" />
   </Target>
+  <PropertyGroup Label="XportTemplateSync">
+    <UseXcrt Condition="'$(UseXcrt)'==''">true</UseXcrt>
+    <XcrtEnabled>false</XcrtEnabled>
+    <XcrtEnabled Condition="'$(Configuration)|$(Platform)'=='Release|Win32' and '$(UseXcrt)'=='true' and '$(LockstepDebug)'!='true'">true</XcrtEnabled>
+    <OutDir>$(ProjectDir)..\..\..\bin\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\_build\x86\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="XportTemplateSync">
+    <TargetName>NFSHS_debug</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="XportTemplateSync">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ProgramDataBaseFileName>$(IntDir)NFSHS-compile.pdb</ProgramDataBaseFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4100;4244;4554;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>FULL_NAME="Need for Speed: High Stakes";GAPI_OGL;_DEBUG;XPORT_ENABLE_AUDIT;XPORT_MEMORY_DIAGNOSTICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)NFSHS_debug.pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(IntDir)NFSHS_debug.lib</ImportLibrary>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="XportTemplateSync">
+    <TargetName>NFSHS</TargetName>
+    <GenerateManifest>false</GenerateManifest>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="XportTemplateSync">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>false</SDLCheck>
+      <Optimization>MinSpace</Optimization>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Gw /Gs2147483647 %(AdditionalOptions)</AdditionalOptions>
+      <ExceptionHandling>false</ExceptionHandling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <DisableSpecificWarnings>4100;4244;4554;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>FULL_NAME="Need for Speed: High Stakes";GAPI_OGL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)NFSHS.lib</ImportLibrary>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <FixedBaseAddress>true</FixedBaseAddress>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <GenerateManifest>false</GenerateManifest>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32' and '$(LockstepDebug)'!='true'" Label="XportTemplateSync">
+    <ClCompile>
+      <PreprocessorDefinitions>XPORT_DISABLE_FUNCTION_MARKERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(XcrtEnabled)'=='true'" Label="XportTemplateSync">
+    <ClCompile>
+      <PreprocessorDefinitions>GAPI_OGL;XPORT_XCRT;_NO_CRT_STDIO_INLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OmitDefaultLibName>true</OmitDefaultLibName>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/MERGE:.rdata=.text %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <EntryPointSymbol>WinMainCRTStartup</EntryPointSymbol>
+      <AdditionalDependencies>kernel32.lib;opengl32.lib;user32.lib;gdi32.lib;winmm.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup Label="XportTemplateSync">
+    <ResourceCompile Include="icon.rc">
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Image Include="icon.ico" />
+    <ClCompile Include="..\..\..\..\xport\src\platform\win\xcrt.c">
+      <ExcludedFromBuild Condition="'$(XcrtEnabled)'!='true'">true</ExcludedFromBuild>
+      <CompileAs>CompileAsC</CompileAs>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <ForcedIncludeFiles />
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup Label="XportTemplateSync">
+    <ClCompile Update="$(ReconRoot)host\host_runtime.cpp" Condition="'$(XcrtEnabled)'=='true'">
+      <PreprocessorDefinitions>XCRT_CPP_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ForcedIncludeFiles>$(XportRoot)src\platform\win\xcrt.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

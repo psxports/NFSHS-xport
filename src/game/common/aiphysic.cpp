@@ -109,7 +109,6 @@ void AIPhysic_StopCar(Car_tObj *carObj,int velScale,int rotScale)
 void AIPhysic_RevEngine(Car_tObj *carObj)
 {
   int increase;
-  int redLine;
   int iVar1;
   int iVar2;
   
@@ -140,11 +139,6 @@ void AIPhysic_RevEngine(Car_tObj *carObj)
 /* ---- AIPhysic_HandleShifting__FP8Car_tObj  [@0x800693cc] ---- */
 void AIPhysic_HandleShifting(Car_tObj *carObj)
 {
-  int desiredRPM;
-  int speed;
-  int speedDiff;
-  int baseRPM;
-  int invGearSpeedRange;
   Gear_t gear;
   int iVar1;
   int iVar2;
@@ -215,8 +209,6 @@ void AIPhysic_HandleShifting(Car_tObj *carObj)
 /* ---- AIPhysic_CalculateGear__FP8Car_tObj  [@0x80069534] ---- */
 Gear_t AIPhysic_CalculateGear(Car_tObj *carObj)
 {
-  int hi;
-  int speed;
   bool bVar1;
   int iVar2;
   int iVar3;
@@ -265,7 +257,6 @@ Gear_t AIPhysic_CalculateGear(Car_tObj *carObj)
 /* ---- AIPhysic_GearInvSpeedRange__FP8Car_tObj6Gear_t  [@0x80069638] ---- */
 int AIPhysic_GearInvSpeedRange(Car_tObj *carObj,Gear_t gear)
 {
-  int convertedGear;
   while ((int)gear < 2) {
     gear = (Gear_t)2;
   }
@@ -275,7 +266,6 @@ int AIPhysic_GearInvSpeedRange(Car_tObj *carObj,Gear_t gear)
 /* ---- AIPhysic_GearTopSpeed__FP8Car_tObj6Gear_t  [@0x80069660] ---- */
 int AIPhysic_GearTopSpeed(Car_tObj *carObj,Gear_t gear)
 {
-  int convertedGear;
   while ((int)gear < 2) {
     gear = (Gear_t)2;
   }
@@ -294,12 +284,6 @@ int AIPhysic_GearBottomSpeed(Car_tObj *carObj,Gear_t gear)
 /* ---- AIPhysic_CalcAcceleration__FP8Car_tObji  [@0x800696b0] ---- */
 int AIPhysic_CalcAcceleration(Car_tObj *carObj,int speed)
 {
-  int accelEntry;
-  int acceleration;
-  int absSpeed;
-  int speedUpAcc;
-  int normalTopCap;
-  int upgradeTopCap;
   int iVar1;
   int iVar2;
   int a;
@@ -409,7 +393,6 @@ int AIPhysic_ModifyAccelerationAccordingToScript(Car_tObj *carObj,int acc)
 /* ---- AIPhysic_CalcDeceleration__FP8Car_tObj  [@0x800699e8] ---- */
 int AIPhysic_CalcDeceleration(Car_tObj *carObj)
 {
-  int d;
   int iVar1;
   int iVar2;
   
@@ -430,7 +413,6 @@ int AIPhysic_CalcDeceleration(Car_tObj *carObj)
 /* ---- AIPhysic_CheckDesiredDirection__FP8Car_tObj  [@0x80069a34] ---- */
 void AIPhysic_CheckDesiredDirection(Car_tObj *carObj)
 {
-  int turnAroundSpeed;
   if (carObj->speed < 0x8e38e) {
     carObj->direction = carObj->desiredDirection;
   }
@@ -440,8 +422,6 @@ void AIPhysic_CheckDesiredDirection(Car_tObj *carObj)
 /* ---- AIPhysic_HandleSignalling__FP8Car_tObj  [@0x80069a7c] ---- */
 void AIPhysic_HandleSignalling(Car_tObj *carObj)
 {
-  int lDes;
-  int lPos;
   u_short uVar1;
   
   if ((carObj->carFlags & 0x10U) != 0) {
@@ -479,7 +459,6 @@ void AIPhysic_HandleWipeoutTimer(Car_tObj *carObj)
 /* ---- AIPhysic_Main__FP8Car_tObj  [@0x80069b84] ---- */
 void AIPhysic_Main(Car_tObj *carObj)
 {
-  char useCoolPhysics;
   int iVar1;
   u_int uVar2;
   
@@ -565,8 +544,6 @@ LAB_80069dc0:
 /* ---- AIPhysic_CheckForBadPosition__FP8Car_tObj  [@0x80069e14] ---- */
 void AIPhysic_CheckForBadPosition(Car_tObj *carObj)
 {
-  int badSpeed;
-  int badRoadPos;
   bool bVar1;
   bool bVar2;
   int iVar3;
@@ -605,10 +582,6 @@ int AIPhysics_UseCoolPhysics(Car_tObj *carObj)
 /* ---- AIPhysic_SimplePhysics__FP8Car_tObj  [@0x80069f30] ---- */
 void AIPhysic_SimplePhysics(Car_tObj *carObj)
 {
-  coorddef forward;
-  coorddef right;
-  int speed;
-  int sliceLookAhead;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -700,10 +673,6 @@ void AIPhysic_SimplePhysics(Car_tObj *carObj)
 /* ---- AIPhysic_SimplePhysics_LongVel__FP8Car_tObj  [@0x8006a29c] ---- */
 void AIPhysic_SimplePhysics_LongVel(Car_tObj *carObj)
 {
-  int acceleration;
-  int deceleration;
-  u_char bVar1;
-  char cVar2;
   bool bVar3;
   int iVar4;
   int iVar5;
@@ -832,9 +801,6 @@ LAB_8006a5dc:
 /* ---- AIPhysic_SimplePhysics_LatVel__FP8Car_tObj  [@0x8006a5f4] ---- */
 void AIPhysic_SimplePhysics_LatVel(Car_tObj *carObj)
 {
-  int off;
-  coorddef right;
-  int carSpeed;
   int iVar1;
   int iVar2;
   int b;
@@ -928,10 +894,6 @@ void AIPhysic_HandleDirection(Car_tObj *carObj)
 /* ---- AIPhysic_Preperation__FP8Car_tObj  [@0x8006a8b4] ---- */
 void AIPhysic_Preperation(Car_tObj *carObj)
 {
-  coorddef forward;
-  int aCar;
-  int aCarWRTDesired;
-  int aDesired;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -1012,9 +974,6 @@ LAB_8006ab00:
 /* ---- AIPhysic_CalculateRoadPosition__FP8coorddefi  [@0x8006ab1c] ---- */
 int AIPhysic_CalculateRoadPosition(coorddef *pos,int slice)
 {
-  coorddef centerBack;
-  coorddef carRelative;
-  coorddef right;
   int *piVar1;
   int iVar2;
   int iVar3;
@@ -1055,19 +1014,6 @@ int AIPhysic_CalculateRoadPosition(coorddef *pos,int slice)
 /* ---- AIPhysic_GetDesiredVector__FP8Car_tObj  [@0x8006ac3c] ---- */
 void AIPhysic_GetDesiredVector(Car_tObj *carObj)
 {
-  int speed;
-  int roadWidth;
-  int sliceLookAhead;
-  int dirCorrectedSliceLookAhead;
-  coorddef fCPoint;
-  coorddef fPoint;
-  coorddef right;
-  int futureBend;
-  int futureRoadPosition;
-  int numReductions;
-  int goodVector;
-  int thisSlice;
-  int checkSide;
   bool bVar1;
   int iVar2;
   int iVar3;
@@ -1175,8 +1121,8 @@ LAB_8006af18:
     iVar5 = slice * 0x20 + (int)BWorldSm_slices;
     if ((((int)((u_int)*(u_char *)(iVar5 + 0x1f) * 0x8000 * (*(u_char *)(iVar5 + 0x1d) & 0xf)) < iVar2)
         && (carObj->roadPosition < iVar2)) ||
-       ((iVar2 < (int)-((u_int)*(u_char *)(iVar5 + 0x1e) * 0x8000 *
-                       (u_int)(*(u_char *)(iVar5 + 0x1d) >> 4)) && (iVar2 < carObj->roadPosition)))) {
+       ((iVar2 < (int)(0 - ((u_int)*(u_char *)(iVar5 + 0x1e) * 0x8000 *
+                       (u_int)(*(u_char *)(iVar5 + 0x1d) >> 4))) && (iVar2 < carObj->roadPosition)))) {
       iVar5 = 1;
       if (iVar2 < carObj->roadPosition) {
         iVar5 = -1;
@@ -1232,7 +1178,6 @@ void AIPhysic_TargetedGetDesiredVector(Car_tObj *carObj)
 /* ---- AIPhysic_CheckIfOutOfControl__FP8Car_tObj  [@0x8006b260] ---- */
 int AIPhysic_CheckIfOutOfControl(Car_tObj *carObj)
 {
-  int futureBend;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -1262,7 +1207,7 @@ int AIPhysic_CheckIfOutOfControl(Car_tObj *carObj)
     }
     iVar3 = (carObj->N).simRoadInfo.slice * 0x20 + (int)BWorldSm_slices;
     if (carObj->roadPosition <
-        (int)-((u_int)*(u_char *)(iVar3 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar3 + 0x1d) >> 4))) {
+        (int)(0 - ((u_int)*(u_char *)(iVar3 + 0x1e) * 0x8000 * (u_int)(*(u_char *)(iVar3 + 0x1d) >> 4)))) {
       return 1;
     }
     if ((int)((u_int)*(u_char *)(iVar3 + 0x1f) * 0x8000 * (*(u_char *)(iVar3 + 0x1d) & 0xf)) <
@@ -1293,22 +1238,6 @@ int AIPhysic_CheckIfOutOfControl(Car_tObj *carObj)
 /* ---- AIPhysic_OutOfControlPhysics__FP8Car_tObj  [@0x8006b400] ---- */
 void AIPhysic_OutOfControlPhysics(Car_tObj *carObj)
 {
-  int desiredAngVel;
-  int desiredLatVel;
-  int currentAngAcc;
-  int currentLatAcc;
-  int currentLongAcc;
-  int maxLatVel;
-  int maxAngVel;
-  int skid;
-  int dir;
-  int currentLatVel;
-  int latVelLimit;
-  int targetVel;
-  int uTurn;
-  int currentVel;
-  char cVar1;
-  u_char bVar2;
   bool bVar3;
   int iVar4;
   int iVar5;
@@ -1553,7 +1482,6 @@ LAB_8006b908:
 /* ---- AIPhysic_GetRearEndDamageFactor__FP8Car_tObj  [@0x8006ba70] ---- */
 int AIPhysic_GetRearEndDamageFactor(Car_tObj *carObj)
 {
-  int totalDamage;
   int iVar1;
   int iVar2;
   
@@ -1574,35 +1502,6 @@ void AIPhysic_InControlPhysics(Car_tObj *carObj)
   static char copCollisionReactionTime[4] = {0,0,0,0};
   static int copCollisionGripLoss[4] = {0x4ccc,0x8000,0x8000,0x10000};
   static int copCollisionSlowDown[4] = {0x90000,0x84000,0x70000,0x5c000};
-  int currentLatVel;
-  int currentLatPos;
-  int desiredLatPos;
-  int deltaLatPos;
-  int desiredAngVel;
-  int currentAngAcc;
-  int desiredLatVel;
-  int currentLatAcc;
-  int currentLongAcc;
-  int maxAngularAcceleration;
-  int angleWRTdesired;
-  int skid;
-  int dir;
-  int gripMultiplier;
-  int maxLateralAcceleration;
-  int dlvel_to_clacc;
-  int desiredSpeed;
-  int justBumped;
-  coorddef unitDesiredVector;
-  coorddef unitDesiredVectorRight;
-  int lastCollisionTickDiff;
-  int copCollisionFirmness;
-  int vely;
-  int fishtailtick;
-  int signAngle;
-  int maxLatVel;
-  int maxAngVel;
-  char cVar1;
-  u_char bVar2;
   int iVar3;
   int iVar4;
   int iVar5;
@@ -1857,10 +1756,8 @@ void AIPhysic_InControlPhysics(Car_tObj *carObj)
 /* ---- AIPhysic_FinishUp__FP8Car_tObj  [@0x8006c37c] ---- */
 void AIPhysic_FinishUp(Car_tObj *carObj)
 {
-  coorddef angAcc;
   matrixtdef transOrientMat;
   matrixtdef transRoadMat;
-  int tickLoop;
   int iVar1;
   int iVar2;
   int iVar3;
@@ -2020,7 +1917,6 @@ void AIPhysic_CalculateRampedDesiredLatPos(Car_tObj *carObj,eRampType rampType)
 /* ---- AIPhysic_HitWallCheck__FP8Car_tObj  [@0x8006c870] ---- */
 int AIPhysic_HitWallCheck(Car_tObj *carObj)
 {
-  int onRoad;
   u_char bVar1;
   
   bVar1 = *(u_char *)((carObj->N).simRoadInfo.slice * 0x20 + (int)BWorldSm_slices + 0x1d);
@@ -2063,7 +1959,6 @@ void AIPhysic_ProcessBarrierCollision(Car_tObj *carObj)
 /* ---- AIPhysic_ProcessCollision__FP8Car_tObj  [@0x8006c974] ---- */
 void AIPhysic_ProcessCollision(Car_tObj *carObj)
 {
-  int reverseTime;
   int iVar1;
   
   if ((0xd999 < (carObj->N).collision.impulse) &&
@@ -2200,13 +2095,6 @@ void AIPhysic_ResetCar(Car_tObj *carObj)
 /* ---- AIPhysic_InitCar__FP8Car_tObj  [@0x8006cc60] ---- */
 void AIPhysic_InitCar(Car_tObj *carObj)
 {
-  int d;
-  int deceleration;
-  int invDeceleration;
-  int brakeTableLoop;
-  int brakeDistanceMeters;
-  int distance;
-  int sIndex;
   AIPhysic_BrakeInfo *pAVar1;
   int iVar2;
   int iVar3;
@@ -2265,22 +2153,6 @@ void AIPhysic_InitCar(Car_tObj *carObj)
 /* ---- AIPhysic_DeInitCar__FP8Car_tObj  [@0x8006cdd4] ---- */
 void AIPhysic_DeInitCar(Car_tObj *carObj)
 {
-  int dir;
-  int totalDamage;
-  int currentVel;
-  int desiredAngVel;
-  int desiredLatVel;
-  int badSpeed;
-  int badRoadPos;
-  int currentLongAcc;
-  char useCoolPhysics;
-  int currentAngAcc;
-  int currentLatAcc;
-  int uTurn;
-  int currentLatVel;
-  coorddef fCPoint;
-  coorddef fPoint;
-  coorddef carRelative;
   
   if (((carObj->carFlags & 2U) != 0) && (carObj->brakeInfo != (AIPhysic_BrakeInfo *)0x0)) {
     __builtin_delete(carObj->brakeInfo);

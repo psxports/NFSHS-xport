@@ -46,9 +46,7 @@ void DrawCar(tCarInfo *carInfo,short x,short y,float camerax,float cameray,char 
 {
   byte bVar1;
   int iVar2;
-  uint32 ticks;
   char *carBytes = (char*)carInfo;
-  int the_simcarcolor;
   Car_tObj **ppCVar3;
   
   iVar2 = ::ticks;
@@ -80,22 +78,8 @@ tScreenCarSelect::tScreenCarSelect()
 
 {
   int _i;
-  uint uVar1;
-  uint *pkt;
-  uint uVar3;
   short ts9;
-  tOverlay *overlay;
-  int overlays;
-  short i;
   int iVar4;
-  int tp2;
-  int tu7;
-  int tps3;
-  int tu6;
-  uint tu4;
-  int tp8;
-  uint tu5;
-  void *tp1;
   
   tScreen_ctor(&this->_base_tScreen);
   _i = 0;
@@ -160,8 +144,6 @@ void tScreenCarSelect::DrawOverlay(tOverlay *overlay)
   int iVar5;
   int iVar6;
   int iVar7;
-  long value;
-  short text;
   int moneyColor;
   int validCar;
   short i;
@@ -276,7 +258,7 @@ DrawOvl_transitionPos:
         iVar7 = 0x60;
       }
       drawFlags.tint[0] = 0xbebe;
-      DrawShapeExtended(i * 0xA + (ticks >> 4) % 10 + 0x62,((carInfo.fUpgrades & upgradeIcons[i]) == 0) | 0x410,pos.x + i * 0x28 + 0x21,pos.y + 6,iVar7,1,&drawFlags);
+      DrawShapeExtended(i * 0xA + (ticks >> 4) % 10 + 0x62,(int)((carInfo.fUpgrades & upgradeIcons[i]) == 0) | 0x410,pos.x + i * 0x28 + 0x21,pos.y + 6,iVar7,1,&drawFlags);
     }
     break;
   case 5:
@@ -288,7 +270,7 @@ DrawOvl_transitionPos:
           iVar7 = 0x60;
         }
         drawFlags.tint[0] = 0xbebe;
-        DrawShapeExtended(i * 0xA + (ticks >> 4) % 10 + 0x62,((carInfo.fUpgrades & upgradeIcons[i]) == 0) | 0x410,pos.x + i * 0x28 + 0x85,pos.y + 6,iVar7,1,&drawFlags);
+        DrawShapeExtended(i * 0xA + (ticks >> 4) % 10 + 0x62,(int)((carInfo.fUpgrades & upgradeIcons[i]) == 0) | 0x410,pos.x + i * 0x28 + 0x85,pos.y + 6,iVar7,1,&drawFlags);
       }
       temp.y = pos.y + 0x23;
       temp.x = pos.x + 0x1e;
@@ -355,9 +337,7 @@ void tScreenCarSelect::SetState(int state)
   short sVar3;
   int iVar4;
   tOverlay *ovl;
-  short i;
   int iVar6;
-  short fPreviousState;
   
   state2 = this->fState;
   if (state != this->fState) {
@@ -451,7 +431,6 @@ void tScreenCarSelect::CalcSplinePosition(int knot1,int knot2,int knot3,int knot
 {
   int _i;
   int iVar1;
-  short i;
   int T [4];
   int G [4] [4];
   int Result1 [4];
@@ -607,7 +586,6 @@ void tScreenCarSelect::Initialize()
   tTrackInformation *trackInfo2;
   __vtbl_ptr_type (*vtbl) [10];
   int valid;
-  short i;
   uint uVar6;
   tCarInfo carInfo;
   tTrackInformation trackInfo;
@@ -688,7 +666,6 @@ void tScreenCarSelect::ProcessInput(tPlayer keyval,tInputKeyType &key_input,tMen
   __vtbl_ptr_type (*vtbl) [10];
   int iVar3;
   tInputKeyType tVar4;
-  byte validCar;
   tMenuItemOptionsLeftRightChoice *lrItem;
   int state;
   tCarInfo carInfo;
@@ -755,7 +732,6 @@ void tScreenCarSelect::DrawVideoWall(short y)
   short valid;
   __vtbl_ptr_type (*vtbl) [10];
   tVideoWall *this_00;
-  byte validCar;
   tCarInfo carInfo;
   
   vtbl = (this->_base_tScreen)._vf;
@@ -935,12 +911,9 @@ void tScreenCarSelect::DrawSliders(tCarInfo &carInfo,short x,short y)
 
 {
   byte bVar1;
-  tCarStatType carStat;
-  short result;
   tCarStatType tVar2;
   ushort value;
   int iVar3;
-  short j;
   short sVar4;
   
   for (sVar4 = 0; iVar3 = (int)sVar4, iVar3 < 5; sVar4 = sVar4 + 1) {
@@ -982,23 +955,13 @@ void tScreenCarSelect::DrawForeground()
   float camerax;
   float cameray;
   tOverlay *ovl;
-  short knot1;
-  short knot2;
   __vtbl_ptr_type (*vtbl) [10];
   int iVar10;
-  short knot3;
-  int fadeVal;
   tCarInfo *carObj;
-  short knot4;
   short sVar12;
-  short i;
   tMenuItem *item;
   int iVar14;
-  uint32 textTicks;
   uint uVar15;
-  int textColor;
-  int textID;
-  byte validCar;
   tCarInfo carInfo;
   tDrawShapeExtended drawFlags;
   int cameraY;
@@ -1355,9 +1318,7 @@ void tScreenCarSelectDuel::DrawVideoWall(short y)
   short valid;
   __vtbl_ptr_type (*vtbl) [10];
   tVideoWall *vw;
-  short i;
   int iVar3;
-  byte validCar;
   tCarInfo carInfo;
   
   vtbl = (this->_base_tScreenCarSelect)._base_tScreen._vf;
@@ -1396,7 +1357,6 @@ void tScreenCarSelectDuel::DrawVideoWall(short y)
 void tScreenCarSelectDuel::DrawOpponentVideoWall(short y)
 
 {
-  short i;
   int i_2;
   tVideoWall *vw_opp;
   tVideoWall *this_00;
@@ -1516,7 +1476,6 @@ void tScreenCarSelectDuel::DrawBackground()
   int pkt_addr24_2;
   tListIteratorCar *carIter;
   short sVar2;
-  byte validCar;
   PSX_RECT r;
   tCarInfo carInfo;
   PSX_RECT temp;
@@ -1573,7 +1532,7 @@ void tScreenCarSelectDuel::DrawBackground()
   }
   this->_base_tScreenCarSelect.UpdateBrightness(1);
   showRoomFlag = 0;
-  DrawCar(&carInfo,0x116,0xb8,1.7,-9.9,(char)(this->_base_tScreenCarSelect).fBrightness[1],false,
+  DrawCar(&carInfo,0x116,0xb8,1.7f,-9.9f,(char)(this->_base_tScreenCarSelect).fBrightness[1],false,
              (this->_base_tScreenCarSelect).fCameraRotation,kPlayerTwo);
   if (((gCarObj[1]->async_handle == 0) &&
       (sVar2 = (this->_base_tScreenCarSelect).fBrightness[1],
@@ -1624,7 +1583,7 @@ void tScreenCarSelectDuel::DrawBackground()
   }
   this->_base_tScreenCarSelect.UpdateBrightness(0);
   showRoomFlag = 0;
-  DrawCar(&carInfo,0x116,0x4f,1.7,-9.9,(char)(this->_base_tScreenCarSelect).fBrightness[0],false,
+  DrawCar(&carInfo,0x116,0x4f,1.7f,-9.9f,(char)(this->_base_tScreenCarSelect).fBrightness[0],false,
              (this->_base_tScreenCarSelect).fCameraRotation,kPlayerOne);
   if ((((gCarObj[0]->async_handle == 0) &&
        (sVar2 = (this->_base_tScreenCarSelect).fBrightness[0],
@@ -1669,20 +1628,14 @@ void tScreenCarSelectDuel::DrawBackground()
 void tScreenCarSelectDuel::DrawForeground()
 
 {
-  tCarInfo *carInfo;
   __vtbl_ptr_type (*vtbl) [10];
   int iVar2;
   int iVar3;
-  short result;
   ushort carStat;
   tCarStatType tVar4;
-  short j;
   short sVar5;
-  short y;
   short fY;
-  short i;
   int iVar6;
-  byte validCar;
   tCarInfo tStack_f8;
   
   fY = 0x2d;
@@ -1731,9 +1684,7 @@ int tScreenCarSelectTwoPlayer::GetCar(tCarInfo &carInfo)
   byte bVar1;
   ushort uVar2;
   uint player;
-  int garageNumber;
   uint uVar4;
-  int currentplayer;
   
   player = (uint)(byte)FEApp->fPlayer;
   if (frontEnd.carListType == '\0') {
@@ -1768,9 +1719,7 @@ void tScreenCarSelectTwoPlayer::DrawVideoWall(short y)
   __vtbl_ptr_type (*vtbl) [10];
   short sVar2;
   tVideoWall *vw;
-  short i;
   int iVar4;
-  byte validCar;
   tCarInfo carInfo;
   
   vtbl = (this->_base_tScreenCarSelect)._base_tScreen._vf;
@@ -1883,7 +1832,6 @@ void tScreenCarSelectTwoPlayer::DrawBackground()
   short carY_2;
   short sVar3;
   short ts3;
-  short carY;
   short ts10;
   PSX_RECT r;
   tCarInfo carInfo;
@@ -1923,7 +1871,7 @@ void tScreenCarSelectTwoPlayer::DrawBackground()
               (this->_base_tScreenCarSelect)._base_tScreen.fPermShapes.fFilename + vtbl[1][2].delta + -0x14,
                &carInfo);
     showRoomFlag = 0;
-    DrawCar(&carInfo,0x116,0x4f,1.7,-9.9,(char)(this->_base_tScreenCarSelect).fBrightness[0],false,
+    DrawCar(&carInfo,0x116,0x4f,1.7f,-9.9f,(char)(this->_base_tScreenCarSelect).fBrightness[0],false,
                (this->_base_tScreenCarSelect).fCameraRotation,(tPlayer)(byte)FEApp->fPlayer);
     vtbl = (this->_base_tScreenCarSelect)._base_tScreen._vf;
     NFS4_VCALL0(vtbl[1][6].pfn,
@@ -1956,7 +1904,7 @@ void tScreenCarSelectTwoPlayer::DrawBackground()
     }
     this->_base_tScreenCarSelect.UpdateBrightness(0);
     showRoomFlag = 0;
-    DrawCar(&carInfo,0x116,ts10,1.7,-9.9,(char)(this->_base_tScreenCarSelect).fBrightness[0],false,
+    DrawCar(&carInfo,0x116,ts10,1.7f,-9.9f,(char)(this->_base_tScreenCarSelect).fBrightness[0],false,
                (this->_base_tScreenCarSelect).fCameraRotation,(tPlayer)(byte)FEApp->fPlayer);
   }
   IsShapeFileLoaded((tScreen *)this,&(this->_base_tScreenCarSelect)._base_tScreen.fSwapShapes);
@@ -2017,16 +1965,12 @@ void tScreenCarSelectTwoPlayer::DrawForeground()
 
 {
   tGlobalMenuDefs *mdefs;
-  tCarStatType carStat;
   int iVar2;
   tCarStatType tVar3;
-  short result;
   ushort value;
   uint uVar4;
   int iVar5;
-  short yOffset;
   short fY;
-  short j;
   short sVar6;
   tCarInfo carInfo;
   __vtbl_ptr_type (*vtbl)[10];
@@ -2092,7 +2036,6 @@ void tScreenCarSelectTwoPlayer::SetDialog()
   char *fmt;
   char *str;
   uint uVar4;
-  int player;
   
   player2 = FEApp->fPlayer;
   uVar4 = (uint)player2;
@@ -2228,11 +2171,8 @@ void tScreenPinkSlipsCarSelect::DoMemCardStuff()
   CARDINFO_def *cardInfo;
   long lVar5;
   PinkSlipsCarSelectState PVar6;
-  int ret;
   PinkSlipsCarSelectState *pinkState;
-  int card;
   int card_00;
-  int player;
   tPlayer atIndex;
   
   player2 = FEApp->fPlayer;
@@ -2390,7 +2330,6 @@ void tScreenPinkSlipsCarSelect::SetDialog()
   short y_off;
   int iVar3;
   int wordnum;
-  int player;
   uint p;
   byte p_byte;
   
@@ -2568,19 +2507,6 @@ tScreenCarSelectTwoPlayer::~tScreenCarSelectTwoPlayer()
 tScreenCarSelectDuel::~tScreenCarSelectDuel()
 
 {
-  int ret;
-  int value;
-  int fadeVal;
-  short text;
-  int card;
-  DRAWENV *drenv;
-  int garageNumber;
-  int currentplayer;
-  PSX_RECT pos;
-  PSX_RECT temp;
-  PSX_RECT r;
-  int T [4];
-  char buffer [32];
   
   tScreenCarSelect_dtor(&this->_base_tScreenCarSelect,2);
   return;

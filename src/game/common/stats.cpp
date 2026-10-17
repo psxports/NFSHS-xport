@@ -21,13 +21,10 @@ void Stats_DoPlayerGlue(void)
 
 {
   int iVar1;
-  int dist;
   Car_tObj *pCVar2;
   Car_tObj **ppCVar3;
-  int i;
   int iVar4;
   Stats_tPosition *pSVar5;
-  int humanLeader;
   int iVar6;
   
   iVar6 = 99;
@@ -92,7 +89,6 @@ void Stats_ClearPosition(void)
 {
   Stats_tPosition *pSVar1;
   int iVar2;
-  int i;
   
   iVar2 = 0;
   pSVar1 = Stats_racePosition;
@@ -113,9 +109,6 @@ int Stats_GetPosition(Car_tObj *carObj)
 {
   Stats_tPosition *pSVar1;
   int iVar2;
-  int i;
-  int position;
-  int carindex;
   
   iVar2 = 0;
   if (0 < Cars_gNumRaceCars) {
@@ -137,9 +130,7 @@ int Stats_GetNumOpponents(void)
 {
   Stats_tPosition *pSVar1;
   int iVar2;
-  int numCars;
   int iVar3;
-  int i;
   
   iVar3 = 0;
   iVar2 = 0;
@@ -160,25 +151,17 @@ int Stats_GetNumOpponents(void)
 void Stats_TrackStats(Car_tObj *carObj)
 
 {
-  int roadSlice;
   int *piVar1;
   int iVar2;
   u_int uVar3;
-  int r1;
   int iVar4;
   int r2;
   int iVar5;
   int iVar6;
-  int r3;
   int iVar7;
-  int r4;
   int iVar8;
   Stats_tPosition *pSVar9;
-  int j;
   Stats_tPosition *pSVar10;
-  int i;
-  int currentTime;
-  int trackSlices;
   
   iVar5 = gNumSlices;
   iVar6 = simGlobal.gameTicks;
@@ -274,27 +257,16 @@ void Stats_TrackStats(Car_tObj *carObj)
 void Stats_ExtrapolateOpponentTimes(int type)
 
 {
-  int j;
-  int startingTime;
-  int sliceTotal;
-  int m;
   int *piVar1;
   bool bVar2;
   int iVar3;
   int iVar4;
-  int averageLap;
   int iVar5;
   int iVar6;
-  int y;
   Car_tObj *pCVar7;
-  int position;
   int iVar8;
   Car_tObj **ppCVar9;
-  int x;
-  int extrapolatedTime;
   Car_tObj **ppCVar10;
-  int i;
-  int quick_finish;
   int iVar11;
   
   iVar3 = Input_Interface(3,0);
@@ -316,7 +288,7 @@ void Stats_ExtrapolateOpponentTimes(int type)
       if (iVar5 == 0) {
         trap(0x1c00);
       }
-      if ((iVar5 == -1) && (iVar8 == -0x80000000)) {
+      if ((iVar5 == -1) && (iVar8 == 0x80000000)) {
         trap(0x1800);
       }
       if (bVar2) {
@@ -412,7 +384,7 @@ void Stats_ExtrapolateOpponentTimes(int type)
       if (iVar5 == 0) {
         trap(0x1c00);
       }
-      if ((iVar5 == -1) && (iVar8 == -0x80000000)) {
+      if ((iVar5 == -1) && (iVar8 == 0x80000000)) {
         trap(0x1800);
       }
       if ((bVar2) || ((Cars_gHumanRaceCarList[0]->stats).finishType == 2)) {
@@ -451,7 +423,7 @@ void Stats_ExtrapolateOpponentTimes(int type)
     if (GameSetup_gData.numLaps == 0) {
       trap(0x1c00);
     }
-    if ((GameSetup_gData.numLaps == -1) && (iVar8 == -0x80000000)) {
+    if ((GameSetup_gData.numLaps == -1) && (iVar8 == 0x80000000)) {
       trap(0x1800);
     }
     iVar5 = iVar8 / GameSetup_gData.numLaps - iVar5 / 0x30;
@@ -506,28 +478,13 @@ void Stats_TrackEndGame(void)
   int iVar1;
   int iVar2;
   int iVar3;
-  int r1;
   int iVar4;
-  int averageLap;
   Car_tObj *pCVar5;
-  int y;
-  int trackSlices;
-  int startingTime;
-  int i;
   int iVar6;
-  int carindex;
-  int x;
-  int extrapolatedTime;
   Car_tObj **ppCVar7;
-  int j;
   int iVar8;
-  int DesiredComparison;
   int iVar9;
-  int quick_finish;
   Car_tObj **ppCVar10;
-  int DesiredSpeed;
-  int PlayerPosition;
-  int DesiredSlice;
   int iVar11;
   int Stats_PlayersFinishedRace;
   int PlayerSlice;
@@ -593,7 +550,7 @@ void Stats_TrackEndGame(void)
           if (iVar4 == 0) {
             trap(0x1c00);
           }
-          if ((iVar4 == -1) && (iVar11 == -0x80000000)) {
+          if ((iVar4 == -1) && (iVar11 == 0x80000000)) {
             trap(0x1800);
           }
           (pCVar5->stats).checkpointDifference = iVar11 / iVar4;

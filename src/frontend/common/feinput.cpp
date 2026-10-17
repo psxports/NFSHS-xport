@@ -8,7 +8,7 @@
 /* ---- FEInput.obj-OWNED data -- DEFINED here (self-contained; real NFS4.EXE bytes).
    nextTick/debounce are fn-static state (materialized in-fn); getKeyMappings is the PSX->FE
    key-map table (16 x tPSXToFEMapping). ---- */
-tPSXToFEMapping getKeyMappings[16] = { {16, 512}, {128, 2048}, {32, 4096}, {64, 1024}, {1024, 32}, {256, 64}, {2048, 128}, {512, 256}, {1048576, 512}, {8388608, 2048}, {2097152, 4096}, {4194304, 1024}, {268435456, 512}, {-2147483648, 2048}, {536870912, 4096}, {1073741824, 1024} };   /* @0x8005173c */
+tPSXToFEMapping getKeyMappings[16] = { {16, 512}, {128, 2048}, {32, 4096}, {64, 1024}, {1024, 32}, {256, 64}, {2048, 128}, {512, 256}, {1048576, 512}, {8388608, 2048}, {2097152, 4096}, {4194304, 1024}, {268435456, 512}, {(-2147483647 - 1), 2048}, {536870912, 4096}, {1073741824, 1024} };   /* @0x8005173c */
 
 
 /* ---- FEInput_VerifyControllerValues  [FEINPUT.CPP:28-38] SLD-VERIFIED ---- */
@@ -33,7 +33,6 @@ int FEInput_GetNoDebounceKey(int key,int controller)
   u_char uVar1;
   bool bVar2;
   u_int uVar3;
-  char *analogs;
   
   PAD_update();
   if (gPadinfo.buf[controller * 4].nopad != '\0') {
@@ -175,7 +174,6 @@ FEInput_GetKeyFromPlayer(tPlayer player,long debounce)
   bool bVar1;
   int iVar2;
   tInputKeyType tVar3;
-  u_short i;
   u_short uVar4;
   
   uVar4 = 0;

@@ -40,7 +40,7 @@ extern "C" int iSNDallocchan(unsigned int priority, int numChannels, int a2, uns
 {
     int reserved = 0;
     int result = -9;
-    int i, k, off;
+    int i, k;
     unsigned int best, c, v, bestval;
 
     for (i = 0; i < numChannels; i++) /* clear the chosen list */

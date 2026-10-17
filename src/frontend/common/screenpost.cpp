@@ -172,25 +172,17 @@ void tScreenTournamentStandings::DrawBackground()
   char *str;
   int iVar3;
   int iVar4;
-  tTexture_ShapeInfo *shape;
   tListIteratorTournament *this_00;
   long lVar5;
-  int tt;
-  int wwwww;
-  int colb;
   tMenuTextState statedull;
-  int j;
   int iVar6;
-  int i;
   int iVar7;
   int colf;
   int lbx;
   int width;
   int wobble;
-  tMenuTextState state;
   tMenuTextState textState_00;
   int iVar8;
-  int fade;
   int iVar9;
   char sBuildOutput [80];
   tTrackInformation trackInfo;
@@ -371,20 +363,15 @@ void tScreenPinkSlipStandings::DrawBackground()
   int iVar2;
   char *str;
   int iVar4;
-  tTexture_ShapeInfo *shape;
   tfrontEnd *index;
-  int tt;
   int wwwww;
   int lbx;
   tDrawShapeExtended drawflags;
   int width;
   int wobble;
   uint i;
-  tMenuTextState state;
   tMenuTextState textState;
-  int fade;
   int iVar7;
-  tMenuTextType type;
   char sBuildOutput [50];
   tTrackInformation trackInfo;
   char string [30];
@@ -502,14 +489,6 @@ tScreenTournamentStandings3item::~tScreenTournamentStandings3item()
 tScreenTournamentStandings::~tScreenTournamentStandings()
 
 {
-  int tt;
-  int wwwww;
-  int colb;
-  int colf;
-  int i;
-  char sBuildOutput [80];
-  tTrackInformation trackInfo;
-  char string [30];
   
   ((tScreen*)(&this->_base_tScreen))->~tScreen();
   return;

@@ -275,11 +275,10 @@ extern "C" void StatChk_SaveTopTime(Car_tStats *dummyCars,short nNumCars)
   char *playerName;
   int nCheckTotalTime;
   uint recBase;
-  short k;
+  int k;
   ushort rank;
   short *pSlot;
   uint slot;
-  short nCar;
   tRecordBuffer *pRec;
   int nTopTenSort [8];
   short nTopTenIndex [8];
@@ -288,6 +287,8 @@ extern "C" void StatChk_SaveTopTime(Car_tStats *dummyCars,short nNumCars)
   short nLapIndicator;
   short nPlace;
   
+  // Native policy: Initialize name bytes that the original reads before strcpy
+  memset(DummyRaceResult.sName,0,sizeof(DummyRaceResult.sName));
   bDoRecordCheck = false;
   k = 0;
   bTopTenFlag = false;
@@ -327,7 +328,7 @@ extern "C" void StatChk_SaveTopTime(Car_tStats *dummyCars,short nNumCars)
     do {
       pSlot = &nRankCarTotalTimes[k >> 0x10];
       carInfo = GetCarFromSimID(&carManager, (short)dummyCars[*pSlot].carType);
-      if (1 < carInfo->fCarClass - 7) {
+      if ((uint32)carInfo->fCarClass - 7u > 1u) {
         if ((byte)frontEnd.gameMode < 3) {
           k = (int)*pSlot;
 StatChkSave_validateCarFinish:

@@ -162,7 +162,6 @@ void tScreenTournSelect::DrawVideoWall()
 
 {
   bool onState;
-  long j;
   long i;
   uint transCount;
   tDrawShapeExtended drawFlags;
@@ -241,16 +240,10 @@ void tScreenTournSelect::DrawBackground()
   int ti7;
   char *tstr8;
   tListIteratorTournament *tp9;
-  short shapeY;
-  short j;
-  short i;
   int ti10;
-  short y;
   tTourneyInfo *tourn;
-  char buffer [64];
   PSX_RECT r;
   char moviename [80];
-  uint32 movieRGB;
   
   tb1 = frontEnd.tournament;
   if (frontEnd.tier != '\0') {
@@ -390,14 +383,6 @@ void tScreenTournSelect::DrawBackground()
 void tScreenTournSelect::DrawForeground()
 
 {
-  short shapeY;
-  short y;
-  int DarkGreyCol;
-  int YellowCol;
-  char buffer [64];
-  PSX_RECT r;
-  uint movieRGB;
-  tDrawShapeExtended drawFlags;
   
   PSXDrawBrightEndLine(0x232323,0xa7,0x29,0x13c,1,3,(int)(this->_base_tScreen).fScreenFadeVal,0x14);
   PSXDrawBrightEndLine(0x232323,0xa7,0x4a,0x13c,1,2,(int)(this->_base_tScreen).fScreenFadeVal,0x14);

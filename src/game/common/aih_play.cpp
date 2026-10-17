@@ -105,28 +105,11 @@ void AIHigh_Player::SetupBlockade()
 
 
 {
-  int copLoop;
-  int blockadeHandle;
-  copLevel_t*pLevel;
-  trigger_t *blockade;
-  int used;
-  int nCopsNeeded[2];
   int requestSpikeBeltAtSlice;
-  int nCopsAvail[2];
-  int totalRoadWidth;
   int blockadeTriggerSlice;
   int blockadeSlice;
-  int blockadeType;
-  int blockadeFlags;
-  bool saySpikeBelt;
-  AIHigh_Cop*blockadeCar;
-  int posIndex;
-  int loop;
-  int needed[2];
   AIHigh_Cop*thisCop;
-  int addToSlice;
 
-  short sVar1;
 
   bool bVar2;
 
@@ -136,9 +119,6 @@ void AIHigh_Player::SetupBlockade()
 
   Speaker *pSVar5;
 
-  int iVar7;
-
-  void (*pcVar8)(MobileSpeaker *);
 
   Car_tObj *pCVar9;
 
@@ -168,7 +148,6 @@ void AIHigh_Player::SetupBlockade()
 
   int local_3c;
 
-  Car_tObj *pCStack_38;
 
   int local_34;
 
@@ -644,9 +623,7 @@ LAB_800620e8: ;   /* empty stmt: gcc2.7.2 label before brace */
 
         pSVar5 = (Speaker *)Speech_Mobile(pAVar18->carObj_);
 
-        sVar1 = (*pSVar5->_vf)[10].delta;
-
-        pcVar8 = (void (*)(MobileSpeaker *))(*pSVar5->_vf)[10].pfn;
+        pSVar5->RoadBlock();
 
       }
 
@@ -654,33 +631,31 @@ LAB_800620e8: ;   /* empty stmt: gcc2.7.2 label before brace */
 
         pSVar5 = (Speaker *)Speech_Mobile(pAVar18->carObj_);
 
-        sVar1 = (*pSVar5->_vf)[11].delta;
-
-        pcVar8 = (void (*)(MobileSpeaker *))(*pSVar5->_vf)[11].pfn;
+        pSVar5->SpikeBelt();
 
       }
 
-      (*pcVar8)((MobileSpeaker *)((char *)pSVar5 + sVar1));
+
 
       pSVar5 = (Speaker *)Speech_Mobile(pAVar18->carObj_);
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar5->_vf)[6];
-        ((void (*)(MobileSpeaker *, Car_tObj *))entry.pfn)((MobileSpeaker *)((char *)pSVar5 + entry.delta), (this->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
+
+        (pSVar5)->Engage((this->_base_AIHigh_BasicPerp)._base_AIHigh_Base.carObj_);
       }
 
       pSVar5 = (Speaker *)Speech_Dispatch();
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar5->_vf)[4];
-        ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)pSVar5 + entry.delta));
+
+        (pSVar5)->Grant();
       }
 
       pSVar5 = (Speaker *)Speech_Dispatch();
 
       {
-        const __vtbl_ptr_type &entry = (*pSVar5->_vf)[5];
-        ((void (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)pSVar5 + entry.delta), pAVar18->carObj_);
+
+        (pSVar5)->Ready(pAVar18->carObj_);
       }
 
     }
@@ -705,9 +680,6 @@ void AIHigh_Player::CheckForNewLevel(int force)
 
 
 {
-  int chaseLevel;
-  int oldChaseLevel;
-  int level;
 
   __vtbl_ptr_type (*pa_Var1) [3];
 
@@ -911,9 +883,6 @@ void AIHigh_Player::HandleSpeech()
 
 
 {
-  int highestRankedCopIndex;
-  int arrestType;
-  int player;
 
   Speaker *pSVar1;
 
@@ -1006,8 +975,8 @@ LAB_800625d0:
   pSVar1 = (Speaker *)Speech_Mobile(Cars_gList[iVar2]);
 
   {
-    const __vtbl_ptr_type &entry = (*pSVar1->_vf)[9];
-    ((void (*)(MobileSpeaker *, int))entry.pfn)((MobileSpeaker *)((char *)pSVar1 + entry.delta), iVar3);
+
+    (pSVar1)->Catch(iVar3);
   }
 
   return;
@@ -1028,15 +997,6 @@ void AIHigh_Player::MaintainAvailableCops()
 
 
 {
-  int need[2];
-  int got[2];
-  int availableCops;
-  int playLoop;
-  Car_tObj*playerCarObj;
-  AIHigh_Player*playerHighObj;
-  int copLoop;
-  Car_tObj*copCarObj;
-  AIHigh_Cop*copHighObj;
 
   bool bVar1;
 
@@ -1181,9 +1141,6 @@ AIHigh_Player::AIHigh_Player(Car_tObj *carObj)
 
 
 {
-  int gameIndex;
-  int lapIndex;
-  copGame_t*copGameInfo;
 
   int iVar1;
 
@@ -1327,9 +1284,6 @@ void AIHigh_Player::HandleCops()
 
 
 {
-  copLevel_t*pLevel;
-  int ticks;
-  int totalCopsEngaged;
 
   int iVar1;
 
@@ -1445,10 +1399,6 @@ void AIHigh_Player::CleanupBlockaders(int forceClearAll)
 
 
 {
-  int clearWaitingBlockaders;
-  int copLoop;
-  AIHigh_Cop*thisCop;
-  blockade_t*blockade;
 
   bool bVar1;
 
@@ -1516,8 +1466,6 @@ void AIHigh_Player::HandlePullOver()
 
 
 {
-  int chaseTime;
-  int lapIndex;
 
   bool bVar1;
 

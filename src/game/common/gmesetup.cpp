@@ -6,9 +6,7 @@
 #include "../../nfs4_types.h"
 #include "gmesetup_externs.h"
 
-#ifdef AP_WIN
 extern "C" void NFSHS_HostLog(const char *fmt);
-#endif
 
 /* ---- gmesetup.obj OWNED global (EXT) ---- */
 extern "C" { GameSetup_tData GameSetup_gData; }
@@ -22,11 +20,6 @@ extern "C" { void GameSetup_CleanUp(void); }
 extern "C" void GameSetup_StartUp(int *FrontEndDataStream)
 
 {
-  int*p;
-  int i;
-  int * h;
-  int * s;
-  FEI_tList * l;
   int iVar1;
   u_int uVar2;
   int iVar3;
@@ -84,11 +77,9 @@ extern "C" void GameSetup_StartUp(int *FrontEndDataStream)
       return;
     }
     iVar3 = *piVar7;
-#ifdef AP_WIN
     if (iVar3 == 282 || iVar3 == 283)
       NFSHS_DIAGNOSTIC_CALL(([&]() { char nfshsLogLine[767] = {}; snprintf(nfshsLogLine, sizeof(nfshsLogLine), "TEST_SETUP_TAG tag=%d car=%d value=%08x stream=%p",
                     iVar3,piVar7[1],(unsigned int)piVar7[2],piVar7); NFSHS_HostLog(nfshsLogLine); }()));
-#endif
     if (iVar3 < 0x103) {
       pFVar4 = FEI_gList;
       if (iVar3 < 0x4d) {

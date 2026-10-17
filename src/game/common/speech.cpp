@@ -1,32 +1,164 @@
-/* game/common/speech.cpp -- RECONSTRUCTED (NFS4 PSX cop speech/dispatch engine; C++ TU)
- *   101 fns across 7 classes (Speech + Speaker/MobileSpeaker/DispatchSpeaker hierarchy +
- *   CarBank/CarBankName/LocationBank helpers) + 4 free C entry points (Speech_AllocateRAM/
- *   PurgeRAM/HandleRequest/Server). Methods emitted free-fn-with-explicit-this `Class_method`
- *   (structs carry no member-fn protos). Virtual dispatch via _vf[31]. GTE-free.
- */
+/* Police speech engine with native Speaker inheritance and virtual dispatch */
 #include "../../nfs4_types.h"
 #include "speech_externs.h"
 #include "../../mips_semantics.h"
 
+/* Native construction mirrors the original inlined base/derived initialization */
+Speaker::Speaker() : fSub(0) {}
+MobileSpeaker::MobileSpeaker() : fCarObj(0) {}
+DispatchSpeaker::DispatchSpeaker() {}
+
 /* ---- speech.obj OWNED globals (EXT; SYM Globals.jsonl tu=Speech.obj, @0x80111a44+) ---- */
-Speech_tCarDescription      Speech_gCarDescription[15];
-Speech_tLocationDescription Speech_gLocationDescription00[13];
-Speech_tLocationDescription Speech_gLocationDescription02[14];
-Speech_tLocationDescription Speech_gLocationDescription03[13];
-Speech_tLocationDescription Speech_gLocationDescription04[9];
-Speech_tLocationDescription Speech_gLocationDescription05[14];
-Speech_tLocationDescription Speech_gLocationDescription06[11];
-Speech_tLocationDescription Speech_gLocationDescription07[11];
-Speech_tLocationDescription *Speech_gLocationDescription[11];
-Speech_tCallSignDescription Speech_gCallSignDescription[1];
-Speech_tMobileVoiceAttr     Speech_gCopAttr[9];
+Speech_tCarDescription Speech_gCarDescription[15] = {
+    {(char *)"BMWZ", (char *)"bmwz3.", (char *)"bmw.", (char *)"z3."},
+    {(char *)"HSVT", (char *)"sedan.", (char *)"sedan.", (char *)"sedan."},
+    {(char *)"FORD", (char *)"sedan.", (char *)"sedan.", (char *)"sedan."},
+    {(char *)"CMRO", (char *)"chvcam.", (char *)"chevro.", (char *)"cam."},
+    {(char *)"TRAM", (char *)"pont.", (char *)"pont.", (char *)"pont."},
+    {(char *)"ADB7", (char *)"aston.", (char *)"aston.", (char *)"aston."},
+    {(char *)"JXKR", (char *)"jag.", (char *)"jag.", (char *)"jag."},
+    {(char *)"BMWM", (char *)"bmwm5.", (char *)"bmw.", (char *)"m5."},
+    {(char *)"CORV", (char *)"chvcor.", (char *)"chevro.", (char *)"corv."},
+    {(char *)"P993", (char *)"por911.", (char *)"porsc.", (char *)"porsc."},
+    {(char *)"DIAB", (char *)"lamdia.", (char *)"lamb.", (char *)"dia."},
+    {(char *)"MCF1", (char *)"mclar.", (char *)"mclar.", (char *)"mclar."},
+    {(char *)"X993", (char *)"por911.", (char *)"porsc.", (char *)"porsc."},
+    {(char *)"XCF1", (char *)"chvcor.", (char *)"chevro.", (char *)"corv."},
+    {0, (char *)"sport.", (char *)"sport.", (char *)"sport."}
+};
+Speech_tLocationDescription Speech_gLocationDescription00[13] = {
+    {(char *)"cab.", 45, 56},
+    {(char *)"cab.", 70, 76},
+    {(char *)"baov.", 188, 191},
+    {(char *)"tun.", 250, 260},
+    {(char *)"scrv.", 304, 340},
+    {(char *)"twr.", 480, 483},
+    {(char *)"brg.", 588, 600},
+    {(char *)"frm.", 660, 666},
+    {(char *)"tun.", 690, 699},
+    {(char *)"pike.", 794, 847},
+    {(char *)"ltun.", 855, 910},
+    {(char *)"icec.", 911, 950},
+    {0, 0, 0}
+};
+Speech_tLocationDescription Speech_gLocationDescription02[14] = {
+    {(char *)"mar.", 1061, 20},
+    {(char *)"bay.", 110, 130},
+    {(char *)"rarc.", 185, 188},
+    {(char *)"scrv.", 236, 260},
+    {(char *)"lth.", 305, 318},
+    {(char *)"ruin.", 456, 470},
+    {(char *)"spfl.", 616, 618},
+    {(char *)"brg.", 632, 638},
+    {(char *)"tbrg.", 639, 656},
+    {(char *)"brg.", 657, 662},
+    {(char *)"ltun.", 806, 839},
+    {(char *)"tun.", 959, 975},
+    {(char *)"bgdr.", 990, 1025},
+    {0, 0, 0}
+};
+Speech_tLocationDescription Speech_gLocationDescription03[13] = {
+    {(char *)"over.", 57, 59},
+    {(char *)"over.", 96, 99},
+    {(char *)"over.", 139, 142},
+    {(char *)"tun.", 156, 165},
+    {(char *)"fld.", 222, 260},
+    {(char *)"brg.", 264, 274},
+    {(char *)"stun.", 365, 416},
+    {(char *)"htou.", 545, 551},
+    {(char *)"rarc.", 661, 662},
+    {(char *)"ruin.", 679, 705},
+    {(char *)"tun.", 869, 877},
+    {(char *)"ogt.", 914, 929},
+    {0, 0, 0}
+};
+Speech_tLocationDescription Speech_gLocationDescription04[9] = {
+    {(char *)"trnx.", 1, 2},
+    {(char *)"lsp.", 94, 96},
+    {(char *)"cab.", 162, 163},
+    {(char *)"hsv.", 170, 300},
+    {(char *)"pent.", 305, 309},
+    {(char *)"tun.", 465, 474},
+    {(char *)"brg.", 575, 593},
+    {(char *)"ltun.", 693, 709},
+    {0, 0, 0}
+};
+Speech_tLocationDescription Speech_gLocationDescription05[14] = {
+    {(char *)"ogt.", 4, 8},
+    {(char *)"wfrm.", 35, 109},
+    {(char *)"tun.", 240, 250},
+    {(char *)"ruin.", 251, 325},
+    {(char *)"tun.", 326, 338},
+    {(char *)"fld.", 366, 452},
+    {(char *)"owel.", 569, 572},
+    {(char *)"over.", 681, 682},
+    {(char *)"toll.", 711, 713},
+    {(char *)"toll.", 741, 743},
+    {(char *)"obwm.", 875, 889},
+    {(char *)"vill.", 890, 925},
+    {(char *)"over.", 1066, 1069},
+    {0, 0, 0}
+};
+Speech_tLocationDescription Speech_gLocationDescription06[11] = {
+    {(char *)"fld.", 17, 45},
+    {(char *)"omus.", 118, 120},
+    {(char *)"kngm.", 265, 275},
+    {(char *)"vill.", 330, 398},
+    {(char *)"scrv.", 570, 627},
+    {(char *)"stun.", 637, 657},
+    {(char *)"hpin.", 705, 742},
+    {(char *)"over.", 760, 765},
+    {(char *)"arch.", 818, 821},
+    {(char *)"ltun.", 940, 1017},
+    {0, 0, 0}
+};
+Speech_tLocationDescription Speech_gLocationDescription07[11] = {
+    {(char *)"scrv.", 32, 74},
+    {(char *)"over.", 116, 158},
+    {(char *)"ltun.", 249, 301},
+    {(char *)"over.", 330, 334},
+    {(char *)"medi.", 348, 426},
+    {(char *)"frm.", 515, 536},
+    {(char *)"farm.", 537, 538},
+    {(char *)"frm.", 540, 577},
+    {(char *)"vill.", 627, 720},
+    {(char *)"tun.", 767, 785},
+    {0, 0, 0}
+};
+Speech_tLocationDescription * Speech_gLocationDescription[11] = {
+    Speech_gLocationDescription00,
+    Speech_gLocationDescription02,
+    Speech_gLocationDescription02,
+    Speech_gLocationDescription03,
+    Speech_gLocationDescription04,
+    Speech_gLocationDescription05,
+    Speech_gLocationDescription06,
+    Speech_gLocationDescription07,
+    Speech_gLocationDescription02,
+    Speech_gLocationDescription02,
+    Speech_gLocationDescription02
+};
+Speech_tCallSignDescription Speech_gCallSignDescription[1] = {
+    {(char *)"all.",
+     {(char *)"dis.", (char *)"cen.", (char *)"cont.", (char *)"hq.", (char *)"cou."},
+     {(char *)"20.", (char *)"25.", (char *)"31.", (char *)"37.", (char *)"38.", (char *)"43.", (char *)"45.", (char *)"46.", (char *)"52.", (char *)"217.", (char *)"223.", (char *)"316.", (char *)"332.", (char *)"355.", (char *)"371."}}
+};
+Speech_tMobileVoiceAttr Speech_gCopAttr[9] = {
+    {1, 0},
+    {2, 0},
+    {4, 0},
+    {1, 5},
+    {2, 5},
+    {4, 5},
+    {1, -5},
+    {2, -5},
+    {4, -5}
+};
 /* Speech::fgSpeech static-member singleton (active engine instance; $gp+0x838=0x8013cd84) */
-Speech            *Speech_fgSpeech;
-/* Speech::fgUndefined static-member buffer (cfront fn-local static _6Speech.fgUndefined,
-   756 B @0x8013cd88). NOT zero scratch -- it is a packed bank-name lookup table: slot[0]
-   is a runtime Speaker* (0 in image), followed by 3-/4-char model abbreviations + full names
-   compared in Speech_CarBankName (strncmp vs +0x2c4/+0x2cc/+0x2d4/+0x2dc). Bytes verified
-   byte-exact vs NFS4.EXE .data. All bytes <=0x7f -> fit signed char, no narrowing. */
+extern Speech *_6Speech_fgSpeech;
+extern Speaker *_6Speech_fgUndefined;
+/* Original data snapshot at 0x8013cd88, including adjacent bank-name strings
+   The live Speaker pointer is _6Speech_fgUndefined, not the snapshot's first word */
 char Speech_fgUndefined[756] = {
     0x00,0x00,0x00,0x00,0x42,0x4d,0x57,0x5a,0x00,0x00,0x00,0x00,
     0x62,0x6d,0x77,0x7a,0x33,0x2e,0x00,0x00,0x62,0x6d,0x77,0x2e,
@@ -98,108 +230,16 @@ void              *gSpeechBankPool;
    NFS4.EXE). Read in StartUp via switch(GameSetup_gData.languageSpeech) -> "%szzzz%s.viv". */
 static char        gSpeechLangSuffix[4][4] = { "fre", "ger", "brt", "eng" };
 
-/* ---- intra-TU forward declarations (auto-emitted, signature-exact) ---- */
+/* Free host callbacks and original static entry points */
 void *Speech_AllocateRAM(int numBytes,char *message);
 void Speech_PurgeRAM(void *memPtr);
-void Speech_HandleRequest(long bank,long localoffset,long size,long event);
-void CarBankName_SetCar(CarBankName *pThis,int carIndex);
-bool CarBank_Check(CarBank *pThis,char *name,u_int id,CarBankName *bankname);
-void Speaker_SetCar(Speaker *pThis,Car_tObj *car);
-void Speech_CountLocations(Speech *pThis);
-u_int Speech_CheckLocationBank(Speech *pThis,LocationBank *locationbank,char *name,int id);
-int LocationBank_Distance(LocationBank *pThis,int slice);
-void * Speech_FindClosestLocationTo(Speech *pThis,LocationBank *bank,int slice);
-void Speaker_FindLocation(Speaker *pThis,Car_tObj *car);
-bool Speech_CheckCallSignBank(Speech *pThis,CallSignBank *bank,char *name,u_int id);
-u_int Speech_CheckMultiBank(Speech *pThis,char *name,u_int id,CarBankName *bn);
-int Speech_CalculateBankSize(Speech *pThis,char *header,CarBankName *bn,long *hoffset,long *hsize);
-void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoffset,long hsize);
-Speech * Speech_ct(Speech *pThis);
+void Speech_HandleRequest(sint32 bank,sint32 localoffset,sint32 size,sint32 event);
 void Speech_Reset(void);
-void Speech_dt(Speech *pThis,u_int __in_chrg);
-u_int Speech_BankPatch(Speech *pThis,int bank,Car_tObj *car);
 int Speech_SubmitRequest(int bank,int localoffset,u_int size);
-void Speaker_Report(Speaker *pThis,Car_tObj *cop);
-void Speaker_Deny(Speaker *pThis);
-void Speaker_Grant(Speaker *pThis);
-void Speaker_Ready(Speaker *pThis,Car_tObj *wing);
-void Speaker_Engage(Speaker *pThis,Car_tObj *perp);
-void Speaker_Lose(Speaker *pThis);
-void Speaker_Accident(Speaker *pThis,int slice);
-void Speaker_Catch(Speaker *pThis,int ticket);
-void Speaker_RoadBlock(Speaker *pThis);
-void Speaker_SpikeBelt(Speaker *pThis);
-void Speaker_Backup(Speaker *pThis);
-void Speaker_ReportBlockade(Speaker *pThis);
-void Speaker_Roger(Speaker *pThis);
-void Speaker_Bullhorn(Speaker *pThis);
-void Speaker_Purge(Speaker *pThis);
-void Speaker_Promote(Speaker *pThis);
 void Speech_Server(void);
-void Speech_SetDelayedStatus(Speech *pThis,Speaker *sub,int delay);
-void DispatchSpeaker_Activate(DispatchSpeaker *pThis,u_int seedupdatecount);
 intptr Speech_Dispatch(void);
-void DispatchSpeaker_Roger(DispatchSpeaker *pThis);
-void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis);
-void DispatchSpeaker_Status(DispatchSpeaker *pThis);
-void MobileSpeaker_Status(MobileSpeaker *pThis);
-void DispatchSpeaker_ClearPerp(DispatchSpeaker *pThis,Car_tObj *car);
-void * DispatchSpeaker_KnownPerp(DispatchSpeaker *pThis,Car_tObj *car);
-void DispatchSpeaker_AddPerp(DispatchSpeaker *pThis,Car_tObj *car);
-void DispatchSpeaker_Report(DispatchSpeaker *pThis,Car_tObj *perp);
-void DispatchSpeaker_Accident(DispatchSpeaker *pThis,int slice);
-void DispatchSpeaker_Deny(DispatchSpeaker *pThis);
-void DispatchSpeaker_Grant(DispatchSpeaker *pThis);
-void DispatchSpeaker_Ready(DispatchSpeaker *pThis,Car_tObj *carObj);
-int Speech_PickVoice(Speech *pThis,Car_tObj *carObj);
-void Speech_GetVoice(Car_tObj *carObj);
-void MobileSpeaker_Activate(MobileSpeaker *pThis,Car_tObj *carObj);
-void MobileSpeaker_ReActivate(MobileSpeaker *pThis);
-Speaker * Speech_FindMobile(Speech *pThis,Car_tObj *carObj);
+int Speech_GetVoice(Car_tObj *carObj);
 intptr Speech_Mobile(Car_tObj *carObj);
-int Speaker_CalcMph(Speaker *pThis,Car_tObj *perp);
-void MobileSpeaker_SetSpeed(MobileSpeaker *pThis,Car_tObj *perp);
-int MobileSpeaker_DistToPerp(MobileSpeaker *pThis);
-void MobileSpeaker_Report(MobileSpeaker *pThis,Car_tObj *perp);
-void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp);
-void MobileSpeaker_Lose(MobileSpeaker *pThis);
-void MobileSpeaker_Accident(MobileSpeaker *pThis,int slice);
-void MobileSpeaker_Catch(MobileSpeaker *pThis,int ticket);
-void MobileSpeaker_RoadBlock(MobileSpeaker *pThis);
-void MobileSpeaker_SpikeBelt(MobileSpeaker *pThis);
-void MobileSpeaker_Backup(MobileSpeaker *pThis);
-void MobileSpeaker_Roger(MobileSpeaker *pThis);
-void MobileSpeaker_Bullhorn(MobileSpeaker *pThis);
-void MobileSpeaker_Purge(MobileSpeaker *pThis);
-void MobileSpeaker_ReportBlockade(MobileSpeaker *pThis);
-Car_tObj * MobileSpeaker_Perp(MobileSpeaker *pThis);
-int MobileSpeaker_Unit(MobileSpeaker *pThis);
-CallSignBank * MobileSpeaker_CallSign(MobileSpeaker *pThis);
-LocationBank * MobileSpeaker_FindClosestLocationTo(MobileSpeaker *pThis,int slice);
-CarBank * MobileSpeaker_GetCarBank(MobileSpeaker *pThis,int carIndex);
-Car_tObj * MobileSpeaker_CarObj(MobileSpeaker *pThis);
-void * MobileSpeaker_IsSuper(MobileSpeaker *pThis);
-CallSignBank * DispatchSpeaker_CallSign(DispatchSpeaker *pThis);
-LocationBank * DispatchSpeaker_FindClosestLocationTo(DispatchSpeaker *pThis,int slice);
-CarBank * DispatchSpeaker_GetCarBank(DispatchSpeaker *pThis,int carIndex);
-void DispatchSpeaker_PurgeStatusSub(DispatchSpeaker *pThis);
-Speaker * DispatchSpeaker_StatusSub(DispatchSpeaker *pThis);
-int DispatchSpeaker_StatusCount(DispatchSpeaker *pThis);
-LocationBank * Speaker_FindClosestLocationTo(Speaker *pThis,int slice);
-CarBank * Speaker_GetCarBank(Speaker *pThis,int carIndex);
-Car_tObj * Speaker_Perp(Speaker *pThis);
-void Speaker_ReActivate(Speaker *pThis);
-Car_tObj * Speaker_CarObj(Speaker *pThis);
-int Speaker_DistToPerp(Speaker *pThis);
-void Speaker_PurgeStatusSub(Speaker *pThis);
-Speaker * Speaker_StatusSub(Speaker *pThis);
-int Speaker_StatusCount(Speaker *pThis);
-void * Speaker_IsSuper(Speaker *pThis);
-void Speaker_ClearPerp(Speaker *pThis,Car_tObj *car);
-void * Speaker_KnownPerp(Speaker *pThis,Car_tObj *car);
-int Speaker_Unit(Speaker *pThis);
-void Speaker_Status(Speaker *pThis);
-
 
 /* ---- Speech_AllocateRAM__FlPc  [SPEECH.CPP:169-170] SLD-VERIFIED ---- */
 void *Speech_AllocateRAM(int numBytes,char *message)
@@ -217,19 +257,18 @@ void Speech_PurgeRAM(void *memPtr)
 }
 
 /* ---- Speech_HandleRequest__Fllll  [SPEECH.CPP:179-180] SLD-VERIFIED ---- */
-void Speech_HandleRequest(long bank,long localoffset,long size,long event)
+void Speech_HandleRequest(sint32 bank,sint32 localoffset,sint32 size,sint32 event)
 
 {
+  (void)event;
   Speech_SubmitRequest(bank,localoffset,size);
   return;
 }
 
 /* ---- SetCar__Q26Speech11CarBankNamei  [SPEECH.CPP:234-246] SLD-VERIFIED ---- */
-void CarBankName_SetCar(CarBankName *pThis,int carIndex)
+void CarBankName::SetCar(int carIndex)
 
 {
-  char*game;
-  Speech_tCarDescription * d;
   int iVar1;
   int iVar2;
   char *pcVar3;
@@ -244,17 +283,16 @@ void CarBankName_SetCar(CarBankName *pThis,int carIndex)
     pSVar4 = pSVar4 + 1;
     pcVar3 = pSVar4->game;
   }
-  pThis->fFull = pSVar4->full;
-  pThis->fMake = pSVar4->make;
-  pThis->fModel = pSVar4->model;
+  this->fFull = pSVar4->full;
+  this->fMake = pSVar4->make;
+  this->fModel = pSVar4->model;
   return;
 }
 
 /* ---- Check__Q26Speech7CarBankPciPQ26Speech11CarBankName  [SPEECH.CPP:257-275] SLD-VERIFIED ---- */
-bool CarBank_Check(CarBank *pThis,char *name,u_int id,CarBankName *bankname)
+bool CarBank::Check(char *name,uint32 id,CarBankName *bankname)
 
 {
-  int match;
   bool bVar1;
   long lVar2;
   int iVar3;
@@ -267,7 +305,7 @@ bool CarBank_Check(CarBank *pThis,char *name,u_int id,CarBankName *bankname)
     bVar4 = iVar3 == 0;
   }
   if (bVar4) {
-    pThis->fFull = id;
+    this->fFull = id;
   }
   bVar1 = false;
   if (bankname->fMake != 0) {
@@ -276,7 +314,7 @@ bool CarBank_Check(CarBank *pThis,char *name,u_int id,CarBankName *bankname)
     bVar1 = iVar3 == 0;
   }
   if (bVar1) {
-    pThis->fMake = id;
+    this->fMake = id;
     bVar4 = true;
   }
   bVar1 = false;
@@ -286,101 +324,88 @@ bool CarBank_Check(CarBank *pThis,char *name,u_int id,CarBankName *bankname)
     bVar1 = iVar3 == 0;
   }
   if (bVar1) {
-    pThis->fModel = id;
+    this->fModel = id;
     bVar4 = true;
   }
   return bVar4;
 }
 
 /* ---- CheckCarBank__6SpeechPQ26Speech7CarBankPciPQ26Speech11CarBankName  [SPEECH.CPP:281-295] SLD-VERIFIED ---- */
-u_int
-Speech_CheckCarBank(Speech *pThis,CarBank *carbank,char *name,u_int id,CarBankName *bankname)
-
+u_int Speech::CheckCarBank(CarBank *carbank,char *name,u_int id,CarBankName *bankname)
 {
-  int match;
-  int i;
   int iVar1;
   int iVar2;
   u_int uVar3;
   
   iVar2 = 0;
   uVar3 = 0;
-  if (0 < pThis->fCarCount) {
+  if (0 < this->fCarCount) {
     do {
-      iVar1 = CarBank_Check(carbank,name,id,bankname);
+      iVar1 = carbank->Check(name,id,bankname);
       if (iVar1 != 0) {
         uVar3 = 1;
       }
       bankname = bankname + 1;
       iVar2 = iVar2 + 1;
       carbank = carbank + 1;
-    } while (iVar2 < pThis->fCarCount);
+    } while (iVar2 < this->fCarCount);
   }
   return uVar3;
 }
 
 /* ---- SetCar__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:301-373] SLD-VERIFIED ---- */
-void Speaker_SetCar(Speaker *pThis,Car_tObj *car)
-
+void Speaker::SetCar(Car_tObj *car)
 {
-  int carcolour;
   int *piVar1;
   int iVar2;
-  int Colour;
   u_int uVar3;
   
   uVar3 = 1 << (car->carInfo->SpeechColour & 0x1fU);
-  piVar1 = (int *)NFS4_VCALL_AUTO((*pThis->_vf)[0x1c].pfn, (int)&(pThis->fPosition).flags + (int)(*pThis->_vf)[0x1c].delta,
-                             car->carIndex);
+  piVar1 = (int *)(this)->GetCarBank(car->carIndex);
   if (*piVar1 == -1) {
-    pThis->fCar = 0;
-    (pThis->fColour).flags = 0;
+    this->fCar = 0;
+    (this->fColour).flags = 0;
   }
   else {
-    if (*(int *)(((int)Speech_fgSpeech) + 0x388) == 0) {
-      (pThis->fColour).flags = uVar3 | 0x78020;
+    if (_6Speech_fgSpeech->fMultiplePerps == 0) {
+      (this->fColour).flags = uVar3 | 0x78020;
     }
     else {
-      (pThis->fColour).flags = uVar3;
+      (this->fColour).flags = uVar3;
     }
     iVar2 = Speech_Dispatch();
     iVar2 = ([&]() -> int {
       DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr_t)iVar2;
-      const __vtbl_ptr_type &entry = (*dispatch->_base_Speaker._vf)[18];
-      return ((void * (*)(DispatchSpeaker *, Car_tObj *))entry.pfn)((DispatchSpeaker *)((char *)dispatch + entry.delta), car) != nullptr;
+
+      return (dispatch)->KnownPerp(car) != nullptr;
     }());
     if (iVar2 == 0) {
-      piVar1 = (int *)NFS4_VCALL_AUTO((*pThis->_vf)[0x1c].pfn, (int)&(pThis->fPosition).flags + (int)(*pThis->_vf)[0x1c].delta,
-                                 car->carIndex);
-      pThis->fCar = *piVar1;
+      piVar1 = (int *)(this)->GetCarBank(car->carIndex);
+      this->fCar = *piVar1;
     }
     else {
-      iVar2 = NFS4_VCALL_AUTO((*pThis->_vf)[0x1c].pfn, (int)&(pThis->fPosition).flags + (int)(*pThis->_vf)[0x1c].delta,car->carIndex
-                        );
-      pThis->fCar = *(int *)(iVar2 + 8);
+      this->fCar = this->GetCarBank(car->carIndex)->fModel;
     }
   }
   return;
 }
 
 /* ---- CountLocations__6Speech  [SPEECH.CPP:521-534] SLD-VERIFIED ---- */
-void Speech_CountLocations(Speech *pThis)
-
+void Speech::CountLocations()
 {
-  Speech_tLocationDescription * d;
   char *pcVar1;
   Speech_tLocationDescription *pSVar2;
   
-  pThis->fLocationCount = 0;
+  this->fLocationCount = 0;
   pSVar2 = Speech_gLocationDescription[GameSetup_gData.track];
   if (pSVar2 != (Speech_tLocationDescription *)0x0) {
     pcVar1 = pSVar2->name;
     while (pcVar1 != (char *)0x0) {
       pSVar2 = pSVar2 + 1;
-      if (0xf < pThis->fLocationCount) {
+      if (0xf < this->fLocationCount) {
         return;
       }
-      pThis->fLocationCount = pThis->fLocationCount + 1;
+      this->fLocationCount = this->fLocationCount + 1;
       pcVar1 = pSVar2->name;
     }
   }
@@ -388,14 +413,10 @@ void Speech_CountLocations(Speech *pThis)
 }
 
 /* ---- CheckLocationBank__6SpeechPQ26Speech12LocationBankPci  [SPEECH.CPP:539-561] SLD-VERIFIED ---- */
-u_int Speech_CheckLocationBank(Speech *pThis,LocationBank *locationbank,char *name,int id)
-
+u_int Speech::CheckLocationBank(LocationBank *locationbank,char *name,int id)
 {
-  int match;
-  Speech_tLocationDescription * d;
-  int i;
-  int bankid;
   short sVar1;
+
   short sVar2;
   long lVar3;
   int iVar4;
@@ -412,7 +433,7 @@ u_int Speech_CheckLocationBank(Speech *pThis,LocationBank *locationbank,char *na
   }
   else {
     psVar7 = &pSVar6->end;
-    for (iVar8 = 0; iVar8 < pThis->fLocationCount; iVar8 = iVar8 + 1) {
+    for (iVar8 = 0; iVar8 < this->fLocationCount; iVar8 = iVar8 + 1) {
       lVar3 = strlen(pSVar6->name);
       iVar4 = strncmp(name,pSVar6->name,lVar3);
       if (iVar4 == 0) {
@@ -434,7 +455,7 @@ u_int Speech_CheckLocationBank(Speech *pThis,LocationBank *locationbank,char *na
 }
 
 /* ---- Distance__Q26Speech12LocationBanki  [SPEECH.CPP:567-587] SLD-VERIFIED ---- */
-int LocationBank_Distance(LocationBank *pThis,int slice)
+int LocationBank::Distance(int slice)
 
 {
   int iVar1;
@@ -442,8 +463,8 @@ int LocationBank_Distance(LocationBank *pThis,int slice)
   int iVar3;
   int iVar4;
   
-  iVar4 = pThis->fStartSlice;
-  iVar2 = pThis->fEndSlice;
+  iVar4 = this->fStartSlice;
+  iVar2 = this->fEndSlice;
   if (iVar2 < iVar4) {
     if ((iVar4 <= slice) || (iVar1 = nfs4_mips_subu_s32(slice, iVar2), slice <= iVar2)) {
       return 0;
@@ -469,29 +490,23 @@ Distance_clampMin:
 }
 
 /* ---- FindClosestLocationTo__6SpeechPQ26Speech12LocationBanki  [SPEECH.CPP:594-618] SLD-VERIFIED ---- */
-void * Speech_FindClosestLocationTo(Speech *pThis,LocationBank *bank,int slice)
-
+void * Speech::FindClosestLocationTo(LocationBank *bank,int slice)
 {
   int iVar1;
-  int distance;
-  LocationBank *locationbank;
   LocationBank *this_00;
-  int i;
   int iVar2;
-  int closestdistance;
   int iVar3;
-  LocationBank *closestbank;
   LocationBank *pLVar4;
   
-  if (pThis->fLocationCount == 0) {
+  if (this->fLocationCount == 0) {
     pLVar4 = (LocationBank *)0x0;
   }
   else {
     pLVar4 = (LocationBank *)0x0;
     iVar3 = 10000;
-    for (iVar2 = 0; iVar2 < pThis->fLocationCount; iVar2 = iVar2 + 1) {
+    for (iVar2 = 0; iVar2 < this->fLocationCount; iVar2 = iVar2 + 1) {
       this_00 = bank + iVar2;
-      if ((this_00->fBankId != -1) && (iVar1 = LocationBank_Distance(this_00,slice), iVar1 < iVar3)
+      if ((this_00->fBankId != -1) && (iVar1 = this_00->Distance(slice), iVar1 < iVar3)
          ) {
         iVar3 = iVar1;
         pLVar4 = this_00;
@@ -502,8 +517,7 @@ void * Speech_FindClosestLocationTo(Speech *pThis,LocationBank *bank,int slice)
 }
 
 /* ---- FindLocation__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:624-788] SLD-VERIFIED ---- */
-void Speaker_FindLocation(Speaker *pThis,Car_tObj *car)
-
+void Speaker::FindLocation(Car_tObj *car)
 {
   int carPos_x;
   int loc_x_diff;
@@ -534,30 +548,29 @@ FindLoc_noWrapCalc:
       iVar1 = nfs4_mips_subu_s32(nfs4_mips_addu_s32((int)(car->N).simRoadInfo.slice, best_dist / 0x60000), gNumSlices);
     }
   }
-  typedef LocationBank *(NFS4_THISCALL *FindLocationCall)(void *, int);
-  this_00 = ((FindLocationCall)(*pThis->_vf)[0x1d].pfn)
-    ((char *)pThis + (*pThis->_vf)[0x1d].delta, iVar1);
+
+  this_00 = this->FindClosestLocationTo(iVar1);
   if (this_00 == (LocationBank *)0x0) {
-    (pThis->fDistance).flags = 0;
-    (pThis->fPosition).flags = 0;
-    pThis->fLocation = nfs4_mips_bits_to_s32((unsigned int)PsyQ_readRam32(8));
+    (this->fDistance).flags = 0;
+    (this->fPosition).flags = 0;
+    this->fLocation = nfs4_mips_bits_to_s32((unsigned int)PsyQ_readRam32(8));
     return;
   }
-  carPos_z = LocationBank_Distance(this_00,(int)(car->N).simRoadInfo.slice);
-  iVar1 = LocationBank_Distance(this_00,iVar1);
+  carPos_z = this_00->Distance((int)(car->N).simRoadInfo.slice);
+  iVar1 = this_00->Distance(iVar1);
   loc_idx = 4;
   if (iVar1 == 0) {
-    (pThis->fDistance).flags = 0;
+    (this->fDistance).flags = 0;
     goto FindLoc_assignIdx;
   }
   loc_z_diff = __ltdf2(__floatsidf(iVar1), psx_double_value(0x4040AAAAAAAAAAABULL));
   if (loc_z_diff < 0) {
-    (pThis->fDistance).flags = 0;
+    (this->fDistance).flags = 0;
     if (nfs4_mips_addu_s32(iVar1, 2) < carPos_z) {
-      (pThis->fPosition).flags = 9;
+      (this->fPosition).flags = 9;
     }
     if (nfs4_mips_addu_s32(iVar1, -2) < carPos_z) {
-      (pThis->fPosition).flags = 8;
+      (this->fPosition).flags = 8;
       goto FindLoc_assignAndReturn;
     }
 FindLoc_setIdxDefault:
@@ -566,52 +579,51 @@ FindLoc_setIdxDefault:
   else {
     if (GameSetup_gData.measurement == 1) {
       if (iVar1 < 0xa6) {
-        (pThis->fDistance).flags = 8;
+        (this->fDistance).flags = 8;
         if (nfs4_mips_addu_s32(iVar1, -2) < carPos_z) {
-          (pThis->fPosition).flags = 0x10;
+          (this->fPosition).flags = 0x10;
           goto FindLoc_assignAndReturn;
         }
       }
       else {
         loc_radius = 0x10;
-        (pThis->fDistance).flags = 0x10;
+        (this->fDistance).flags = 0x10;
         if (nfs4_mips_addu_s32(iVar1, -2) < carPos_z) {
 FindLoc_setRadiusReturn:
-          (pThis->fPosition).flags = loc_radius;
+          (this->fPosition).flags = loc_radius;
           goto FindLoc_assignAndReturn;
         }
       }
       goto FindLoc_setIdxDefault;
     }
     if (iVar1 < 0x86) {
-      (pThis->fDistance).flags = 1;
+      (this->fDistance).flags = 1;
       if (carPos_z <= nfs4_mips_addu_s32(iVar1, -2)) goto FindLoc_setIdxDefault;
       loc_idx = 0x10;
     }
     else {
       loc_radius = 2;
       if (iVar1 < 0x10c) {
-        (pThis->fDistance).flags = 2;
+        (this->fDistance).flags = 2;
         if (carPos_z <= nfs4_mips_addu_s32(iVar1, -2)) goto FindLoc_setRadiusReturn;
         loc_idx = 0x10;
       }
       else {
-        (pThis->fDistance).flags = 4;
+        (this->fDistance).flags = 4;
         loc_idx = 0x10;
         if (carPos_z <= nfs4_mips_addu_s32(iVar1, -2)) goto FindLoc_setIdxDefault;
       }
     }
   }
 FindLoc_assignIdx:
-  (pThis->fPosition).flags = loc_idx;
+  (this->fPosition).flags = loc_idx;
 FindLoc_assignAndReturn:
-  pThis->fLocation = this_00->fBankId;
+  this->fLocation = this_00->fBankId;
   return;
 }
 
 /* ---- CheckCallSignBank__6SpeechPQ26Speech12CallSignBankPci  [SPEECH.CPP:852-884] SLD-VERIFIED ---- */
-bool Speech_CheckCallSignBank(Speech *pThis,CallSignBank *bank,char *name,u_int id)
-
+bool Speech::CheckCallSignBank(CallSignBank *bank,char *name,u_int id)
 {
   long lVar1;
   int iVar2;
@@ -644,45 +656,44 @@ bool Speech_CheckCallSignBank(Speech *pThis,CallSignBank *bank,char *name,u_int 
 }
 
 /* ---- CheckMultiBank__6SpeechPciPQ26Speech11CarBankName  [SPEECH.CPP:889-924] SLD-VERIFIED ---- */
-u_int Speech_CheckMultiBank(Speech *pThis,char *name,u_int id,CarBankName *bn)
-
+u_int Speech::CheckMultiBank(char *name,u_int id,CarBankName *bn)
 {
   int iVar1;
   
   iVar1 = strncmp(name,(char *)(Speech_fgUndefined + 0x2c4),5);
   if (iVar1 == 0) {
-    return Speech_CheckCallSignBank(pThis,&pThis->fCallSignBank.Dispatch,name + 5,id);
+    return (this)->CheckCallSignBank(&this->fCallSignBank.Dispatch,name + 5,id);
   }
   iVar1 = strncmp(name,(char *)(Speech_fgUndefined + 0x2cc),7);
   if (iVar1 == 0) {
-    return Speech_CheckCarBank(pThis,pThis->fCarBank.Dispatch,name + 7,id,bn);
+    return (this)->CheckCarBank(this->fCarBank.Dispatch,name + 7,id,bn);
   }
   iVar1 = strncmp(name,"j:location\\",0xb);
   if (iVar1 == 0) {
-    return Speech_CheckLocationBank(pThis,pThis->fLocationBank.Dispatch,name + 0xb,id);
+    return (this)->CheckLocationBank(this->fLocationBank.Dispatch,name + 0xb,id);
   }
   iVar1 = strncmp(name,(char *)(Speech_fgUndefined + 0x2d4),6);
   if (iVar1 == 0) {
-    return Speech_CheckCallSignBank(pThis,&pThis->fCallSignBank.Mobile,name + 6,id);
+    return (this)->CheckCallSignBank(&this->fCallSignBank.Mobile,name + 6,id);
   }
   iVar1 = strncmp(name,"j:ccars\\",8);
   if (iVar1 == 0) {
-    return Speech_CheckCarBank(pThis,pThis->fCarBank.Mobile,name + 8,id,bn);
+    return (this)->CheckCarBank(this->fCarBank.Mobile,name + 8,id,bn);
   }
   iVar1 = strncmp(name,"j:clocaton\\",0xb);
   if (iVar1 == 0) {
-    return Speech_CheckLocationBank(pThis,pThis->fLocationBank.Mobile,name + 0xb,id);
+    return (this)->CheckLocationBank(this->fLocationBank.Mobile,name + 0xb,id);
   }
   iVar1 = strncmp(name,(char *)(Speech_fgUndefined + 0x2dc),7);
   if (iVar1 == 0) {
-    pThis->fBlpClpBank = id;
+    this->fBlpClpBank = id;
   }
   else {
     iVar1 = strncmp(name,"j:silenc.",9);
     if (iVar1 != 0) {
       return 1;
     }
-    pThis->fStaticBank = id;
+    this->fStaticBank = id;
   }
   return 1;
 }
@@ -694,8 +705,7 @@ static u_int Speech_ReadBE32(const u_char *bytes)
          ((u_int)bytes[2] << 8) | (u_int)bytes[3];
 }
 
-int Speech_CalculateBankSize(Speech *pThis,char *header,CarBankName *bn,long *hoffset,long *hsize)
-
+int Speech::CalculateBankSize(char *header,CarBankName *bn,long *hoffset,long *hsize)
 {
   int eventOffset;
   int eventSize;
@@ -719,7 +729,7 @@ int Speech_CalculateBankSize(Speech *pThis,char *header,CarBankName *bn,long *ho
           *hoffset = offset;
         }
         *hsize = (offset + size) - *hoffset;
-        if (Speech_CheckMultiBank(pThis,name,bankCount,bn) != 0) {
+        if ((this)->CheckMultiBank(name,bankCount,bn) != 0) {
           bankCount = bankCount + 1;
           totalSize = totalSize + size;
         }
@@ -727,32 +737,31 @@ int Speech_CalculateBankSize(Speech *pThis,char *header,CarBankName *bn,long *ho
       entry = (u_char *)end + 1;
     }
   }
-  pThis->fBankCount = bankCount;
+  this->fBankCount = bankCount;
   return totalSize;
 }
 
 /* ---- LoadBankHeaders__6SpeechPcPQ26Speech11CarBankNamell  [SPEECH.CPP:990-1102] SLD-VERIFIED ---- */
-void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoffset,long hsize)
-
+void Speech::LoadBankHeaders(char *header,CarBankName *bn,long hoffset,long hsize)
 {
   int eventOffset;
   int eventSize;
   int headerBank = 0;
   int nextDataBank = 0;
-  u_char *eventData = (u_char *)(pThis->fBankOffset + pThis->fBankCount);
+  u_char *eventData = (u_char *)(this->fBankOffset + this->fBankCount);
   u_int fileCount = Speech_ReadBE32((u_char *)header + 8);
   u_char *entry = (u_char *)header + 0x10;
 
   locatebigentry(header,"j:eventdat\\event.dat",0,&eventOffset,&eventSize);
-  FILE_readsync(pThis->fFileHandle,eventOffset,(intptr)eventData,eventSize,100);
+  FILE_readsync(this->fFileHandle,eventOffset,(intptr)eventData,eventSize,100);
   SPCH_ResolveData((unsigned short *)eventData);
   u_char *bankData = eventData + eventSize;
   u_char *headerData = (u_char *)reservememadr("spch temp",hsize,0x10);
-  FILE_readsync(pThis->fFileHandle,hoffset,(intptr)headerData,hsize,100);
-  char **bankNames = (char **)reservememadr("spch temp",pThis->fBankCount * sizeof(char *),0x10);
-  for (int i = 0; i < pThis->fBankCount; i = i + 1) {
+  FILE_readsync(this->fFileHandle,hoffset,(intptr)headerData,hsize,100);
+  char **bankNames = (char **)reservememadr("spch temp",this->fBankCount * sizeof(char *),0x10);
+  for (int i = 0; i < this->fBankCount; i = i + 1) {
     bankNames[i] = 0;
-    pThis->fBankOffset[i] = 0;
+    this->fBankOffset[i] = 0;
   }
   for (u_int file = 0; file < fileCount; file = file + 1) {
     systemtask(0);
@@ -766,7 +775,7 @@ void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoff
     char *end = name + nameLength;
     if (4 < nameLength) {
       bool isHeader = (end[-4] == '.') && (end[-3] == 'h') && (end[-2] == 'd') && (end[-1] == 'r');
-      if (isHeader && Speech_CheckMultiBank(pThis,name,headerBank,bn) != 0) {
+      if (isHeader && (this)->CheckMultiBank(name,headerBank,bn) != 0) {
         headerBank = headerBank + 1;
         memcpy(bankData,headerData + offset - hoffset,size);
         int bankId = SPCH_AddBank((intptr)bankData);
@@ -776,15 +785,15 @@ void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoff
       else {
         bool isData = (end[-4] == '.') && (end[-3] == 'd') && (end[-2] == 'a') && (end[-1] == 't');
         if (isData) {
-          if ((nextDataBank < pThis->fBankCount) && (bankNames[nextDataBank] != 0) &&
+          if ((nextDataBank < this->fBankCount) && (bankNames[nextDataBank] != 0) &&
               (strncmp(name,bankNames[nextDataBank],nameLength - 3) == 0)) {
-            pThis->fBankOffset[nextDataBank] = offset;
+            this->fBankOffset[nextDataBank] = offset;
             nextDataBank = nextDataBank + 1;
           }
           else {
-            for (int i = 0; i < pThis->fBankCount; i = i + 1) {
+            for (int i = 0; i < this->fBankCount; i = i + 1) {
               if ((bankNames[i] != 0) && (strncmp(name,bankNames[i],nameLength - 3) == 0)) {
-                pThis->fBankOffset[i] = offset;
+                this->fBankOffset[i] = offset;
                 nextDataBank = i + 1;
               }
             }
@@ -800,7 +809,7 @@ void Speech_LoadBankHeaders(Speech *pThis,char *header,CarBankName *bn,long hoff
 }
 
 /* ---- __6Speech  [SPEECH.CPP:1110-1228] SLD-VERIFIED ---- */
-Speech * Speech_ct(Speech *pThis)
+Speech::Speech()
 
 {
   bool bVar1;
@@ -819,33 +828,26 @@ Speech * Speech_ct(Speech *pThis)
   long local_1c;
   
   for (iVar8 = 0; iVar8 < 9; iVar8 = iVar8 + 1) {
-    pThis->fCarBank.Mobile[iVar8].fFull = -1;
-    pThis->fCarBank.Mobile[iVar8].fMake = -1;
-    pThis->fCarBank.Mobile[iVar8].fModel = -1;
-    pThis->fCarBank.Dispatch[iVar8].fFull = -1;
-    pThis->fCarBank.Dispatch[iVar8].fMake = -1;
-    pThis->fCarBank.Dispatch[iVar8].fModel = -1;
+    this->fCarBank.Mobile[iVar8].fFull = -1;
+    this->fCarBank.Mobile[iVar8].fMake = -1;
+    this->fCarBank.Mobile[iVar8].fModel = -1;
+    this->fCarBank.Dispatch[iVar8].fFull = -1;
+    this->fCarBank.Dispatch[iVar8].fMake = -1;
+    this->fCarBank.Dispatch[iVar8].fModel = -1;
   }
   for (iVar8 = 0; iVar8 < 16; iVar8 = iVar8 + 1) {
-    pThis->fLocationBank.Mobile[iVar8].fBankId = -1;
-    pThis->fLocationBank.Dispatch[iVar8].fBankId = -1;
+    this->fLocationBank.Mobile[iVar8].fBankId = -1;
+    this->fLocationBank.Dispatch[iVar8].fBankId = -1;
   }
-  dispatch = (DispatchSpeaker *)__builtin_new(sizeof(DispatchSpeaker));
-  dispatch->_base_Speaker._vf = (__vtbl_ptr_type (*)[31])Speaker_vtable;
-  dispatch->_base_Speaker.fSub = 0;
-  dispatch->_base_Speaker._vf = (__vtbl_ptr_type (*)[31])DispatchSpeaker_vtable;
-  pThis->fDispatch = dispatch;
+  dispatch = new(__builtin_new(sizeof(DispatchSpeaker))) DispatchSpeaker();
+  this->fDispatch = dispatch;
   for (iVar8 = 0; iVar10 = 0, iVar8 < 4; iVar8 = iVar8 + 1) {
-    mobile = (MobileSpeaker *)__builtin_new(sizeof(MobileSpeaker));
-    mobile->_base_Speaker._vf = (__vtbl_ptr_type (*)[31])Speaker_vtable;
-    mobile->_base_Speaker.fSub = 0;
-    mobile->_base_Speaker._vf = (__vtbl_ptr_type (*)[31])MobileSpeaker_vtable;
-    mobile->fCarObj = 0;
-    pThis->fMobile[iVar8] = mobile;
+    mobile = new(__builtin_new(sizeof(MobileSpeaker))) MobileSpeaker();
+    this->fMobile[iVar8] = mobile;
   }
   iVar9 = 0;
-  pThis->fFileOpen = 0;
-  pThis->fBankOffset = 0;
+  this->fFileOpen = 0;
+  this->fBankOffset = 0;
   iVar8 = 0;
   if (0 < GameSetup_gData.numCars) {
     do {
@@ -860,23 +862,23 @@ Speech * Speech_ct(Speech *pThis)
     } while (iVar9 < GameSetup_gData.numCars);
   }
   if ((iVar10 == 0) && (1 < iVar8)) {
-    pThis->fMultiplePerps = 1;
+    this->fMultiplePerps = 1;
   }
   else {
-    pThis->fMultiplePerps = 0;
+    this->fMultiplePerps = 0;
   }
   iVar8 = 0;
   gettick();
   bVar1 = 0 < GameSetup_gData.numCars;
-  pThis->fCarCount = GameSetup_gData.numCars;
+  this->fCarCount = GameSetup_gData.numCars;
   if (bVar1) {
     do {
-      CarBankName_SetCar(&bankNames[iVar8],iVar8);
+      bankNames[iVar8].SetCar(iVar8);
       iVar8 = iVar8 + 1;
-    } while (iVar8 < pThis->fCarCount);
+    } while (iVar8 < this->fCarCount);
   }
-  Speech_CountLocations(pThis);
-  pThis->fBankCount = 0;
+  (this)->CountLocations();
+  this->fBankCount = 0;
   iVar8 = 0;
   if (GameSetup_gData.languageSpeech == 2) {
     SpeechLanguage = gSpeechLangSuffix[0] /* @0x8013d06c "fre" */;
@@ -900,25 +902,25 @@ Speech * Speech_ct(Speech *pThis)
   local_20 = 0;
   local_1c = 0;
   if (header != (void *)0x0) {
-    iVar8 = Speech_CalculateBankSize(pThis,(char *)header,bankNames,&local_20,&local_1c);
+    iVar8 = (this)->CalculateBankSize((char *)header,bankNames,&local_20,&local_1c);
   }
   if (0 < iVar8) {
-    pThis->fBankOffset = (long *)reservememadr("spch index",pThis->fBankCount * sizeof(long) + iVar8,0);
+    this->fBankOffset = (long *)reservememadr("spch index",this->fBankCount * sizeof(long) + iVar8,0);
   }
-  if (pThis->fBankOffset != 0) {
+  if (this->fBankOffset != 0) {
     uVar11 = SPCH_GetSampleDataRate(0x2b11,0x10,2);
-    SPCH_Init((intptr)Speech_HandleRequest,0x12345678,uVar11);
-    SPCH_InitBankMem((intptr)Speech_AllocateRAM,
-               (intptr)Speech_PurgeRAM,pThis->fBankCount);
-    iVar8 = FILE_opensync(acStack_88,1,100,&pThis->fFileHandle);
-    pThis->fFileOpen = (u_int)(iVar8 != 0);
-    Speech_LoadBankHeaders(pThis,(char *)header,bankNames,local_20,local_1c);
+    SPCH_Init(Speech_HandleRequest,0x12345678,uVar11);
+    SPCH_InitBankMem(Speech_AllocateRAM,
+               Speech_PurgeRAM,this->fBankCount);
+    iVar8 = FILE_opensync(acStack_88,1,100,&this->fFileHandle);
+    this->fFileOpen = (u_int)(iVar8 != 0);
+    (this)->LoadBankHeaders((char *)header,bankNames,local_20,local_1c);
   }
   if (header != (void *)0x0) {
     purgememadr(header);
   }
   gettick();
-  return pThis;
+  return;
 }
 
 /* ---- Reset__6Speech  [SPEECH.CPP:1248-1261] SLD-VERIFIED ---- */
@@ -930,9 +932,9 @@ void Speech_Reset(void)
   int iVar6;
   u_int uVar7;
   
-  if (Speech_fgSpeech != 0) {
+  if (_6Speech_fgSpeech != 0) {
     for (iVar6 = 0; iVar6 < 4; iVar6 = iVar6 + 1) {
-      Speech_fgSpeech->fMobile[iVar6]->fCarObj = 0;
+      _6Speech_fgSpeech->fMobile[iVar6]->fCarObj = 0;
     }
     SPCH_ClearEventQueue();
     randtemp = fastRandom * randSeed;
@@ -943,51 +945,45 @@ void Speech_Reset(void)
     randtemp = (uVar4 & 0xffff) * randSeed;
     uVar7 = (randtemp & 0xffff00) >> 8;
     fastRandom = randtemp & 0xffff;
-    Speech_fgSpeech->fCopCount = ((uVar3 & 0xffff00) >> 8) % 9;
-    Speech_fgSpeech->fSuperCount = ((uVar4 & 0xffff00) >> 8) % 6;
-    DispatchSpeaker_Activate(Speech_fgSpeech->fDispatch,
-               uVar7 + ((uVar7 / 7 + ((uVar7 - uVar7 / 7) >> 1)) >> 2) * -7);
+    _6Speech_fgSpeech->fCopCount = ((uVar3 & 0xffff00) >> 8) % 9;
+    _6Speech_fgSpeech->fSuperCount = ((uVar4 & 0xffff00) >> 8) % 6;
+    (_6Speech_fgSpeech->fDispatch)->Activate(uVar7 + ((uVar7 / 7 + ((uVar7 - uVar7 / 7) >> 1)) >> 2) * -7);
   }
   return;
 }
 
 /* ---- _._6Speech  [SPEECH.CPP:1267-1283] SLD-VERIFIED ---- */
-void Speech_dt(Speech *pThis,u_int __in_chrg)
+Speech::~Speech()
 
 {
-  int i;
   int iVar3;
   
-  if (pThis->fBankOffset != 0) {
+  if (this->fBankOffset != 0) {
     SPCH_Deinit();
-    purgememadr(pThis->fBankOffset);
+    purgememadr(this->fBankOffset);
   }
-  if (pThis->fFileOpen != 0) {
-    FILE_closesync(pThis->fFileHandle,100);   /* oracle 0x85b84/b88: a1=0x64 (was dropped) */
+  if (this->fFileOpen != 0) {
+    FILE_closesync(this->fFileHandle,100);   /* oracle 0x85b84/b88: a1=0x64 (was dropped) */
   }
   iVar3 = 0;
-  __builtin_delete(pThis->fDispatch);
+  __builtin_delete(this->fDispatch);
   do {
-    __builtin_delete(pThis->fMobile[iVar3]);
+    __builtin_delete(this->fMobile[iVar3]);
     iVar3 = iVar3 + 1;
   } while (iVar3 < 4);
-  if ((__in_chrg & 1) != 0) {
-    __builtin_delete(pThis);
-  }
   return;
 }
 
 /* ---- BankPatch__6SpeechlP8Car_tObj  [SPEECH.CPP:1297-1307] SLD-VERIFIED ---- */
-u_int Speech_BankPatch(Speech *pThis,int bank,Car_tObj *car)
-
+u_int Speech::BankPatch(int bank,Car_tObj *car)
 {
   u_int uVar1;
   
-  if (bank == pThis->fStaticBank) {
+  if (bank == this->fStaticBank) {
     return 0x15;
   }
   uVar1 = 0xffffffff;
-  if ((bank == pThis->fBlpClpBank) && (uVar1 = 0x13, car != 0)) {
+  if ((bank == this->fBlpClpBank) && (uVar1 = 0x13, car != 0)) {
     uVar1 = 0x14;
   }
   return uVar1;
@@ -1001,23 +997,23 @@ int Speech_SubmitRequest(int bank,int localoffset,u_int size)
   int patch;
   int offset;
   
-  if (Speech_fgSpeech == 0) {
+  if (_6Speech_fgSpeech == 0) {
     offset = 0;
   }
   else {
-    Speech_fgSpeech->fDispatch->fStatusSub = 0;
-    Speech_fgSpeech->fDispatch->fStatusCount = 0x200;
-    car = Speech_fgSpeech->fSpeakerCar;
-    patch = Speech_BankPatch(Speech_fgSpeech,bank,car);
-    if ((bank < 0) || (Speech_fgSpeech->fBankCount <= bank)) {
+    _6Speech_fgSpeech->fDispatch->fStatusSub = 0;
+    _6Speech_fgSpeech->fDispatch->fStatusCount = 0x200;
+    car = _6Speech_fgSpeech->fSpeakerCar;
+    patch = (_6Speech_fgSpeech)->BankPatch(bank,car);
+    if ((bank < 0) || (_6Speech_fgSpeech->fBankCount <= bank)) {
       offset = 0;
     }
     else {
-      offset = Speech_fgSpeech->fBankOffset[bank];
+      offset = _6Speech_fgSpeech->fBankOffset[bank];
     }
     if (patch < 0) {
       if (offset != 0) {
-        CopSpeak_DirectRequest(Speech_fgSpeech->fFileHandle,offset + localoffset,size,car,0);
+        CopSpeak_DirectRequest(_6Speech_fgSpeech->fFileHandle,offset + localoffset,size,car,0);
       }
       offset = offset + localoffset;
     }
@@ -1030,130 +1026,112 @@ int Speech_SubmitRequest(int bank,int localoffset,u_int size)
 }
 
 /* ---- Report__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:1352-1356] SLD-VERIFIED ---- */
-void Speaker_Report(Speaker *pThis,Car_tObj *cop)
-
+void Speaker::Report(Car_tObj *cop)
 {
   return;
 }
 
 /* ---- Deny__Q26Speech7Speaker  [SPEECH.CPP:1363-1367] SLD-VERIFIED ---- */
-void Speaker_Deny(Speaker *pThis)
-
+void Speaker::Deny()
 {
   return;
 }
 
 /* ---- Grant__Q26Speech7Speaker  [SPEECH.CPP:1371-1375] SLD-VERIFIED ---- */
-void Speaker_Grant(Speaker *pThis)
-
+void Speaker::Grant()
 {
   return;
 }
 
 /* ---- Ready__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:1379-1383] SLD-VERIFIED ---- */
-void Speaker_Ready(Speaker *pThis,Car_tObj *wing)
-
+void Speaker::Ready(Car_tObj *wing)
 {
   return;
 }
 
 /* ---- Engage__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:1394-1398] SLD-VERIFIED ---- */
-void Speaker_Engage(Speaker *pThis,Car_tObj *perp)
-
+void Speaker::Engage(Car_tObj *perp)
 {
   return;
 }
 
 /* ---- Lose__Q26Speech7Speaker  [SPEECH.CPP:1402-1406] SLD-VERIFIED ---- */
-void Speaker_Lose(Speaker *pThis)
-
+void Speaker::Lose()
 {
   return;
 }
 
 /* ---- Accident__Q26Speech7Speakeri  [SPEECH.CPP:1410-1414] SLD-VERIFIED ---- */
-void Speaker_Accident(Speaker *pThis,int slice)
-
+void Speaker::Accident(int slice)
 {
   return;
 }
 
 /* ---- Catch__Q26Speech7Speakeri  [SPEECH.CPP:1418-1422] SLD-VERIFIED ---- */
-void Speaker_Catch(Speaker *pThis,int ticket)
-
+void Speaker::Catch(int ticket)
 {
   return;
 }
 
 /* ---- RoadBlock__Q26Speech7Speaker  [SPEECH.CPP:1426-1430] SLD-VERIFIED ---- */
-void Speaker_RoadBlock(Speaker *pThis)
-
+void Speaker::RoadBlock()
 {
   return;
 }
 
 /* ---- SpikeBelt__Q26Speech7Speaker  [SPEECH.CPP:1434-1438] SLD-VERIFIED ---- */
-void Speaker_SpikeBelt(Speaker *pThis)
-
+void Speaker::SpikeBelt()
 {
   return;
 }
 
 /* ---- Backup__Q26Speech7Speaker  [SPEECH.CPP:1442-1446] SLD-VERIFIED ---- */
-void Speaker_Backup(Speaker *pThis)
-
+void Speaker::Backup()
 {
   return;
 }
 
 /* ---- ReportBlockade__Q26Speech7Speaker  [SPEECH.CPP:1450-1454] SLD-VERIFIED ---- */
-void Speaker_ReportBlockade(Speaker *pThis)
-
+void Speaker::ReportBlockade()
 {
   return;
 }
 
 /* ---- Roger__Q26Speech7Speaker  [SPEECH.CPP:1459-1463] SLD-VERIFIED ---- */
-void Speaker_Roger(Speaker *pThis)
-
+void Speaker::Roger()
 {
   return;
 }
 
 /* ---- Bullhorn__Q26Speech7Speaker  [SPEECH.CPP:1467-1471] SLD-VERIFIED ---- */
-void Speaker_Bullhorn(Speaker *pThis)
-
+void Speaker::Bullhorn()
 {
   return;
 }
 
 /* ---- Purge__Q26Speech7Speaker  [SPEECH.CPP:1475-1479] SLD-VERIFIED ---- */
-void Speaker_Purge(Speaker *pThis)
-
+void Speaker::Purge()
 {
   return;
 }
 
 /* ---- Promote__Q26Speech7Speaker  [SPEECH.CPP:1490-1503] SLD-VERIFIED ---- */
-void Speaker_Promote(Speaker *pThis)
-
+void Speaker::Promote()
 {
-  Speaker * Sub;
   Speaker *pSVar1;
-  int iVar2;
-  Speaker *Super;
+  Speaker *dispatch;
   Speaker *pSVar3;
   
   pSVar1 = (Speaker *)Speech_Dispatch();
   do {
     pSVar3 = pSVar1;
     pSVar1 = pSVar3->fSub;
-  } while (pSVar1 != (Speaker *)0x0 && pSVar1 != pThis);
-  pSVar3->fSub = pThis->fSub;
-  iVar2 = Speech_Dispatch();
-  pThis->fSub = *(Speaker **)(iVar2 + 0x48);
-  iVar2 = Speech_Dispatch();
-  *(Speaker **)(iVar2 + 0x48) = pThis;
+  } while (pSVar1 != (Speaker *)0x0 && pSVar1 != this);
+  pSVar3->fSub = this->fSub;
+  dispatch = (Speaker *)Speech_Dispatch();
+  this->fSub = dispatch->fSub;
+  dispatch = (Speaker *)Speech_Dispatch();
+  dispatch->fSub = this;
   return;
 }
 
@@ -1162,39 +1140,36 @@ void Speech_Server(void)
 
 {
   Speaker *speaker = (Speaker *)Speech_Dispatch();
-  __vtbl_ptr_type *entry = &(*speaker->_vf)[2];
-  NFS4_VCALL0(entry->pfn,(u_char *)speaker + entry->delta);
+
+  (speaker)->Status();
   return;
 }
 
 /* ---- SetDelayedStatus__6SpeechPQ26Speech7Speakeri  [SPEECH.CPP:1546-1548] SLD-VERIFIED ---- */
-void Speech_SetDelayedStatus(Speech *pThis,Speaker *sub,int delay)
-
+void Speech::SetDelayedStatus(Speaker *sub,int delay)
 {
-  Speech_fgSpeech->fDispatch->fStatusSub = sub;
-  Speech_fgSpeech->fDispatch->fStatusCount = delay;
+  _6Speech_fgSpeech->fDispatch->fStatusSub = sub;
+  _6Speech_fgSpeech->fDispatch->fStatusCount = delay;
   return;
 }
 
 /* ---- Activate__Q26Speech15DispatchSpeakeri  [SPEECH.CPP:1554-1571] SLD-VERIFIED ---- */
-void DispatchSpeaker_Activate(DispatchSpeaker *pThis,u_int seedupdatecount)
-
+void DispatchSpeaker::Activate(u_int seedupdatecount)
 {
-  __vtbl_ptr_type *entry = &(*pThis->_base_Speaker._vf)[30];
-  CallSignBank *callSign = (CallSignBank *)NFS4_VCALL_PTR0(
-      entry->pfn,(u_char *)pThis + entry->delta);
 
-  pThis->_base_Speaker.fFrom = callSign->fDispatch;
-  pThis->_base_Speaker.fConfirm.flags = 0xff;
-  pThis->_base_Speaker.fPerpName.flags = 0xf;
-  pThis->_base_Speaker.fSub = 0;
-  pThis->_base_Speaker.fReverse.flags = GameSetup_gData.track & 1;
-  pThis->fPerp[1] = 0;
-  pThis->fPerp[0] = 0;
-  pThis->fStatusCount = 0x200;
-  pThis->fStatusSub = 0;
-  pThis->fUpdateCount = seedupdatecount;
-  pThis->_base_Speaker.fHavePerp = 0;
+  CallSignBank *callSign = (CallSignBank *)(this)->CallSign();
+
+  this->fFrom = callSign->fDispatch;
+  this->fConfirm.flags = 0xff;
+  this->fPerpName.flags = 0xf;
+  this->fSub = 0;
+  this->fReverse.flags = GameSetup_gData.track & 1;
+  this->fPerp[1] = 0;
+  this->fPerp[0] = 0;
+  this->fStatusCount = 0x200;
+  this->fStatusSub = 0;
+  this->fUpdateCount = seedupdatecount;
+  this->fHavePerp = 0;
   return;
 }
 
@@ -1202,30 +1177,28 @@ void DispatchSpeaker_Activate(DispatchSpeaker *pThis,u_int seedupdatecount)
 intptr Speech_Dispatch(void)
 
 {
-  Speaker *result;
   
-  if ((Speech_fgSpeech != 0) && (Speech_fgSpeech->fBankOffset != 0)) {
-    return (intptr)Speech_fgSpeech->fDispatch;
+  if ((_6Speech_fgSpeech != 0) && (_6Speech_fgSpeech->fBankOffset != 0)) {
+    return (intptr)_6Speech_fgSpeech->fDispatch;
   }
-  return (intptr)*(Speaker **)Speech_fgUndefined;
+  return (intptr)_6Speech_fgUndefined;
 }
 
 /* ---- Roger__Q26Speech15DispatchSpeaker  [SPEECH.CPP:1592-1629] SLD-VERIFIED ---- */
-void DispatchSpeaker_Roger(DispatchSpeaker *pThis)
-
+void DispatchSpeaker::Roger()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub;
   Car_tObj *perp;
   CallSignBank *callSign;
-  __vtbl_ptr_type *entry;
+
   int unit;
 
-  Speech_fgSpeech->fSpeakerCar = 0;
+  _6Speech_fgSpeech->fSpeakerCar = 0;
   sub = base->fSub;
   if (sub != 0) {
-    entry = &(*sub->_vf)[27];
-    perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
+
+    perp = (Car_tObj *)(sub)->Perp();
   }
   else {
     perp = 0;
@@ -1234,28 +1207,28 @@ void DispatchSpeaker_Roger(DispatchSpeaker *pThis)
     SPCHNFS_D_A_CONFIRM(&base->fConfirm);
   }
   else if (sub->fArrest.flags != 0) {
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*sub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (sub)->Unit();
     base->fTo = callSign->fMobile[unit];
     SPCHNFS_D_C_PERP_APPREHENSION_REPLY(base->fTo,&base->fConfirm,&base->fPerpName);
   }
   else if (sub->fUpdate.flags == 0) {
     SPCHNFS_D_A_CONFIRM(&base->fConfirm);
     SPCH_PlaySpeech();
-    Speaker_SetCar(base,perp);
+    (base)->SetCar(perp);
     SPCHNFS_D_C_PERP_LOST_CONFIRM(&base->fColour,base->fCar);
   }
   else {
-    Speaker_SetCar(base,perp);
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*sub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+    (base)->SetCar(perp);
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (sub)->Unit();
     base->fTo = callSign->fMobile[unit];
-    entry = &(*sub->_vf)[24];
-    if (NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta) < 0x280000) {
+
+    if ((sub)->DistToPerp() < 0x280000) {
       SPCHNFS_D_C_IN_PURS_NEAR_PERP_CONFIRM(&base->fColour,base->fCar,base->fTo,
                                             &base->fConfirm,&base->fPerpName);
     }
@@ -1269,13 +1242,12 @@ void DispatchSpeaker_Roger(DispatchSpeaker *pThis)
 }
 
 /* ---- StatusReply__Q26Speech15DispatchSpeaker  [SPEECH.CPP:1636-1713] SLD-VERIFIED ---- */
-void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis)
-
+void DispatchSpeaker::StatusReply()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub = base->fSub;
   Speaker *savedSub = 0;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   Car_tObj *car;
   int unit;
@@ -1284,43 +1256,43 @@ void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis)
   if (sub == 0) {
     return;
   }
-  entry = &(*sub->_vf)[27];
-  if (NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta) == 0) {
+
+  if ((sub)->Perp() == 0) {
     return;
   }
 
-  Speech_fgSpeech->fSpeakerCar = 0;
+  _6Speech_fgSpeech->fSpeakerCar = 0;
   if (sub->fBlockade.flags == 0) {
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*sub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (sub)->Unit();
     base->fTo = callSign->fMobile[unit];
   }
   else {
-    if (Speech_fgSpeech->fMultiplePerps != 0) {
-      entry = &(*sub->_vf)[13];
-      NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+    if (_6Speech_fgSpeech->fMultiplePerps != 0) {
+
+      (sub)->ReportBlockade();
       return;
     }
     savedSub = sub->fSub;
     if ((savedSub != 0) && (savedSub->fBlockade.flags != 0)) {
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-      entry = &(*sub->_vf)[17];
-      unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+      callSign = (CallSignBank *)(base)->CallSign();
+
+      unit = (sub)->Unit();
       base->fTo = callSign->fMobile[unit];
       sub = savedSub;
     }
     else {
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fAllUnits;
       savedSub = sub;
     }
-    entry = &(*sub->_vf)[13];
-    NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
-    Speech_fgSpeech->fSpeakerCar = 0;
+
+    (sub)->ReportBlockade();
+    _6Speech_fgSpeech->fSpeakerCar = 0;
     SPCHNFS_D_A_CONFIRM(&base->fConfirm);
     SPCH_PlaySpeech();
   }
@@ -1328,16 +1300,16 @@ void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis)
   SPCHNFS_D_C_INTRO_CALL(base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
   sub = base->fSub;
-  entry = &(*sub->_vf)[25];
-  car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
-  Speaker_FindLocation(base,car);
+
+  car = (Car_tObj *)(sub)->CarObj();
+  (base)->FindLocation(car);
 
   sub = base->fSub;
   if (sub->fBlockade.flags == 1) {
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*savedSub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)savedSub + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (savedSub)->Unit();
     base->fWing = callSign->fMobile[unit];
     base->fSpikeSide.flags = 4;
     SPCHNFS_D_C_SPBLT_CONFIRMED(&base->fPosition,base->fLocation,&base->fDistance,
@@ -1350,19 +1322,19 @@ void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis)
   }
   else if (sub->fSub != 0) {
     Speaker *nextSub = sub->fSub;
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*nextSub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)nextSub + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (nextSub)->Unit();
     base->fWing = callSign->fMobile[unit];
     SPCHNFS_D_C_BKUP_REQUEST_GRANT_REPLY(&base->fDistance,&base->fPosition,
                                          base->fLocation,base->fWing);
     SPCH_PlaySpeech();
-    entry = &(*sub->_vf)[14];
-    NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
-    pThis->fStatusCount = 0x140;
-    pThis->fUpdateCount++;
-    pThis->fStatusSub = nextSub;
+
+    (sub)->Roger();
+    this->fStatusCount = 0x140;
+    this->fUpdateCount++;
+    this->fStatusSub = nextSub;
   }
   if (playBlockadeConfirmation) {
     SPCH_PlaySpeech();
@@ -1370,8 +1342,8 @@ void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis)
 
   sub = base->fSub;
   if (savedSub != sub) {
-    entry = &(*sub->_vf)[14];
-    NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    (sub)->Roger();
   }
   if ((sub->fSub != 0) && (sub->fSub->fBlockade.flags != 0)) {
     sub->fBlockade.flags = 0;
@@ -1379,14 +1351,13 @@ void DispatchSpeaker_StatusReply(DispatchSpeaker *pThis)
 }
 
 /* ---- Status__Q26Speech15DispatchSpeaker  [SPEECH.CPP:1718-1848] SLD-VERIFIED ---- */
-void DispatchSpeaker_Status(DispatchSpeaker *pThis)
-
+void DispatchSpeaker::Status()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub = base->fSub;
   Speaker *statusSub;
   Speaker *nextSub;
-  __vtbl_ptr_type *entry;
+
   Car_tObj *car;
   Car_tObj *perp;
   CallSignBank *callSign;
@@ -1396,56 +1367,56 @@ void DispatchSpeaker_Status(DispatchSpeaker *pThis)
   if (sub == 0) {
     return;
   }
-  entry = &(*sub->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
+
+  perp = (Car_tObj *)(sub)->Perp();
   if (perp == 0) {
     return;
   }
 
-  entry = &(*sub->_vf)[25];
-  car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
+
+  car = (Car_tObj *)(sub)->CarObj();
   if ((car->carFlags & 0x200) != 0) {
-    entry = &(*sub->_vf)[24];
-    dist = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    dist = (sub)->DistToPerp();
     if (sub->fHavePerp == 0) {
       if (dist < 0x640000) {
-        entry = &(*sub->_vf)[27];
-        perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
-        entry = &(*sub->_vf)[6];
-        NFS4_VCALL_P1(entry->pfn,(u_char *)sub + entry->delta,perp);
+
+        perp = (Car_tObj *)(sub)->Perp();
+
+        (sub)->Engage(perp);
       }
     }
     else if (dist > 0x15e0000) {
       sub->fHavePerp = 0;
       sub->fUpdate.flags = 0;
-      entry = &(*sub->_vf)[2];
-      NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+      (sub)->Status();
     }
   }
 
-  if (pThis->fStatusSub != 0) {
-    if (--pThis->fStatusCount != 0) {
+  if (this->fStatusSub != 0) {
+    if (--this->fStatusCount != 0) {
       return;
     }
-    statusSub = pThis->fStatusSub;
+    statusSub = this->fStatusSub;
     if (statusSub == base) {
-      DispatchSpeaker_StatusReply(pThis);
+      (this)->StatusReply();
       return;
     }
     sub = base->fSub;
-    entry = &(*statusSub->_vf)[2];
-    NFS4_VCALL0(entry->pfn,(u_char *)statusSub + entry->delta);
+
+    (statusSub)->Status();
     if ((sub != 0) && (statusSub == sub->fSub)) {
       return;
     }
-    Speech_fgSpeech->fSpeakerCar = 0;
-    entry = &(*base->_vf)[14];
-    NFS4_VCALL0(entry->pfn,(u_char *)base + entry->delta);
+    _6Speech_fgSpeech->fSpeakerCar = 0;
+
+    (base)->Roger();
     return;
   }
 
-  if (0 < pThis->fStatusCount) {
-    pThis->fStatusCount--;
+  if (0 < this->fStatusCount) {
+    this->fStatusCount--;
     return;
   }
   sub = base->fSub;
@@ -1455,16 +1426,16 @@ void DispatchSpeaker_Status(DispatchSpeaker *pThis)
 
   nextSub = sub->fSub;
   if (nextSub != 0) {
-    entry = &(*nextSub->_vf)[27];
-    car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)nextSub + entry->delta);
-    entry = &(*sub->_vf)[27];
-    perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
+
+    car = (Car_tObj *)(nextSub)->Perp();
+
+    perp = (Car_tObj *)(sub)->Perp();
     if (car != perp) {
-      Speaker_Promote(nextSub);
+      (nextSub)->Promote();
     }
   }
 
-  switch (pThis->fUpdateCount & 3) {
+  switch (this->fUpdateCount & 3) {
   case 0:
     sub->fUpdate.flags = 0x26;
     break;
@@ -1472,15 +1443,15 @@ void DispatchSpeaker_Status(DispatchSpeaker *pThis)
     sub->fUpdate.flags = 1;
     break;
   case 2:
-    entry = &(*sub->_vf)[24];
-    dist = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    dist = (sub)->DistToPerp();
     if (dist < 0x280000) {
-      entry = &(*sub->_vf)[25];
-      car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
-      if (Speaker_CalcMph(base,car) > 0x32) {
-        entry = &(*sub->_vf)[27];
-        perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
-        if (Speaker_CalcMph(base,perp) > 0x32) {
+
+      car = (Car_tObj *)(sub)->CarObj();
+      if ((base)->CalcMph(car) > 0x32) {
+
+        perp = (Car_tObj *)(sub)->Perp();
+        if ((base)->CalcMph(perp) > 0x32) {
           sub->fUpdate.flags = 8;
           break;
         }
@@ -1489,190 +1460,189 @@ void DispatchSpeaker_Status(DispatchSpeaker *pThis)
     sub->fUpdate.flags = 0x26;
     break;
   case 3:
-    entry = &(*sub->_vf)[20];
-    if ((NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta) != 0) &&
-        (pThis->fUpdateCount == 7)) {
+
+    if (((sub)->IsSuper() != 0) &&
+        (this->fUpdateCount == 7)) {
       sub->fUpdate.flags = 0;
-      entry = &(*sub->_vf)[2];
-      NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
-      pThis->fUpdateCount++;
+
+      (sub)->Status();
+      this->fUpdateCount++;
       return;
     }
-    entry = &(*sub->_vf)[24];
-    dist = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    dist = (sub)->DistToPerp();
     if (dist < 0x140000) {
-      entry = &(*sub->_vf)[15];
-      NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
-      pThis->fUpdateCount++;
+
+      (sub)->Bullhorn();
+      this->fUpdateCount++;
       return;
     }
     sub->fUpdate.flags = 1;
     break;
   }
 
-  Speech_fgSpeech->fSpeakerCar = 0;
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  entry = &(*sub->_vf)[17];
-  unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+  _6Speech_fgSpeech->fSpeakerCar = 0;
+
+  callSign = (CallSignBank *)(base)->CallSign();
+
+  unit = (sub)->Unit();
   base->fTo = callSign->fMobile[unit];
   SPCHNFS_D_C_INTRO_CALL(base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
   SPCHNFS_D_C_IN_PURS_NEAR_PERP(&sub->fUpdate);
   SPCH_PlaySpeech();
-  pThis->fStatusCount = 0x60;
-  pThis->fStatusSub = sub;
-  pThis->fUpdateCount++;
+  this->fStatusCount = 0x60;
+  this->fStatusSub = sub;
+  this->fUpdateCount++;
 }
 
 /* ---- Status__Q26Speech13MobileSpeaker  [SPEECH.CPP:1853-1948] SLD-VERIFIED ---- */
-void MobileSpeaker_Status(MobileSpeaker *pThis)
-
+void MobileSpeaker::Status()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub;
   Speaker *savedDispatchSub;
   DispatchSpeaker *dispatch;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   Car_tObj *car;
   Car_tObj *perp;
   int dist;
 
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  perp = (Car_tObj *)(base)->Perp();
   if (perp == 0) {
     return;
   }
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
   if (base->fArrest.flags == 1) {
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
     base->fTo = callSign->fDispatch;
-    SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+    SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
     SPCH_PlaySpeech();
-    SPCHNFS_C_D_PERP_APPREHENSION(&pThis->fVoice,&base->fPerpName);
+    SPCHNFS_C_D_PERP_APPREHENSION(&this->fVoice,&base->fPerpName);
   }
   else {
-    entry = &(*base->_vf)[25];
-    car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    car = (Car_tObj *)(base)->CarObj();
     if (((car->carFlags & 0x200) != 0) && (base->fUpdate.flags == 0)) {
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fDispatch;
-      SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+      SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
       SPCH_PlaySpeech();
-      entry = &(*base->_vf)[27];
-      perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-      Speaker_SetCar(base,perp);
-      Speaker_FindLocation(base,pThis->fCarObj);
-      SPCHNFS_C_D_PERP_LOST(&pThis->fVoice,&base->fColour,base->fCar,&base->fPosition,
+
+      perp = (Car_tObj *)(base)->Perp();
+      (base)->SetCar(perp);
+      (base)->FindLocation(this->fCarObj);
+      SPCHNFS_C_D_PERP_LOST(&this->fVoice,&base->fColour,base->fCar,&base->fPosition,
                             base->fLocation,&base->fDistance,&base->fPerpName);
       SPCH_PlaySpeech();
 
       dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-      savedDispatchSub = dispatch->_base_Speaker.fSub;
+      savedDispatchSub = dispatch->fSub;
       dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-      dispatch->_base_Speaker.fSub = base;
+      dispatch->fSub = base;
       dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-      entry = &(*dispatch->_base_Speaker._vf)[14];
-      NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta);
+
+      (dispatch)->Roger();
       dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-      dispatch->_base_Speaker.fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
+      dispatch->fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
       return;
     }
 
-    entry = &(*base->_vf)[20];
+
     sub = base->fSub;
-    if ((NFS4_VCALL0(entry->pfn,(u_char *)base + entry->delta) != 0) &&
+    if (((base)->IsSuper() != 0) &&
         (base->fUpdate.flags == 0) && (sub != 0)) {
-      entry = &(*sub->_vf)[25];
-      car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)sub + entry->delta);
+
+      car = (Car_tObj *)(sub)->CarObj();
     }
     else {
       car = 0;
     }
     if ((car != 0) && ((car->carFlags & 0x40) == 0)) {
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fAllUnits;
-      SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+      SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
       SPCH_PlaySpeech();
-      SPCHNFS_S_C_SUPER_COP_CRITICISM(&pThis->fVoice);
+      SPCHNFS_S_C_SUPER_COP_CRITICISM(&this->fVoice);
     }
     else {
       dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-      sub = dispatch->_base_Speaker.fSub;
+      sub = dispatch->fSub;
       if ((sub != 0) && (sub->fSub == base)) {
-        SPCHNFS_C_C_NEW_OFFICER_ENGAGING(&pThis->fVoice,base->fFrom);
+        SPCHNFS_C_C_NEW_OFFICER_ENGAGING(&this->fVoice,base->fFrom);
         dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-        sub = dispatch->_base_Speaker.fSub;
-        entry = &(*sub->_vf)[14];
-        NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+        sub = dispatch->fSub;
+
+        (sub)->Roger();
         return;
       }
 
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fDispatch;
-      SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+      SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
       SPCH_PlaySpeech();
-      entry = &(*base->_vf)[27];
-      perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-      Speaker_SetCar(base,perp);
-      entry = &(*base->_vf)[25];
-      car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-      Speaker_FindLocation(base,car);
-      MobileSpeaker_SetSpeed(pThis,pThis->fPerp);
-      entry = &(*base->_vf)[24];
-      dist = NFS4_VCALL0(entry->pfn,(u_char *)base + entry->delta);
+
+      perp = (Car_tObj *)(base)->Perp();
+      (base)->SetCar(perp);
+
+      car = (Car_tObj *)(base)->CarObj();
+      (base)->FindLocation(car);
+      (this)->SetSpeed(this->fPerp);
+
+      dist = (base)->DistToPerp();
 
       if (dist < 0x280000) {
-        entry = &(*base->_vf)[27];
-        perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+        perp = (Car_tObj *)(base)->Perp();
         if (perp->N.flightTime > 0x40) {
-          SPCHNFS_C_D_IN_PURS_PERP_AIRBORN(&pThis->fVoice);
+          SPCHNFS_C_D_IN_PURS_PERP_AIRBORN(&this->fVoice);
         }
         else if (base->fUpdate.flags == 1) {
-          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_LOC(&pThis->fVoice,&base->fPosition,
+          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_LOC(&this->fVoice,&base->fPosition,
                                                 base->fLocation,&base->fDistance);
         }
         else if (base->fUpdate.flags != 8) {
-          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_STS(&pThis->fVoice,&base->fColour,
+          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_STS(&this->fVoice,&base->fColour,
                                                 base->fCar,&base->fDistance,
                                                 &base->fPosition,base->fLocation);
         }
         else {
-          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_SPD(&pThis->fVoice,pThis->fSpeed,&pThis->fSpeedType);
+          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_SPD(&this->fVoice,this->fSpeed,&this->fSpeedType);
         }
       }
       else if (base->fHavePerp != 0) {
         if (base->fUpdate.flags == 1) {
-          SPCHNFS_C_D_IN_PURS_AWAY_PERP_REPLY_LOC(&pThis->fVoice,&base->fPosition,
+          SPCHNFS_C_D_IN_PURS_AWAY_PERP_REPLY_LOC(&this->fVoice,&base->fPosition,
                                                   base->fLocation,&base->fDistance,
                                                   &base->fColour,base->fCar,&base->fPerpName);
         }
         else if (base->fUpdate.flags != 8) {
-          SPCHNFS_C_D_IN_PURS_AWAY_PERP_REPLY_STS(&pThis->fVoice,&base->fColour,
+          SPCHNFS_C_D_IN_PURS_AWAY_PERP_REPLY_STS(&this->fVoice,&base->fColour,
                                                   base->fCar,&base->fPosition,
                                                   base->fLocation,&base->fDistance);
         }
         else {
-          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_SPD(&pThis->fVoice,pThis->fSpeed,&pThis->fSpeedType);
+          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_SPD(&this->fVoice,this->fSpeed,&this->fSpeedType);
         }
       }
       else {
         if (base->fUpdate.flags == 1) {
-          SPCHNFS_C_D_IN_PURS_LOOK_PERP_REPLY_LOC(&pThis->fVoice,&base->fPosition,
+          SPCHNFS_C_D_IN_PURS_LOOK_PERP_REPLY_LOC(&this->fVoice,&base->fPosition,
                                                   base->fLocation,&base->fDistance,
                                                   &base->fColour,base->fCar);
         }
         else if (base->fUpdate.flags == 8) {
-          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_SPD(&pThis->fVoice,pThis->fSpeed,&pThis->fSpeedType);
+          SPCHNFS_C_D_IN_PURS_NEAR_PERP_REP_SPD(&this->fVoice,this->fSpeed,&this->fSpeedType);
         }
         else {
-          SPCHNFS_C_D_IN_PURS_LOOK_PERP_REPLY_STS(&pThis->fVoice,&base->fColour,
+          SPCHNFS_C_D_IN_PURS_LOOK_PERP_REPLY_STS(&this->fVoice,&base->fColour,
                                                   base->fCar,&base->fPerpName);
         }
       }
@@ -1682,122 +1652,113 @@ void MobileSpeaker_Status(MobileSpeaker *pThis)
 }
 
 /* ---- ClearPerp__Q26Speech15DispatchSpeakerP8Car_tObj  [SPEECH.CPP:1954-1958] SLD-VERIFIED ---- */
-void DispatchSpeaker_ClearPerp(DispatchSpeaker *pThis,Car_tObj *car)
-
+void DispatchSpeaker::ClearPerp(Car_tObj *car)
 {
   int i;
   
   i = 0;
   do {
-    if (pThis->fPerp[0] == car) {
-      pThis->fPerp[0] = (Car_tObj *)0x0;
+    if (this->fPerp[i] == car) {
+      this->fPerp[i] = (Car_tObj *)0x0;
     }
     i = i + 1;
-    pThis = (DispatchSpeaker *)&(pThis->_base_Speaker).fDistance;
   } while (i < 2);
   return;
 }
 
 /* ---- KnownPerp__Q26Speech15DispatchSpeakerP8Car_tObj  [SPEECH.CPP:1964-1969] SLD-VERIFIED ---- */
-void * DispatchSpeaker_KnownPerp(DispatchSpeaker *pThis,Car_tObj *car)
-
+void * DispatchSpeaker::KnownPerp(Car_tObj *car)
 {
   int i;
   
   i = 0;
   do {
-    i = i + 1;
-    if (pThis->fPerp[0] == car) {
+    if (this->fPerp[i] == car) {
       return (void *)0x1;
     }
-    pThis = (DispatchSpeaker *)&(pThis->_base_Speaker).fDistance;
+    i = i + 1;
   } while (i < 2);
   return (void *)0x0;
 }
 
 /* ---- AddPerp__Q26Speech15DispatchSpeakerP8Car_tObj  [SPEECH.CPP:1976-1980] SLD-VERIFIED ---- */
-void DispatchSpeaker_AddPerp(DispatchSpeaker *pThis,Car_tObj *car)
-
+void DispatchSpeaker::AddPerp(Car_tObj *car)
 {
   int i;
   
   i = 0;
   do {
-    if (pThis->fPerp[0] == (Car_tObj *)0x0) {
-      pThis->fPerp[0] = car;
+    if (this->fPerp[i] == (Car_tObj *)0x0) {
+      this->fPerp[i] = car;
     }
     i = i + 1;
-    pThis = (DispatchSpeaker *)&(pThis->_base_Speaker).fDistance;
   } while (i < 2);
   return;
 }
 
 /* ---- Report__Q26Speech15DispatchSpeakerP8Car_tObj  [SPEECH.CPP:1990-2031] SLD-VERIFIED ---- */
-void DispatchSpeaker_Report(DispatchSpeaker *pThis,Car_tObj *perp)
-
+void DispatchSpeaker::Report(Car_tObj *perp)
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub = base->fSub;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   int unit;
   bool known;
 
-  Speech_fgSpeech->fSpeakerCar = 0;
-  entry = &(*base->_vf)[18];
-  known = NFS4_VCALL_PTR_P1(entry->pfn,(u_char *)base + entry->delta,perp) != 0;
+  _6Speech_fgSpeech->fSpeakerCar = 0;
+
+  known = (base)->KnownPerp(perp) != 0;
   if (known && (sub != 0)) {
-    if (Speech_fgSpeech->fMultiplePerps == 0) {
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-      entry = &(*sub->_vf)[17];
-      unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+    if (_6Speech_fgSpeech->fMultiplePerps == 0) {
+
+      callSign = (CallSignBank *)(base)->CallSign();
+
+      unit = (sub)->Unit();
       base->fTo = callSign->fMobile[unit];
       SPCHNFS_D_C_PERP_SIGHTED_CONFIRM(&base->fConfirm,base->fTo);
       SPCH_PlaySpeech();
     }
   }
   else {
-    if (Speech_fgSpeech->fMultiplePerps == 0) {
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+    if (_6Speech_fgSpeech->fMultiplePerps == 0) {
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fAllUnits;
       SPCHNFS_D_C_INTRO_CALL(base->fTo,base->fFrom,&base->fReverse);
       SPCH_PlaySpeech();
-      Speaker_SetCar(base,perp);
-      Speaker_FindLocation(base,perp);
+      (base)->SetCar(perp);
+      (base)->FindLocation(perp);
       SPCHNFS_D_C_BEGIN_PURS_REP_SPDR(&base->fColour,base->fCar,&base->fPosition,
                                       base->fLocation,&base->fDistance);
       SPCH_PlaySpeech();
     }
-    DispatchSpeaker_AddPerp(pThis,perp);
-    pThis->fStatusCount = 0x2a0;
+    (this)->AddPerp(perp);
+    this->fStatusCount = 0x2a0;
   }
 }
 
 /* ---- Accident__Q26Speech15DispatchSpeakeri  [SPEECH.CPP:2039-2043] SLD-VERIFIED ---- */
-void DispatchSpeaker_Accident(DispatchSpeaker *pThis,int slice)
-
+void DispatchSpeaker::Accident(int slice)
 {
   return;
 }
 
 /* ---- Deny__Q26Speech15DispatchSpeaker  [SPEECH.CPP:2049-2073] SLD-VERIFIED ---- */
-void DispatchSpeaker_Deny(DispatchSpeaker *pThis)
-
+void DispatchSpeaker::Deny()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub = base->fSub;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   int unit;
 
   if (sub != 0) {
-    Speech_fgSpeech->fSpeakerCar = 0;
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*sub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+    _6Speech_fgSpeech->fSpeakerCar = 0;
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (sub)->Unit();
     base->fTo = callSign->fMobile[unit];
     SPCHNFS_D_C_INTRO_CALL(base->fTo,base->fFrom,&base->fReverse);
     SPCH_PlaySpeech();
@@ -1814,17 +1775,16 @@ void DispatchSpeaker_Deny(DispatchSpeaker *pThis)
 }
 
 /* ---- Grant__Q26Speech15DispatchSpeaker  [SPEECH.CPP:2079-2098] SLD-VERIFIED ---- */
-void DispatchSpeaker_Grant(DispatchSpeaker *pThis)
-
+void DispatchSpeaker::Grant()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub = base->fSub;
 
   /* The second guard is literal MIPS: addiu v0,sub,0x14; beqz v0.
    * It protects the address-of-member expression for the undefined sentinel. */
   if ((sub != 0) && (sub != (Speaker *)(intptr)(intptr)-0x14)) {
-    Speech_fgSpeech->fSpeakerCar = 0;
-    if (Speech_fgSpeech->fMultiplePerps == 0) {
+    _6Speech_fgSpeech->fSpeakerCar = 0;
+    if (_6Speech_fgSpeech->fMultiplePerps == 0) {
       SPCHNFS_D_C_RDBLK_SPBLT_GRANT_REPLY(&sub->fBlockade,&base->fConfirm);
       SPCH_PlaySpeech();
     }
@@ -1832,155 +1792,127 @@ void DispatchSpeaker_Grant(DispatchSpeaker *pThis)
 }
 
 /* ---- Ready__Q26Speech15DispatchSpeakerP8Car_tObj  [SPEECH.CPP:2104-2123] SLD-VERIFIED ---- */
-void DispatchSpeaker_Ready(DispatchSpeaker *pThis,Car_tObj *carObj)
-
+void DispatchSpeaker::Ready(Car_tObj *carObj)
 {
-  int Blockade;
   Speaker *pSVar1;
-  __vtbl_ptr_type (*pa_Var2) [31];
-  int src_pos;
+
+  Car_tObj *src_pos;
   Speaker *pSVar3;
-  Speaker *Wing;
   
   pSVar1 = (Speaker *)Speech_Mobile(carObj);
-  pSVar3 = (pThis->_base_Speaker).fSub;
+  pSVar3 = this->fSub;
   if (pSVar3 != (Speaker *)0x0 && pSVar1 != pSVar3) {
     (pSVar1->fBlockade).flags = (pSVar3->fBlockade).flags;
-    pSVar3 = (pThis->_base_Speaker).fSub;
-    pa_Var2 = pSVar3->_vf;
-    src_pos = NFS4_VCALL_AUTO((*pa_Var2)[0x1b].pfn, (int)&(pSVar3->fPosition).flags + (int)(*pa_Var2)[0x1b].delta)
-    ;
-    NFS4_VCALL_AUTO((*pSVar1->_vf)[6].pfn, (int)&(pSVar1->fPosition).flags + (int)(*pSVar1->_vf)[6].delta,src_pos)
-    ;
+    pSVar3 = this->fSub;
+    src_pos = pSVar3->Perp();
+    pSVar1->Engage(src_pos);
   }
-  pThis->fStatusSub = &pThis->_base_Speaker;
-  pThis->fStatusCount = 0x80;
+  this->fStatusSub = this;
+  this->fStatusCount = 0x80;
   return;
 }
 
 /* ---- PickVoice__6SpeechP8Car_tObj  [SPEECH.CPP:2144-2150] SLD-VERIFIED ---- */
-int Speech_PickVoice(Speech *pThis,Car_tObj *carObj)
-
+int Speech::PickVoice(Car_tObj *carObj)
 {
   int iVar1;
   
   if ((carObj->carFlags & 0x40U) != 0) {
-    iVar1 = pThis->fSuperCount;
-    pThis->fSuperCount = iVar1 + 1;
+    iVar1 = this->fSuperCount;
+    this->fSuperCount = (int)((uint32)iVar1 + 1u);
     return iVar1 % 6;
   }
   if ((carObj->carFlags & 0x80U) == 0) {
-    iVar1 = pThis->fCopCount;
-    pThis->fCopCount = iVar1 + 1;
+    iVar1 = this->fCopCount;
+    this->fCopCount = (int)((uint32)iVar1 + 1u);
     return iVar1 % 9;
   }
   return 0;
 }
 
 /* ---- GetVoice__6SpeechP8Car_tObj  [SPEECH.CPP:2156-2157] SLD-VERIFIED ---- */
-void Speech_GetVoice(Car_tObj *carObj)
+int Speech_GetVoice(Car_tObj *carObj)
 
 {
-  Speech_PickVoice((Speech *)((int)Speech_fgSpeech),carObj);
-  return;
+  return (_6Speech_fgSpeech)->PickVoice(carObj);
 }
 
 /* ---- Activate__Q26Speech13MobileSpeakerP8Car_tObj  [SPEECH.CPP:2163-2189] SLD-VERIFIED ---- */
-void MobileSpeaker_Activate(MobileSpeaker *pThis,Car_tObj *carObj)
-
+void MobileSpeaker::Activate(Car_tObj *carObj)
 {
-  Speech_tMobileVoiceAttr * a;
   int reg_v0;
-  int Voice;
   uint32 uVar1;
-  __vtbl_ptr_type (*pa_Var2) [31];
+
   int iVar3;
-  int unit;
   
-  pThis->fCarObj = carObj;
-  Speech_GetVoice(carObj);
-  pThis->fUnit = reg_v0;
+  this->fCarObj = carObj;
+  reg_v0 = Speech_GetVoice(carObj);
+  this->fUnit = reg_v0;
   if ((carObj->carFlags & 0x40U) == 0) {
     uVar1 = Speech_gCopAttr[reg_v0].voice;
   }
   else {
-    pThis->fUnit = reg_v0 + 9;
+    this->fUnit = (int)((uint32)reg_v0 + 9u);
     uVar1 = 8;
   }
-  (pThis->fVoice).flags = uVar1;
-  pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x1e].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x1e].delta);
-  (pThis->_base_Speaker).fFrom = *(int *)(iVar3 + pThis->fUnit * 4 + 8);
+  (this->fVoice).flags = uVar1;
+
+  iVar3 = (intptr)(this)->CallSign();
+  this->fFrom = *(int *)(iVar3 + this->fUnit * 4 + 8);
   iVar3 = GameSetup_gData.track;
-  (pThis->_base_Speaker).fConfirm.flags = 0xff;
-  (pThis->_base_Speaker).fPerpName.flags = 0xf;
-  (pThis->_base_Speaker).fBlockade.flags = 0;
-  (pThis->_base_Speaker).fArrest.flags = 0;
-  (pThis->_base_Speaker).fUpdate.flags = 0;
-  pThis->fPerp = (Car_tObj *)0x0;
-  (pThis->_base_Speaker).fSub = (Speaker *)0x0;
-  (pThis->_base_Speaker).fHavePerp = 0;
-  (pThis->_base_Speaker).fReverse.flags = iVar3 & 1;
+  this->fConfirm.flags = 0xff;
+  this->fPerpName.flags = 0xf;
+  this->fBlockade.flags = 0;
+  this->fArrest.flags = 0;
+  this->fUpdate.flags = 0;
+  this->fPerp = (Car_tObj *)0x0;
+  this->fSub = (Speaker *)0x0;
+  this->fHavePerp = 0;
+  this->fReverse.flags = iVar3 & 1;
   return;
 }
 
 /* ---- ReActivate__Q26Speech13MobileSpeaker  [SPEECH.CPP:2199-2212] SLD-VERIFIED ---- */
-void MobileSpeaker_ReActivate(MobileSpeaker *pThis)
-
+void MobileSpeaker::ReActivate()
 {
   int reg_v0;
-  int Voice;
   int tu2;
-  __vtbl_ptr_type (*pa_Var1) [31];
+
   int iVar2;
-  int unit;
-  Speech_tMobileVoiceAttr *a;
   
-  a = (Speech_tMobileVoiceAttr *)pThis->fCarObj;
-  Speech_GetVoice((Car_tObj *)a);
-  pThis->fUnit = reg_v0;
-  if ((pThis->fCarObj->carFlags & 0x40U) == 0) {
+  reg_v0 = Speech_GetVoice(this->fCarObj);
+  this->fUnit = reg_v0;
+  if ((this->fCarObj->carFlags & 0x40U) == 0) {
     tu2 = Speech_gCopAttr[reg_v0].voice;
   }
   else {
-    pThis->fUnit = reg_v0 + 9;
+    this->fUnit = (int)((uint32)reg_v0 + 9u);
     tu2 = 8;
   }
-  (pThis->fVoice).flags = tu2;
-  pa_Var1 = (pThis->_base_Speaker)._vf;
-  iVar2 = NFS4_VCALL_AUTO((*pa_Var1)[0x1e].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var1)[0x1e].delta);
-  (pThis->_base_Speaker).fFrom = *(int *)(iVar2 + pThis->fUnit * 4 + 8);
+  (this->fVoice).flags = tu2;
+
+  iVar2 = (intptr)(this)->CallSign();
+  this->fFrom = *(int *)(iVar2 + this->fUnit * 4 + 8);
   return;
 }
 
 /* ---- FindMobile__6SpeechP8Car_tObj  [SPEECH.CPP:2218-2237] SLD-VERIFIED ---- */
-Speaker * Speech_FindMobile(Speech *pThis,Car_tObj *carObj)
-
+Speaker * Speech::FindMobile(Car_tObj *carObj)
 {
-  MobileSpeaker **ppMVar1;
-  int iVar2;
-  Speech *pSVar3;
-  int iVar4;
-  int i;
-  
-  pSVar3 = pThis;
-  for (iVar4 = 0; iVar2 = 0, iVar4 < 4; iVar4 = iVar4 + 1) {
-    ppMVar1 = pSVar3->fMobile;
-    pSVar3 = (Speech *)&(pSVar3->fCarBank).Mobile[0].fMake;
-    if (carObj == (*ppMVar1)->fCarObj) {
-      return &(*ppMVar1)->_base_Speaker;
+  int index;
+
+  for (index = 0; index < 4; index = index + 1) {
+    if (carObj == this->fMobile[index]->fCarObj) {
+      return this->fMobile[index];
     }
   }
-  while( true ) {
-    if (3 < iVar2) {
-      return (Speaker *)(*(int *)&(Speech_fgUndefined));
+  for (index = 0; index < 4; index = index + 1) {
+    if (this->fMobile[index]->fCarObj == (Car_tObj *)0x0) {
+      (this->fMobile[index])->Activate(carObj);
+      return this->fMobile[index];
     }
-    if (pThis->fMobile[0]->fCarObj == (Car_tObj *)0x0) break;
-    pThis = (Speech *)&(pThis->fCarBank).Mobile[0].fMake;
-    iVar2 = iVar2 + 1;
   }
-  MobileSpeaker_Activate(pThis->fMobile[0],carObj);
-  return &pThis->fMobile[0]->_base_Speaker;
+  return _6Speech_fgUndefined;
 }
 
 /* ---- Mobile__6SpeechP8Car_tObj  [SPEECH.CPP:2244-2250] SLD-VERIFIED ---- */
@@ -1989,16 +1921,15 @@ intptr Speech_Mobile(Car_tObj *carObj)
 {
   Speaker *pSVar1;
   
-  pSVar1 = *(Speaker **)Speech_fgUndefined;
-  if ((Speech_fgSpeech != 0) && (Speech_fgSpeech->fBankOffset != 0)) {
-    pSVar1 = Speech_FindMobile(Speech_fgSpeech,carObj);
+  pSVar1 = _6Speech_fgUndefined;
+  if ((_6Speech_fgSpeech != 0) && (_6Speech_fgSpeech->fBankOffset != 0)) {
+    pSVar1 = (_6Speech_fgSpeech)->FindMobile(carObj);
   }
   return (intptr)pSVar1;
 }
 
 /* ---- CalcMph__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:2256-2257] SLD-VERIFIED ---- */
-int Speaker_CalcMph(Speaker *pThis,Car_tObj *perp)
-
+int Speaker::CalcMph(Car_tObj *perp)
 {
   int iVar1;
   
@@ -2014,14 +1945,13 @@ int Speaker_CalcMph(Speaker *pThis,Car_tObj *perp)
 }
 
 /* ---- SetSpeed__Q26Speech13MobileSpeakerP8Car_tObj  [SPEECH.CPP:2263-2272] SLD-VERIFIED ---- */
-void MobileSpeaker_SetSpeed(MobileSpeaker *pThis,Car_tObj *perp)
-
+void MobileSpeaker::SetSpeed(Car_tObj *perp)
 {
   int a;
   int iVar1;
   
   if (GameSetup_gData.measurement == 1) {
-    (pThis->fSpeedType).flags = 1;
+    (this->fSpeedType).flags = 1;
     iVar1 = (perp->linearVel_ch).z;
     if (iVar1 < 0) {
       iVar1 = -iVar1;
@@ -2036,7 +1966,7 @@ MSSetSpeed_zeroPath:
     a = 0x39999;
   }
   else {
-    (pThis->fSpeedType).flags = 2;
+    (this->fSpeedType).flags = 2;
     iVar1 = (perp->linearVel_ch).z;
     if (iVar1 < 0) {
       iVar1 = -iVar1;
@@ -2052,63 +1982,52 @@ MSSetSpeed_zeroPath:
   iVar1 = fixedmult(a,iVar1);
   iVar1 = iVar1 / 0xa0000 + -3;
 MSSetSpeed_assignReturn:
-  pThis->fSpeed = iVar1;
+  this->fSpeed = iVar1;
   return;
 }
 
 /* ---- DistToPerp__Q26Speech13MobileSpeaker  [SPEECH.CPP:2281-2286] SLD-VERIFIED ---- */
-int MobileSpeaker_DistToPerp(MobileSpeaker *pThis)
-
+int MobileSpeaker::DistToPerp()
 {
-  short sVar1;
-  int d;
-  __vtbl_ptr_type (*pa_Var2) [31];
+
+
   int iVar3;
   int iVar4;
-  int z;
-  nfs4_vtbl_pfn pcVar5;
-  int x;
+
   int iVar6;
-  
-  pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
-  pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
+
+  iVar3 = (intptr)(this)->CarObj();
+
+  iVar4 = (intptr)(this)->Perp();
   if (*(int *)(iVar3 + 0xa0) - *(int *)(iVar4 + 0xa0) < 1) {
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    sVar1 = (*pa_Var2)[0x19].delta;
-    pcVar5 = (*pa_Var2)[0x19].pfn;
+
+    iVar3 = (intptr)(this)->Perp();
+
+    iVar4 = (intptr)this->CarObj();
   }
   else {
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    sVar1 = (*pa_Var2)[0x1b].delta;
-    pcVar5 = (*pa_Var2)[0x1b].pfn;
+
+    iVar3 = (intptr)(this)->CarObj();
+
+    iVar4 = (intptr)this->Perp();
   }
-  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))pcVar5)((MobileSpeaker *)((char *)pThis + sVar1));
   iVar6 = *(int *)(iVar3 + 0xa0) - *(int *)(iVar4 + 0xa0);
-  pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
-  pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
+
+  iVar3 = (intptr)(this)->CarObj();
+
+  iVar4 = (intptr)(this)->Perp();
   if (*(int *)(iVar3 + 0xa8) - *(int *)(iVar4 + 0xa8) < 1) {
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x1b].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x1b].delta));
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    sVar1 = (*pa_Var2)[0x19].delta;
-    pcVar5 = (*pa_Var2)[0x19].pfn;
+
+    iVar3 = (intptr)(this)->Perp();
+
+    iVar4 = (intptr)this->CarObj();
   }
   else {
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    iVar3 = (intptr)((Car_tObj *(*)(MobileSpeaker *))(*pa_Var2)[0x19].pfn)((MobileSpeaker *)((char *)pThis + (*pa_Var2)[0x19].delta));
-    pa_Var2 = (pThis->_base_Speaker)._vf;
-    sVar1 = (*pa_Var2)[0x1b].delta;
-    pcVar5 = (*pa_Var2)[0x1b].pfn;
+
+    iVar3 = (intptr)(this)->CarObj();
+
+    iVar4 = (intptr)this->Perp();
   }
-  iVar4 = (intptr)((Car_tObj *(*)(MobileSpeaker *))pcVar5)((MobileSpeaker *)((char *)pThis + sVar1));
   iVar3 = *(int *)(iVar3 + 0xa8) - *(int *)(iVar4 + 0xa8);
   if (iVar3 < iVar6) {
     iVar6 = iVar6 + (iVar3 >> 2);
@@ -2120,84 +2039,82 @@ int MobileSpeaker_DistToPerp(MobileSpeaker *pThis)
 }
 
 /* ---- Report__Q26Speech13MobileSpeakerP8Car_tObj  [SPEECH.CPP:2295-2316] SLD-VERIFIED ---- */
-void MobileSpeaker_Report(MobileSpeaker *pThis,Car_tObj *perp)
-
+void MobileSpeaker::Report(Car_tObj *perp)
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   DispatchSpeaker *dispatch;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+  callSign = (CallSignBank *)(base)->CallSign();
   base->fTo = callSign->fDispatch;
-  SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+  SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-  Speaker_SetCar(base,perp);
-  Speaker_FindLocation(base,perp);
-  MobileSpeaker_SetSpeed(pThis,perp);
-  SPCHNFS_C_D_PERP_SIGHTED(&pThis->fVoice,&base->fColour,base->fCar,&base->fDistance,
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+  (base)->SetCar(perp);
+  (base)->FindLocation(perp);
+  (this)->SetSpeed(perp);
+  SPCHNFS_C_D_PERP_SIGHTED(&this->fVoice,&base->fColour,base->fCar,&base->fDistance,
                            &base->fPosition,base->fLocation,&base->fPerpName);
   SPCH_PlaySpeech();
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  dispatch->_base_Speaker.fSub = base;
+  dispatch->fSub = base;
 }
 
 /* ---- Engage__Q26Speech13MobileSpeakerP8Car_tObj  [SPEECH.CPP:2331-2450] SLD-VERIFIED ---- */
-void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
-
+void MobileSpeaker::Engage(Car_tObj *perp)
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *previous;
   Speaker *cursor;
   Speaker *dispatchSub;
   Speaker *savedDispatchSub;
   DispatchSpeaker *dispatch;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   Car_tObj *activePerp;
   Car_tObj *car;
   bool insertAtHead = false;
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
   base->fHavePerp = 1;
-  entry = &(*base->_vf)[27];
-  activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  activePerp = (Car_tObj *)(base)->Perp();
 
   if (perp == activePerp) {
-    if (Speech_fgSpeech->fMultiplePerps != 0) {
+    if (_6Speech_fgSpeech->fMultiplePerps != 0) {
       return;
     }
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    entry = &(*dispatch->_base_Speaker._vf)[21];
-    if (NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta) >= 0x160) {
+
+    if ((dispatch)->StatusCount() >= 0x160) {
       return;
     }
-    Speaker_SetCar(base,activePerp);
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+    (base)->SetCar(activePerp);
+
+    callSign = (CallSignBank *)(base)->CallSign();
     base->fTo = callSign->fDispatch;
-    SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+    SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
     SPCH_PlaySpeech();
-    entry = &(*base->_vf)[27];
-    activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    Speaker_FindLocation(base,activePerp);
-    SPCHNFS_C_C_PERP_REAQUIRED(&pThis->fVoice,&base->fColour,base->fCar,
+
+    activePerp = (Car_tObj *)(base)->Perp();
+    (base)->FindLocation(activePerp);
+    SPCHNFS_C_C_PERP_REAQUIRED(&this->fVoice,&base->fColour,base->fCar,
                                &base->fPosition,base->fLocation,&base->fDistance);
     goto MobileEngage_playAndReturn;
   }
 
-  pThis->fPerp = perp;
-  entry = &(*base->_vf)[27];
-  activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_SetCar(base,activePerp);
-  entry = &(*base->_vf)[25];
-  car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+  this->fPerp = perp;
+
+  activePerp = (Car_tObj *)(base)->Perp();
+  (base)->SetCar(activePerp);
+
+  car = (Car_tObj *)(base)->CarObj();
   if ((car->carFlags & 0x200) == 0) {
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    previous = &dispatch->_base_Speaker;
+    previous = dispatch;
     cursor = previous->fSub;
     while ((cursor != 0) && (cursor != base)) {
       previous = cursor;
@@ -2210,69 +2127,69 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   }
 
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  if (dispatch->_base_Speaker.fSub == base) {
-    entry = &(*base->_vf)[25];
-    car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+  if (dispatch->fSub == base) {
+
+    car = (Car_tObj *)(base)->CarObj();
     if ((car->carFlags & 0x200) == 0) {
       return;
     }
-    entry = &(*dispatch->_base_Speaker._vf)[1];
-    NFS4_VCALL_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,perp);
-    Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    (dispatch)->Report(perp);
+    _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+    callSign = (CallSignBank *)(base)->CallSign();
     base->fTo = callSign->fDispatch;
-    entry = &(*base->_vf)[27];
-    activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    Speaker_FindLocation(base,activePerp);
-    SPCHNFS_C_D_ENGAGE_PURS_REP_SPDR_REPLY(&pThis->fVoice,base->fTo,&base->fColour,
+
+    activePerp = (Car_tObj *)(base)->Perp();
+    (base)->FindLocation(activePerp);
+    SPCHNFS_C_D_ENGAGE_PURS_REP_SPDR_REPLY(&this->fVoice,base->fTo,&base->fColour,
                                            base->fCar,&base->fDistance,&base->fPosition,
                                            base->fLocation,&base->fConfirm);
     goto MobileEngage_playAndReturn;
   }
 
-  entry = &(*base->_vf)[20];
-  if (NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta) != 0) {
-    entry = &(*base->_vf)[27];
-    activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  if ((base)->IsSuper() != 0) {
+
+    activePerp = (Car_tObj *)(base)->Perp();
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    dispatchSub = dispatch->_base_Speaker.fSub;
+    dispatchSub = dispatch->fSub;
     if (((activePerp->carFlags & 4) != 0) && (dispatchSub != 0)) {
-      entry = &(*dispatchSub->_vf)[25];
-      car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)dispatchSub + entry->delta);
+
+      car = (Car_tObj *)(dispatchSub)->CarObj();
       insertAtHead = (car->carFlags & 0x40) == 0;
     }
   }
 
   if (insertAtHead) {
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    base->fSub = dispatch->_base_Speaker.fSub;
+    base->fSub = dispatch->fSub;
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    dispatch->_base_Speaker.fSub = base;
+    dispatch->fSub = base;
     if (base->fBlockade.flags != 0) {
       return;
     }
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
     base->fTo = callSign->fAllUnits;
-    SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+    SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
     SPCH_PlaySpeech();
-    SPCHNFS_S_C_SUPER_COP_ARRIVAL(&pThis->fVoice);
+    SPCHNFS_S_C_SUPER_COP_ARRIVAL(&this->fVoice);
     goto MobileEngage_playAndReturn;
   }
 
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  previous = &dispatch->_base_Speaker;
+  previous = dispatch;
   dispatchSub = previous->fSub;
   if (dispatchSub != 0) {
-    entry = &(*dispatchSub->_vf)[27];
-    car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)dispatchSub + entry->delta);
+
+    car = (Car_tObj *)(dispatchSub)->Perp();
     if (car != 0) {
-      entry = &(*dispatchSub->_vf)[27];
-      car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)dispatchSub + entry->delta);
+
+      car = (Car_tObj *)(dispatchSub)->Perp();
       if ((car->carFlags & 4) == 0) {
-        entry = &(*base->_vf)[27];
-        activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+        activePerp = (Car_tObj *)(base)->Perp();
         insertAtHead = (activePerp->carFlags & 4) != 0;
       }
     }
@@ -2292,52 +2209,52 @@ void MobileSpeaker_Engage(MobileSpeaker *pThis,Car_tObj *perp)
   }
 
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  entry = &(*dispatch->_base_Speaker._vf)[18];
-  if (NFS4_VCALL_PTR_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,perp) != 0) {
+
+  if ((dispatch)->KnownPerp(perp) != 0) {
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    entry = &(*dispatch->_base_Speaker._vf)[21];
-    if (NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta) < 0x180) {
+
+    if ((dispatch)->StatusCount() < 0x180) {
       return;
     }
   }
 
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  callSign = (CallSignBank *)(base)->CallSign();
   base->fTo = callSign->fDispatch;
-  SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+  SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
-  entry = &(*base->_vf)[27];
-  activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_FindLocation(base,activePerp);
-  entry = &(*base->_vf)[27];
-  activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  MobileSpeaker_SetSpeed(pThis,activePerp);
+
+  activePerp = (Car_tObj *)(base)->Perp();
+  (base)->FindLocation(activePerp);
+
+  activePerp = (Car_tObj *)(base)->Perp();
+  (this)->SetSpeed(activePerp);
 
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  entry = &(*dispatch->_base_Speaker._vf)[18];
-  if (NFS4_VCALL_PTR_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,activePerp) == 0) {
-    SPCHNFS_C_D_ENGAGE_PURS_REP_SPDR(&pThis->fVoice,&base->fColour,base->fCar,
+
+  if ((dispatch)->KnownPerp(activePerp) == 0) {
+    SPCHNFS_C_D_ENGAGE_PURS_REP_SPDR(&this->fVoice,&base->fColour,base->fCar,
                                      &base->fPosition,base->fLocation,&base->fDistance,
-                                     pThis->fSpeed,&pThis->fSpeedType,&base->fPerpName);
+                                     this->fSpeed,&this->fSpeedType,&base->fPerpName);
   }
   else {
-    SPCHNFS_C_D_PERP_SIGHTED(&pThis->fVoice,&base->fColour,base->fCar,
+    SPCHNFS_C_D_PERP_SIGHTED(&this->fVoice,&base->fColour,base->fCar,
                              &base->fDistance,&base->fPosition,base->fLocation,
                              &base->fPerpName);
   }
   SPCH_PlaySpeech();
 
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  savedDispatchSub = dispatch->_base_Speaker.fSub;
+  savedDispatchSub = dispatch->fSub;
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  dispatch->_base_Speaker.fSub = base;
+  dispatch->fSub = base;
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  entry = &(*base->_vf)[27];
-  activePerp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  entry = &(*dispatch->_base_Speaker._vf)[1];
-  NFS4_VCALL_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,activePerp);
+
+  activePerp = (Car_tObj *)(base)->Perp();
+
+  (dispatch)->Report(activePerp);
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  dispatch->_base_Speaker.fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
+  dispatch->fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
   return;
 
 MobileEngage_playAndReturn:
@@ -2345,38 +2262,37 @@ MobileEngage_playAndReturn:
 }
 
 /* ---- Lose__Q26Speech13MobileSpeaker  [SPEECH.CPP:2463-2538] SLD-VERIFIED ---- */
-void MobileSpeaker_Lose(MobileSpeaker *pThis)
-
+void MobileSpeaker::Lose()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   DispatchSpeaker *dispatch;
   Speaker *leader = 0;
   Speaker *savedDispatchSub;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   Car_tObj *perp;
   Car_tObj *car;
   int unit;
 
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  perp = (Car_tObj *)(base)->Perp();
   if (perp == 0) {
     return;
   }
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  leader = dispatch->_base_Speaker.fSub;
+  leader = dispatch->fSub;
   if (!((leader != 0) && (leader->fSub == base) &&
         (base->fBlockade.flags == 0) && (base->fArrest.flags == 0))) {
     leader = 0;
   }
 
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  callSign = (CallSignBank *)(base)->CallSign();
   if (leader != 0) {
-    entry = &(*leader->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)leader + entry->delta);
+
+    unit = (leader)->Unit();
     base->fTo = callSign->fMobile[unit];
   }
   else {
@@ -2386,50 +2302,50 @@ void MobileSpeaker_Lose(MobileSpeaker *pThis)
   if (base->fArrest.flags == 0) {
     if ((base->fBlockade.flags == 0) && (leader == 0)) {
       dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-      entry = &(*dispatch->_base_Speaker._vf)[21];
-      if (NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta) > 0x160) {
+
+      if ((dispatch)->StatusCount() > 0x160) {
         return;
       }
     }
   }
   else {
-    SPCHNFS_C_P_FALSE_ARREST_BULLHORN(&pThis->fVoice);
+    SPCHNFS_C_P_FALSE_ARREST_BULLHORN(&this->fVoice);
     SPCH_PlaySpeech();
   }
 
-  SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+  SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_SetCar(base,perp);
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_FindLocation(base,perp);
+
+  perp = (Car_tObj *)(base)->Perp();
+  (base)->SetCar(perp);
+
+  perp = (Car_tObj *)(base)->Perp();
+  (base)->FindLocation(perp);
 
   if (base->fArrest.flags == 0) {
-    entry = &(*base->_vf)[25];
-    car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    car = (Car_tObj *)(base)->CarObj();
     if ((car->carFlags & 0x200) == 0) {
       if (base->fBlockade.flags == 1) {
-        SPCHNFS_C_D_SPBLT_FAILED(&pThis->fVoice,&base->fColour,base->fCar);
+        SPCHNFS_C_D_SPBLT_FAILED(&this->fVoice,&base->fColour,base->fCar);
       }
       else if (base->fBlockade.flags == 2) {
-        SPCHNFS_C_D_RDBLK_FAILED(&pThis->fVoice,&base->fColour,base->fCar);
+        SPCHNFS_C_D_RDBLK_FAILED(&this->fVoice,&base->fColour,base->fCar);
       }
       else if (leader == 0) {
-        SPCHNFS_C_D_PERP_LOST(&pThis->fVoice,&base->fColour,base->fCar,&base->fPosition,
+        SPCHNFS_C_D_PERP_LOST(&this->fVoice,&base->fColour,base->fCar,&base->fPosition,
                               base->fLocation,&base->fDistance,&base->fPerpName);
       }
       else {
-        SPCHNFS_C_C_IDLE_WINGMAN_DISAPPEARS(&pThis->fVoice);
+        SPCHNFS_C_C_IDLE_WINGMAN_DISAPPEARS(&this->fVoice);
       }
     }
     else {
-      SPCHNFS_C_D_ENDGAME(&pThis->fVoice);
+      SPCHNFS_C_D_ENDGAME(&this->fVoice);
     }
   }
   else {
-    SPCHNFS_C_D_DURING_FALSE_ARREST(&pThis->fVoice,&base->fPerpName);
+    SPCHNFS_C_D_DURING_FALSE_ARREST(&this->fVoice,&base->fPerpName);
   }
   SPCH_PlaySpeech();
   base->fBlockade.flags = 0;
@@ -2438,128 +2354,125 @@ void MobileSpeaker_Lose(MobileSpeaker *pThis)
 
   if (leader == 0) {
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    savedDispatchSub = dispatch->_base_Speaker.fSub;
-    dispatch->_base_Speaker.fSub = base;
-    entry = &(*dispatch->_base_Speaker._vf)[14];
-    NFS4_VCALL0(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta);
-    dispatch->_base_Speaker.fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
+    savedDispatchSub = dispatch->fSub;
+    dispatch->fSub = base;
+
+    (dispatch)->Roger();
+    dispatch->fSub = savedDispatchSub; /* PORTABILITY-REVIEWED: SPEECH-DISPATCH-SAVE-RESTORE-01 */
   }
 }
 
 /* ---- Accident__Q26Speech13MobileSpeakeri  [SPEECH.CPP:2544-2548] SLD-VERIFIED ---- */
-void MobileSpeaker_Accident(MobileSpeaker *pThis,int slice)
-
+void MobileSpeaker::Accident(int slice)
 {
   return;
 }
 
 /* ---- Catch__Q26Speech13MobileSpeakeri  [SPEECH.CPP:2554-2621] SLD-VERIFIED ---- */
-void MobileSpeaker_Catch(MobileSpeaker *pThis,int ticket)
-
+void MobileSpeaker::Catch(int ticket)
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   DispatchSpeaker *dispatch;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   Car_tObj *perp;
   uint32 ambulanceFlags;
 
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  perp = (Car_tObj *)(base)->Perp();
   if (perp == 0) {
     return;
   }
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+  perp = (Car_tObj *)(base)->Perp();
   if (perp->N.orientationToGround.y < 0) {
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
     base->fTo = callSign->fDispatch;
-    SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+    SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
     SPCH_PlaySpeech();
-    entry = &(*base->_vf)[27];
-    perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    Speaker_FindLocation(base,perp);
-    SPCHNFS_C_D_PERP_CRASH_ROLL(&pThis->fVoice,&base->fPosition,base->fLocation,
+
+    perp = (Car_tObj *)(base)->Perp();
+    (base)->FindLocation(perp);
+    SPCHNFS_C_D_PERP_CRASH_ROLL(&this->fVoice,&base->fPosition,base->fLocation,
                                 &base->fDistance,&base->fPerpName);
     SPCH_PlaySpeech();
     ambulanceFlags = 4;
     goto MobileCatch_requestEms;
   }
 
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  perp = (Car_tObj *)(base)->Perp();
   if (perp->collision.smoking == 0) {
     base->fArrest.flags = ticket;
     if (ticket == 1) {
-      SPCHNFS_C_P_ARRESTED(&pThis->fVoice,&base->fArrest);
+      SPCHNFS_C_P_ARRESTED(&this->fVoice,&base->fArrest);
     }
     else if (ticket == 2) {
-      SPCHNFS_C_P_WARNING(&pThis->fVoice,&base->fArrest);
+      SPCHNFS_C_P_WARNING(&this->fVoice,&base->fArrest);
     }
     else {
-      SPCHNFS_C_P_TICKET(&pThis->fVoice,&base->fArrest);
+      SPCHNFS_C_P_TICKET(&this->fVoice,&base->fArrest);
     }
     SPCH_PlaySpeech();
     if (ticket == 1) {
-      Speech_SetDelayedStatus(Speech_fgSpeech,base,0x60);
+      (_6Speech_fgSpeech)->SetDelayedStatus(base,0x60);
     }
     goto MobileCatch_dispatchCallback;
   }
 
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+  callSign = (CallSignBank *)(base)->CallSign();
   base->fTo = callSign->fDispatch;
-  SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+  SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_SetCar(base,perp);
-  entry = &(*base->_vf)[27];
-  perp = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_FindLocation(base,perp);
-  SPCHNFS_C_D_PERP_CRASH_GEN(&pThis->fVoice,&base->fPosition,base->fLocation,
+
+  perp = (Car_tObj *)(base)->Perp();
+  (base)->SetCar(perp);
+
+  perp = (Car_tObj *)(base)->Perp();
+  (base)->FindLocation(perp);
+  SPCHNFS_C_D_PERP_CRASH_GEN(&this->fVoice,&base->fPosition,base->fLocation,
                              &base->fColour,base->fCar,&base->fDistance,&base->fPerpName);
   SPCH_PlaySpeech();
   ambulanceFlags = 0x20;
 
 MobileCatch_requestEms:
   base->fAmbulance.flags = ambulanceFlags;
-  SPCHNFS_C_D_REQUEST_EMS(&pThis->fVoice,&base->fAmbulance);
+  SPCHNFS_C_D_REQUEST_EMS(&this->fVoice,&base->fAmbulance);
   SPCH_PlaySpeech();
 
 MobileCatch_dispatchCallback:
   dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  entry = &(*dispatch->_base_Speaker._vf)[19];
-  NFS4_VCALL_P1(entry->pfn,(u_char *)&dispatch->_base_Speaker + entry->delta,pThis->fPerp);
+
+  (dispatch)->ClearPerp(this->fPerp);
 }
 
 /* ---- RoadBlock__Q26Speech13MobileSpeaker  [SPEECH.CPP:2627-2648] SLD-VERIFIED ---- */
-void MobileSpeaker_RoadBlock(MobileSpeaker *pThis)
-
+void MobileSpeaker::RoadBlock()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  Speaker *sub = dispatch->_base_Speaker.fSub;
-  __vtbl_ptr_type *entry;
+  Speaker *sub = dispatch->fSub;
+
   CallSignBank *callSign;
 
   if ((sub != 0) && (sub != base)) {
-    entry = &(*sub->_vf)[10];
-    NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    (sub)->RoadBlock();
   }
   else {
-    Speaker_Promote(base);
-    if (Speech_fgSpeech->fMultiplePerps == 0) {
-      Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+    (base)->Promote();
+    if (_6Speech_fgSpeech->fMultiplePerps == 0) {
+      _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fDispatch;
-      SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+      SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
       SPCH_PlaySpeech();
-      SPCHNFS_C_D_REQ_RDBLK(&pThis->fVoice);
+      SPCHNFS_C_D_REQ_RDBLK(&this->fVoice);
       SPCH_PlaySpeech();
     }
     base->fBlockade.flags = 2;
@@ -2567,29 +2480,28 @@ void MobileSpeaker_RoadBlock(MobileSpeaker *pThis)
 }
 
 /* ---- SpikeBelt__Q26Speech13MobileSpeaker  [SPEECH.CPP:2656-2677] SLD-VERIFIED ---- */
-void MobileSpeaker_SpikeBelt(MobileSpeaker *pThis)
-
+void MobileSpeaker::SpikeBelt()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-  Speaker *sub = dispatch->_base_Speaker.fSub;
-  __vtbl_ptr_type *entry;
+  Speaker *sub = dispatch->fSub;
+
   CallSignBank *callSign;
 
   if ((sub != 0) && (sub != base)) {
-    entry = &(*sub->_vf)[11];
-    NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    (sub)->SpikeBelt();
   }
   else {
-    Speaker_Promote(base);
-    if (Speech_fgSpeech->fMultiplePerps == 0) {
-      Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-      entry = &(*base->_vf)[30];
-      callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+    (base)->Promote();
+    if (_6Speech_fgSpeech->fMultiplePerps == 0) {
+      _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+      callSign = (CallSignBank *)(base)->CallSign();
       base->fTo = callSign->fDispatch;
-      SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+      SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
       SPCH_PlaySpeech();
-      SPCHNFS_C_D_REQ_SPBLT(&pThis->fVoice);
+      SPCHNFS_C_D_REQ_SPBLT(&this->fVoice);
       SPCH_PlaySpeech();
     }
     base->fBlockade.flags = 1;
@@ -2597,131 +2509,117 @@ void MobileSpeaker_SpikeBelt(MobileSpeaker *pThis)
 }
 
 /* ---- Backup__Q26Speech13MobileSpeaker  [SPEECH.CPP:2685-2705] SLD-VERIFIED ---- */
-void MobileSpeaker_Backup(MobileSpeaker *pThis)
-
+void MobileSpeaker::Backup()
 {
-  Speaker *base = &pThis->_base_Speaker;
-  __vtbl_ptr_type *entry;
+  Speaker *base = this;
+
   CallSignBank *callSign;
   Car_tObj *car;
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+  callSign = (CallSignBank *)(base)->CallSign();
   base->fTo = callSign->fDispatch;
-  SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+  SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
   SPCH_PlaySpeech();
-  entry = &(*base->_vf)[27];
-  car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_SetCar(base,car);
-  entry = &(*base->_vf)[25];
-  car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_FindLocation(base,car);
-  SPCHNFS_C_D_REQUEST_BKUP(&pThis->fVoice,&base->fColour,base->fCar,&base->fPosition,
+
+  car = (Car_tObj *)(base)->Perp();
+  (base)->SetCar(car);
+
+  car = (Car_tObj *)(base)->CarObj();
+  (base)->FindLocation(car);
+  SPCHNFS_C_D_REQUEST_BKUP(&this->fVoice,&base->fColour,base->fCar,&base->fPosition,
                            base->fLocation,&base->fDistance);
   SPCH_PlaySpeech();
   base->fBlockade.flags = 0;
 }
 
 /* ---- Roger__Q26Speech13MobileSpeaker  [SPEECH.CPP:2711-2733] SLD-VERIFIED ---- */
-void MobileSpeaker_Roger(MobileSpeaker *pThis)
-
+void MobileSpeaker::Roger()
 {
-  Speaker *base = &pThis->_base_Speaker;
+  Speaker *base = this;
   Speaker *sub = base->fSub;
   Speaker *statusSub = 0;
   DispatchSpeaker *dispatch;
-  __vtbl_ptr_type *entry;
+
   CallSignBank *callSign;
   Car_tObj *car;
   int unit;
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
   if (sub != 0) {
     dispatch = (DispatchSpeaker *)(intptr)Speech_Dispatch();
-    entry = &(*dispatch->_base_Speaker._vf)[22];
-    statusSub = (Speaker *)NFS4_VCALL_PTR0(entry->pfn,
-                                           (u_char *)&dispatch->_base_Speaker + entry->delta);
+
+    statusSub = (Speaker *)(dispatch)->StatusSub();
   }
   if ((sub != 0) && (statusSub == sub)) {
     SPCH_PlaySpeech();
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    entry = &(*sub->_vf)[17];
-    unit = NFS4_VCALL0(entry->pfn,(u_char *)sub + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
+
+    unit = (sub)->Unit();
     base->fTo = callSign->fMobile[unit];
-    SPCHNFS_C_A_CONFIRM(&pThis->fVoice,base->fTo,&base->fConfirm);
+    SPCHNFS_C_A_CONFIRM(&this->fVoice,base->fTo,&base->fConfirm);
     SPCH_PlaySpeech();
-    entry = &(*base->_vf)[27];
-    car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-    Speaker_SetCar(base,car);
-    SPCHNFS_C_C_IN_PURS_NEAR_PERP(&pThis->fVoice,&base->fColour,base->fCar);
+
+    car = (Car_tObj *)(base)->Perp();
+    (base)->SetCar(car);
+    SPCHNFS_C_C_IN_PURS_NEAR_PERP(&this->fVoice,&base->fColour,base->fCar);
   }
   else {
-    entry = &(*base->_vf)[30];
-    callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+
+    callSign = (CallSignBank *)(base)->CallSign();
     base->fTo = callSign->fDispatch;
-    SPCHNFS_C_A_CONFIRM(&pThis->fVoice,base->fTo,&base->fConfirm);
+    SPCHNFS_C_A_CONFIRM(&this->fVoice,base->fTo,&base->fConfirm);
   }
   SPCH_PlaySpeech();
 }
 
 /* ---- Bullhorn__Q26Speech13MobileSpeaker  [SPEECH.CPP:2741-2748] SLD-VERIFIED ---- */
-void MobileSpeaker_Bullhorn(MobileSpeaker *pThis)
-
+void MobileSpeaker::Bullhorn()
 {
-  Car_tObj *carObj;
   SPCHNFSType_VOICE *VOICE;
   
-  VOICE = &pThis->fVoice;
-  *(Car_tObj **)(((int)Speech_fgSpeech) + 0x38c) = pThis->fCarObj;
+  VOICE = &this->fVoice;
+  *(Car_tObj **)(((int)_6Speech_fgSpeech) + 0x38c) = this->fCarObj;
   SPCHNFS_C_P_BULLHORN_SPEECH(VOICE);
   SPCH_PlaySpeech();
   return;
 }
 
 /* ---- Purge__Q26Speech13MobileSpeaker  [SPEECH.CPP:2754-2839] SLD-VERIFIED ---- */
-void MobileSpeaker_Purge(MobileSpeaker *pThis)
-
+void MobileSpeaker::Purge()
 {
   bool bVar1;
-  __vtbl_ptr_type (*pa_Var2) [31];
+
   int iVar3;
-  MobileSpeaker *pMVar4;
-  MobileSpeaker *pMVar5;
-  Speaker *Chain;
+  Speaker *pMVar4;
+  Speaker *pMVar5;
+  Car_tObj *car;
+  DispatchSpeaker *dispatch;
   
-  if (pThis->fCarObj == (Car_tObj *)0x0) {
+  if (this->fCarObj == (Car_tObj *)0x0) {
     return;
   }
-  pa_Var2 = (pThis->_base_Speaker)._vf;
-  iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x19].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x19].delta);
-  if ((*(u_int *)(iVar3 + 0x260) & 0x200) == 0) {
-    pThis->fCarObj = (Car_tObj *)0x0;
-    iVar3 = Speech_Dispatch();
-    pMVar4 = (MobileSpeaker *)
-             ([&]() -> Speaker * {
-      DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr_t)iVar3;
-      const __vtbl_ptr_type &entry = (*dispatch->_base_Speaker._vf)[22];
-      return ((Speaker * (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)dispatch + entry.delta));
-    }());
-    if (pMVar4 == pThis) {
-      iVar3 = Speech_Dispatch();
-      ([&]() -> void {
-      DispatchSpeaker *dispatch = (DispatchSpeaker *)(intptr_t)iVar3;
-      const __vtbl_ptr_type &entry = (*dispatch->_base_Speaker._vf)[23];
-      return ((void (*)(DispatchSpeaker *))entry.pfn)((DispatchSpeaker *)((char *)dispatch + entry.delta));
-    }());
+
+  car = this->CarObj();
+  if ((car->carFlags & 0x200) == 0) {
+    this->fCarObj = (Car_tObj *)0x0;
+    dispatch = (DispatchSpeaker *)Speech_Dispatch();
+    pMVar4 = dispatch->StatusSub();
+    if (pMVar4 == this) {
+      dispatch = (DispatchSpeaker *)Speech_Dispatch();
+      dispatch->PurgeStatusSub();
     }
-    pMVar4 = (MobileSpeaker *)Speech_Dispatch();
+    pMVar4 = (Speaker *)Speech_Dispatch();
     do {
-      pMVar5 = (MobileSpeaker *)(pMVar4->_base_Speaker).fSub;
-      if (pMVar5 == pThis) {
-        (pMVar4->_base_Speaker).fSub = (pThis->_base_Speaker).fSub;
+      pMVar5 = pMVar4->fSub;
+      if (pMVar5 == this) {
+        pMVar4->fSub = this->fSub;
         return;
       }
       pMVar4 = pMVar5;
-    } while (pMVar5 != (MobileSpeaker *)0x0);
+    } while (pMVar5 != (Speaker *)0x0);
     return;
   }
   CopSpeak_Flush();
@@ -2737,10 +2635,9 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
       stackSpeedUpEnbabledFlag = 1;
     }
   }
-  pa_Var2 = (pThis->_base_Speaker)._vf;
+
   bVar1 = false;
-  iVar3 = NFS4_VCALL_AUTO((*pa_Var2)[0x1b].pfn, (int)&(pThis->_base_Speaker).fPosition.flags + (int)(*pa_Var2)[0x1b].delta);
-  if (iVar3 != 0) {
+  if (this->Perp() != 0) {
     iVar3 = AudioMus_Threshold();
     bVar1 = iVar3 != 0;
   }
@@ -2752,365 +2649,223 @@ void MobileSpeaker_Purge(MobileSpeaker *pThis)
       AudioMus_PlaySong((char *)0x0);
       gWSavePtr = (intptr)NFSHS_NativeStackHint((void *)gWSavePtr);
       stackSpeedUpEnbabledFlag = 1;
-      (pThis->_base_Speaker).fBlockade.flags = 0;
+      this->fBlockade.flags = 0;
       goto Purge_resetSpeakerFields;
     }
     AudioMus_StopSong(500);
     AudioMus_PlaySong((char *)0x0);
   }
-  (pThis->_base_Speaker).fBlockade.flags = 0;
+  this->fBlockade.flags = 0;
 Purge_resetSpeakerFields:
-  (pThis->_base_Speaker).fArrest.flags = 0;
-  (pThis->_base_Speaker).fUpdate.flags = 0;
-  pThis->fPerp = (Car_tObj *)0x0;
-  (pThis->_base_Speaker).fSub = (Speaker *)0x0;
+  this->fArrest.flags = 0;
+  this->fUpdate.flags = 0;
+  this->fPerp = (Car_tObj *)0x0;
+  this->fSub = (Speaker *)0x0;
   return;
 }
 
 /* ---- ReportBlockade__Q26Speech13MobileSpeaker  [SPEECH.CPP:2843-2861] SLD-VERIFIED ---- */
-void MobileSpeaker_ReportBlockade(MobileSpeaker *pThis)
-
+void MobileSpeaker::ReportBlockade()
 {
-  Speaker *base = &pThis->_base_Speaker;
-  __vtbl_ptr_type *entry;
+  Speaker *base = this;
+
   CallSignBank *callSign;
   Car_tObj *car;
 
-  Speech_fgSpeech->fSpeakerCar = pThis->fCarObj;
-  entry = &(*base->_vf)[30];
-  callSign = (CallSignBank *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
+  _6Speech_fgSpeech->fSpeakerCar = this->fCarObj;
+
+  callSign = (CallSignBank *)(base)->CallSign();
   base->fTo = callSign->fDispatch;
-  entry = &(*base->_vf)[25];
-  car = (Car_tObj *)NFS4_VCALL_PTR0(entry->pfn,(u_char *)base + entry->delta);
-  Speaker_FindLocation(base,car);
+
+  car = (Car_tObj *)(base)->CarObj();
+  (base)->FindLocation(car);
   base->fSpikeSide.flags = 4;
   if (base->fBlockade.flags == 2) {
-    SPCHNFS_C_A_INTRO(&pThis->fVoice,base->fTo,base->fFrom,&base->fReverse);
+    SPCHNFS_C_A_INTRO(&this->fVoice,base->fTo,base->fFrom,&base->fReverse);
     SPCH_PlaySpeech();
-    SPCHNFS_W_D_RDBLK_PLC(&pThis->fVoice,&base->fPosition,base->fLocation,&base->fDistance);
+    SPCHNFS_W_D_RDBLK_PLC(&this->fVoice,&base->fPosition,base->fLocation,&base->fDistance);
   }
   else {
-    SPCHNFS_W_D_SPBLT_PLC(&pThis->fVoice,&base->fPosition,&base->fSpikeSide,
+    SPCHNFS_W_D_SPBLT_PLC(&this->fVoice,&base->fPosition,&base->fSpikeSide,
                           base->fFrom,base->fLocation,&base->fDistance);
   }
   SPCH_PlaySpeech();
 }
 
 /* ---- Perp__Q26Speech13MobileSpeaker  [SPEECH.CPP:147-147] SLD-VERIFIED ---- */
-Car_tObj * MobileSpeaker_Perp(MobileSpeaker *pThis)
-
+Car_tObj * MobileSpeaker::Perp()
 {
-  return pThis->fPerp;
+  return this->fPerp;
 }
 
 /* ---- Unit__Q26Speech13MobileSpeaker  [SPEECH.CPP:134-135] SLD-VERIFIED ---- */
-int MobileSpeaker_Unit(MobileSpeaker *pThis)
-
+int MobileSpeaker::Unit()
 {
-  return pThis->fUnit;
+  return this->fUnit;
 }
 
 /* ---- CallSign__Q26Speech13MobileSpeaker  [SPEECH.CPP:130-135] SLD-FLAG:NONMONO ---- */
-CallSignBank * MobileSpeaker_CallSign(MobileSpeaker *pThis)
-
+CallSignBank * MobileSpeaker::CallSign()
 {
-  return (CallSignBank *)(((int)Speech_fgSpeech) + 0x2d8);
+  return &_6Speech_fgSpeech->fCallSignBank.Mobile;
 }
 
 /* ---- FindClosestLocationTo__Q26Speech13MobileSpeakeri  [SPEECH.CPP:126-131] SLD-FLAG:NONMONO ---- */
-LocationBank * MobileSpeaker_FindClosestLocationTo(MobileSpeaker *pThis,int slice)
-
+LocationBank * MobileSpeaker::FindClosestLocationTo(int slice)
 {
   LocationBank *pLVar1;
-  int reg_a1;
-  
-  pLVar1 = (LocationBank *)Speech_FindClosestLocationTo((Speech *)((int)Speech_fgSpeech),(LocationBank *)(((int)Speech_fgSpeech) + 0xd8),reg_a1);
+  (void)this;
+  pLVar1 = (LocationBank *)_6Speech_fgSpeech->FindClosestLocationTo(_6Speech_fgSpeech->fLocationBank.Mobile,slice);
   return pLVar1;
 }
 
 /* ---- GetCarBank__Q26Speech13MobileSpeakeri  [SPEECH.CPP:122-127] SLD-FLAG:NONMONO ---- */
-CarBank * MobileSpeaker_GetCarBank(MobileSpeaker *pThis,int carIndex)
-
+CarBank * MobileSpeaker::GetCarBank(int carIndex)
 {
-  return (CarBank *)(((int)Speech_fgSpeech) + carIndex * 0xc);
+  return &_6Speech_fgSpeech->fCarBank.Mobile[carIndex];
 }
 
 /* ---- CarObj__Q26Speech13MobileSpeaker  [SPEECH.CPP:114-114] SLD-VERIFIED ---- */
-Car_tObj * MobileSpeaker_CarObj(MobileSpeaker *pThis)
-
+Car_tObj * MobileSpeaker::CarObj()
 {
-  return pThis->fCarObj;
+  return this->fCarObj;
 }
 
 /* ---- IsSuper__Q26Speech13MobileSpeaker  [SPEECH.CPP:106-106] SLD-VERIFIED ---- */
-void * MobileSpeaker_IsSuper(MobileSpeaker *pThis)
-
+void * MobileSpeaker::IsSuper()
 {
-  return (void *)((u_int)pThis->fCarObj->carFlags >> 6 & 1);
+  return (void *)((u_int)this->fCarObj->carFlags >> 6 & 1);
 }
 
 /* ---- CallSign__Q26Speech15DispatchSpeaker  [SPEECH.CPP:73-74] SLD-VERIFIED ---- */
-CallSignBank * DispatchSpeaker_CallSign(DispatchSpeaker *pThis)
-
+CallSignBank * DispatchSpeaker::CallSign()
 {
-  return (CallSignBank *)(((int)Speech_fgSpeech) + 0x31c);
+  return &_6Speech_fgSpeech->fCallSignBank.Dispatch;
 }
 
 /* ---- FindClosestLocationTo__Q26Speech15DispatchSpeakeri  [SPEECH.CPP:69-74] SLD-FLAG:NONMONO ---- */
-LocationBank * DispatchSpeaker_FindClosestLocationTo(DispatchSpeaker *pThis,int slice)
-
+LocationBank * DispatchSpeaker::FindClosestLocationTo(int slice)
 {
   LocationBank *pLVar1;
-  int reg_a1;
-  
-  pLVar1 = (LocationBank *)Speech_FindClosestLocationTo((Speech *)((int)Speech_fgSpeech),(LocationBank *)(((int)Speech_fgSpeech) + 0x1d8),reg_a1)
+  (void)this;
+  pLVar1 = (LocationBank *)_6Speech_fgSpeech->FindClosestLocationTo(_6Speech_fgSpeech->fLocationBank.Dispatch,slice)
   ;
   return pLVar1;
 }
 
 /* ---- GetCarBank__Q26Speech15DispatchSpeakeri  [SPEECH.CPP:65-70] SLD-FLAG:NONMONO ---- */
-CarBank * DispatchSpeaker_GetCarBank(DispatchSpeaker *pThis,int carIndex)
-
+CarBank * DispatchSpeaker::GetCarBank(int carIndex)
 {
-  return (CarBank *)(((int)Speech_fgSpeech) + carIndex * 0xc + 0x6c);
+  return &_6Speech_fgSpeech->fCarBank.Dispatch[carIndex];
 }
 
 /* ---- PurgeStatusSub__Q26Speech15DispatchSpeaker  [SPEECH.CPP:58-66] SLD-FLAG:NONMONO ---- */
-void DispatchSpeaker_PurgeStatusSub(DispatchSpeaker *pThis)
-
+void DispatchSpeaker::PurgeStatusSub()
 {
-  pThis->fStatusSub = (Speaker *)0x0;
+  this->fStatusSub = (Speaker *)0x0;
   return;
 }
 
 /* ---- StatusSub__Q26Speech15DispatchSpeaker  [SPEECH.CPP:57-58] SLD-VERIFIED ---- */
-Speaker * DispatchSpeaker_StatusSub(DispatchSpeaker *pThis)
-
+Speaker * DispatchSpeaker::StatusSub()
 {
-  return pThis->fStatusSub;
+  return this->fStatusSub;
 }
 
 /* ---- StatusCount__Q26Speech15DispatchSpeaker  [SPEECH.CPP:56-57] SLD-VERIFIED ---- */
-int DispatchSpeaker_StatusCount(DispatchSpeaker *pThis)
-
+int DispatchSpeaker::StatusCount()
 {
-  return pThis->fStatusCount;
+  return this->fStatusCount;
 }
 
 /* ---- FindClosestLocationTo__Q26Speech7Speakeri  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-LocationBank * Speaker_FindClosestLocationTo(Speaker *pThis,int slice)
-
+LocationBank * Speaker::FindClosestLocationTo(int slice)
 {
   return (LocationBank *)0x0;
 }
 
 /* ---- GetCarBank__Q26Speech7Speakeri  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-CarBank * Speaker_GetCarBank(Speaker *pThis,int carIndex)
-
+CarBank * Speaker::GetCarBank(int carIndex)
 {
   return (CarBank *)0x0;
 }
 
 /* ---- Perp__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-Car_tObj * Speaker_Perp(Speaker *pThis)
-
+Car_tObj * Speaker::Perp()
 {
   return (Car_tObj *)0x0;
 }
 
 /* ---- ReActivate__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-void Speaker_ReActivate(Speaker *pThis)
-
+void Speaker::ReActivate()
 {
   return;
 }
 
 /* ---- CarObj__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-Car_tObj * Speaker_CarObj(Speaker *pThis)
-
+Car_tObj * Speaker::CarObj()
 {
   return (Car_tObj *)0x0;
 }
 
 /* ---- DistToPerp__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-int Speaker_DistToPerp(Speaker *pThis)
-
+int Speaker::DistToPerp()
 {
   return 0x3e80000;
 }
 
 /* ---- PurgeStatusSub__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-void Speaker_PurgeStatusSub(Speaker *pThis)
-
+void Speaker::PurgeStatusSub()
 {
   return;
 }
 
 /* ---- StatusSub__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-Speaker * Speaker_StatusSub(Speaker *pThis)
-
+Speaker * Speaker::StatusSub()
 {
   return (Speaker *)0x0;
 }
 
 /* ---- StatusCount__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-int Speaker_StatusCount(Speaker *pThis)
-
+int Speaker::StatusCount()
 {
   return 0;
 }
 
 /* ---- IsSuper__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-void * Speaker_IsSuper(Speaker *pThis)
-
+void * Speaker::IsSuper()
 {
   return (void *)0x0;
 }
 
 /* ---- ClearPerp__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-void Speaker_ClearPerp(Speaker *pThis,Car_tObj *car)
-
+void Speaker::ClearPerp(Car_tObj *car)
 {
   return;
 }
 
 /* ---- KnownPerp__Q26Speech7SpeakerP8Car_tObj  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-void * Speaker_KnownPerp(Speaker *pThis,Car_tObj *car)
-
+void * Speaker::KnownPerp(Car_tObj *car)
 {
   return (void *)0x0;
 }
 
 /* ---- Unit__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-int Speaker_Unit(Speaker *pThis)
-
+int Speaker::Unit()
 {
   return 0;
 }
 
 /* ---- Status__Q26Speech7Speaker  [SPEECH.CPP:?] SLD-FLAG:NO_SLD ---- */
-void Speaker_Status(Speaker *pThis)
-
+void Speaker::Status()
 {
-  int Voice;
-  int numhumancops;
-  char *SpeechLanguage;
-  int Arrest;
-  int banksize;
-  int bcount;
-  int namelen;
-  int bankid;
-  char filename [100];
   
   return;
 }
 
 /* base Speech::Speaker virtual not separately reconstructed (vtable-only ref, surfaced by #75
  * data-materialization); faithful from nfs4-f.exe @0x80099364 = { jr $ra; addiu $v0,$zero,0 } */
-CallSignBank * Speaker_CallSign(Speaker *pThis)   /* @0x80099364  CallSign__Q26Speech7Speaker -> NULL */
+CallSignBank * Speaker::CallSign()
 {
   return (CallSignBank *)0;
 }
-
-/* ---- #75 data-materialization: 3 Speech vtables (nested Speech::<Leaf>, flat <Leaf>_<Method> pfns). ---- */
-__vtbl_ptr_type Speaker_vtable[31] = {   /* @0x80055dc4  Speech::Speaker vtable (#75 data-mat; faithful nfs4-f.exe bytes) */
-  {0, 0, nullptr},                           /* @0x80055dc4  null */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Report)},             /* @0x80055dcc  Report__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Status)},             /* @0x80055dd4  Status__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Deny)},               /* @0x80055ddc  Deny__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Grant)},              /* @0x80055de4  Grant__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Ready)},              /* @0x80055dec  Ready__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Engage)},             /* @0x80055df4  Engage__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Lose)},               /* @0x80055dfc  Lose__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Accident)},           /* @0x80055e04  Accident__Q26Speech7Speakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Catch)},              /* @0x80055e0c  Catch__Q26Speech7Speakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_RoadBlock)},          /* @0x80055e14  RoadBlock__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_SpikeBelt)},          /* @0x80055e1c  SpikeBelt__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Backup)},             /* @0x80055e24  Backup__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReportBlockade)},     /* @0x80055e2c  ReportBlockade__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Roger)},              /* @0x80055e34  Roger__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Bullhorn)},           /* @0x80055e3c  Bullhorn__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Purge)},              /* @0x80055e44  Purge__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Unit)},               /* @0x80055e4c  Unit__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_KnownPerp)},          /* @0x80055e54  KnownPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ClearPerp)},          /* @0x80055e5c  ClearPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_IsSuper)},            /* @0x80055e64  IsSuper__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusCount)},        /* @0x80055e6c  StatusCount__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusSub)},          /* @0x80055e74  StatusSub__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_PurgeStatusSub)},     /* @0x80055e7c  PurgeStatusSub__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_DistToPerp)},         /* @0x80055e84  DistToPerp__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_CarObj)},             /* @0x80055e8c  CarObj__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReActivate)},         /* @0x80055e94  ReActivate__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Perp)},               /* @0x80055e9c  Perp__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_GetCarBank)},         /* @0x80055ea4  GetCarBank__Q26Speech7Speakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_FindClosestLocationTo)}, /* @0x80055eac  FindClosestLocationTo__Q26Speech7Speakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_CallSign)},           /* @0x80055eb4  CallSign__Q26Speech7Speaker */
-};
-__vtbl_ptr_type MobileSpeaker_vtable[31] = {   /* @0x80055bd4  Speech::MobileSpeaker vtable (#75 data-mat; faithful nfs4-f.exe bytes) */
-  {0, 0, nullptr},                           /* @0x80055bd4  null */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Report)},       /* @0x80055bdc  Report__Q26Speech13MobileSpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Status)},       /* @0x80055be4  Status__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Deny)},               /* @0x80055bec  Deny__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Grant)},              /* @0x80055bf4  Grant__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Ready)},              /* @0x80055bfc  Ready__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Engage)},       /* @0x80055c04  Engage__Q26Speech13MobileSpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Lose)},         /* @0x80055c0c  Lose__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Accident)},     /* @0x80055c14  Accident__Q26Speech13MobileSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Catch)},        /* @0x80055c1c  Catch__Q26Speech13MobileSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_RoadBlock)},    /* @0x80055c24  RoadBlock__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_SpikeBelt)},    /* @0x80055c2c  SpikeBelt__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Backup)},       /* @0x80055c34  Backup__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_ReportBlockade)}, /* @0x80055c3c  ReportBlockade__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Roger)},        /* @0x80055c44  Roger__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Bullhorn)},     /* @0x80055c4c  Bullhorn__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Purge)},        /* @0x80055c54  Purge__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Unit)},         /* @0x80055c5c  Unit__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_KnownPerp)},          /* @0x80055c64  KnownPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ClearPerp)},          /* @0x80055c6c  ClearPerp__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_IsSuper)},      /* @0x80055c74  IsSuper__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusCount)},        /* @0x80055c7c  StatusCount__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_StatusSub)},          /* @0x80055c84  StatusSub__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_PurgeStatusSub)},     /* @0x80055c8c  PurgeStatusSub__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_DistToPerp)},   /* @0x80055c94  DistToPerp__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_CarObj)},       /* @0x80055c9c  CarObj__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_ReActivate)},   /* @0x80055ca4  ReActivate__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_Perp)},         /* @0x80055cac  Perp__Q26Speech13MobileSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_GetCarBank)},   /* @0x80055cb4  GetCarBank__Q26Speech13MobileSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_FindClosestLocationTo)}, /* @0x80055cbc  FindClosestLocationTo__Q26Speech13MobileSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&MobileSpeaker_CallSign)},     /* @0x80055cc4  CallSign__Q26Speech13MobileSpeaker */
-};
-__vtbl_ptr_type DispatchSpeaker_vtable[31] = {   /* @0x80055ccc  Speech::DispatchSpeaker vtable (#75 data-mat; faithful nfs4-f.exe bytes) */
-  {0, 0, nullptr},                           /* @0x80055ccc  null */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Report)},     /* @0x80055cd4  Report__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Status)},     /* @0x80055cdc  Status__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Deny)},       /* @0x80055ce4  Deny__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Grant)},      /* @0x80055cec  Grant__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Ready)},      /* @0x80055cf4  Ready__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Engage)},             /* @0x80055cfc  Engage__Q26Speech7SpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Lose)},               /* @0x80055d04  Lose__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Accident)},   /* @0x80055d0c  Accident__Q26Speech15DispatchSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Catch)},              /* @0x80055d14  Catch__Q26Speech7Speakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_RoadBlock)},          /* @0x80055d1c  RoadBlock__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_SpikeBelt)},          /* @0x80055d24  SpikeBelt__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Backup)},             /* @0x80055d2c  Backup__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReportBlockade)},     /* @0x80055d34  ReportBlockade__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_Roger)},      /* @0x80055d3c  Roger__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Bullhorn)},           /* @0x80055d44  Bullhorn__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Purge)},              /* @0x80055d4c  Purge__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Unit)},               /* @0x80055d54  Unit__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_KnownPerp)},  /* @0x80055d5c  KnownPerp__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_ClearPerp)},  /* @0x80055d64  ClearPerp__Q26Speech15DispatchSpeakerP8Car_tObj */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_IsSuper)},            /* @0x80055d6c  IsSuper__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_StatusCount)}, /* @0x80055d74  StatusCount__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_StatusSub)},  /* @0x80055d7c  StatusSub__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_PurgeStatusSub)}, /* @0x80055d84  PurgeStatusSub__Q26Speech15DispatchSpeaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_DistToPerp)},         /* @0x80055d8c  DistToPerp__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_CarObj)},             /* @0x80055d94  CarObj__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_ReActivate)},         /* @0x80055d9c  ReActivate__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&Speaker_Perp)},               /* @0x80055da4  Perp__Q26Speech7Speaker */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_GetCarBank)}, /* @0x80055dac  GetCarBank__Q26Speech15DispatchSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_FindClosestLocationTo)}, /* @0x80055db4  FindClosestLocationTo__Q26Speech15DispatchSpeakeri */
-  {0, 0, NFS4_VTABLE_ENTRY(&DispatchSpeaker_CallSign)},   /* @0x80055dbc  CallSign__Q26Speech15DispatchSpeaker */
-};
-
-/* end of speech.cpp */
